@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #0C0507;
+  color: #FAF4E8;
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* 7-bar waveform  ·  one bar per swaram */
+@keyframes waveBar {
+  0%, 100% { height: 3px; }
+  50%       { height: 18px; }
+}
+
+.wave-bar {
+  width: 3px;
+  border-radius: 2px;
+  min-height: 3px;
+  height: 3px;
+}
+
+.wave-active .wave-bar:nth-child(1) { animation: waveBar 0.55s ease-in-out 0.00s infinite; }
+.wave-active .wave-bar:nth-child(2) { animation: waveBar 0.55s ease-in-out 0.08s infinite; }
+.wave-active .wave-bar:nth-child(3) { animation: waveBar 0.55s ease-in-out 0.16s infinite; }
+.wave-active .wave-bar:nth-child(4) { animation: waveBar 0.55s ease-in-out 0.22s infinite; }
+.wave-active .wave-bar:nth-child(5) { animation: waveBar 0.55s ease-in-out 0.16s infinite; }
+.wave-active .wave-bar:nth-child(6) { animation: waveBar 0.55s ease-in-out 0.08s infinite; }
+.wave-active .wave-bar:nth-child(7) { animation: waveBar 0.55s ease-in-out 0.00s infinite; }
+
+/* Heritage Styles */
+.heritage-card {
+  background: #EDE0C4; /* c-card */
+  border: 1px solid #C8A872; /* c-border */
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.heritage-card::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(200, 168, 114, 0.2);
+  pointer-events: none;
+}
+
+.heritage-border-corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.heritage-corner-tl { top: 4px; left: 4px; border-top: 2px solid #9A7640; border-left: 2px solid #9A7640; }
+.heritage-corner-tr { top: 4px; right: 4px; border-top: 2px solid #9A7640; border-right: 2px solid #9A7640; }
+.heritage-corner-bl { bottom: 4px; left: 4px; border-bottom: 2px solid #9A7640; border-left: 2px solid #9A7640; }
+.heritage-corner-br { bottom: 4px; right: 4px; border-bottom: 2px solid #9A7640; border-right: 2px solid #9A7640; }
+
+.texture-overlay {
+  position: fixed;
+  inset: 0;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 50;
+  mix-blend-mode: multiply;
+  background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+}

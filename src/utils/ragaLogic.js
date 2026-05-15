@@ -795,7 +795,7 @@ export const RAGAS = {
     'Kalyana Vasantham': {
         arohanam:     ['Sa', 'Ga2', 'Ma1', 'Da1', 'Ni3', 'Sa'],
         avarohanam:   ['Sa', 'Ni3', 'Da1', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'],
-        type:         'Janya · Kalyani (65)',
+        type:         'Janya · Keeravani (21)',
         mood:         'Bliss · Spring',
         description:  'Spring-time bliss  ·  a joyful, rare pentatonic ascending that skips notes in surprising ways. The kind of raga that makes you smile immediately.',
         compositions: ['Kalyana Vasantham Geetham'],

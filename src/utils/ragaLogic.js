@@ -389,8 +389,8 @@ export const RAGAS = {
         video:        "https://www.youtube.com/watch?v=JtiONAdXJOo",
     },
     'Chalanata': {
-        arohanam:     ['Sa', 'Ri3', 'Ga3', 'Ma1', 'Pa', 'Ni2', 'Ni3', 'Sa'],
-        avarohanam:   ['Sa', 'Ni3', 'Ni2', 'Pa', 'Ma1', 'Ga3', 'Ri3', 'Sa'],
+        arohanam:     ['Sa', 'Ri3', 'Ga3', 'Ma1', 'Pa', 'Da3', 'Ni3', 'Sa'],
+        avarohanam:   ['Sa', 'Ni3', 'Da3', 'Pa', 'Ma1', 'Ga3', 'Ri3', 'Sa'],
         type:         'Melakarta 36',
         mood:         'Movement · Dance',
         description:  'The final Ma1 Melakarta  ·  named for movement in dance. Consecutive semitones in both lower and upper registers create a distinctive stepping quality.',

@@ -96,6 +96,15 @@ const RagaDetail = ({ raga, hasClearMatch }) => {
             </div>
 
             <div className="p-6">
+                {/* AI source disclaimer */}
+                {raga.type?.startsWith('Groq') && (
+                    <div className="flex items-start gap-2 mb-4 px-3 py-2 rounded-lg bg-amber-950/30 border border-amber-700/30">
+                        <span className="text-amber-500/70 text-xs mt-0.5">⚠</span>
+                        <p className="text-[10px] text-amber-400/70 font-playfair italic leading-relaxed">
+                            Scales and compositions sourced from Groq AI — verify against a trusted reference before relying on them.
+                        </p>
+                    </div>
+                )}
                 {/* Mood + Description */}
                 {raga.mood && (
                     <div className="flex items-center gap-1.5 mb-2">

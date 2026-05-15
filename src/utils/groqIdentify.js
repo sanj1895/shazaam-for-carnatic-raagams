@@ -68,28 +68,33 @@ Respond ONLY with valid JSON exactly matching this format:
 }
 
 export async function askGroqAboutRaga(ragaName, apiKey, model = 'llama-3.3-70b-versatile') {
+    const ragaRef = Object.entries(RAGAS)
+        .map(([name, data]) => `${name}: Arohanam=[${data.arohanam.join(', ')}] Avarohanam=[${data.avarohanam.join(', ')}] Parent=${data.type}`)
+        .join('\n');
+
     const PROMPT = `You are an expert Carnatic classical musician and musicologist.
-The user is asking about a specific term: "${ragaName}".
+The user is asking about: "${ragaName}".
 
-CRITICAL RULE: If "${ragaName}" is NOT a real, mathematically valid Carnatic raga, you MUST NOT hallucinate or invent one. You must instead return a JSON object with only an "error" field explaining that this raga does not exist in traditional Carnatic music.
+VERIFIED RAGA DATABASE (these scales are 100% correct — use them as ground truth):
+${ragaRef}
 
-If it IS a real Carnatic raga, provide a concise, encyclopedic description of this raga in the exact JSON format below. Ensure the arohanam and avarohanam use the standard Carnatic swaras (Sa, Ri1, Ri2, Ga2, Ga3, etc.).
+INSTRUCTIONS:
+1. If "${ragaName}" exactly matches a raga in the database above, copy its arohanam and avarohanam VERBATIM. Do not alter a single note.
+2. If "${ragaName}" is clearly a janya or variant of a raga in the database (e.g. a graha bhedam, murchana, or alternate spelling), derive the scale mathematically from the parent. Explain the relationship in "description".
+3. If "${ragaName}" is NOT a real Carnatic raga at all, return only: { "error": "<explanation>" }
+4. NEVER invent compositions. Only include compositions you are certain about for THIS specific raga. If unsure, return an empty array.
+5. Use standard swara notation: Sa, Ri1, Ri2, Ri3, Ga1, Ga2, Ga3, Ma1, Ma2, Pa, Da1, Da2, Da3, Ni1, Ni2, Ni3.
 
+Respond ONLY with valid JSON:
 {
-  "error": "<Include this ONLY if the raga is fake. String explaining it does not exist. Omit all other fields.>",
-  "name": "<Correctly spelled name of the real raga>",
-  "parent": "<Name of its parent Melakarta - e.g. Madhyamavati belongs to Kharaharapriya (22)>",
+  "name": "<correctly spelled raga name>",
+  "parent": "<parent melakarta name and number>",
   "arohanam": ["Sa", ...],
   "avarohanam": ["Sa", ...],
-  "mood": "<1-3 words describing its mood>",
-  "description": "<A 2-3 sentence engaging description of the raga's character, history, and feeling>",
-  "compositions": ["<Famous composition 1>", "<Famous composition 2>"]
-}
-
-STRICT FACTUAL RULES:
-1. DO NOT HALLUCINATE. If you are unsure of the parent Melakarta, you must verify it. (e.g., Madhyamavati is Janya of 22nd Kharaharapriya, NOT 65th Kalyani).
-2. DO NOT include notes in the scales that do not belong. Madhyamavati is an Audava (5-note) raga; do not return a 7-note scale for it.
-3. MATCH COMPOSITIONS CORRECTLY. "Dorakuna Ituvanti" is Bilahari, not Madhyamavati. Return only compositions that are universally verified for the specific raga name requested.`;
+  "mood": "<1-3 words>",
+  "description": "<2-3 sentences about character, history, and feeling — mention if this is a graha bhedam/variant>",
+  "compositions": ["<only compositions you are 100% certain belong to this raga>"]
+}`;
 
     const response = await fetch(`https://api.groq.com/openai/v1/chat/completions`, {
         method: 'POST',

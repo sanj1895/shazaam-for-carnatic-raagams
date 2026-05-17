@@ -14,34 +14,61 @@ const swaraFreq = (swara, sa) => sa * Math.pow(2, (SEMITONES[swara] ?? 0) / 12);
 const playTone = (freq, duration = 1.1) => {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.22, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-        osc.start();
-        osc.stop(ctx.currentTime + duration);
+        const master = ctx.createGain();
+        master.connect(ctx.destination);
+
+        // Additive synthesis — harmonics approximate a sung vowel sound
+        const harmonics = [1, 2, 3, 4, 5, 6, 7];
+        const amps      = [0.48, 0.26, 0.14, 0.07, 0.03, 0.015, 0.008];
+        harmonics.forEach((mult, i) => {
+            const osc = ctx.createOscillator();
+            const g   = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq * mult;
+            g.gain.value = amps[i];
+            osc.connect(g);
+            g.connect(master);
+            osc.start();
+            osc.stop(ctx.currentTime + duration);
+        });
+
+        // Natural attack / sustain / release
+        master.gain.setValueAtTime(0, ctx.currentTime);
+        master.gain.linearRampToValueAtTime(0.28, ctx.currentTime + 0.07);
+        master.gain.setValueAtTime(0.28, ctx.currentTime + Math.max(0.07, duration - 0.12));
+        master.gain.linearRampToValueAtTime(0, ctx.currentTime + duration);
     } catch {}
 };
 
+// Compute octave-aware frequencies so the second Sa is an octave above the first
+const octaveFreqs = (swaras, sa) => {
+    const out = [];
+    let octave = 0, prevSt = -1;
+    for (const s of swaras) {
+        const st = SEMITONES[s] ?? 0;
+        if (prevSt >= 0 && st <= prevSt) octave++;
+        out.push(sa * Math.pow(2, (st + octave * 12) / 12));
+        prevSt = st;
+    }
+    return out;
+};
+
 const playSequenceAsync = async (swaras, sa, onIdx, signal) => {
+    const freqs = octaveFreqs(swaras, sa);
     for (let i = 0; i < swaras.length; i++) {
         if (signal?.aborted) return;
         onIdx(i);
-        playTone(swaraFreq(swaras[i], sa), 0.7);
+        playTone(freqs[i], 0.7);
         await new Promise(r => setTimeout(r, 750));
     }
     onIdx(-1);
 };
 
-// Autocorrelation pitch detector
+// Autocorrelation pitch detector — tuned for human voice
 const detectPitch = (buf, sampleRate) => {
     const SIZE = buf.length;
     const rms = Math.sqrt(buf.reduce((s, v) => s + v * v, 0) / SIZE);
-    if (rms < 0.007) return { freq: null, level: rms };
+    if (rms < 0.002) return { freq: null, level: rms };
 
     const corr = new Float32Array(SIZE);
     for (let lag = 0; lag < SIZE; lag++) {
@@ -55,7 +82,7 @@ const detectPitch = (buf, sampleRate) => {
     for (let i = d; i < SIZE / 2; i++) {
         if (corr[i] > maxVal) { maxVal = corr[i]; maxLag = i; }
     }
-    if (maxLag < 2 || maxVal < 0.008) return { freq: null, level: rms };
+    if (maxLag < 2 || maxVal < 0.0005) return { freq: null, level: rms };
     const prev = corr[maxLag - 1], curr = corr[maxLag], next = corr[maxLag + 1] ?? 0;
     const denom = 2 * curr - prev - next;
     const shift = denom !== 0 ? (next - prev) / (2 * denom) : 0;
@@ -63,6 +90,14 @@ const detectPitch = (buf, sampleRate) => {
 };
 
 const centsDiff = (freq, target) => 1200 * Math.log2(freq / target);
+
+// Match freq to the nearest octave of targetSemitone — so singer can use their natural range
+const centsToNearest = (freq, targetSt, sa) => {
+    let base = sa * Math.pow(2, targetSt / 12);
+    while (base * 1.5 < freq) base *= 2;
+    while (base / 1.5 > freq) base /= 2;
+    return centsDiff(freq, base);
+};
 
 // ─── Curriculum data ──────────────────────────────────────────────────────────
 
@@ -310,7 +345,7 @@ function ExerciseSing({ swara, sa, instruction, onDone }) {
     const streamRef  = useRef(null);
     const intervalRef = useRef(null);
     const heldRef    = useRef(0);
-    const target     = swaraFreq(swara, sa);
+    const targetSt   = SEMITONES[swara] ?? 0;
 
     const cleanup = () => {
         clearInterval(intervalRef.current);
@@ -330,7 +365,7 @@ function ExerciseSing({ swara, sa, instruction, onDone }) {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             const source = ctx.createMediaStreamSource(stream);
             const analyser = ctx.createAnalyser();
-            analyser.fftSize = 2048;
+            analyser.fftSize = 4096; // larger buffer = better low-frequency resolution for voice
             source.connect(analyser);
             const buf = new Float32Array(analyser.fftSize);
             setPhase('listening');
@@ -343,7 +378,7 @@ function ExerciseSing({ swara, sa, instruction, onDone }) {
                 setLevel(Math.min(100, rms * 700));
 
                 if (freq && freq > 50 && freq < 2200) {
-                    const diff = centsDiff(freq, target);
+                    const diff = centsToNearest(freq, targetSt, sa);
                     setCents(diff);
                     if (Math.abs(diff) <= TOLERANCE) {
                         heldRef.current += 100;
@@ -378,8 +413,13 @@ function ExerciseSing({ swara, sa, instruction, onDone }) {
             {/* Target */}
             <div className="flex flex-col items-center gap-1.5">
                 <div className="text-[60px] font-mono font-bold text-c-gold leading-none">{swara}</div>
-                <button onClick={() => playTone(target)}
-                        className="text-xs text-c-cream-dark hover:text-c-gold transition-colors font-playfair italic flex items-center gap-1">
+                <button onClick={() => {
+                    // Play at the octave closest to a comfortable singing range (~220–440 Hz)
+                    let f = sa * Math.pow(2, targetSt / 12);
+                    while (f < 180) f *= 2;
+                    while (f > 520) f /= 2;
+                    playTone(f);
+                }} className="text-xs text-c-cream-dark hover:text-c-gold transition-colors font-playfair italic flex items-center gap-1">
                     <span>▶</span> Hear it
                 </button>
             </div>
@@ -773,12 +813,12 @@ export default function Tutor({ saFrequency }) {
 
             {/* Sa warning — shown prominently if not set */}
             {!saFrequency && (
-                <div className="w-full max-w-2xl flex items-start gap-3 px-4 py-3 rounded-lg bg-amber-950/40 border border-amber-700/40">
-                    <span className="text-amber-400 text-base mt-0.5">⚠</span>
+                <div className="w-full max-w-2xl flex items-start gap-3 px-4 py-3 rounded-lg" style={{ background: '#5c3a00', border: '1px solid #c8860a' }}>
+                    <span style={{ color: '#fbbf24' }} className="text-base mt-0.5 flex-shrink-0">⚠</span>
                     <div>
-                        <p className="text-amber-300 text-sm font-semibold">Sa not set — pitch exercises will be off</p>
-                        <p className="text-amber-400/80 text-xs mt-0.5 leading-relaxed">
-                            Go to <strong>Sing &amp; Discover → Start mic → Set Sa</strong> first. The tutor needs your personal Sa frequency so pitch matching is calibrated to your voice. Right now it's defaulting to C4 (262 Hz) which may not match your singing range.
+                        <p style={{ color: '#fef08a' }} className="text-sm font-semibold">Sa not set — pitch exercises won't match your voice</p>
+                        <p style={{ color: '#fcd34d' }} className="text-xs mt-1 leading-relaxed">
+                            Go to <strong>Sing &amp; Discover</strong>, start the mic, and set your Sa first. Without it the tutor defaults to C4 (262 Hz), which is probably not your natural range.
                         </p>
                     </div>
                 </div>

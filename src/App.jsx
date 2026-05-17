@@ -10,6 +10,7 @@ import GrahaBhedam from './components/GrahaBhedam';
 import SingBackChallenge from './components/SingBackChallenge';
 import ShruthiBox from './components/ShruthiBox';
 import Talam from './components/Talam';
+import Tutor from './components/Tutor';
 import { getSwaram, identifyRaga, RAGAS } from './utils/ragaLogic';
 import RagaDetail from './components/RagaDetail';
 
@@ -28,6 +29,7 @@ const VeenaIcon = () => (
 );
 
 const FEATURES = [
+    { id: 'tutor',     label: 'Tutor',        desc: 'Learn Carnatic singing from scratch',    symbol: '◈' },
     { id: 'listen',    label: 'Sing & Discover', desc: 'Sing a melody  ·  find the raga',       symbol: '♬' },
     { id: 'library',   label: 'Library',      desc: 'Browse every Carnatic raga',             symbol: '◈' },
     { id: 'melakarta', label: 'Melakarta',    desc: 'The complete 72-raga parent chart',      symbol: '⊹' },
@@ -357,6 +359,9 @@ function App() {
                     </div>
                 </div>
             )}
+
+                {/* ══ TUTOR ══ */}
+                {view === 'tutor' && <Tutor saFrequency={saFrequency} />}
 
                 {/* ══ LISTEN ══ */}
                 {view === 'listen' && (

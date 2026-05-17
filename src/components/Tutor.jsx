@@ -1,40 +1,47 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { RAGAS } from '../utils/ragaLogic';
 
-// ─── Audio helpers ────────────────────────────────────────────────────────────
+// ─── Audio ────────────────────────────────────────────────────────────────────
 
 const SEMITONES = {
-    'Sa': 0, 'Ri1': 1, 'Ri2': 2, 'Ga2': 3, 'Ga3': 4,
-    'Ma1': 5, 'Ma2': 6, 'Pa': 7, 'Da1': 8, 'Da2': 9, 'Ni2': 10, 'Ni3': 11,
+    'Sa': 0, 'Ri1': 1, 'Ri2': 2, 'Ga1': 2, 'Ga2': 3, 'Ga3': 4,
+    'Ma1': 5, 'Ma2': 6, 'Pa': 7, 'Da1': 8, 'Da2': 9, 'Da3': 10,
+    'Ni1': 9, 'Ni2': 10, 'Ni3': 11,
 };
 
 const swaraFreq = (swara, sa) => sa * Math.pow(2, (SEMITONES[swara] ?? 0) / 12);
 
-const playTone = (freq, duration = 1.2) => {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.22, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-    osc.start();
-    osc.stop(ctx.currentTime + duration);
+const playTone = (freq, duration = 1.1) => {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.22, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+    } catch {}
 };
 
-const playSequence = async (swaras, sa) => {
-    for (const swara of swaras) {
-        playTone(swaraFreq(swara, sa), 0.75);
-        await new Promise(r => setTimeout(r, 700));
+const playSequenceAsync = async (swaras, sa, onIdx, signal) => {
+    for (let i = 0; i < swaras.length; i++) {
+        if (signal?.aborted) return;
+        onIdx(i);
+        playTone(swaraFreq(swaras[i], sa), 0.7);
+        await new Promise(r => setTimeout(r, 750));
     }
+    onIdx(-1);
 };
 
 // Autocorrelation pitch detector
 const detectPitch = (buf, sampleRate) => {
     const SIZE = buf.length;
     const rms = Math.sqrt(buf.reduce((s, v) => s + v * v, 0) / SIZE);
-    if (rms < 0.008) return null;
+    if (rms < 0.007) return { freq: null, level: rms };
 
     const corr = new Float32Array(SIZE);
     for (let lag = 0; lag < SIZE; lag++) {
@@ -42,339 +49,244 @@ const detectPitch = (buf, sampleRate) => {
         for (let i = 0; i < SIZE - lag; i++) sum += buf[i] * buf[i + lag];
         corr[lag] = sum;
     }
-
     let d = 1;
     while (d < SIZE - 1 && corr[d] > corr[d - 1]) d++;
     let maxVal = -Infinity, maxLag = -1;
     for (let i = d; i < SIZE / 2; i++) {
         if (corr[i] > maxVal) { maxVal = corr[i]; maxLag = i; }
     }
-    if (maxLag < 2 || maxVal < 0.01) return null;
-
+    if (maxLag < 2 || maxVal < 0.008) return { freq: null, level: rms };
     const prev = corr[maxLag - 1], curr = corr[maxLag], next = corr[maxLag + 1] ?? 0;
-    const shift = (2 * curr - prev - next) !== 0 ? (next - prev) / (2 * (2 * curr - prev - next)) : 0;
-    return sampleRate / (maxLag + shift);
+    const denom = 2 * curr - prev - next;
+    const shift = denom !== 0 ? (next - prev) / (2 * denom) : 0;
+    return { freq: sampleRate / (maxLag + shift), level: rms };
 };
 
 const centsDiff = (freq, target) => 1200 * Math.log2(freq / target);
 
-// ─── Curriculum ───────────────────────────────────────────────────────────────
+// ─── Curriculum data ──────────────────────────────────────────────────────────
 
 const CURRICULUM = [
     {
-        id: 'foundation',
-        title: 'The Foundation',
+        id: 'foundation', title: 'The Foundation', symbol: '◈',
         subtitle: 'Sa & Pa — the two fixed pillars of every raga',
-        symbol: '◈',
-        color: '#7a2a10',
+        color: '#5c1a0a',
+        swaras: ['Sa', 'Pa'],
         lessons: [
             {
-                id: 'meet_sa',
-                title: 'Meet Sa',
+                id: 'meet_sa', title: 'Meet Sa',
                 exercises: [
-                    { type: 'listen', swara: 'Sa', instruction: 'This is Sa — the home note. Every raga begins and ends here. Just listen.' },
-                    { type: 'listen', swara: 'Sa', instruction: 'Listen again. Notice the complete sense of rest. This feeling is Sa.' },
+                    { type: 'listen', swara: 'Sa', instruction: 'Sa is the root — where every raga begins and ends. This is what complete rest sounds like.' },
                     { type: 'identify', play: 'Sa', choices: ['Sa', 'Pa'], instruction: 'Which swara did you hear?' },
+                    { type: 'identify', play: 'Pa', choices: ['Sa', 'Pa'], instruction: 'And this one?' },
                 ],
             },
             {
-                id: 'meet_pa',
-                title: 'Meet Pa',
+                id: 'meet_pa', title: 'Meet Pa',
                 exercises: [
-                    { type: 'listen', swara: 'Pa', instruction: 'This is Pa — the second fixed note. Exactly 7 semitones above Sa. It cannot be altered.' },
-                    { type: 'identify', play: 'Pa', choices: ['Sa', 'Pa'], instruction: 'Sa or Pa?' },
-                    { type: 'identify', play: 'Sa', choices: ['Sa', 'Pa'], instruction: 'And this one?' },
+                    { type: 'listen', swara: 'Pa', instruction: 'Pa sits exactly 7 semitones above Sa — a perfect fifth. Like Sa, it cannot be altered in any raga.' },
+                    { type: 'identify', play: 'Pa', choices: ['Sa', 'Pa'], instruction: 'Which is this?' },
+                    { type: 'identify', play: 'Sa', choices: ['Sa', 'Pa'], instruction: 'Now this?' },
                     { type: 'identify', play: 'Pa', choices: ['Sa', 'Pa'], instruction: 'One more.' },
                 ],
             },
             {
-                id: 'sing_sa_pa',
-                title: 'Sing Sa & Pa',
+                id: 'sing_sa_pa', title: 'Sing Sa & Pa',
                 exercises: [
-                    { type: 'sing', swara: 'Sa', instruction: 'Now you sing. Match Sa and hold it steady.' },
-                    { type: 'sing', swara: 'Pa', instruction: 'Now Pa. Feel the upward jump.' },
+                    { type: 'sing', swara: 'Sa', instruction: 'Sing Sa. Match the pitch and hold it steady.' },
+                    { type: 'sing', swara: 'Pa', instruction: 'Sing Pa. Feel the upward jump from Sa.' },
                     { type: 'sing', swara: 'Sa', instruction: 'Return home to Sa.' },
                 ],
             },
         ],
     },
     {
-        id: 'mayamalavagowla',
-        title: 'Mayamalavagowla',
-        subtitle: 'The first raga every student learns — 36th melakarta',
-        symbol: '♬',
-        color: '#1a3a5c',
+        id: 'mmg', title: 'Mayamalavagowla', symbol: '♬',
+        subtitle: 'The first raga every student learns — 15th melakarta',
+        color: '#0e2a4a',
+        swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', 'Pa', 'Da1', 'Ni3', 'Sa'],
         lessons: [
             {
-                id: 'the_scale',
-                title: 'Hear the Scale',
+                id: 'mmg_scale', title: 'Hear the Scale',
                 exercises: [
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', 'Pa', 'Da1', 'Ni3', 'Sa'], instruction: 'Listen to Mayamalavagowla ascending. Seven distinct swaras.' },
-                    { type: 'listen', swara: 'Ri1', instruction: 'Ri1 — Shuddha Rishabam. Flat and close to Sa. It leans inward.' },
-                    { type: 'listen', swara: 'Ga3', instruction: 'Ga3 — Antara Gandharam. A bright jump — the characteristic note of this raga.' },
+                    { type: 'listen_sequence', swaras: ['Sa','Ri1','Ga3','Ma1','Pa','Da1','Ni3','Sa'], instruction: 'Listen to Mayamalavagowla — all 7 swaras ascending.' },
+                    { type: 'listen', swara: 'Ri1', instruction: 'Ri1 (Shuddha Rishabam) — flat and close to Sa. Plaintive, inward.' },
+                    { type: 'listen', swara: 'Ga3', instruction: 'Ga3 (Antara Gandharam) — a bright jump. The characteristic note of this raga.' },
                     { type: 'identify', play: 'Ri1', choices: ['Sa', 'Ri1', 'Ga3'], instruction: 'Which swara?' },
-                    { type: 'identify', play: 'Ga3', choices: ['Sa', 'Ri1', 'Ga3'], instruction: 'And this one?' },
-                    { type: 'identify', play: 'Ri1', choices: ['Ri1', 'Ga3'], instruction: 'These two are far apart — Ri1 or Ga3?' },
+                    { type: 'identify', play: 'Ga3', choices: ['Sa', 'Ri1', 'Ga3'], instruction: 'And this?' },
                 ],
             },
             {
-                id: 'upper_half',
-                title: 'Da & Ni',
+                id: 'mmg_upper', title: 'Da & Ni',
                 exercises: [
-                    { type: 'listen', swara: 'Da1', instruction: 'Da1 — the mirror of Ri1 in the upper half. Same plaintive, lowered quality.' },
-                    { type: 'listen', swara: 'Ni3', instruction: 'Ni3 — the mirror of Ga3. Bright, pulling you back toward Sa.' },
+                    { type: 'listen', swara: 'Da1', instruction: 'Da1 mirrors Ri1 in the upper half — same lowered, plaintive quality above Pa.' },
+                    { type: 'listen', swara: 'Ni3', instruction: 'Ni3 mirrors Ga3 — bright, leading back to Sa.' },
                     { type: 'identify', play: 'Da1', choices: ['Pa', 'Da1', 'Ni3'], instruction: 'Which swara?' },
                     { type: 'identify', play: 'Ni3', choices: ['Pa', 'Da1', 'Ni3'], instruction: 'And this?' },
-                    { type: 'identify', play: 'Ri1', choices: ['Ri1', 'Da1'], instruction: 'These sound similar — Ri1 or Da1?' },
-                    { type: 'identify', play: 'Da1', choices: ['Ri1', 'Da1'], instruction: 'Which is this one?' },
+                    { type: 'identify', play: 'Ri1', choices: ['Ri1', 'Da1'], instruction: 'These two sound similar — Ri1 or Da1?' },
                 ],
             },
             {
-                id: 'sing_scale',
-                title: 'Sing the Scale',
+                id: 'mmg_sing', title: 'Sing the Scale',
                 exercises: [
-                    { type: 'sing', swara: 'Ri1', instruction: 'Sing Ri1. It sits just a semitone above Sa.' },
-                    { type: 'sing', swara: 'Ga3', instruction: 'Sing Ga3. A clear bright jump — 4 semitones up from Sa.' },
-                    { type: 'sing', swara: 'Da1', instruction: 'Sing Da1.' },
-                    { type: 'sing', swara: 'Ni3', instruction: 'Sing Ni3. Feel it pulling back toward Sa.' },
+                    { type: 'sing', swara: 'Ri1', instruction: 'Sing Ri1 — 1 semitone above Sa, very close.' },
+                    { type: 'sing', swara: 'Ga3', instruction: 'Sing Ga3 — 4 semitones up from Sa, a clear bright jump.' },
                     { type: 'sing', swara: 'Ma1', instruction: 'Sing Ma1 — the stable middle note.' },
+                    { type: 'sing', swara: 'Da1', instruction: 'Sing Da1.' },
+                    { type: 'sing', swara: 'Ni3', instruction: 'Sing Ni3 — feel it pulling back toward Sa.' },
                 ],
             },
         ],
     },
     {
-        id: 'alankaras',
-        title: 'Alankaras',
-        subtitle: 'The foundational melodic patterns',
-        symbol: '♩',
-        color: '#1a4a40',
+        id: 'alankaras', title: 'Alankaras', symbol: '♩',
+        subtitle: 'The foundational melodic patterns — sung in every raga',
+        color: '#1a3a20',
+        swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', 'Pa'],
         lessons: [
             {
-                id: 'alankara_1',
-                title: 'Pattern 1: S R G',
+                id: 'al_1', title: 'S R G — ascending',
                 exercises: [
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3'], instruction: 'Listen: Sa Ri1 Ga3. The first three notes ascending.' },
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ri1', 'Sa'], instruction: 'Now with a turn: Sa Ri1 Ga3 Ri1 Sa.' },
+                    { type: 'listen_sequence', swaras: ['Sa','Ri1','Ga3'], instruction: 'Sa Ri1 Ga3 — three notes up.' },
+                    { type: 'listen_sequence', swaras: ['Sa','Ri1','Ga3','Ri1','Sa'], instruction: 'With a turn: S R G R S.' },
                     { type: 'identify', play: 'Ri1', choices: ['Sa', 'Ri1', 'Ga3'], instruction: 'Identify this swara.' },
-                    { type: 'identify', play: 'Ga3', choices: ['Sa', 'Ri1', 'Ga3'], instruction: 'And this.' },
-                    { type: 'sing', swara: 'Ri1', instruction: 'Warm up — hold Ri1.' },
-                    { type: 'sing', swara: 'Ga3', instruction: 'Now Ga3.' },
+                    { type: 'sing', swara: 'Ri1', instruction: 'Sing Ri1.' },
+                    { type: 'sing', swara: 'Ga3', instruction: 'Sing Ga3.' },
                 ],
             },
             {
-                id: 'alankara_2',
-                title: 'Pattern 2: S R G M',
+                id: 'al_2', title: 'S R G M — four notes',
                 exercises: [
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1'], instruction: 'Listen: Sa Ri1 Ga3 Ma1. Four notes ascending.' },
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', 'Ga3', 'Ri1', 'Sa'], instruction: 'A full phrase: S R G M G R S.' },
-                    { type: 'identify', play: 'Ma1', choices: ['Ga3', 'Ma1', 'Pa'], instruction: 'Can you pick out Ma1?' },
+                    { type: 'listen_sequence', swaras: ['Sa','Ri1','Ga3','Ma1','Ga3','Ri1','Sa'], instruction: 'Full phrase: S R G M G R S.' },
+                    { type: 'identify', play: 'Ma1', choices: ['Ga3', 'Ma1', 'Pa'], instruction: 'Pick out Ma1.' },
                     { type: 'sing', swara: 'Ma1', instruction: 'Sing Ma1.' },
-                    { type: 'sing', swara: 'Ga3', instruction: 'Now Ga3 — notice the downward step from Ma1.' },
                 ],
             },
             {
-                id: 'alankara_3',
-                title: 'Pattern 3: S R G M P',
+                id: 'al_3', title: 'S R G M P — all the way to Pa',
                 exercises: [
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', 'Pa'], instruction: 'Listen: S R G M P — all the way to Pa.' },
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa'], instruction: 'Full phrase: S R G M P M G R S.' },
+                    { type: 'listen_sequence', swaras: ['Sa','Ri1','Ga3','Ma1','Pa','Ma1','Ga3','Ri1','Sa'], instruction: 'Full phrase: S R G M P M G R S.' },
                     { type: 'identify', play: 'Pa', choices: ['Ma1', 'Pa', 'Da1'], instruction: 'Which is Pa?' },
-                    { type: 'sing', swara: 'Pa', instruction: 'Sing Pa.' },
-                ],
-            },
-        ],
-    },
-    {
-        id: 'raga_ear',
-        title: 'Raga Ear Training',
-        subtitle: 'Recognise ragas by their characteristic phrases',
-        symbol: '◎',
-        color: '#3a2a6a',
-        lessons: [
-            {
-                id: 'mmg_vs_others',
-                title: 'Spot Mayamalavagowla',
-                exercises: [
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', 'Pa', 'Da1', 'Ni3', 'Sa'], instruction: 'Listen to this — it is Mayamalavagowla.' },
-                    { type: 'identify', play: 'Ga3', choices: ['Ga2', 'Ga3'], instruction: 'Mayamalavagowla uses which Ga?' },
-                    { type: 'identify', play: 'Ri1', choices: ['Ri1', 'Ri2'], instruction: 'Which Ri does it use?' },
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', 'Pa', 'Da1', 'Ni3', 'Sa'], instruction: 'One more listen. Notice Ri1 and Ga3 together.' },
-                    { type: 'identify', play: 'Da1', choices: ['Da1', 'Da2'], instruction: 'And which Da?' },
-                ],
-            },
-            {
-                id: 'characteristic_phrases',
-                title: 'Characteristic Phrases',
-                exercises: [
-                    { type: 'listen_sequence', swaras: ['Ga3', 'Ri1', 'Sa'], instruction: 'G R S — the classic Mayamalavagowla descent.' },
-                    { type: 'listen_sequence', swaras: ['Ni3', 'Da1', 'Pa'], instruction: 'N D P — upper descent, same shape.' },
-                    { type: 'identify', play: 'Ga3', choices: ['Ga2', 'Ga3'], instruction: 'The bright Ga we keep hearing — which one?' },
-                    { type: 'sing', swara: 'Ga3', instruction: 'Sing Ga3 — the heartbeat of this raga.' },
-                    { type: 'sing', swara: 'Ni3', instruction: 'Now Ni3 — its mirror.' },
+                    { type: 'sing', swara: 'Pa', instruction: 'Sing Pa — feel it settle.' },
                 ],
             },
         ],
     },
 ];
 
-// ─── Exercise: Listen ─────────────────────────────────────────────────────────
+// ─── Shared: Listen exercise ──────────────────────────────────────────────────
 
 function ExerciseListen({ swara, sa, instruction, onDone }) {
-    const [played, setPlayed] = useState(false);
-
     useEffect(() => {
-        const t = setTimeout(() => {
-            playTone(swaraFreq(swara, sa));
-            setPlayed(true);
-        }, 300);
+        const t = setTimeout(() => playTone(swaraFreq(swara, sa)), 200);
         return () => clearTimeout(t);
     }, [swara, sa]);
 
     return (
-        <div className="flex flex-col items-center gap-8 w-full">
+        <div className="flex flex-col items-center gap-7 w-full">
             <p className="text-c-cream-dark text-sm font-playfair italic text-center max-w-sm leading-relaxed">{instruction}</p>
-            <div className="flex flex-col items-center gap-3">
-                <div className="text-6xl font-mono font-bold text-c-gold">{swara}</div>
-                <button
-                    onClick={() => { playTone(swaraFreq(swara, sa)); setPlayed(true); }}
-                    className="flex items-center gap-2 text-xs text-c-cream-dark hover:text-c-gold transition-colors font-playfair italic"
-                >
-                    <span className="text-base">▶</span> Play again
-                </button>
-            </div>
-            {played && (
-                <button
-                    onClick={onDone}
-                    className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:bg-c-gold-light transition-colors animate-fade-in"
-                >
-                    Continue
-                </button>
-            )}
-        </div>
-    );
-}
-
-// ─── Exercise: Listen Sequence ────────────────────────────────────────────────
-
-function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
-    const [activeIdx, setActiveIdx] = useState(-1);
-    const [playing, setPlaying] = useState(false);
-    const [done, setDone] = useState(false);
-
-    const runSequence = async () => {
-        setPlaying(true);
-        for (let i = 0; i < swaras.length; i++) {
-            setActiveIdx(i);
-            playTone(swaraFreq(swaras[i], sa), 0.75);
-            await new Promise(r => setTimeout(r, 750));
-        }
-        setActiveIdx(-1);
-        setPlaying(false);
-        setDone(true);
-    };
-
-    useEffect(() => { runSequence(); }, []);
-
-    return (
-        <div className="flex flex-col items-center gap-8 w-full">
-            <p className="text-c-cream-dark text-sm font-playfair italic text-center max-w-sm leading-relaxed">{instruction}</p>
-            <div className="flex flex-wrap justify-center gap-3">
-                {swaras.map((s, i) => (
-                    <div
-                        key={i}
-                        className={`w-12 h-12 rounded-lg border flex items-center justify-center text-sm font-mono font-bold transition-all duration-150 ${
-                            i === activeIdx
-                                ? 'border-c-gold bg-c-gold text-c-bg scale-110'
-                                : 'border-c-border text-c-cream-dark'
-                        }`}
-                    >
-                        {s}
-                    </div>
-                ))}
-            </div>
-            <div className="flex gap-3">
-                <button
-                    onClick={runSequence}
-                    disabled={playing}
-                    className="flex items-center gap-2 text-xs text-c-cream-dark hover:text-c-gold transition-colors font-playfair italic disabled:opacity-40"
-                >
+            <div className="flex flex-col items-center gap-2">
+                <div className="text-[64px] font-mono font-bold text-c-gold leading-none">{swara}</div>
+                <button onClick={() => playTone(swaraFreq(swara, sa))}
+                        className="text-xs text-c-cream-dark hover:text-c-gold transition-colors font-playfair italic flex items-center gap-1.5">
                     <span>▶</span> Play again
                 </button>
             </div>
-            {done && (
-                <button
-                    onClick={onDone}
-                    className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:bg-c-gold-light transition-colors animate-fade-in"
-                >
-                    Continue
-                </button>
-            )}
+            <button onClick={onDone}
+                    className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity">
+                Continue
+            </button>
         </div>
     );
 }
 
-// ─── Exercise: Identify ───────────────────────────────────────────────────────
+// ─── Shared: Listen sequence ──────────────────────────────────────────────────
+
+function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
+    const [activeIdx, setActiveIdx] = useState(-1);
+    const [finished, setFinished] = useState(false);
+    const abortRef = useRef(null);
+
+    const run = useCallback(() => {
+        abortRef.current?.abort();
+        const ctrl = new AbortController();
+        abortRef.current = ctrl;
+        setFinished(false);
+        playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal).then(() => {
+            if (!ctrl.signal.aborted) setFinished(true);
+        });
+    }, [swaras, sa]);
+
+    useEffect(() => { run(); return () => abortRef.current?.abort(); }, []);
+
+    return (
+        <div className="flex flex-col items-center gap-7 w-full">
+            <p className="text-c-cream-dark text-sm font-playfair italic text-center max-w-sm leading-relaxed">{instruction}</p>
+            <div className="flex flex-wrap justify-center gap-2">
+                {swaras.map((s, i) => (
+                    <div key={i} className={`px-3 py-2 rounded-lg border font-mono text-sm font-bold transition-all duration-100 ${
+                        i === activeIdx ? 'border-c-gold bg-c-gold text-c-bg scale-110' : 'border-c-border text-c-cream-dark'
+                    }`}>{s}</div>
+                ))}
+            </div>
+            <div className="flex items-center gap-4">
+                <button onClick={run} className="text-xs text-c-cream-dark hover:text-c-gold transition-colors font-playfair italic flex items-center gap-1.5">
+                    <span>▶</span> Play again
+                </button>
+                {finished && (
+                    <button onClick={onDone}
+                            className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity animate-fade-in">
+                        Continue
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+}
+
+// ─── Shared: Identify exercise ────────────────────────────────────────────────
 
 function ExerciseIdentify({ play, choices, sa, instruction, onDone }) {
     const [selected, setSelected] = useState(null);
-    const [played, setPlayed] = useState(false);
 
     useEffect(() => {
-        const t = setTimeout(() => {
-            playTone(swaraFreq(play, sa));
-            setPlayed(true);
-        }, 300);
+        const t = setTimeout(() => playTone(swaraFreq(play, sa)), 300);
         return () => clearTimeout(t);
     }, [play, sa]);
 
-    const correct = selected === play;
-
-    const handleSelect = (choice) => {
-        if (selected) return;
-        setSelected(choice);
-    };
-
     return (
-        <div className="flex flex-col items-center gap-8 w-full">
+        <div className="flex flex-col items-center gap-7 w-full">
             <p className="text-c-cream-dark text-sm font-playfair italic text-center max-w-sm">{instruction}</p>
-            <button
-                onClick={() => { playTone(swaraFreq(play, sa)); setPlayed(true); }}
-                className="w-16 h-16 rounded-full border-2 border-c-gold/40 bg-c-gold-faint flex items-center justify-center text-c-gold hover:bg-c-gold hover:text-c-bg transition-colors text-xl"
-            >
+            <button onClick={() => playTone(swaraFreq(play, sa))}
+                    className="w-16 h-16 rounded-full border-2 border-c-gold/40 bg-c-gold-faint flex items-center justify-center text-c-gold hover:bg-c-gold hover:text-c-bg transition-colors text-2xl">
                 ▶
             </button>
             <div className="flex gap-3 flex-wrap justify-center">
                 {choices.map(choice => {
                     const isSelected = selected === choice;
-                    const isCorrect = isSelected && choice === play;
-                    const isWrong = isSelected && choice !== play;
-                    const showCorrect = selected && choice === play && !isSelected;
+                    const correct = choice === play;
                     return (
-                        <button
-                            key={choice}
-                            onClick={() => handleSelect(choice)}
-                            disabled={!played || !!selected}
-                            className={`px-8 py-3 rounded-xl border text-sm font-mono font-bold transition-all duration-200 ${
-                                isCorrect  ? 'border-emerald-500 bg-emerald-900/40 text-emerald-400' :
-                                isWrong   ? 'border-red-700 bg-red-950/40 text-red-400' :
-                                showCorrect ? 'border-emerald-500/50 bg-emerald-900/20 text-emerald-500' :
-                                'border-c-border bg-c-card text-c-cream hover:border-c-gold/60 disabled:opacity-50 disabled:cursor-not-allowed'
-                            }`}
-                        >
+                        <button key={choice} disabled={!!selected}
+                                onClick={() => setSelected(choice)}
+                                className={`px-8 py-3 rounded-xl border font-mono text-sm font-bold transition-all duration-200 ${
+                                    !selected ? 'border-c-border bg-c-card text-c-cream hover:border-c-gold/60' :
+                                    isSelected && correct  ? 'border-emerald-500 bg-emerald-900/40 text-emerald-400' :
+                                    isSelected && !correct ? 'border-red-700 bg-red-950/40 text-red-400' :
+                                    correct ? 'border-emerald-500/40 bg-emerald-900/10 text-emerald-600' :
+                                    'border-c-border/30 text-c-cream-dark opacity-40'
+                                }`}>
                             {choice}
                         </button>
                     );
                 })}
             </div>
             {selected && (
-                <div className="flex flex-col items-center gap-4 animate-fade-in">
-                    <p className={`text-sm font-playfair italic ${correct ? 'text-emerald-400' : 'text-red-400'}`}>
-                        {correct ? 'Correct' : `That was ${play}`}
+                <div className="flex flex-col items-center gap-3 animate-fade-in">
+                    <p className={`text-sm font-playfair italic ${selected === play ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {selected === play ? 'Correct' : `That was ${play}`}
                     </p>
-                    <button
-                        onClick={onDone}
-                        className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:bg-c-gold-light transition-colors"
-                    >
+                    <button onClick={onDone}
+                            className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity">
                         Continue
                     </button>
                 </div>
@@ -383,32 +295,35 @@ function ExerciseIdentify({ play, choices, sa, instruction, onDone }) {
     );
 }
 
-// ─── Exercise: Sing ───────────────────────────────────────────────────────────
+// ─── Shared: Sing exercise ────────────────────────────────────────────────────
 
-const TARGET_HOLD_MS = 1500;
-const TOLERANCE_CENTS = 50;
+const HOLD_MS = 1500;
+const TOLERANCE = 50;
 
 function ExerciseSing({ swara, sa, instruction, onDone }) {
-    const [phase, setPhase] = useState('idle'); // idle | listening | success
-    const [cents, setCents] = useState(null);
+    const [phase, setPhase] = useState('idle');
+    const [level, setLevel] = useState(0);       // 0-100: mic volume
+    const [cents, setCents] = useState(null);     // null = no pitch detected
     const [heldPct, setHeldPct] = useState(0);
-    const [error, setError] = useState('');
+    const [micError, setMicError] = useState('');
 
-    const streamRef = useRef(null);
+    const streamRef  = useRef(null);
     const intervalRef = useRef(null);
-    const heldMsRef = useRef(0);
-    const target = swaraFreq(swara, sa);
+    const heldRef    = useRef(0);
+    const target     = swaraFreq(swara, sa);
 
-    const stopMic = () => {
+    const cleanup = () => {
         clearInterval(intervalRef.current);
         streamRef.current?.getTracks().forEach(t => t.stop());
     };
+    useEffect(() => () => cleanup(), []);
 
-    const startListening = async () => {
-        setError('');
-        heldMsRef.current = 0;
+    const startMic = async () => {
+        setMicError('');
+        heldRef.current = 0;
         setHeldPct(0);
         setCents(null);
+        setLevel(0);
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             streamRef.current = stream;
@@ -418,200 +333,363 @@ function ExerciseSing({ swara, sa, instruction, onDone }) {
             analyser.fftSize = 2048;
             source.connect(analyser);
             const buf = new Float32Array(analyser.fftSize);
-
             setPhase('listening');
+
             intervalRef.current = setInterval(() => {
                 analyser.getFloatTimeDomainData(buf);
-                const freq = detectPitch(buf, ctx.sampleRate);
-                if (freq && freq > 60 && freq < 2000) {
+                const { freq, level: rms } = detectPitch(buf, ctx.sampleRate);
+
+                // Always show mic level
+                setLevel(Math.min(100, rms * 700));
+
+                if (freq && freq > 50 && freq < 2200) {
                     const diff = centsDiff(freq, target);
                     setCents(diff);
-                    if (Math.abs(diff) <= TOLERANCE_CENTS) {
-                        heldMsRef.current += 100;
-                        setHeldPct(Math.min(100, (heldMsRef.current / TARGET_HOLD_MS) * 100));
-                        if (heldMsRef.current >= TARGET_HOLD_MS) {
-                            stopMic();
+                    if (Math.abs(diff) <= TOLERANCE) {
+                        heldRef.current += 100;
+                        setHeldPct(Math.min(100, (heldRef.current / HOLD_MS) * 100));
+                        if (heldRef.current >= HOLD_MS) {
+                            cleanup();
                             setPhase('success');
                             setTimeout(onDone, 900);
                         }
                     } else {
-                        heldMsRef.current = Math.max(0, heldMsRef.current - 80);
-                        setHeldPct(Math.max(0, (heldMsRef.current / TARGET_HOLD_MS) * 100));
+                        heldRef.current = Math.max(0, heldRef.current - 80);
+                        setHeldPct(prev => Math.max(0, prev - 5));
                     }
                 } else {
                     setCents(null);
-                    heldMsRef.current = Math.max(0, heldMsRef.current - 80);
-                    setHeldPct(Math.max(0, (heldMsRef.current / TARGET_HOLD_MS) * 100));
+                    heldRef.current = Math.max(0, heldRef.current - 80);
+                    setHeldPct(prev => Math.max(0, prev - 5));
                 }
             }, 100);
         } catch {
-            setError('Microphone access denied.');
+            setMicError('Microphone access denied. Please allow mic access and try again.');
         }
     };
 
-    useEffect(() => () => stopMic(), []);
-
-    const inTune = cents !== null && Math.abs(cents) <= TOLERANCE_CENTS;
-    const needleLeft = cents !== null ? 50 + Math.max(-45, Math.min(45, cents / 100 * 45)) : 50;
+    const inTune = cents !== null && Math.abs(cents) <= TOLERANCE;
+    const needleLeft = cents !== null ? 50 + Math.max(-44, Math.min(44, (cents / 100) * 44)) : 50;
 
     return (
-        <div className="flex flex-col items-center gap-7 w-full">
-            <p className="text-c-cream-dark text-sm font-playfair italic text-center max-w-sm leading-relaxed">{instruction}</p>
+        <div className="flex flex-col items-center gap-6 w-full max-w-xs mx-auto">
+            <p className="text-c-cream-dark text-sm font-playfair italic text-center leading-relaxed">{instruction}</p>
 
-            <div className="flex flex-col items-center gap-1">
-                <div className="text-5xl font-mono font-bold text-c-gold">{swara}</div>
-                <button
-                    onClick={() => playTone(target)}
-                    className="text-xs text-c-cream-dark hover:text-c-gold transition-colors font-playfair italic flex items-center gap-1"
-                >
+            {/* Target */}
+            <div className="flex flex-col items-center gap-1.5">
+                <div className="text-[60px] font-mono font-bold text-c-gold leading-none">{swara}</div>
+                <button onClick={() => playTone(target)}
+                        className="text-xs text-c-cream-dark hover:text-c-gold transition-colors font-playfair italic flex items-center gap-1">
                     <span>▶</span> Hear it
                 </button>
             </div>
 
             {phase === 'idle' && (
-                <button
-                    onClick={startListening}
-                    className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors"
-                >
+                <button onClick={startMic}
+                        className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors">
                     Start singing
                 </button>
             )}
 
             {phase === 'listening' && (
-                <div className="flex flex-col items-center gap-4 w-full max-w-xs">
-                    {/* Pitch meter */}
-                    <div className="relative w-full h-8 bg-c-card border border-c-border rounded-full overflow-hidden">
-                        <div className="absolute inset-y-0 left-1/2 w-px bg-c-gold/20" />
-                        <div
-                            className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full transition-all duration-75 ${
-                                inTune ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]' : 'bg-c-gold'
-                            }`}
-                            style={{ left: `${needleLeft}%` }}
-                        />
+                <div className="flex flex-col gap-3 w-full">
+                    {/* Mic level — always visible so user knows mic is working */}
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-c-cream-dark font-playfair w-8">Mic</span>
+                        <div className="flex-1 h-2 bg-c-border rounded-full overflow-hidden">
+                            <div className={`h-full rounded-full transition-all duration-75 ${level > 5 ? 'bg-c-gold' : 'bg-c-border'}`}
+                                 style={{ width: `${level}%` }} />
+                        </div>
+                        <span className={`text-[9px] w-12 text-right ${level > 5 ? 'text-c-gold' : 'text-c-cream-dark'}`}>
+                            {level > 5 ? 'active' : 'silent'}
+                        </span>
                     </div>
-                    <p className={`text-xs font-mono h-4 ${inTune ? 'text-emerald-400' : 'text-c-cream-dark'}`}>
-                        {cents === null ? 'sing into the mic…' :
-                         inTune ? '✓ in tune' :
-                         cents > 0 ? `+${Math.round(cents)}¢  too sharp` :
-                         `${Math.round(cents)}¢  too flat`}
+
+                    {/* Pitch needle */}
+                    <div>
+                        <div className="flex justify-between text-[9px] text-c-cream-dark mb-1 px-1">
+                            <span>flat</span><span>in tune</span><span>sharp</span>
+                        </div>
+                        <div className="relative w-full h-7 bg-c-card border border-c-border rounded-full overflow-hidden">
+                            {/* Center mark */}
+                            <div className="absolute inset-y-0 left-1/2 w-px bg-c-gold/20" />
+                            {/* In-tune zone */}
+                            <div className="absolute inset-y-0 bg-emerald-900/20 rounded-full" style={{ left: '44%', width: '12%' }} />
+                            {/* Needle */}
+                            {cents !== null && (
+                                <div className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full transition-all duration-75 shadow-sm ${
+                                    inTune ? 'bg-emerald-400 shadow-emerald-400/40' : 'bg-c-gold'
+                                }`} style={{ left: `${needleLeft}%` }} />
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Cents label */}
+                    <p className={`text-xs text-center font-mono h-4 transition-colors ${inTune ? 'text-emerald-400' : 'text-c-cream-dark'}`}>
+                        {cents === null
+                            ? (level > 5 ? 'pitch not clear — sing more steadily' : 'sing into the mic')
+                            : inTune ? '✓ in tune — hold it!'
+                            : cents > 0 ? `+${Math.round(cents)}¢ — too sharp, lower slightly`
+                            : `${Math.round(cents)}¢ — too flat, raise slightly`}
                     </p>
+
                     {/* Hold bar */}
-                    <div className="w-full h-2 bg-c-border rounded-full overflow-hidden">
-                        <div
-                            className="h-full bg-emerald-500 rounded-full transition-all duration-100"
-                            style={{ width: `${heldPct}%` }}
-                        />
+                    <div>
+                        <div className="flex justify-between text-[9px] text-c-cream-dark mb-1">
+                            <span>Hold</span><span>{Math.round(heldPct)}%</span>
+                        </div>
+                        <div className="w-full h-2.5 bg-c-border rounded-full overflow-hidden">
+                            <div className="h-full bg-emerald-500 rounded-full transition-all duration-100"
+                                 style={{ width: `${heldPct}%` }} />
+                        </div>
                     </div>
-                    <p className="text-[10px] text-c-cream-dark font-playfair italic">
-                        {heldPct > 5 ? 'Hold it steady…' : 'Sing and hold the note'}
-                    </p>
                 </div>
             )}
 
             {phase === 'success' && (
                 <div className="flex flex-col items-center gap-2 animate-fade-in">
-                    <div className="w-12 h-12 rounded-full bg-emerald-900/40 border border-emerald-500/50 flex items-center justify-center text-emerald-400 text-xl">✓</div>
-                    <p className="text-emerald-400 text-sm font-playfair italic">Nicely held</p>
+                    <div className="w-12 h-12 rounded-full border border-emerald-500/50 bg-emerald-900/30 flex items-center justify-center text-emerald-400 text-xl">✓</div>
+                    <p className="text-emerald-400 text-sm font-playfair italic">Held it</p>
                 </div>
             )}
 
-            {error && <p className="text-red-400 text-xs font-playfair italic">{error}</p>}
+            {micError && <p className="text-red-400 text-xs font-playfair italic text-center">{micError}</p>}
         </div>
     );
 }
 
-// ─── Lesson Runner ────────────────────────────────────────────────────────────
+// ─── Lesson runner ────────────────────────────────────────────────────────────
 
-function LessonRunner({ unit, lesson, sa, onComplete, onBack }) {
-    const [exIdx, setExIdx] = useState(0);
+function LessonRunner({ lesson, sa, onComplete, onBack }) {
+    const [idx, setIdx] = useState(0);
     const exercises = lesson.exercises;
-    const ex = exercises[exIdx];
-    const pct = Math.round((exIdx / exercises.length) * 100);
+    const ex = exercises[idx];
+    const pct = Math.round((idx / exercises.length) * 100);
 
-    const next = () => {
-        if (exIdx + 1 >= exercises.length) {
-            onComplete();
-        } else {
-            setExIdx(i => i + 1);
-        }
-    };
+    const next = () => idx + 1 >= exercises.length ? onComplete() : setIdx(i => i + 1);
 
-    const renderExercise = () => {
-        const key = `${lesson.id}-${exIdx}`;
-        if (ex.type === 'listen')
-            return <ExerciseListen key={key} swara={ex.swara} sa={sa} instruction={ex.instruction} onDone={next} />;
-        if (ex.type === 'listen_sequence')
-            return <ExerciseListenSequence key={key} swaras={ex.swaras} sa={sa} instruction={ex.instruction} onDone={next} />;
-        if (ex.type === 'identify')
-            return <ExerciseIdentify key={key} play={ex.play} choices={ex.choices} sa={sa} instruction={ex.instruction} onDone={next} />;
-        if (ex.type === 'sing')
-            return <ExerciseSing key={key} swara={ex.swara} sa={sa} instruction={ex.instruction} onDone={next} />;
-        return null;
+    const renderEx = () => {
+        const key = `${lesson.id}-${idx}`;
+        if (ex.type === 'listen')          return <ExerciseListen         key={key} {...ex} sa={sa} onDone={next} />;
+        if (ex.type === 'listen_sequence') return <ExerciseListenSequence key={key} {...ex} sa={sa} onDone={next} />;
+        if (ex.type === 'identify')        return <ExerciseIdentify       key={key} {...ex} sa={sa} onDone={next} />;
+        if (ex.type === 'sing')            return <ExerciseSing           key={key} {...ex} sa={sa} onDone={next} />;
     };
 
     return (
-        <div className="w-full max-w-lg mx-auto flex flex-col gap-6">
-            {/* Header */}
-            <div className="flex items-center gap-4">
-                <button onClick={onBack} className="text-c-cream-dark hover:text-c-gold transition-colors text-sm">✕</button>
+        <div className="w-full max-w-lg mx-auto flex flex-col gap-5">
+            <div className="flex items-center gap-3">
+                <button onClick={onBack} className="text-c-cream-dark hover:text-c-gold text-lg leading-none transition-colors">✕</button>
                 <div className="flex-1 h-2 bg-c-border rounded-full overflow-hidden">
                     <div className="h-full bg-c-gold rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
                 </div>
-                <span className="text-xs text-c-cream-dark font-mono">{exIdx + 1}/{exercises.length}</span>
+                <span className="text-[11px] text-c-cream-dark font-mono tabular-nums">{idx + 1}/{exercises.length}</span>
             </div>
-
-            <p className="text-xs text-c-cream-dark font-playfair italic text-center">{lesson.title}</p>
-
-            {/* Exercise area */}
-            <div className="min-h-[320px] flex items-center justify-center">
-                {renderExercise()}
+            <p className="text-[11px] text-c-cream-dark font-playfair italic text-center">{lesson.title}</p>
+            <div className="min-h-[340px] flex items-center justify-center py-4">
+                {renderEx()}
             </div>
         </div>
     );
 }
 
-// ─── Home View ────────────────────────────────────────────────────────────────
+// ─── Raga Practice: one raga session ─────────────────────────────────────────
 
-function HomeView({ curriculum, progress, isUnlocked, onSelectUnit }) {
+function RagaSession({ ragaName, raga, sa, onBack }) {
+    const [phase, setPhase] = useState('listen'); // listen | sing | done
+    const [singIdx, setSingIdx] = useState(0);
+
+    const singNotes = raga.arohanam.filter(n => n !== 'Sa' || singIdx === 0);
+
+    const handleSingDone = () => {
+        if (singIdx + 1 >= raga.arohanam.length) {
+            setPhase('done');
+        } else {
+            setSingIdx(i => i + 1);
+        }
+    };
+
+    return (
+        <div className="w-full max-w-lg mx-auto flex flex-col gap-5">
+            {/* Header */}
+            <div className="flex items-center gap-3">
+                <button onClick={onBack} className="text-c-cream-dark hover:text-c-gold text-lg transition-colors">←</button>
+                <div>
+                    <div className="font-playfair text-lg text-c-gold">{ragaName}</div>
+                    <div className="text-[10px] text-c-cream-dark uppercase tracking-widest">{raga.type}</div>
+                </div>
+            </div>
+
+            {/* Phase indicator */}
+            <div className="flex gap-1">
+                {['Hear', 'Sing', 'Done'].map((label, i) => {
+                    const active = (i === 0 && phase === 'listen') || (i === 1 && phase === 'sing') || (i === 2 && phase === 'done');
+                    const past = (i === 0 && phase !== 'listen') || (i === 1 && phase === 'done');
+                    return (
+                        <div key={label} className="flex items-center gap-1">
+                            <div className={`px-3 py-1 rounded-full text-[10px] font-playfair transition-colors ${
+                                active ? 'bg-c-gold text-c-bg font-bold' :
+                                past   ? 'bg-c-gold/20 text-c-gold' :
+                                'bg-c-border/30 text-c-cream-dark'
+                            }`}>{label}</div>
+                            {i < 2 && <div className="w-3 h-px bg-c-border" />}
+                        </div>
+                    );
+                })}
+            </div>
+
+            <div className="min-h-[340px] flex items-center justify-center py-4">
+                {phase === 'listen' && (
+                    <ExerciseListenSequence
+                        key="raga-listen"
+                        swaras={raga.arohanam}
+                        sa={sa}
+                        instruction={`Listen to the ${ragaName} arohanam. ${raga.mood ? `Mood: ${raga.mood}.` : ''}`}
+                        onDone={() => { setPhase('sing'); setSingIdx(0); }}
+                    />
+                )}
+
+                {phase === 'sing' && (
+                    <ExerciseSing
+                        key={`sing-${singIdx}`}
+                        swara={raga.arohanam[singIdx]}
+                        sa={sa}
+                        instruction={`Sing note ${singIdx + 1} of ${raga.arohanam.length}: ${raga.arohanam[singIdx]}`}
+                        onDone={handleSingDone}
+                    />
+                )}
+
+                {phase === 'done' && (
+                    <div className="flex flex-col items-center gap-5 animate-fade-in">
+                        <div className="w-16 h-16 rounded-full border border-c-gold/40 bg-c-gold-faint flex items-center justify-center text-c-gold text-2xl">✓</div>
+                        <div className="text-center">
+                            <p className="font-playfair text-lg text-c-cream">You sang {ragaName}</p>
+                            <p className="text-xs text-c-cream-dark mt-1 font-playfair italic">{raga.mood && `${raga.mood} · `}{raga.type}</p>
+                        </div>
+                        <div className="flex flex-wrap justify-center gap-2 mt-2">
+                            {raga.arohanam.map((n, i) => (
+                                <span key={i} className="px-2 py-1 rounded border border-c-gold/30 text-xs font-mono text-c-gold bg-c-gold/5">{n}</span>
+                            ))}
+                        </div>
+                        <div className="flex gap-3 mt-2">
+                            <button onClick={() => { setPhase('listen'); setSingIdx(0); }}
+                                    className="px-5 py-2 border border-c-border text-c-cream-dim text-xs rounded-full font-playfair hover:border-c-gold/40 transition-colors">
+                                Practice again
+                            </button>
+                            <button onClick={onBack}
+                                    className="px-5 py-2 bg-c-gold text-c-bg text-xs rounded-full font-playfair font-bold hover:opacity-90 transition-opacity">
+                                All ragas
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Sing progress dots */}
+            {phase === 'sing' && (
+                <div className="flex justify-center gap-1.5">
+                    {raga.arohanam.map((n, i) => (
+                        <div key={i} className={`w-2 h-2 rounded-full transition-colors ${
+                            i < singIdx ? 'bg-emerald-500' : i === singIdx ? 'bg-c-gold' : 'bg-c-border'
+                        }`} />
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ─── Raga Practice: browser ───────────────────────────────────────────────────
+
+function RagaPractice({ sa }) {
+    const [search, setSearch] = useState('');
+    const [selected, setSelected] = useState(null);
+
+    const allRagas = Object.entries(RAGAS);
+    const filtered = allRagas.filter(([name]) => name.toLowerCase().includes(search.toLowerCase()));
+
+    if (selected) {
+        return (
+            <RagaSession
+                ragaName={selected[0]}
+                raga={selected[1]}
+                sa={sa}
+                onBack={() => setSelected(null)}
+            />
+        );
+    }
+
+    const colorMap = { maroon: '#5c1a0a', navy: '#0e2a4a', teal: '#0e3a36' };
+
     return (
         <div className="w-full max-w-2xl flex flex-col gap-4">
-            <div className="mb-2">
-                <h2 className="font-playfair text-2xl text-c-gold">Tutor</h2>
-                <p className="text-c-cream-dark text-xs mt-1">Learn Carnatic singing from the ground up — one swara at a time.</p>
+            <div>
+                <h3 className="font-playfair text-xl text-c-gold">Raga Practice</h3>
+                <p className="text-c-cream-dark text-xs mt-1">Choose any raga — hear its scale, then sing each note.</p>
             </div>
-            {curriculum.map((unit, idx) => {
-                const unlocked = isUnlocked(idx);
-                const total = unit.lessons.length;
-                const done = unit.lessons.filter(l => progress[`${unit.id}/${l.id}`]).length;
-                const complete = done === total;
+            <input
+                type="text"
+                placeholder="Search ragas…"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full bg-c-surface border border-c-border rounded-full py-2 px-4 text-xs text-c-cream focus:outline-none focus:border-c-gold/60 transition-colors"
+            />
+            <div className="grid sm:grid-cols-2 gap-2 max-h-[60vh] overflow-y-auto pr-1">
+                {filtered.map(([name, data]) => (
+                    <button key={name} onClick={() => setSelected([name, data])}
+                            className="text-left flex items-center gap-3 px-4 py-3 rounded-lg border border-c-border bg-c-surface hover:border-c-gold/40 transition-colors">
+                        <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: colorMap[data.color] || '#5c1a0a' }} />
+                        <div className="flex-1 min-w-0">
+                            <div className="font-playfair text-sm text-c-cream truncate">{name}</div>
+                            <div className="text-[10px] text-c-cream-dark truncate">{data.type}{data.mood ? ` · ${data.mood}` : ''}</div>
+                        </div>
+                        <span className="text-c-cream-dark text-xs">→</span>
+                    </button>
+                ))}
+            </div>
+            {filtered.length === 0 && (
+                <p className="text-c-cream-dark text-sm font-playfair italic text-center py-8">No ragas match "{search}"</p>
+            )}
+        </div>
+    );
+}
 
+// ─── Curriculum home ──────────────────────────────────────────────────────────
+
+function CurriculumHome({ progress, isUnlocked, onSelectUnit }) {
+    return (
+        <div className="w-full max-w-2xl flex flex-col gap-3">
+            {CURRICULUM.map((unit, idx) => {
+                const unlocked = isUnlocked(idx);
+                const done = unit.lessons.filter(l => progress[`${unit.id}/${l.id}`]).length;
+                const total = unit.lessons.length;
+                const complete = done === total;
                 return (
-                    <button
-                        key={unit.id}
-                        onClick={() => unlocked && onSelectUnit(unit, idx)}
-                        disabled={!unlocked}
-                        className={`w-full text-left rounded-xl border overflow-hidden transition-all duration-300 ${
-                            unlocked ? 'border-c-border hover:border-c-gold/50 cursor-pointer' : 'border-c-border/40 opacity-50 cursor-not-allowed'
-                        }`}
-                    >
-                        {/* Color band */}
+                    <button key={unit.id} disabled={!unlocked} onClick={() => onSelectUnit(unit, idx)}
+                            className={`w-full text-left rounded-xl border overflow-hidden transition-all duration-200 ${
+                                unlocked ? 'border-c-border hover:border-c-gold/40' : 'border-c-border/30 opacity-40 cursor-not-allowed'
+                            }`}>
                         <div className="px-5 py-4 flex items-center gap-4" style={{ background: unit.color }}>
-                            <span className="text-2xl text-white/80">{unit.symbol}</span>
+                            <span className="text-xl text-white/70">{unit.symbol}</span>
                             <div className="flex-1">
-                                <div className="font-playfair text-white font-bold tracking-wide">{unit.title}</div>
-                                <div className="text-white/60 text-[11px] mt-0.5">{unit.subtitle}</div>
+                                <div className="font-playfair text-white font-bold">{unit.title}</div>
+                                <div className="text-white/55 text-[11px] mt-0.5">{unit.subtitle}</div>
+                                {unlocked && unit.swaras && (
+                                    <div className="flex gap-1.5 mt-2 flex-wrap">
+                                        {unit.swaras.map((s, i) => (
+                                            <span key={i} className="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-white/70 font-mono">{s}</span>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
-                            {!unlocked && <span className="text-white/40 text-lg">🔒</span>}
+                            {!unlocked && <span className="text-white/30">🔒</span>}
                             {complete && <span className="text-emerald-400 text-lg">✓</span>}
                         </div>
-                        {/* Progress */}
                         {unlocked && (
-                            <div className="bg-c-surface px-5 py-3 flex items-center gap-3">
+                            <div className="bg-c-surface px-5 py-2.5 flex items-center gap-3">
                                 <div className="flex-1 h-1.5 bg-c-border rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-c-gold rounded-full transition-all duration-500"
-                                        style={{ width: `${total > 0 ? (done / total) * 100 : 0}%` }}
-                                    />
+                                    <div className="h-full bg-c-gold rounded-full transition-all duration-500"
+                                         style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
                                 </div>
                                 <span className="text-[10px] text-c-cream-dark font-mono">{done}/{total} lessons</span>
                             </div>
@@ -623,44 +701,36 @@ function HomeView({ curriculum, progress, isUnlocked, onSelectUnit }) {
     );
 }
 
-// ─── Unit View ────────────────────────────────────────────────────────────────
+// ─── Unit view ────────────────────────────────────────────────────────────────
 
 function UnitView({ unit, progress, onSelectLesson, onBack }) {
-    const isLessonUnlocked = (idx) => {
-        if (idx === 0) return true;
-        return !!progress[`${unit.id}/${unit.lessons[idx - 1].id}`];
-    };
-
+    const isUnlocked = (idx) => idx === 0 || !!progress[`${unit.id}/${unit.lessons[idx - 1].id}`];
     return (
         <div className="w-full max-w-lg flex flex-col gap-4">
-            <div className="flex items-center gap-3 mb-2">
-                <button onClick={onBack} className="text-c-cream-dark hover:text-c-gold transition-colors text-sm">←</button>
+            <div className="flex items-center gap-3">
+                <button onClick={onBack} className="text-c-cream-dark hover:text-c-gold transition-colors">←</button>
                 <div>
                     <h2 className="font-playfair text-xl text-c-gold">{unit.title}</h2>
-                    <p className="text-c-cream-dark text-[11px]">{unit.subtitle}</p>
+                    <p className="text-[11px] text-c-cream-dark">{unit.subtitle}</p>
                 </div>
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
                 {unit.lessons.map((lesson, idx) => {
                     const done = !!progress[`${unit.id}/${lesson.id}`];
-                    const unlocked = isLessonUnlocked(idx);
+                    const unlocked = isUnlocked(idx);
                     return (
-                        <button
-                            key={lesson.id}
-                            onClick={() => unlocked && onSelectLesson(lesson)}
-                            disabled={!unlocked}
-                            className={`w-full text-left flex items-center gap-4 px-5 py-4 rounded-xl border transition-all duration-200 ${
-                                done      ? 'border-c-gold/30 bg-c-gold/5 hover:border-c-gold/60' :
-                                unlocked  ? 'border-c-border bg-c-surface hover:border-c-gold/40' :
-                                'border-c-border/30 bg-c-bg/30 opacity-40 cursor-not-allowed'
-                            }`}
-                        >
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 border ${
+                        <button key={lesson.id} disabled={!unlocked} onClick={() => unlocked && onSelectLesson(lesson)}
+                                className={`w-full text-left flex items-center gap-4 px-5 py-4 rounded-xl border transition-all ${
+                                    done     ? 'border-c-gold/30 bg-c-gold/5 hover:border-c-gold/50' :
+                                    unlocked ? 'border-c-border bg-c-surface hover:border-c-gold/30' :
+                                    'border-c-border/20 opacity-35 cursor-not-allowed'
+                                }`}>
+                            <div className={`w-8 h-8 rounded-full border flex items-center justify-center text-sm flex-shrink-0 ${
                                 done     ? 'border-emerald-500/60 bg-emerald-900/30 text-emerald-400' :
                                 unlocked ? 'border-c-gold/40 bg-c-gold-faint text-c-gold' :
                                 'border-c-border text-c-cream-dark'
                             }`}>
-                                {done ? '✓' : unlocked ? (idx + 1) : '🔒'}
+                                {done ? '✓' : unlocked ? idx + 1 : '🔒'}
                             </div>
                             <div>
                                 <div className="font-playfair text-sm text-c-cream">{lesson.title}</div>
@@ -676,12 +746,11 @@ function UnitView({ unit, progress, onSelectLesson, onBack }) {
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-const SA_DEFAULT = 261.63; // C4
-
 export default function Tutor({ saFrequency }) {
-    const sa = saFrequency || SA_DEFAULT;
-    const [screen, setScreen] = useState('home'); // home | unit | lesson
-    const [activeUnit, setActiveUnit] = useState(null);
+    const sa = saFrequency || 261.63;
+    const [tab, setTab]         = useState('curriculum'); // curriculum | practice
+    const [screen, setScreen]   = useState('home');       // home | unit | lesson
+    const [activeUnit, setActiveUnit]     = useState(null);
     const [activeLesson, setActiveLesson] = useState(null);
     const [progress, setProgress] = useState(() => {
         try { return JSON.parse(localStorage.getItem('tutor_progress') || '{}'); } catch { return {}; }
@@ -699,11 +768,60 @@ export default function Tutor({ saFrequency }) {
         return prev.lessons.every(l => progress[`${prev.id}/${l.id}`]);
     };
 
-    if (screen === 'lesson') {
-        return (
-            <div className="w-full px-4 md:px-8 py-8 flex justify-center animate-fade-in">
-                <LessonRunner
+    return (
+        <div className="w-full px-4 md:px-8 py-8 flex flex-col items-center gap-6 animate-fade-in">
+
+            {/* Sa warning — shown prominently if not set */}
+            {!saFrequency && (
+                <div className="w-full max-w-2xl flex items-start gap-3 px-4 py-3 rounded-lg bg-amber-950/40 border border-amber-700/40">
+                    <span className="text-amber-400 text-base mt-0.5">⚠</span>
+                    <div>
+                        <p className="text-amber-300 text-sm font-semibold">Sa not set — pitch exercises will be off</p>
+                        <p className="text-amber-400/80 text-xs mt-0.5 leading-relaxed">
+                            Go to <strong>Sing &amp; Discover → Start mic → Set Sa</strong> first. The tutor needs your personal Sa frequency so pitch matching is calibrated to your voice. Right now it's defaulting to C4 (262 Hz) which may not match your singing range.
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* Tab switcher — only show on home screens */}
+            {screen === 'home' && (
+                <div className="w-full max-w-2xl">
+                    <div className="flex gap-1 border-b border-c-border mb-6">
+                        {[['curriculum', 'Curriculum'], ['practice', 'Raga Practice']].map(([id, label]) => (
+                            <button key={id} onClick={() => setTab(id)}
+                                    className={`px-5 py-2 text-xs font-playfair tracking-wide transition-colors relative ${
+                                        tab === id ? 'text-c-gold' : 'text-c-cream-dim hover:text-c-cream'
+                                    }`}>
+                                {label}
+                                {tab === id && <span className="absolute bottom-0 left-0 right-0 h-px bg-c-gold" />}
+                            </button>
+                        ))}
+                    </div>
+
+                    {tab === 'curriculum' ? (
+                        <CurriculumHome
+                            progress={progress}
+                            isUnlocked={isUnlocked}
+                            onSelectUnit={(unit) => { setActiveUnit(unit); setScreen('unit'); }}
+                        />
+                    ) : (
+                        <RagaPractice sa={sa} />
+                    )}
+                </div>
+            )}
+
+            {screen === 'unit' && (
+                <UnitView
                     unit={activeUnit}
+                    progress={progress}
+                    onSelectLesson={(lesson) => { setActiveLesson(lesson); setScreen('lesson'); }}
+                    onBack={() => setScreen('home')}
+                />
+            )}
+
+            {screen === 'lesson' && (
+                <LessonRunner
                     lesson={activeLesson}
                     sa={sa}
                     onComplete={() => {
@@ -712,31 +830,7 @@ export default function Tutor({ saFrequency }) {
                     }}
                     onBack={() => setScreen('unit')}
                 />
-            </div>
-        );
-    }
-
-    if (screen === 'unit') {
-        return (
-            <div className="w-full px-4 md:px-8 py-8 flex justify-center animate-fade-in">
-                <UnitView
-                    unit={activeUnit}
-                    progress={progress}
-                    onSelectLesson={(lesson) => { setActiveLesson(lesson); setScreen('lesson'); }}
-                    onBack={() => setScreen('home')}
-                />
-            </div>
-        );
-    }
-
-    return (
-        <div className="w-full px-4 md:px-8 py-8 flex justify-center animate-fade-in">
-            <HomeView
-                curriculum={CURRICULUM}
-                progress={progress}
-                isUnlocked={isUnlocked}
-                onSelectUnit={(unit) => { setActiveUnit(unit); setScreen('unit'); }}
-            />
+            )}
         </div>
     );
 }

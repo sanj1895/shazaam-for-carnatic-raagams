@@ -1813,6 +1813,7 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
     const [feedback, setFeedback] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
     const [rmsVolume, setRmsVolume] = useState(0);
+    const [guruStyle, setGuruStyle] = useState('classic'); // 'classic' | 'young'
 
     const expectedSwaras = currentExercise?.swaras || (currentExercise?.swara ? [currentExercise.swara] : []);
     const expectedString = expectedSwaras.length > 0 ? expectedSwaras.join(' - ') : 'Sustain Sa / Hmmm';
@@ -1987,6 +1988,11 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
 
     const stopAndAnalyze = async () => {
         cleanup();
+        await generateFeedback(guruStyle);
+    };
+
+    const generateFeedback = async (styleToUse) => {
+        setGuruStyle(styleToUse);
         setPhase('processing');
 
         try {
@@ -2031,7 +2037,8 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
             // Make Groq request if key is available, else mock dynamic feedback
             let feedbackText = '';
             if (GROQ_KEY) {
-                const PROMPT = `You are an expert classical Carnatic vocal coach (guru). 
+                const PROMPT = styleToUse === 'classic'
+                    ? `You are an expert classical Carnatic vocal coach (guru). 
 The student is practicing a lesson in their foundational curriculum.
 
 LESSON CONTEXT:
@@ -2053,7 +2060,26 @@ CRITICAL INSTRUCTIONS FOR GURU:
 3. Compare what they actually sang with what they were expected to sing. Use classical terms naturally like "Shruti alignment", "Swarasthana accuracy", "Arohanam progression", "Avarohanam descent", or "Akaram resonance".
 4. Highlight 1 key vocal strength (e.g., breath control, stable Sa foundation, or natural resonance).
 5. Highlight 1 clear vocal correction needed (e.g., slight sharp or flat drifts, sequence order mismatch, or pitch stability waver).
-6. Give 1 highly actionable classical vocal tip (e.g., visual pitch onset mapping, abdominal breathing, or anchoring ears to the Tambura drone). Do NOT mention cents or numbers in your final feedback.`;
+6. Give 1 highly actionable classical vocal tip (e.g., visual pitch onset mapping, abdominal breathing, or anchoring ears to the Tambura drone). Do NOT mention cents or numbers in your final feedback.`
+                    : `You are an expert Carnatic vocal coach (guru) speaking to a child (12 years or younger) or an absolute beginner.
+The student is practicing a lesson in their foundational curriculum.
+
+LESSON CONTEXT:
+- Lesson Title: "${lesson.title}"
+- Current Exercise: "${currentExercise.title || 'Sing Along'}"
+- Expected Target Swara Sequence to Sing: ${expectedString}
+
+STUDENT PERFORMANCE DATA DETECTED (8-second window):
+- Chronological Swaras Actually Sang: "${chronologicalDetectedSwaras || 'No distinct swaras detected'}"
+
+CRITICAL INSTRUCTIONS FOR GURU:
+1. Speak with the voice of a very warm, loving, kind, and encouraging Carnatic guru, like a sweet, supportive grandparent or teacher.
+2. Greet the student lovingly with a warm blessing (e.g., "Namaste, my dear child!").
+3. Use extremely simple, friendly, and non-technical language. Do NOT use complex technical jargon like "Swarasthana accuracy", "Avarohanam descent", "cents deviation", or "Akaram resonance" without explaining them simply (e.g. call it "singing the notes on target" or "holding a steady voice").
+4. Compare what they actually sang with the target sequence in a very clear, supportive, and simple way.
+5. Highlight 1 simple thing they did great (e.g., "Your voice is so bright and sweet!" or "You hit that first Sa beautifully!").
+6. Highlight 1 friendly little thing to practice with a playful, fun tip (e.g., "Try to hum like a little bee to make your voice super steady!" or "Imagine blowing out a tiny candle to support your breath!").
+7. Keep it very warm and under 120 words (2 short paragraphs maximum). Do NOT mention cents, numbers, or technical stability ratings.`;
 
                 const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: 'POST',
@@ -2076,34 +2102,24 @@ CRITICAL INSTRUCTIONS FOR GURU:
                 feedbackText = data.choices[0]?.message?.content || 'Unable to generate feedback at this time.';
             } else {
                 // Mock pedagogical feedback using stats for offline/no-key usage
-                const sangNotes = stats.map(s => s.note);
-                const missedNotes = expectedSwaras.filter(n => !sangNotes.includes(n));
-                const extraNotes = sangNotes.filter(n => !expectedSwaras.includes(n));
+                const sangNotes = sequenceRef.current;
+                
+                if (styleToUse === 'classic') {
+                    feedbackText = `### 🌟 Guru Sing-Along Feedback (Classical)
 
-                feedbackText = `### 🌟 Guru Sing-Along Feedback (${practiceType})
+Namaste, my dear student. I appreciate your dedication to our classical foundations.
 
-- **Swarasthana Transcription:** You sang: **${sangNotes.join(' - ') || 'No distinct notes'}** (Expected: **${expectedString}**).
-`;
+In this practice of ${practiceType}, you were expected to sing: **${expectedString}**. Your actual performance was: **${sangNotes.join(' - ') || 'Silence'}**. 
 
-                if (missedNotes.length === 0 && extraNotes.length === 0 && sangNotes.length > 0) {
-                    feedbackText += `- **Key Strength:** Excellent pitch lock! You sang the exact expected sequence with precise Shruti alignment.\n`;
-                } else if (missedNotes.length > 0) {
-                    feedbackText += `- **Area to Improve:** You missed **${missedNotes.join(' & ')}** in your voice. Focus on moving your voice deliberately to hit these steps.\n`;
-                } else if (extraNotes.length > 0) {
-                    feedbackText += `- **Drifting Pitches:** You sang target notes but drifted into unintended notes like **${extraNotes.join(' & ')}** in your Akaram resonance.\n`;
+Your basic breath support is stable. To refine your sargam further, focus on keeping your Shruti alignment anchored to the base drone, minimizing minor pitch wavers.`;
                 } else {
-                    feedbackText += `- **No Pitch Lock:** We couldn't establish a clear pitch lock. Make sure to project your voice clearly and hold your pitches steady!\n`;
-                }
+                    feedbackText = `### 🌸 Guru Sing-Along Feedback (Simple & Warm)
 
-                const mostDeviated = stats.reduce((prev, current) => {
-                    return Math.abs(current.avgDev) > Math.abs(prev.avgDev) ? current : prev;
-                }, stats[0]);
+Namaste, my dear child! I am so happy to hear your beautiful voice today!
 
-                if (mostDeviated) {
-                    const sign = mostDeviated.avgDev >= 0 ? 'sharp' : 'flat';
-                    if (Math.abs(mostDeviated.avgDev) > 15) {
-                        feedbackText += `- **Actionable Guru Tip:** Your **${mostDeviated.note}** was slightly **${sign}**. Align your tone and lock your ears onto the Tambura drone to settle naturally.\n`;
-                    }
+For this exercise, we wanted to sing: **${expectedString}**, and you sang: **${sangNotes.join(' - ') || 'Silence'}**!
+
+You did a wonderful job bringing a bright and sweet energy to your singing. To make your notes even steadier, imagine humming like a little bumblebee! Keep practicing, you are doing great!`;
                 }
             }
 
@@ -2250,6 +2266,30 @@ CRITICAL INSTRUCTIONS FOR GURU:
 
                 {phase === 'result' && (
                     <div className="flex flex-col gap-4 animate-fade-in relative z-10">
+                        {/* Elegant Heritage Coach Style Toggle */}
+                        <div className="flex justify-center gap-2 bg-c-gold-faint p-1 rounded-xl border border-c-border/30 max-w-xs mx-auto w-full">
+                            <button
+                                onClick={() => generateFeedback('classic')}
+                                className={`flex-1 py-1.5 px-3 rounded-lg text-[10px] font-playfair uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1 ${
+                                    guruStyle === 'classic' 
+                                        ? 'bg-c-gold text-c-bg shadow-md shadow-c-gold/15' 
+                                        : 'text-c-cream-dim hover:text-c-cream'
+                                }`}
+                            >
+                                🧘🏽‍♂️ Wise Guru (Classic)
+                            </button>
+                            <button
+                                onClick={() => generateFeedback('young')}
+                                className={`flex-1 py-1.5 px-3 rounded-lg text-[10px] font-playfair uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1 ${
+                                    guruStyle === 'young' 
+                                        ? 'bg-c-gold text-c-bg shadow-md shadow-c-gold/15' 
+                                        : 'text-c-cream-dim hover:text-c-cream'
+                                }`}
+                            >
+                                🌸 Young Student (Simple)
+                            </button>
+                        </div>
+
                         <div className="bg-c-gold-faint border border-c-border/20 rounded-xl p-3.5 flex flex-col gap-1.5">
                             <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-c-gold/80 font-bold">
                                 <span>📊</span> Transcript Summary

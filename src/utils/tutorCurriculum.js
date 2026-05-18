@@ -333,21 +333,23 @@ export const CURRICULUM = [
 
 export function parseMmg(str) {
     const map = {
-        's': 'Sa',
-        'r': 'Ri',
-        'g': 'Ga',
-        'm': 'Ma',
-        'p': 'Pa',
-        'd': 'Da',
-        'n': 'Ni',
-        'S': 'Ṡ',
-        ',': ','
+        's': 'Sa', 'r': 'Ri', 'g': 'Ga', 'm': 'Ma', 'p': 'Pa', 'd': 'Da', 'n': 'Ni', 'S': 'Ṡ', ',': ','
     };
-    return str
-        .replace(/[||\s]/g, '')
-        .split('')
-        .map(char => map[char])
-        .filter(Boolean);
+    const tokens = [];
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        if (map[char]) {
+            tokens.push(map[char]);
+        } else if (char === '|') {
+            if (str[i+1] === '|') {
+                tokens.push('||');
+                i++;
+            } else {
+                tokens.push('|');
+            }
+        }
+    }
+    return tokens;
 }
 
 export const SARALI_CURRICULUM = [

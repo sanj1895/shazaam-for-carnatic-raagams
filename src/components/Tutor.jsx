@@ -45,8 +45,9 @@ const playSequenceAsync = async (swaras, sa, onIdx, signal) => {
     const octaves = getOctaveSequence(swaras);
     for (let i = 0; i < swaras.length; i++) {
         if (signal?.aborted) return;
-        onIdx(i);
         const swara = swaras[i];
+        if (swara === '|' || swara === '||') continue;
+        onIdx(i);
         const freq = swaraFreq(swara, sa) * Math.pow(2, octaves[i]);
         playSingleTone(freq, 0.7);
         await new Promise(r => setTimeout(r, 750));
@@ -174,43 +175,36 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
     useEffect(() => { run(); return () => abortRef.current?.abort(); }, [run]);
 
     const renderSwaras = () => {
-        if (swaras.length === 16) {
-            const line1 = swaras.slice(0, 8);
-            const line2 = swaras.slice(8, 16);
-            return (
-                <div className="flex flex-col gap-3 items-center w-full px-4">
-                    {/* Arohanam Line */}
-                    <div className="flex justify-center gap-2.5">
-                        {line1.map((s, idx) => {
-                            const i = idx;
-                            return (
-                                <div key={i} className={`px-3.5 py-2.5 rounded-lg border font-mono text-sm font-bold transition-all duration-100 ${
-                                    i === activeIdx ? 'border-c-gold bg-c-gold text-c-bg scale-115 font-extrabold shadow-lg shadow-c-gold/20' : 'border-c-border text-c-cream-dark bg-c-surface'
-                                }`}>{s}</div>
-                            );
-                        })}
-                    </div>
-                    {/* Avarohanam Line */}
-                    <div className="flex justify-center gap-2.5">
-                        {line2.map((s, idx) => {
-                            const i = idx + 8;
-                            return (
-                                <div key={i} className={`px-3.5 py-2.5 rounded-lg border font-mono text-sm font-bold transition-all duration-100 ${
-                                    i === activeIdx ? 'border-c-gold bg-c-gold text-c-bg scale-115 font-extrabold shadow-lg shadow-c-gold/20' : 'border-c-border text-c-cream-dark bg-c-surface'
-                                }`}>{s}</div>
-                            );
-                        })}
-                    </div>
-                </div>
-            );
+        const lines = [];
+        let currentLine = [];
+        for (let idx = 0; idx < swaras.length; idx++) {
+            currentLine.push({ s: swaras[idx], i: idx });
+            if (swaras[idx] === '||') {
+                lines.push(currentLine);
+                currentLine = [];
+            }
         }
+        if (currentLine.length > 0) lines.push(currentLine);
 
         return (
-            <div className="flex flex-wrap justify-center gap-2">
-                {swaras.map((s, i) => (
-                    <div key={i} className={`px-3.5 py-2.5 rounded-lg border font-mono text-sm font-bold transition-all duration-100 ${
-                        i === activeIdx ? 'border-c-gold bg-c-gold text-c-bg scale-115 font-extrabold shadow-lg shadow-c-gold/20' : 'border-c-border text-c-cream-dark bg-c-surface'
-                    }`}>{s}</div>
+            <div className="flex flex-col gap-3 items-center w-full px-4">
+                {lines.map((line, lIdx) => (
+                    <div key={lIdx} className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                        {line.map(({ s, i }) => {
+                            if (s === '|' || s === '||') {
+                                return (
+                                    <div key={i} className={`flex items-center text-c-gold/40 font-light mx-0.5 sm:mx-1 ${s === '||' ? 'tracking-widest' : ''}`}>
+                                        {s}
+                                    </div>
+                                );
+                            }
+                            return (
+                                <div key={i} className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2.5 rounded-lg border font-mono text-xs sm:text-sm font-bold transition-all duration-100 ${
+                                    i === activeIdx ? 'border-c-gold bg-c-gold text-c-bg scale-115 font-extrabold shadow-lg shadow-c-gold/20' : 'border-c-border text-c-cream-dark bg-c-surface'
+                                }`}>{s}</div>
+                            );
+                        })}
+                    </div>
                 ))}
             </div>
         );
@@ -1464,6 +1458,8 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
     
     const [isPlayingGuide, setIsPlayingGuide] = useState(false);
     
+    const beatToSwaraIdx = React.useMemo(() => swaras.map((s, i) => (s !== '|' && s !== '||') ? i : -1).filter(i => i !== -1), [swaras]);
+
     const streamRef = useRef(null);
     const intervalRef = useRef(null);
     const guideAbortRef = useRef(null);
@@ -1543,16 +1539,19 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
         intervalRef.current = setInterval(() => {
             const now = Date.now();
             const elapsed = now - startMs;
-            const currentIdx = Math.floor(elapsed / NOTE_MS);
+            const currentBeat = Math.floor(elapsed / NOTE_MS);
             
-            if (currentIdx >= swaras.length) {
+            if (currentBeat >= beatToSwaraIdx.length) {
                 cleanup();
                 // Evaluate
-                const finalStatuses = scoresRef.current.map(s => (s.total > 0 && s.hits / s.total > 0.3) ? 'hit' : 'miss');
+                const finalStatuses = scoresRef.current.map((s, i) => {
+                    if (swaras[i] === '|' || swaras[i] === '||') return null;
+                    return (s.total > 0 && s.hits / s.total > 0.3) ? 'hit' : 'miss';
+                });
                 setStatuses(finalStatuses);
                 setActiveIdx(-1);
                 const hitCount = finalStatuses.filter(s => s === 'hit').length;
-                if (hitCount / swaras.length >= 0.7) {
+                if (hitCount / beatToSwaraIdx.length >= 0.7) {
                     setPhase('success');
                 } else {
                     setPhase('fail');
@@ -1560,9 +1559,11 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                 return;
             }
 
+            const currentIdx = beatToSwaraIdx[currentBeat];
+
             if (currentIdx !== activeIdx) {
                 setActiveIdx(currentIdx);
-                const beatIdx = Math.floor(currentIdx / speed);
+                const beatIdx = Math.floor(currentBeat / speed);
                 if (beatIdx !== lastBeat) {
                     playTick(ctx, ctx.currentTime);
                     lastBeat = beatIdx;
@@ -1615,57 +1616,40 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             <p className="text-c-cream-dark text-sm font-playfair italic text-center leading-relaxed">{instruction}</p>
             
             {(() => {
-                if (swaras.length === 16) {
-                    const line1 = swaras.slice(0, 8);
-                    const line2 = swaras.slice(8, 16);
-                    return (
-                        <div className="flex flex-col gap-3.5 items-center w-full px-4">
-                            {/* Arohanam Line */}
-                            <div className="flex justify-center gap-2">
-                                {line1.map((s, idx) => {
-                                    const i = idx;
-                                    return (
-                                        <div key={i} className={`w-9 h-11 flex items-center justify-center font-mono text-sm font-bold border rounded-md transition-all duration-75 ${
-                                            i === activeIdx ? 'scale-115 shadow-lg border-c-gold bg-c-gold/25 text-c-gold font-extrabold' :
-                                            statuses[i] === 'hit' ? 'border-emerald-800/30 bg-emerald-800/15 text-emerald-800 font-bold' :
-                                            statuses[i] === 'miss' ? 'border-red-700/30 bg-red-950/15 text-red-800 font-bold' :
-                                            'border-c-border/50 bg-c-card text-c-cream-dim'
-                                        }`}>
-                                            {mode === 'akaram' && s !== ',' ? 'A' : (s === ',' ? '-' : s.replace(/[0-9]/g, ''))}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                            {/* Avarohanam Line */}
-                            <div className="flex justify-center gap-2">
-                                {line2.map((s, idx) => {
-                                    const i = idx + 8;
-                                    return (
-                                        <div key={i} className={`w-9 h-11 flex items-center justify-center font-mono text-sm font-bold border rounded-md transition-all duration-75 ${
-                                            i === activeIdx ? 'scale-115 shadow-lg border-c-gold bg-c-gold/25 text-c-gold font-extrabold' :
-                                            statuses[i] === 'hit' ? 'border-emerald-800/30 bg-emerald-800/15 text-emerald-800 font-bold' :
-                                            statuses[i] === 'miss' ? 'border-red-700/30 bg-red-950/15 text-red-800 font-bold' :
-                                            'border-c-border/50 bg-c-card text-c-cream-dim'
-                                        }`}>
-                                            {mode === 'akaram' && s !== ',' ? 'A' : (s === ',' ? '-' : s.replace(/[0-9]/g, ''))}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    );
+                const lines = [];
+                let currentLine = [];
+                for (let idx = 0; idx < swaras.length; idx++) {
+                    currentLine.push({ s: swaras[idx], i: idx });
+                    if (swaras[idx] === '||') {
+                        lines.push(currentLine);
+                        currentLine = [];
+                    }
                 }
+                if (currentLine.length > 0) lines.push(currentLine);
 
                 return (
-                    <div className="flex flex-wrap justify-center gap-1.5 max-w-2xl px-4">
-                        {swaras.map((s, i) => (
-                            <div key={i} className={`w-9 h-11 flex items-center justify-center font-mono text-sm font-bold border rounded-md transition-all duration-75 ${
-                                i === activeIdx ? 'scale-115 shadow-lg border-c-gold bg-c-gold/25 text-c-gold font-extrabold' :
-                                statuses[i] === 'hit' ? 'border-emerald-800/30 bg-emerald-800/15 text-emerald-800 font-bold' :
-                                statuses[i] === 'miss' ? 'border-red-700/30 bg-red-950/15 text-red-800 font-bold' :
-                                'border-c-border/50 bg-c-card text-c-cream-dim'
-                            }`}>
-                                {mode === 'akaram' && s !== ',' ? 'A' : (s === ',' ? '-' : s.replace(/[0-9]/g, ''))}
+                    <div className="flex flex-col gap-3.5 items-center w-full px-4">
+                        {lines.map((line, lIdx) => (
+                            <div key={lIdx} className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
+                                {line.map(({ s, i }) => {
+                                    if (s === '|' || s === '||') {
+                                        return (
+                                            <div key={i} className={`flex items-center text-c-gold/40 font-light mx-0.5 sm:mx-1 ${s === '||' ? 'tracking-widest' : ''}`}>
+                                                {s}
+                                            </div>
+                                        );
+                                    }
+                                    return (
+                                        <div key={i} className={`w-8 sm:w-9 h-10 sm:h-11 flex items-center justify-center font-mono text-xs sm:text-sm font-bold border rounded-md transition-all duration-75 ${
+                                            i === activeIdx ? 'scale-115 shadow-lg border-c-gold bg-c-gold/25 text-c-gold font-extrabold' :
+                                            statuses[i] === 'hit' ? 'border-emerald-800/30 bg-emerald-800/15 text-emerald-800 font-bold' :
+                                            statuses[i] === 'miss' ? 'border-red-700/30 bg-red-950/15 text-red-800 font-bold' :
+                                            'border-c-border/50 bg-c-card text-c-cream-dim'
+                                        }`}>
+                                            {mode === 'akaram' && s !== ',' ? 'A' : (s === ',' ? '-' : s.replace(/[0-9]/g, ''))}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         ))}
                     </div>

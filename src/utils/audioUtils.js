@@ -167,20 +167,20 @@ export function playNote(note, saHz, ctx, options = {}) {
 export function getOctaveSequence(notes) {
   const octaves = [];
   let octave = 0;
+  let lastNoteSemi = 0;
   for (let i = 0; i < notes.length; i++) {
-    const currSemi = SWARA_SEMITONE[notes[i]] ?? 0;
-    if (i > 0) {
-      const prevSemi = SWARA_SEMITONE[notes[i - 1]] ?? 0;
-      // Ascending wrap: high note → lower semitone = we went up an octave
-      if (currSemi < prevSemi && (prevSemi - currSemi) > 6) {
-        octave++;
-      }
-      // Descending wrap: low note → higher semitone = we went down an octave
-      if (currSemi > prevSemi && (currSemi - prevSemi) > 6 && octave > 0) {
-        octave--;
-      }
+    const swara = notes[i];
+    if (swara === '|' || swara === '||' || swara === ',') {
+       octaves.push(octave);
+       continue;
+    }
+    const currSemi = SWARA_SEMITONE[swara] ?? 0;
+    if (i > 0 && lastNoteSemi !== undefined) {
+      if (currSemi < lastNoteSemi && (lastNoteSemi - currSemi) > 6) octave++;
+      if (currSemi > lastNoteSemi && (currSemi - lastNoteSemi) > 6 && octave > 0) octave--;
     }
     octaves.push(octave);
+    lastNoteSemi = currSemi;
   }
   return octaves;
 }

@@ -946,7 +946,10 @@ export const identifyRaga = (detectedSwarams, noteFrequencies = {}) => {
     let candidates = [];
 
     for (const [name, data] of Object.entries(RAGAS)) {
-        const ragaNotes = new Set([...data.arohanam, ...data.avarohanam]);
+        const cleanArohanam = data.arohanam.filter(n => n !== '|' && n !== '||' && n !== ',');
+        const cleanAvarohanam = data.avarohanam.filter(n => n !== '|' && n !== '||' && n !== ',');
+        
+        const ragaNotes = new Set([...cleanArohanam, ...cleanAvarohanam]);
 
         let matchCount = 0;
         let alienCount = 0;
@@ -960,8 +963,8 @@ export const identifyRaga = (detectedSwarams, noteFrequencies = {}) => {
 
         // Arohanam prominence: are the arohanam notes sung more than average?
         // Janya ragas with skip notes score higher when those skipped notes are rare.
-        const arohanamSet = new Set(data.arohanam);
-        const arohanamNotes = data.arohanam.filter(n => n !== 'Sa');
+        const arohanamSet = new Set(cleanArohanam);
+        const arohanamNotes = cleanArohanam.filter(n => n !== 'Sa');
         // Sum frequency for arohanam notes, checking enharmonic equivalents too
         const getFreq = (n) => (noteFrequencies[n] || 0) + (noteFrequencies[ENHARMONIC[n]] || 0);
         const avgArohanamFreq = arohanamNotes.length
@@ -974,7 +977,7 @@ export const identifyRaga = (detectedSwarams, noteFrequencies = {}) => {
         // Vakra penalty: notes that appear in avarohanam but NOT arohanam should be rare.
         // If they're sung frequently, this raga is a worse fit (those notes should only appear in descent).
         const inArohanam = (n) => arohanamSet.has(n) || (ENHARMONIC[n] && arohanamSet.has(ENHARMONIC[n]));
-        const vakraNotes = data.avarohanam.filter(n => !inArohanam(n) && n !== 'Sa');
+        const vakraNotes = cleanAvarohanam.filter(n => !inArohanam(n) && n !== 'Sa');
         const avgVakraFreq = vakraNotes.length
             ? vakraNotes.reduce((s, n) => s + getFreq(n), 0) / vakraNotes.length
             : 0;

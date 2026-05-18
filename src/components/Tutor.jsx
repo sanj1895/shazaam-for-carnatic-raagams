@@ -352,39 +352,40 @@ function ExerciseCompare({ note1, note2, question, choices, correct, sa, onDone 
 
 function ExerciseTaalam({ instruction, onDone }) {
     const gestures = [
-        { label: 'Pat', icon: '🦵', gifUrl: '/gestures/pat.gif' },
-        { label: 'Pinky', icon: '🖐', gifUrl: '/gestures/pinky.gif' },
-        { label: 'Ring', icon: '🖐', gifUrl: '/gestures/ring.gif' },
-        { label: 'Middle', icon: '🖐', gifUrl: '/gestures/middle.gif' },
-        { label: 'Pat', icon: '🦵', gifUrl: '/gestures/pat.gif' },
-        { label: 'Wave', icon: '👋', gifUrl: '/gestures/wave.gif' },
-        { label: 'Pat', icon: '🦵', gifUrl: '/gestures/pat.gif' },
-        { label: 'Wave', icon: '👋', gifUrl: '/gestures/wave.gif' }
+        { label: 'Pat', icon: '🦵', desc: 'Pat your right thigh with your right hand. This is the downbeat — the strongest beat in the cycle.' },
+        { label: 'Pinky', icon: '🖐', desc: 'Keep your hand on your thigh. Tap your pinky finger down.' },
+        { label: 'Ring', icon: '🖐', desc: 'Tap your ring finger down, one after the other.' },
+        { label: 'Middle', icon: '🖐', desc: 'Tap your middle finger down. That completes the first group of 4.' },
+        { label: 'Pat', icon: '🦵', desc: 'Pat your thigh again — this is beat 5, the start of the second group.' },
+        { label: 'Wave', icon: '👋', desc: 'Flip your hand over so the back of your hand faces up. This is the Wave (Visarjitam).' },
+        { label: 'Pat', icon: '🦵', desc: 'Pat your thigh again — beat 7.' },
+        { label: 'Wave', icon: '👋', desc: 'Flip your hand over again. Beat 8 — and the cycle is complete. It loops back to beat 1.' },
     ];
-    
-    const [phase, setPhase] = useState('idle'); // idle, watching, ready, practicing, success
+
+    const [phase, setPhase] = useState('idle'); // idle, stepthrough, watching, ready, practicing, success
+    const [stepIdx, setStepIdx] = useState(0);
     const [beat, setBeat] = useState(-1);
-    const [hits, setHits] = useState(Array(8).fill(null)); 
-    
+    const [hits, setHits] = useState(Array(8).fill(null));
+
     const nextBeatTime = useRef(0);
     const currentBeatIdx = useRef(-1);
     const audioCtx = useRef(null);
     const timer = useRef(null);
     const beatsPlayed = useRef(0);
-    
+
     const bpm = 50;
     const beatDuration = 60 / bpm;
-    
+
     const cleanup = () => {
         clearTimeout(timer.current);
         if (audioCtx.current && audioCtx.current.state !== 'closed') audioCtx.current.close();
     };
     useEffect(() => () => cleanup(), []);
-    
+
     const scheduleNextBeat = (mode) => {
         if (!audioCtx.current) return;
         const now = audioCtx.current.currentTime;
-        
+
         while (nextBeatTime.current < now + 0.1) {
             if (mode === 'watching' && beatsPlayed.current >= 8) {
                 setTimeout(() => {
@@ -398,8 +399,7 @@ function ExerciseTaalam({ instruction, onDone }) {
             const b = (currentBeatIdx.current + 1) % 8;
             currentBeatIdx.current = b;
             beatsPlayed.current++;
-            
-            // Play tick
+
             const osc = audioCtx.current.createOscillator();
             const gain = audioCtx.current.createGain();
             osc.frequency.value = (b === 0 || b === 4 || b === 6) ? 1000 : 600;
@@ -409,8 +409,7 @@ function ExerciseTaalam({ instruction, onDone }) {
             gain.gain.exponentialRampToValueAtTime(0.01, nextBeatTime.current + 0.05);
             osc.start(nextBeatTime.current);
             osc.stop(nextBeatTime.current + 0.05);
-            
-            // Schedule UI update
+
             const delay = (nextBeatTime.current - now) * 1000;
             const capturedBeat = b;
             setTimeout(() => {
@@ -426,12 +425,12 @@ function ExerciseTaalam({ instruction, onDone }) {
                     });
                 }
             }, delay);
-            
+
             nextBeatTime.current += beatDuration;
         }
         timer.current = setTimeout(() => scheduleNextBeat(mode), 50);
     };
-    
+
     const start = (mode) => {
         cleanup();
         setPhase(mode);
@@ -443,13 +442,12 @@ function ExerciseTaalam({ instruction, onDone }) {
         beatsPlayed.current = 0;
         scheduleNextBeat(mode);
     };
-    
+
     const handleTap = () => {
         if (phase !== 'practicing') return;
         const now = audioCtx.current.currentTime;
         const expected = nextBeatTime.current - beatDuration;
         const diff = Math.abs(now - expected);
-        
         if (diff < 0.3) {
             setHits(prev => {
                 const newHits = [...prev];
@@ -458,16 +456,57 @@ function ExerciseTaalam({ instruction, onDone }) {
             });
         }
     };
-    
+
     useEffect(() => {
         if (phase === 'practicing' && hits.every(h => h === 'hit')) {
-            setTimeout(() => {
-                cleanup();
-                setPhase('success');
-            }, 1000);
+            setTimeout(() => { cleanup(); setPhase('success'); }, 1000);
         }
     }, [hits, phase]);
-    
+
+    // ── Step-through view ──────────────────────────────────────────────
+    if (phase === 'stepthrough') {
+        const g = gestures[stepIdx];
+        return (
+            <div className="flex flex-col items-center gap-6 w-full max-w-sm mx-auto animate-fade-in">
+                <div className="flex items-center gap-2 self-start">
+                    {gestures.map((_, i) => (
+                        <div key={i} className={`w-2 h-2 rounded-full transition-colors ${i === stepIdx ? 'bg-c-gold' : i < stepIdx ? 'bg-c-gold/40' : 'bg-c-border'}`} />
+                    ))}
+                </div>
+
+                <p className="text-[11px] text-c-cream-dark font-mono uppercase tracking-widest self-start">Beat {stepIdx + 1} of 8</p>
+
+                <div className="w-full bg-c-surface border border-c-gold/30 rounded-2xl p-8 flex flex-col items-center gap-4">
+                    <span className="text-7xl">{g.icon}</span>
+                    <span className="text-xl font-mono font-bold text-c-gold">{g.label}</span>
+                    <p className="text-sm text-c-cream font-playfair text-center leading-relaxed">{g.desc}</p>
+                </div>
+
+                <div className="flex items-center gap-4 w-full">
+                    <button
+                        onClick={() => stepIdx > 0 ? setStepIdx(i => i - 1) : setPhase('idle')}
+                        className="px-5 py-2 border border-c-border text-c-cream-dim text-sm rounded-full font-playfair hover:border-c-gold/40 transition-colors">
+                        ← Back
+                    </button>
+                    {stepIdx < 7 ? (
+                        <button
+                            onClick={() => setStepIdx(i => i + 1)}
+                            className="flex-1 py-2.5 bg-c-gold text-c-bg rounded-full font-playfair font-bold text-sm hover:opacity-90 transition-opacity">
+                            Next beat →
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => start('watching')}
+                            className="flex-1 py-2.5 bg-c-gold text-c-bg rounded-full font-playfair font-bold text-sm hover:opacity-90 transition-opacity">
+                            Now watch it in action →
+                        </button>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
+    // ── Main grid view (watching / practicing / success) ───────────────
     return (
         <div className="flex flex-col items-center gap-8 w-full max-w-md mx-auto">
             <p className="text-c-cream-dark text-sm font-playfair italic text-center leading-relaxed">
@@ -476,52 +515,51 @@ function ExerciseTaalam({ instruction, onDone }) {
                 {phase === 'ready' && "Now it's your turn. Tap exactly on the beat."}
                 {phase === 'practicing' && instruction}
             </p>
-            
+
             <div className="grid grid-cols-4 gap-3 w-full">
                 {gestures.map((g, i) => (
                     <div key={i} className={`relative flex flex-col items-center justify-center p-2 h-24 rounded-xl border transition-all duration-200 overflow-hidden ${
                         beat === i ? 'border-c-gold shadow-[0_0_12px_rgba(234,179,8,0.4)] scale-105 z-10' : 'border-c-border opacity-60'
                     }`}>
-                        {/* Animated Gesture Icon */}
                         <div className="z-20 flex flex-col items-center">
                             <span className={`text-3xl mb-1 transition-all duration-150 ${
                                 beat === i ? (
-                                    g.label === 'Clap' ? 'scale-125 -rotate-12' : 
-                                    g.label === 'Wave' ? 'scale-110 rotate-12 origin-bottom' : 
+                                    g.label === 'Wave' ? 'scale-110 rotate-12 origin-bottom' :
                                     '-translate-y-2 scale-110'
                                 ) : 'scale-100 rotate-0'
                             }`}>{g.icon}</span>
                             <span className={`text-[10px] font-mono font-bold ${beat === i ? 'text-c-gold' : 'text-c-cream-dark'}`}>{g.label}</span>
                         </div>
-                        
+
                         {(phase === 'practicing' || phase === 'success') && (
                             <div className={`absolute bottom-2 right-2 w-2 h-2 rounded-full z-20 ${
-                                hits[i] === 'hit' ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 
+                                hits[i] === 'hit' ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' :
                                 hits[i] === 'miss' ? 'bg-red-500' : 'bg-c-border/50'
                             }`} />
                         )}
                     </div>
                 ))}
             </div>
-            
+
             {phase === 'idle' && (
-                <button onClick={() => start('watching')} className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors">
-                    Watch Demonstration
+                <button onClick={() => { setStepIdx(0); setPhase('stepthrough'); }}
+                        className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors">
+                    Learn the gestures →
                 </button>
             )}
-            
+
             {phase === 'ready' && (
                 <button onClick={() => start('practicing')} className="px-8 py-2.5 bg-c-gold text-c-bg rounded-full font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity">
                     I'm Ready to Practice
                 </button>
             )}
-            
+
             {phase === 'practicing' && (
                 <button onClick={handleTap} className="w-40 h-40 rounded-full bg-c-gold text-c-bg font-playfair text-xl font-bold tracking-widest shadow-xl shadow-c-gold/20 active:scale-95 transition-transform">
                     TAP
                 </button>
             )}
-            
+
             {phase === 'success' && (
                 <div className="flex flex-col items-center gap-3 animate-fade-in">
                     <div className="text-emerald-800 text-sm font-playfair italic font-bold">Perfect Rhythm!</div>

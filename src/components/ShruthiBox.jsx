@@ -87,7 +87,7 @@ function CtrlLabel({ children }) {
   );
 }
 
-function SpeakerGrille({ size }) {
+function SpeakerGrille() {
   const petalCount = 8;
   const petals = Array.from({ length: petalCount }, (_, i) => {
     const angle = (i * (360 / petalCount)) * (Math.PI / 180);
@@ -114,7 +114,7 @@ function SpeakerGrille({ size }) {
   });
 
   return (
-    <svg viewBox="0 0 100 100" width={size} height={size}>
+    <svg viewBox="0 0 100 100" className="w-full h-full">
       <circle cx="50" cy="50" r="46" fill="none" stroke="#9a8840" strokeWidth="2.5" />
       <circle cx="50" cy="50" r="42" fill="none" stroke="#9a8840" strokeWidth="0.5" strokeDasharray="1,2" />
       {petals}
@@ -249,9 +249,6 @@ export default function ShruthiBox() {
   const currentPitch = PITCHES.find(p => Math.abs(p.hz - saHz) < 1);
   const knobAngle    = -135 + ((volume - 0.05) / 0.95) * 270;
 
-  // Piano key dimensions
-  const wkW = 74, wkH = 104, bkW = 44, bkH = 68;
-
   // ── Shared style tokens ────────────────────────────────────────────────────
   const s = {
     body: {
@@ -269,7 +266,7 @@ export default function ShruthiBox() {
     panel: {
       background: 'linear-gradient(172deg, #eee3c4, #d8cfa4)',
       borderBottom: '3px solid #b4a464',
-      padding: '16px 18px 15px',
+      padding: '16px 14px 15px',
       boxShadow: 'inset 0 2px 9px rgba(0,0,0,0.14)',
     },
     lcd: {
@@ -278,12 +275,12 @@ export default function ShruthiBox() {
       borderRadius: 3,
       padding: '3px 6px',
       color: '#d4a030',
-      fontSize: 14,
+      fontSize: 13,
       fontFamily: '"Courier New", monospace',
       letterSpacing: '0.05em',
       boxShadow: 'inset 0 1px 5px rgba(0,0,0,0.85)',
       textAlign: 'center',
-      minWidth: 80,
+      minWidth: 70,
     },
     led: (on) => ({
       width: 9, height: 9,
@@ -309,47 +306,47 @@ export default function ShruthiBox() {
       <div style={s.panel}>
 
         {/* Header strip */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 12 }}>
           <div>
-            <div style={{ fontSize: 10, color: '#7a2010', letterSpacing: '0.3em', fontWeight: 'bold', textTransform: 'uppercase' }}>ELECTRONIC</div>
-            <div style={{ fontSize: 14, color: '#6b1808', letterSpacing: '0.2em', fontWeight: 'bold', textTransform: 'uppercase', marginTop: 1 }}>SHRUTI BOX</div>
+            <div style={{ fontSize: 9, color: '#7a2010', letterSpacing: '0.25em', fontWeight: 'bold', textTransform: 'uppercase' }}>ELECTRONIC</div>
+            <div style={{ fontSize: 12, color: '#6b1808', letterSpacing: '0.15em', fontWeight: 'bold', textTransform: 'uppercase', marginTop: 1 }}>SHRUTI BOX</div>
           </div>
 
           {/* LED cluster */}
-          <div style={{ display: 'flex', gap: 10, paddingBottom: 2 }}>
+          <div style={{ display: 'flex', gap: 8, paddingBottom: 2 }}>
             {[{ label: 'PWR', on: playing }, { label: 'SA', on: playing }].map(({ label, on }) => (
               <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                 <div style={s.led(on)} />
-                <span style={{ fontSize: 5.5, color: '#5c2c0a', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{label}</span>
+                <span style={{ fontSize: 5, color: '#5c2c0a', letterSpacing: '0.05em', textTransform: 'uppercase' }}>{label}</span>
               </div>
             ))}
           </div>
 
           {/* Brand */}
-          <div style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontWeight: '900', fontSize: 18, color: '#7a1212', letterSpacing: '0.05em' }}>
+          <div style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontWeight: '900', fontSize: 16, color: '#7a1212', letterSpacing: '0.05em' }}>
             Alapana
           </div>
         </div>
 
         {/* ── Mini piano keyboard ── */}
-        <div style={{ position: 'relative', height: wkH, width: wkW * 7, marginBottom: 18, marginLeft: 'auto', marginRight: 'auto' }}>
+        <div className="relative w-full max-w-[518px] mx-auto mb-4" style={{ height: 'calc(11vw + 36px)', maxHeight: 100, minHeight: 64 }}>
           {WHITE_KEYS.map((key, i) => {
             const sel = Math.abs(saHz - key.hz) < 1;
             return (
               <div key={key.label} onClick={() => handleSaChange(key.hz)} style={{
-                position: 'absolute', left: i * wkW, top: 0,
-                width: wkW - 3, height: wkH,
+                position: 'absolute', left: `${i * 14.285}%`, top: 0,
+                width: '14.285%', height: '100%',
                 background: sel
                   ? 'linear-gradient(to bottom, #ffc050, #df7e18)'
                   : 'linear-gradient(to bottom, #f8f4e6, #e8e0c8)',
                 border: `1px solid ${sel ? '#be6c10' : '#afa880'}`,
-                borderRadius: '0 0 7px 7px',
+                borderRadius: '0 0 6px 6px',
                 boxShadow: sel
                   ? 'inset 0 -3px 6px rgba(0,0,0,0.22)'
-                  : '0 2px 6px rgba(0,0,0,0.12), inset 0 -1px 2px rgba(0,0,0,0.07)',
+                  : '0 2px 5px rgba(0,0,0,0.12), inset 0 -1px 2px rgba(0,0,0,0.07)',
                 cursor: 'pointer', zIndex: 1, transition: 'background 0.1s',
                 display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-                paddingBottom: 8, fontSize: 13, fontWeight: 'bold',
+                paddingBottom: 6, fontSize: 'clamp(9px, 2.5vw, 12px)', fontWeight: 'bold',
                 color: sel ? '#713008' : '#888060',
               }}>
                 {key.label}
@@ -358,22 +355,22 @@ export default function ShruthiBox() {
           })}
           {BLACK_KEYS.map((key) => {
             const sel = Math.abs(saHz - key.hz) < 1;
-            const left = (key.afterWhite + 1) * wkW - bkW / 2 - 1.5;
+            const left = `${(key.afterWhite + 1) * 14.285 - 4.25}%`;
             return (
               <div key={key.label} onClick={() => handleSaChange(key.hz)} style={{
                 position: 'absolute', left, top: 0,
-                width: bkW, height: bkH,
+                width: '8.5%', height: '62%',
                 background: sel
                   ? 'linear-gradient(to bottom, #b05010, #7a3408)'
                   : 'linear-gradient(to bottom, #242018, #141008)',
                 border: `1px solid ${sel ? '#8a3c08' : '#060400'}`,
-                borderRadius: '0 0 5px 5px',
+                borderRadius: '0 0 4px 4px',
                 boxShadow: sel
-                  ? 'inset 0 -2px 6px rgba(0,0,0,0.4)'
-                  : '2px 4px 8px rgba(0,0,0,0.55), inset 0 -3px 6px rgba(0,0,0,0.4)',
+                  ? 'inset 0 -2px 5px rgba(0,0,0,0.4)'
+                  : '1px 3px 6px rgba(0,0,0,0.55), inset 0 -2px 4px rgba(0,0,0,0.4)',
                 cursor: 'pointer', zIndex: 2, transition: 'background 0.1s',
                 display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-                paddingBottom: 5, fontSize: 10,
+                paddingBottom: 4, fontSize: 'clamp(7px, 1.8vw, 9px)',
                 color: sel ? '#ffa030' : '#604028',
               }}>
                 {sel ? key.label : ''}
@@ -383,82 +380,81 @@ export default function ShruthiBox() {
         </div>
 
         {/* ── Controls row ── */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
-
-          {/* MAIN SA */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-            <ArrowBtn onClick={() => changePitch(+1)} up />
-            <div style={s.lcd}>{currentPitch?.label ?? '--'}</div>
-            <ArrowBtn onClick={() => changePitch(-1)} up={false} />
-            <CtrlLabel>MAIN SA</CtrlLabel>
-          </div>
-
-          {/* Hz readout */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-            <div style={{ ...s.lcd, minWidth: 80, fontSize: 12 }}>{Math.round(saHz)} Hz</div>
-            <CtrlLabel>SA FREQ</CtrlLabel>
-          </div>
-
-          <div style={{ flex: 1 }} />
-
-          {/* VOLUME */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-            <ArrowBtn onClick={() => adjustVolume(+0.1)} up />
-            <ArrowBtn onClick={() => adjustVolume(-0.1)} up={false} />
-            <CtrlLabel>VOLUME</CtrlLabel>
-          </div>
-
-          {/* Rotary knob (scroll-wheel adjusts volume) */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <div
-              onWheel={e => { e.preventDefault(); adjustVolume(e.deltaY < 0 ? 0.05 : -0.05); }}
-              style={{
-                width: 70, height: 70, borderRadius: '50%', position: 'relative',
-                background: 'radial-gradient(circle at 36% 30%, #7a3618, #361208)',
-                boxShadow: '2px 4px 9px rgba(0,0,0,0.68), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 3px rgba(0,0,0,0.55)',
-                cursor: 'ns-resize',
-              }}
-            >
-              {/* Indicator tick */}
-              <div style={{
-                position: 'absolute', bottom: '50%', left: '50%',
-                width: 3, height: '38%',
-                background: '#e8d8a8', borderRadius: 2,
-                transformOrigin: 'bottom center',
-                transform: `translateX(-50%) rotate(${knobAngle}deg)`,
-                transition: 'transform 0.1s',
-              }} />
-              {/* Hub dot */}
-              <div style={{
-                position: 'absolute', top: '50%', left: '50%',
-                width: 8, height: 8, borderRadius: '50%',
-                background: '#c89030',
-                transform: 'translate(-50%, -50%)',
-                boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5)',
-              }} />
+        <div className="flex flex-wrap items-center justify-between gap-4 mt-3">
+          <div className="flex items-end gap-2.5">
+            {/* MAIN SA */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+              <ArrowBtn onClick={() => changePitch(+1)} up />
+              <div style={s.lcd}>{currentPitch?.label ?? '--'}</div>
+              <ArrowBtn onClick={() => changePitch(-1)} up={false} />
+              <CtrlLabel>MAIN SA</CtrlLabel>
             </div>
-            <CtrlLabel>TONE/VOL</CtrlLabel>
+
+            {/* Hz readout */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+              <div style={{ ...s.lcd, minWidth: 64 }}>{Math.round(saHz)} Hz</div>
+              <CtrlLabel>SA FREQ</CtrlLabel>
+            </div>
           </div>
 
+          <div className="flex items-end gap-2.5 ml-auto">
+            {/* VOLUME */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+              <ArrowBtn onClick={() => adjustVolume(+0.1)} up />
+              <ArrowBtn onClick={() => adjustVolume(-0.1)} up={false} />
+              <CtrlLabel>VOLUME</CtrlLabel>
+            </div>
+
+            {/* Rotary knob */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+              <div
+                onWheel={e => { e.preventDefault(); adjustVolume(e.deltaY < 0 ? 0.05 : -0.05); }}
+                style={{
+                  width: 52, height: 52, borderRadius: '50%', position: 'relative',
+                  background: 'radial-gradient(circle at 36% 30%, #7a3618, #361208)',
+                  boxShadow: '2px 4px 9px rgba(0,0,0,0.68), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 3px rgba(0,0,0,0.55)',
+                  cursor: 'ns-resize',
+                }}
+              >
+                {/* Indicator tick */}
+                <div style={{
+                  position: 'absolute', bottom: '50%', left: '50%',
+                  width: 2.5, height: '38%',
+                  background: '#e8d8a8', borderRadius: 2,
+                  transformOrigin: 'bottom center',
+                  transform: `translateX(-50%) rotate(${knobAngle}deg)`,
+                  transition: 'transform 0.1s',
+                }} />
+                {/* Hub dot */}
+                <div style={{
+                  position: 'absolute', top: '50%', left: '50%',
+                  width: 6, height: 6, borderRadius: '50%',
+                  background: '#c89030',
+                  transform: 'translate(-50%, -50%)',
+                  boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5)',
+                }} />
+              </div>
+              <CtrlLabel>TONE/VOL</CtrlLabel>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* ══════════════ FRONT FACE ══════════════ */}
-      <div style={{ padding: '20px 24px 24px', display: 'flex', gap: 24, alignItems: 'center' }}>
+      <div className="p-4 sm:p-5 flex flex-col sm:flex-row gap-5 sm:gap-6 items-center">
 
         {/* Circular speaker grille */}
-        <div style={{
-          width: 180, height: 180, flexShrink: 0, borderRadius: '50%',
-          background: 'radial-gradient(circle at 42% 38%, #ddd0a0, #bca870)',
-          boxShadow: 'inset 0 6px 20px rgba(0,0,0,0.3), inset 0 -3px 8px rgba(255,240,180,0.12), 0 4px 12px rgba(0,0,0,0.22)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          overflow: 'hidden',
-        }}>
-          <SpeakerGrille size={180} />
+        <div className="w-32 h-32 sm:w-38 sm:h-38 flex-shrink-0 rounded-full flex items-center justify-center overflow-hidden"
+          style={{
+            background: 'radial-gradient(circle at 42% 38%, #ddd0a0, #bca870)',
+            boxShadow: 'inset 0 6px 20px rgba(0,0,0,0.3), inset 0 -3px 8px rgba(255,240,180,0.12), 0 4px 12px rgba(0,0,0,0.22)',
+          }}
+        >
+          <SpeakerGrille />
         </div>
 
         {/* Right panel */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className="w-full flex-1 flex flex-col gap-3">
 
           {/* Drone string LED toggles */}
           <div style={{
@@ -467,18 +463,18 @@ export default function ShruthiBox() {
             borderRadius: 8, padding: '8px 10px',
             boxShadow: 'inset 0 1px 5px rgba(0,0,0,0.13)',
           }}>
-            <div style={{ fontSize: 10, color: '#5c2c0a', letterSpacing: '0.2em', fontWeight: 'bold', marginBottom: 12, textTransform: 'uppercase' }}>
+            <div style={{ fontSize: 9, color: '#5c2c0a', letterSpacing: '0.15em', fontWeight: 'bold', marginBottom: 8, textTransform: 'uppercase' }}>
               Drone Strings
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+            <div className="grid grid-cols-2 gap-x-2 gap-y-2">
               {STRINGS.map(({ id, label }) => {
                 const on = activeStrings.has(id);
                 return (
                   <div key={id} onClick={() => toggleString(id)}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                    <div style={{ ...s.led(on), width: 12, height: 12 }} />
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                    <div style={{ ...s.led(on), width: 10, height: 10 }} />
                     <span style={{
-                      fontSize: 11, fontWeight: 'bold', letterSpacing: '0.14em', textTransform: 'uppercase',
+                      fontSize: 9, fontWeight: 'bold', letterSpacing: '0.08em', textTransform: 'uppercase',
                       color: on ? '#481e00' : '#7a5028',
                       fontFamily: '"Courier New", monospace',
                     }}>
@@ -492,16 +488,16 @@ export default function ShruthiBox() {
 
           {/* START / STOP button */}
           <button onClick={handleTogglePlay} style={{
-            width: '100%', padding: '16px 0',
+            width: '100%', padding: '12px 0',
             background: playing
               ? 'linear-gradient(to bottom, #c04030, #862015)'
               : 'linear-gradient(to bottom, #585850, #343430)',
             border: 'none', borderRadius: 8,
             boxShadow: playing
               ? 'inset 0 2px 6px rgba(0,0,0,0.45), 0 0 12px rgba(200,50,20,0.4)'
-              : '0 4px 0 #161612, inset 0 1px 0 rgba(255,255,255,0.09)',
-            color: '#f0e8d0', fontSize: 16, fontWeight: 'bold',
-            letterSpacing: '0.25em', textTransform: 'uppercase',
+              : '0 3px 0 #161612, inset 0 1px 0 rgba(255,255,255,0.09)',
+            color: '#f0e8d0', fontSize: 14, fontWeight: 'bold',
+            letterSpacing: '0.2em', textTransform: 'uppercase',
             cursor: 'pointer',
             transform: playing ? 'translateY(1px)' : 'none',
             fontFamily: '"Courier New", monospace',
@@ -511,11 +507,11 @@ export default function ShruthiBox() {
           </button>
 
           {/* Brand footer */}
-          <div style={{ textAlign: 'right', marginTop: -3 }}>
-            <div style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontWeight: '900', fontSize: 16, color: '#7a1212' }}>
+          <div style={{ textAlign: 'right', marginTop: -2 }}>
+            <div style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontWeight: '900', fontSize: 13, color: '#7a1212' }}>
               Alapana
             </div>
-            <div style={{ fontSize: 6, color: '#6a4a2a', letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: 2, fontFamily: 'monospace', fontWeight: 'bold' }}>
+            <div style={{ fontSize: 5.5, color: '#6a4a2a', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 1, fontFamily: 'monospace', fontWeight: 'bold' }}>
               VINTAGE HERITAGE EDITION
             </div>
           </div>

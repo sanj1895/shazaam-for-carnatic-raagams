@@ -581,6 +581,117 @@ export const JANTA_CURRICULUM = [
     }
 ];
 
+export const DAATU_CURRICULUM = [
+    {
+        id: 'daatu_stage1', title: 'The First Daatu Varisai (Ascent)', symbol: '🌱',
+        subtitle: 'Leaping note patterns climbing up the scale',
+        color: '#311025', tag: 'Stage 1',
+        lessons: [
+            {
+                id: 'd_1_1', title: 'Varisai 1: Introduction to Leaps', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Guru Introduction', body: 'Namaste, my dear student. Welcome to Daatu Varisai, the "kangaroo leaps" of Carnatic music. Unlike Sarali (straight steps) or Janta (double steps), Daatu introduces interval leaps. We skip notes to build high-level pitch agility.\n\nLet\'s start with the first four ascending phrases of the first Varisai. Maintain stable, pure notes.' },
+                    { type: 'listen', swaras: parseMmg('s r s g | r g | r m || s m g r | s r | g m || r g r m | g m | g p || r p m g | r g | m p ||'), displayLabel: '♪', instruction: 'Listen to the first 4 ascending phrases.' },
+                    { type: 'sing_sequence', swaras: parseMmg('s r s g | r g | r m || s m g r | s r | g m || r g r m | g m | g p || r p m g | r g | m p ||'), speed: 1, instruction: 'Sing the first 4 ascending phrases.' }
+                ]
+            },
+            {
+                id: 'd_1_2', title: 'Varisai 1: Mid-Range Ascent', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Guru Pedagogy', body: 'Very good! Now we move up the scale into the middle octaves. Notice the leap from G to P (Ga to Pa), which requires an exact interval of a major third.\n\nKeep your posture relaxed and lean on the Tambura drone.' },
+                    { type: 'listen', swaras: parseMmg('g m g p | m p | m d || g d p m | g m | p d || m p m d | p d | p n || m n d p | m p | d n ||'), displayLabel: '♪', instruction: 'Listen to the middle ascending phrases.' },
+                    { type: 'sing_sequence', swaras: parseMmg('g m g p | m p | m d || g d p m | g m | p d || m p m d | p d | p n || m n d p | m p | d n ||'), speed: 1, instruction: 'Sing the middle ascending phrases.' }
+                ]
+            },
+            {
+                id: 'd_1_3', title: 'Varisai 1: High Octave Ascent Peak', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Guru Pedagogy', body: 'We now reach the peak of the ascent! These phrases leap into the high octave: p d p n (Pa to Ni) and p Ṡ n d (Pa to High Sa).\n\nLet your voice open naturally, without squeezing your throat.' },
+                    { type: 'listen', swaras: parseMmg('p d p n | d n | d S || p S n d | p d | n S ||'), displayLabel: '♪', instruction: 'Listen to the ascending peak.' },
+                    { type: 'sing_sequence', swaras: parseMmg('p d p n | d n | d S || p S n d | p d | n S ||'), speed: 1, instruction: 'Sing the peak ascending phrases.' }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'daatu_stage2', title: 'The First Daatu Varisai (Descent)', symbol: '🍃',
+        subtitle: 'Leaping down from the high octave',
+        color: '#2a0a22', tag: 'Stage 2',
+        lessons: [
+            {
+                id: 'd_1_4', title: 'Varisai 1: Upper-Range Descent', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Guru Pedagogy', body: 'We begin our descent from the high octave. Descending with leaps is highly challenging, as we must drop pitches without losing pitch centering.\n\nFocus on dropping your jaw relaxed as you descend.' },
+                    { type: 'listen', swaras: parseMmg('S n S d | n d | n p || S p d n | S n | d p || n d n p | d p | d m || n m p d | n d | p m ||'), displayLabel: '♪', instruction: 'Listen to the first 4 descending phrases.' },
+                    { type: 'sing_sequence', swaras: parseMmg('S n S d | n d | n p || S p d n | S n | d p || n d n p | d p | d m || n m p d | n d | p m ||'), speed: 1, instruction: 'Sing the first 4 descending phrases.' }
+                ]
+            },
+            {
+                id: 'd_1_5', title: 'Varisai 1: Mid to Low-Range Descent', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Guru Pedagogy', body: 'We conclude the first Daatu Varisai descending back to the root Sa. These final phrases feature the wide leap from Pa to Ri (p r g m).\n\nAlign your voice carefully with the Tambura drone.' },
+                    { type: 'listen', swaras: parseMmg('d p d m | p m | p g || d g m p | d p | m g || p m p g | m g | m r || p r g m | p m | g r || m g m r | g r | g s || m s r g | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the remaining descending phrases.' },
+                    { type: 'sing_sequence', swaras: parseMmg('d p d m | p m | p g || d g m p | d p | m g || p m p g | m g | m r || p r g m | p m | g r || m g m r | g r | g s || m s r g | m g | r s ||'), speed: 1, instruction: 'Sing the remaining descending phrases.' }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'daatu_stage3', title: 'The Second Daatu Varisai (Ascent)', symbol: '🔥',
+        subtitle: 'Cross-leaping alternating swara patterns',
+        color: '#42142d', tag: 'Stage 3',
+        lessons: [
+            {
+                id: 'd_2_1', title: 'Varisai 2: Intro to Cross-Leaps', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Guru Pedagogy', body: 'Excellent progress, my student. The second Daatu Varisai is even more beautiful! It uses alternate leap structures (Sa to Ma: s m g m).\n\nKeep the notes crisp and precise in time.' },
+                    { type: 'listen', swaras: parseMmg('s m g m | r g | s r || s g r g | s r | g m || r p m p | g m | r g || r m g m | r g | m p ||'), displayLabel: '♪', instruction: 'Listen to the first 4 phrases.' },
+                    { type: 'sing_sequence', swaras: parseMmg('s m g m | r g | s r || s g r g | s r | g m || r p m p | g m | r g || r m g m | r g | m p ||'), speed: 1, instruction: 'Sing the first 4 phrases.' }
+                ]
+            },
+            {
+                id: 'd_2_2', title: 'Varisai 2: Mid-Range Leaps', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Guru Pedagogy', body: 'Moving further up! We transition from middle to high register, leaping to Da and Ni. Let your breath expand naturally to support the higher range.' },
+                    { type: 'listen', swaras: parseMmg('g d p d | m p | g m || g p m p | g m | p d || m n d n | p d | m p || m d p d | m p | d n ||'), displayLabel: '♪', instruction: 'Listen to these phrases.' },
+                    { type: 'sing_sequence', swaras: parseMmg('g d p d | m p | g m || g p m p | g m | p d || m n d n | p d | m p || m d p d | m p | d n ||'), speed: 1, instruction: 'Sing the phrases.' }
+                ]
+            },
+            {
+                id: 'd_2_3', title: 'Varisai 2: Peak Ascent to High Sa', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Guru Pedagogy', body: 'Here is the peak of the second ascent. A majestic cross-leap to high Sa (p Ṡ n Ṡ) and (p n d n).\n\nLet the notes be light and clear.' },
+                    { type: 'listen', swaras: parseMmg('p S n S | d n | p d || p n d n | p d | n S ||'), displayLabel: '♪', instruction: 'Listen to the peak ascending phrases.' },
+                    { type: 'sing_sequence', swaras: parseMmg('p S n S | d n | p d || p n d n | p d | n S ||'), speed: 1, instruction: 'Sing the peak ascending phrases.' }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'daatu_stage4', title: 'The Second Daatu Varisai (Descent)', symbol: '🎓',
+        subtitle: 'Advanced descent and course graduation',
+        color: '#1a0512', tag: 'Stage 4',
+        lessons: [
+            {
+                id: 'd_2_4', title: 'Varisai 2: Descending Cross-Leaps', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Guru Pedagogy', body: 'We begin the final descent of the second Varisai. The leap from high Sa to Pa (Ṡ p d p) requires extremely quick vocal adjustment.\n\nSing with focus and inner calm.' },
+                    { type: 'listen', swaras: parseMmg('S p d p | n d | S n || S d n d | S n | d p || n m p m | d p | n d || n p d p | n d | p m ||'), displayLabel: '♪', instruction: 'Listen to the first 4 descending phrases.' },
+                    { type: 'sing_sequence', swaras: parseMmg('S p d p | n d | S n || S d n d | S n | d p || n m p m | d p | n d || n p d p | n d | p m ||'), speed: 1, instruction: 'Sing the first 4 descending phrases.' }
+                ]
+            },
+            {
+                id: 'd_2_5', title: 'Varisai 2: Complete Mastery & Graduation', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Guru Pedagogy', body: 'The absolute final stretch! Descending back to our root Sa with the ultimate cross-leap patterns. Once completed, you will have fully mastered the Daatu Varisais.\n\nKeep your focus, and graduate with pure grace.' },
+                    { type: 'listen', swaras: parseMmg('d g m g | p m | d p || d m p m | d p | m g || p r g r | m g | p m || p g m g | p m | g r || m s r s | g r | m g || m r g r | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the final descending phrases.' },
+                    { type: 'sing_sequence', swaras: parseMmg('d g m g | p m | d p || d m p m | d p | m g || p r g r | m g | p m || p g m g | p m | g r || m s r s | g r | m g || m r g r | m g | r s ||'), speed: 1, instruction: 'Sing the final descending phrases and graduate!' }
+                ]
+            }
+        ]
+    }
+];
+
 export const COURSES = [
     {
         id: 'foundations',
@@ -612,7 +723,7 @@ export const COURSES = [
         description: 'Leaping note patterns that build high-level pitch accuracy and musical dexterity.',
         symbol: '🦘',
         color: '#311025',
-        upcoming: true
+        curriculum: DAATU_CURRICULUM
     },
     {
         id: 'melsthayi_mandrasthayi',

@@ -2004,11 +2004,18 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
             // Group samples by note to build a rich performance transcript
             const notesGrouped = {};
             samples.forEach(s => {
+                if (!sequenceRef.current.includes(s.note)) {
+                    return; // Ignore transient squeaks, room hums, or clicks!
+                }
                 if (!notesGrouped[s.note]) {
                     notesGrouped[s.note] = [];
                 }
                 notesGrouped[s.note].push(s.dev);
             });
+
+            if (Object.keys(notesGrouped).length === 0) {
+                throw new Error("No distinct sustained notes detected. Please make sure you sing clearly into the microphone near the base drone!");
+            }
 
             const stats = Object.entries(notesGrouped).map(([note, devs]) => {
                 const avgDev = devs.reduce((s, v) => s + v, 0) / devs.length;

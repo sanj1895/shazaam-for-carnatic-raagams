@@ -1833,6 +1833,7 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
     const streamRef = useRef(null);
     const intervalRef = useRef(null);
     const samplesRef = useRef([]); // holds { note, freq, dev, time }
+    const sequenceRef = useRef([]); // holds chronological list of distinct notes (duplicates allowed with pauses)
     const countdownIntervalRef = useRef(null);
 
     const cleanup = () => {
@@ -1851,6 +1852,7 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
         setFeedback('');
         setDetectedNotes([]);
         samplesRef.current = [];
+        sequenceRef.current = [];
         setCountdown(8);
         setRmsVolume(0);
 
@@ -1929,6 +1931,14 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
                         if (swara) {
                             silenceCount = 0; // Reset silence since we are actively detecting a swara
 
+                            // Push raw sample for mathematical accuracy statistics (every frame they are singing)
+                            samplesRef.current.push({
+                                note: swara,
+                                freq: freq,
+                                dev: dev,
+                                time: Date.now()
+                            });
+
                             if (swara === currentCandidate) {
                                 candidateCount++;
                             } else {
@@ -1937,18 +1947,9 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
                             }
 
                             if (candidateCount === 3) {
-                                // Push raw sample for mathematical accuracy statistics
-                                samplesRef.current.push({
-                                    note: swara,
-                                    freq: freq,
-                                    dev: dev,
-                                    time: Date.now()
-                                });
-
-                                // Push to the chronological detected notes array (duplicates allowed with pauses!)
-                                setDetectedNotes(prev => {
-                                    return [...prev, swara];
-                                });
+                                // Add to chronological sequence (duplicates allowed with pauses)
+                                sequenceRef.current.push(swara);
+                                setDetectedNotes([...sequenceRef.current]);
 
                                 lastCommittedSwara = swara;
                             }
@@ -2025,7 +2026,7 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
                 return `- Swara: ${s.note} | Cents Deviation: ${sign}${s.avgDev} cents (${Math.abs(s.avgDev) <= 15 ? 'in tune' : s.avgDev > 0 ? 'sharp' : 'flat'}) | Pitch Stability: ${s.stability}`;
             }).join('\n');
 
-            const chronologicalDetectedSwaras = stats.map(s => s.note).join(' - ');
+            const chronologicalDetectedSwaras = sequenceRef.current.join(' - ');
 
             // Make Groq request if key is available, else mock dynamic feedback
             let feedbackText = '';

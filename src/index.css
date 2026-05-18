@@ -68,3 +68,32 @@ body {
   mix-blend-mode: multiply;
   background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
 }
+
+/* Scrollbar hide utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile safe area for bottom nav */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Touch-friendly tap highlight removal */
+* {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Ensure full-width on mobile */
+@media (max-width: 640px) {
+  .heritage-card {
+    border-radius: 12px;
+  }
+}

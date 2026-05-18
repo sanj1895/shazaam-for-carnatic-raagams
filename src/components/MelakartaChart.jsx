@@ -82,8 +82,9 @@ const Cell = ({ number, name, isSelected, onClick }) => (
 );
 
 const Grid = ({ offset, isMa2, selected, onSelect }) => (
-    <div className="overflow-x-auto">
-        <div className="min-w-[580px]">
+    <div className="overflow-x-auto -mx-1 px-1 pb-2">
+        <p className="text-[9px] text-c-cream-dark/50 italic mb-1 sm:hidden">← Scroll to see all columns</p>
+        <div className="min-w-[520px]">
             {/* Column headers */}
             <div className="grid grid-cols-7 gap-1 mb-1">
                 <div /> {/* Row labels spacer */}
@@ -130,12 +131,12 @@ const Grid = ({ offset, isMa2, selected, onSelect }) => (
 
 const MelakartaChart = ({ onSelectRaga }) => {
     return (
-        <div className="w-full max-w-4xl">
-            <div className="mb-6">
+        <div className="w-full max-w-4xl px-1 sm:px-0">
+            <div className="mb-4 sm:mb-6 px-2 sm:px-0">
                 <h2 className="font-playfair text-2xl text-c-gold">Melakarta Chart</h2>
                 <p className="text-c-cream-dark text-xs mt-1">
                     The 72 parent ragas of Carnatic music  ·  organized by Ri/Ga (rows) and Da/Ni (columns).
-                    Click any raga to explore it.
+                    Tap any raga to explore it.
                 </p>
             </div>
 

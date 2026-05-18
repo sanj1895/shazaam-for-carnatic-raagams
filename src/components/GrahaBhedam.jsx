@@ -149,10 +149,10 @@ export default function GrahaBhedam() {
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 py-8 space-y-10 relative z-10">
+        <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-8 sm:space-y-10 relative z-10">
             {/* Header section with simplified explanation */}
             <div className="text-center space-y-4">
-                <h2 className="font-playfair text-4xl md:text-5xl text-c-gold tracking-tight">Graha Bhedam</h2>
+                <h2 className="font-playfair text-3xl sm:text-4xl md:text-5xl text-c-gold tracking-tight">Graha Bhedam</h2>
                 <div className="flex items-center justify-center gap-3">
                     <div className="h-px w-12 bg-c-gold/30" />
                     <p className="text-c-cream-dim text-sm italic font-playfair tracking-wide uppercase">The Art of Modal Shifting</p>
@@ -194,7 +194,7 @@ export default function GrahaBhedam() {
                 </div>
             </div>
 
-            <div className="grid lg:grid-cols-[1fr_1.5fr] gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-6 lg:gap-8">
                 {/* Left: Source Selection */}
                 <div className="space-y-6">
                     <div className="heritage-card rounded-xl p-8 space-y-6 shadow-2xl border border-c-gold/20">
@@ -328,7 +328,7 @@ export default function GrahaBhedam() {
                                 <button
                                     onClick={() => handlePlayShifted(entry)}
                                     disabled={playingShift !== null}
-                                    className={`w-full md:w-auto px-5 py-2.5 rounded-full border text-xs font-playfair font-bold transition-all flex items-center justify-center gap-2 ${
+                                    className={`w-full px-4 sm:px-5 py-2.5 rounded-full border text-xs font-playfair font-bold transition-all flex items-center justify-center gap-2 ${
                                         playingShift === entry.shiftNote
                                             ? 'bg-c-gold border-c-gold text-c-bg'
                                             : entry.matches.length > 0

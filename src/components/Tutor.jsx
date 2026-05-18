@@ -3165,7 +3165,7 @@ export default function Tutor({ saFrequency }) {
     };
 
     return (
-        <div className="w-full px-4 md:px-8 py-8 flex flex-col items-center gap-6 animate-fade-in">
+        <div className="w-full px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 flex flex-col items-center gap-4 sm:gap-6 animate-fade-in">
 
             {/* Base Sa (Shruti) quick setup bar */}
             {screen === 'home' && (
@@ -3175,22 +3175,22 @@ export default function Tutor({ saFrequency }) {
                     <div className="heritage-border-corner heritage-corner-bl" style={{ bottom: 2, left: 2 }} />
                     <div className="heritage-border-corner heritage-corner-br" style={{ bottom: 2, right: 2 }} />
                     
-                    <div className="flex items-center justify-between z-10">
-                        <div className="flex items-center gap-2.5">
-                            <span className="text-lg">🎼</span>
+                    <div className="flex items-center justify-between gap-2 z-10">
+                        <div className="flex items-center gap-2">
+                            <span className="text-base sm:text-lg">🎼</span>
                             <div>
-                                <div className="text-[9px] text-c-cream-dark uppercase tracking-widest font-mono font-extrabold">Your Custom Base Sa (Shruti)</div>
+                                <div className="text-[8px] sm:text-[9px] text-c-cream-dark uppercase tracking-widest font-mono font-extrabold">Base Sa (Shruti)</div>
                                 <div className="text-sm font-playfair font-black text-c-gold">
-                                    {getWesternNoteName(sa)} <span className="font-sans text-[11px] font-normal text-c-cream-dim">({sa} Hz)</span>
+                                    {getWesternNoteName(sa)} <span className="font-sans text-[10px] sm:text-[11px] font-normal text-c-cream-dim">({sa} Hz)</span>
                                 </div>
                             </div>
                         </div>
                         <button 
                             type="button"
                             onClick={() => setTunerOpen(!tunerOpen)}
-                            className="px-4 py-1 text-xs border border-c-gold/40 text-c-gold rounded-full hover:bg-c-gold hover:text-c-bg font-playfair font-bold transition-all z-20"
+                            className="px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs border border-c-gold/40 text-c-gold rounded-full hover:bg-c-gold hover:text-c-bg font-playfair font-bold transition-all z-20 flex-shrink-0"
                         >
-                            {tunerOpen ? 'Close Tuner' : '🔧 Adjust Shruti'}
+                            {tunerOpen ? 'Close' : '🔧 Tune'}
                         </button>
                     </div>
                     

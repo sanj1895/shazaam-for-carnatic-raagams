@@ -29,21 +29,20 @@ const VeenaIcon = () => (
 );
 
 const FEATURES = [
-    { id: 'tutor',     label: 'Tutor',        desc: 'Learn Carnatic singing from scratch',    symbol: '◈' },
-    { id: 'listen',    label: 'Sing & Discover', desc: 'Sing a melody  ·  find the raga',       symbol: '♬' },
-    { id: 'library',   label: 'Library',      desc: 'Browse every Carnatic raga',             symbol: '◈' },
-    { id: 'melakarta', label: 'Melakarta',    desc: 'The complete 72-raga parent chart',      symbol: '⊹' },
-    { id: 'keyboard',  label: 'Keyboard',     desc: 'Play swaras on virtual keys',            symbol: '♩' },
-    { id: 'bhedam',    label: 'Graha Bhedam', desc: 'Discover modal shifts between ragas',    symbol: '↻' },
-    { id: 'singback',  label: 'Sing-Back',    desc: 'Challenge your raga memory',             symbol: '◎' },
-    { id: 'shruthi',   label: 'Shruthi Box',  desc: 'Continuous drone for practice',          symbol: '〜' },
-    { id: 'talam',     label: 'Talam',        desc: 'Keep the rhythmic cycle',                symbol: '॥' },
+    { id: 'tutor',     label: 'Tutor',        desc: 'Learn Carnatic singing from scratch',    symbol: '◈',  mobileSymbol: '🎓' },
+    { id: 'listen',    label: 'Sing',         desc: 'Sing a melody  ·  find the raga',       symbol: '♬',  mobileSymbol: '🎤' },
+    { id: 'library',   label: 'Library',      desc: 'Browse every Carnatic raga',             symbol: '◈',  mobileSymbol: '📚' },
+    { id: 'melakarta', label: 'Melakarta',    desc: 'The complete 72-raga parent chart',      symbol: '⊹',  mobileSymbol: '🗂️' },
+    { id: 'keyboard',  label: 'Keyboard',     desc: 'Play swaras on virtual keys',            symbol: '♩',  mobileSymbol: '🎹' },
+    { id: 'bhedam',    label: 'Graha Bhedam', desc: 'Discover modal shifts between ragas',    symbol: '↻',  mobileSymbol: '🔄' },
+    { id: 'singback',  label: 'Sing-Back',    desc: 'Challenge your raga memory',             symbol: '◎',  mobileSymbol: '🎯' },
+    { id: 'shruthi',   label: 'Shruthi',      desc: 'Continuous drone for practice',          symbol: '〜', mobileSymbol: '🎵' },
+    { id: 'talam',     label: 'Talam',        desc: 'Keep the rhythmic cycle',                symbol: '॥',  mobileSymbol: '🥁' },
 ];
-
-const NAV_TABS = FEATURES.map(f => ({ id: f.id, label: f.label }));
 
 function App() {
     const [view, setView] = useState('home');
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [showFeatures, setShowFeatures] = useState(false);
     const [saFrequency, setSaFrequency] = useState(null);
     const [detectedNotes, setDetectedNotes] = useState([]);
@@ -190,21 +189,56 @@ function App() {
             {/* Global Texture Overlay for Nostalgic Feel */}
             <div className="texture-overlay" />
 
-            {/* ── Nav ── */}
-            <nav className="bg-c-card border-b border-c-border px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-md backdrop-blur-md">
+            {/* ── Mobile Menu Overlay ── */}
+            {mobileMenuOpen && (
+                <div 
+                    className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col md:hidden"
+                    onClick={() => setMobileMenuOpen(false)}
+                >
+                    <div 
+                        className="mt-auto bg-c-card border-t border-c-gold/20 p-4 pb-8 animate-fade-in"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between mb-4">
+                            <span className="font-playfair text-c-gold text-sm tracking-widest uppercase">Navigate</span>
+                            <button onClick={() => setMobileMenuOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-c-border/20 text-c-cream-dim text-sm">✕</button>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                            {FEATURES.map(({ id, label, mobileSymbol }) => (
+                                <button
+                                    key={id}
+                                    onClick={() => { goTo(id); setMobileMenuOpen(false); }}
+                                    className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all ${
+                                        view === id
+                                            ? 'border-c-gold bg-c-gold/10 text-c-gold'
+                                            : 'border-c-border bg-c-surface text-c-cream-dim active:bg-c-gold/10'
+                                    }`}
+                                >
+                                    <span className="text-xl">{mobileSymbol}</span>
+                                    <span className="text-[10px] font-playfair font-bold uppercase tracking-wide">{label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Top Nav ── */}
+            <nav className="bg-c-card border-b border-c-border px-4 md:px-6 py-3 md:py-4 flex items-center justify-between sticky top-0 z-40 shadow-md backdrop-blur-md">
                 <button
                     onClick={() => { setView('home'); setShowFeatures(false); }}
-                    className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                    className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity"
                 >
                     <VeenaIcon />
                     <div>
-                        <div className="font-playfair text-c-gold text-lg leading-none">Alapana</div>
-                        <div className="text-c-cream-dark text-[9px] tracking-widest uppercase">Carnatic Music</div>
+                        <div className="font-playfair text-c-gold text-base md:text-lg leading-none">Alapana</div>
+                        <div className="text-c-cream-dark text-[8px] md:text-[9px] tracking-widest uppercase">Carnatic Music</div>
                     </div>
                 </button>
 
-                <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-                    {NAV_TABS.map(({ id, label }) => (
+                {/* Desktop nav tabs */}
+                <div className="hidden md:flex items-center gap-1 overflow-x-auto scrollbar-hide">
+                    {FEATURES.map(({ id, label }) => (
                         <button
                             key={id}
                             onClick={() => goTo(id)}
@@ -221,10 +255,40 @@ function App() {
                         </button>
                     ))}
                 </div>
+
+                {/* Mobile hamburger */}
+                <button
+                    onClick={() => setMobileMenuOpen(true)}
+                    className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-c-surface transition-colors"
+                >
+                    <span className={`block w-5 h-0.5 bg-c-gold transition-all ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+                    <span className={`block w-5 h-0.5 bg-c-gold transition-all ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+                    <span className={`block w-5 h-0.5 bg-c-gold transition-all ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+                </button>
             </nav>
 
+            {/* ── Mobile bottom tab bar ── */}
+            {view !== 'home' && (
+                <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-c-card border-t border-c-border flex items-stretch overflow-x-auto scrollbar-hide shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+                    {FEATURES.map(({ id, mobileSymbol, label }) => (
+                        <button
+                            key={id}
+                            onClick={() => goTo(id)}
+                            className={`flex flex-col items-center justify-center gap-0.5 flex-shrink-0 px-3 py-2 min-w-[56px] transition-all ${
+                                view === id
+                                    ? 'text-c-gold border-t-2 border-c-gold -mt-0.5'
+                                    : 'text-c-cream-dark border-t-2 border-transparent -mt-0.5'
+                            }`}
+                        >
+                            <span className="text-base">{mobileSymbol}</span>
+                            <span className="text-[8px] font-bold uppercase tracking-tight leading-none">{label}</span>
+                        </button>
+                    ))}
+                </div>
+            )}
+
             {/* ── Page content ── */}
-            <div className="flex-1 flex flex-col items-center w-full">
+            <div className="flex-1 flex flex-col items-center w-full pb-16 md:pb-0">
 
                 {/* ══ HOME ══ */}
                 {view === 'home' && (
@@ -273,15 +337,15 @@ function App() {
                             </div>
 
                             <h1
-                                className="font-playfair text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-br from-c-gold-light via-[#f7d686] to-[#b88014] tracking-wider uppercase leading-none mb-3 drop-shadow-xl"
+                                className="font-playfair text-5xl sm:text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-br from-c-gold-light via-[#f7d686] to-[#b88014] tracking-wider uppercase leading-none mb-3 drop-shadow-xl"
                                 style={{ textShadow: '0 4px 30px rgba(227,168,33,0.4)' }}
                             >
                                 Alapana
                             </h1>
-                            <p className="text-[#f7d686] text-xs md:text-sm font-semibold tracking-[0.4em] uppercase mb-4 drop-shadow-md">
+                            <p className="text-[#f7d686] text-[10px] sm:text-xs md:text-sm font-semibold tracking-[0.3em] sm:tracking-[0.4em] uppercase mb-3 drop-shadow-md">
                                 Carnatic Music
                             </p>
-                            <p className="text-white/80 text-sm md:text-base max-w-[320px] leading-relaxed font-light italic mb-10">
+                            <p className="text-white/80 text-xs sm:text-sm md:text-base max-w-[280px] sm:max-w-[320px] leading-relaxed font-light italic mb-8 md:mb-10">
                                 From discovering ragas to refining every note, everything you need for Carnatic practice lives here.
                             </p>
 
@@ -304,25 +368,26 @@ function App() {
 
                         {/* Feature grid  ·  revelation transition */}
                         <div
-                            className="relative z-10 w-full max-w-5xl px-5 flex items-center justify-center transition-all duration-1000 ease-out"
+                            className="relative z-10 w-full max-w-5xl px-3 sm:px-5 flex items-center justify-center transition-all duration-1000 ease-out"
                             style={{ 
                                 opacity: showFeatures ? 1 : 0, 
                                 transform: showFeatures ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.98)', 
                                 pointerEvents: showFeatures ? 'auto' : 'none',
                                 flexGrow: showFeatures ? 1 : 0,
                                 minHeight: showFeatures ? '60vh' : 0,
+                                paddingBottom: showFeatures ? '2rem' : 0,
                             }}
                         >
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full max-w-4xl mx-auto">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 md:gap-8 w-full max-w-4xl mx-auto">
                                 {FEATURES.map(({ id, label, desc, symbol }, idx) => (
                                     <button
                                         key={id}
                                         onClick={() => goTo(id)}
-                                        className={`group relative flex flex-col items-center justify-center p-8 text-center transition-all duration-500 hover:-translate-y-3 h-full w-full max-w-xs sm:max-w-none mx-auto ${
-                                            idx === FEATURES.length - 1 ? 'sm:col-span-2 lg:col-span-1 sm:max-w-md lg:max-w-none' : ''
+                                        className={`group relative flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 text-center transition-all duration-500 hover:-translate-y-3 h-full w-full ${
+                                            idx === FEATURES.length - 1 ? 'col-span-2 lg:col-span-1' : ''
                                         }`}
                                         style={{
-                                            transitionDelay: showFeatures ? `${idx * 100}ms` : '0ms',
+                                            transitionDelay: showFeatures ? `${idx * 60}ms` : '0ms',
                                             opacity: showFeatures ? 1 : 0,
                                             transform: showFeatures ? 'translateY(0)' : 'translateY(20px)',
                                         }}
@@ -340,15 +405,15 @@ function App() {
                                     <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-c-gold/40 rounded-br-lg group-hover:w-7 group-hover:h-7 transition-all duration-500" />
 
                                     {/* Symbol with shadow */}
-                                    <div className="relative z-10 text-c-gold text-4xl mb-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 group-hover:text-[#f7d686] transition-all duration-500">
+                                    <div className="relative z-10 text-c-gold text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 group-hover:text-[#f7d686] transition-all duration-500">
                                         {symbol}
                                     </div>
 
                                     {/* Text with vintage spacing */}
-                                    <h3 className="relative z-10 font-playfair text-[#f7d686] text-sm md:text-base font-bold tracking-[0.15em] uppercase mb-1.5 group-hover:text-white transition-colors duration-300">
+                                    <h3 className="relative z-10 font-playfair text-[#f7d686] text-[10px] sm:text-xs md:text-base font-bold tracking-[0.1em] sm:tracking-[0.15em] uppercase mb-1 sm:mb-1.5 group-hover:text-white transition-colors duration-300">
                                         {label}
                                     </h3>
-                                    <p className="relative z-10 text-white/50 text-[10px] md:text-xs leading-relaxed italic max-w-[140px] opacity-70 group-hover:opacity-100 transition-opacity">
+                                    <p className="relative z-10 text-white/50 text-[9px] sm:text-[10px] md:text-xs leading-relaxed italic max-w-[120px] sm:max-w-[140px] opacity-70 group-hover:opacity-100 transition-opacity hidden sm:block">
                                         {desc}
                                     </p>
 

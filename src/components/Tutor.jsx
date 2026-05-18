@@ -1792,7 +1792,7 @@ function MicCalibration({ onDone }) {
 function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
     const GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY;
     const [phase, setPhase] = useState('idle'); // idle | recording | processing | result | error
-    const [countdown, setCountdown] = useState(8);
+    const [countdown, setCountdown] = useState(30);
     const [detectedNotes, setDetectedNotes] = useState([]);
     const [feedback, setFeedback] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
@@ -1838,7 +1838,7 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
         setDetectedNotes([]);
         samplesRef.current = [];
         sequenceRef.current = [];
-        setCountdown(8);
+        setCountdown(30);
         setRmsVolume(0);
 
         try {
@@ -1854,7 +1854,7 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
             setPhase('recording');
 
             // Countdown timer
-            let remaining = 8;
+            let remaining = 30;
             countdownIntervalRef.current = setInterval(() => {
                 remaining -= 1;
                 setCountdown(remaining);

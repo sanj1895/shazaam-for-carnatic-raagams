@@ -91,14 +91,14 @@ const RagaCard = ({ name, data, onClick }) => (
             <div className="mb-1.5">
                 <span className="text-[9px] text-c-cream-dark uppercase tracking-wider mr-2">↑</span>
                 <span className="font-mono text-xs text-c-cream-dim tracking-wider">
-                    {data.arohanam.map(toSargam).join(' ')}
+                    {data.arohanam.map(toSargam).join(' ')} <span className="text-c-gold/40 font-light ml-0.5 tracking-widest">||</span>
                 </span>
             </div>
             {/* Avarohanam */}
             <div>
                 <span className="text-[9px] text-c-cream-dark uppercase tracking-wider mr-2">↓</span>
                 <span className="font-mono text-xs text-c-cream-dim tracking-wider">
-                    {data.avarohanam.map(toSargam).join(' ')}
+                    {data.avarohanam.map(toSargam).join(' ')} <span className="text-c-gold/40 font-light ml-0.5 tracking-widest">||</span>
                 </span>
             </div>
         </div>

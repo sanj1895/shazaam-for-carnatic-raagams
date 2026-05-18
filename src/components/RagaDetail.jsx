@@ -124,28 +124,60 @@ const RagaDetail = ({ raga, hasClearMatch }) => {
                         <div className="absolute inset-0 bg-c-gold/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                         <h3 className="font-playfair font-bold text-c-gold text-sm mb-4 uppercase tracking-[0.2em] border-b border-c-gold/10 pb-2">Arohanam ↑</h3>
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-2 relative z-10">
-                            {raga.arohanam.map((note, i) => (
-                                <React.Fragment key={i}>
-                                    <div className="flex flex-col items-center">
-                                        <span className="font-mono text-base font-bold text-c-cream leading-none">{note}</span>
-                                        <div className="w-1 h-1 rounded-full bg-c-gold/30 mt-1" />
-                                    </div>
-                                </React.Fragment>
-                            ))}
+                            {raga.arohanam.map((note, i) => {
+                                if (note === '|' || note === '||') {
+                                    return (
+                                        <div key={i} className="flex flex-col items-center mx-1">
+                                            <span className={`font-mono text-base font-light text-c-gold/40 leading-none ${note === '||' ? 'tracking-widest' : ''}`}>{note}</span>
+                                            <div className="w-1 h-1 rounded-full bg-transparent mt-1" />
+                                        </div>
+                                    );
+                                }
+                                return (
+                                    <React.Fragment key={i}>
+                                        <div className="flex flex-col items-center">
+                                            <span className="font-mono text-base font-bold text-c-cream leading-none">{note}</span>
+                                            <div className="w-1 h-1 rounded-full bg-c-gold/30 mt-1" />
+                                        </div>
+                                    </React.Fragment>
+                                );
+                            })}
+                            {raga.arohanam[raga.arohanam.length - 1] !== '||' && (
+                                <div className="flex flex-col items-center ml-1">
+                                    <span className="font-mono text-base font-light text-c-gold/40 tracking-widest leading-none">||</span>
+                                    <div className="w-1 h-1 rounded-full bg-transparent mt-1" />
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="bg-c-surface border border-c-gold/20 rounded-lg p-5 relative overflow-hidden group">
                         <div className="absolute inset-0 bg-c-gold/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                         <h3 className="font-playfair font-bold text-c-gold text-sm mb-4 uppercase tracking-[0.2em] border-b border-c-gold/10 pb-2">Avarohanam ↓</h3>
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-2 relative z-10">
-                            {raga.avarohanam.map((note, i) => (
-                                <React.Fragment key={i}>
-                                    <div className="flex flex-col items-center">
-                                        <span className="font-mono text-base font-bold text-c-cream leading-none">{note}</span>
-                                        <div className="w-1 h-1 rounded-full bg-c-gold/30 mt-1" />
-                                    </div>
-                                </React.Fragment>
-                            ))}
+                            {raga.avarohanam.map((note, i) => {
+                                if (note === '|' || note === '||') {
+                                    return (
+                                        <div key={i} className="flex flex-col items-center mx-1">
+                                            <span className={`font-mono text-base font-light text-c-gold/40 leading-none ${note === '||' ? 'tracking-widest' : ''}`}>{note}</span>
+                                            <div className="w-1 h-1 rounded-full bg-transparent mt-1" />
+                                        </div>
+                                    );
+                                }
+                                return (
+                                    <React.Fragment key={i}>
+                                        <div className="flex flex-col items-center">
+                                            <span className="font-mono text-base font-bold text-c-cream leading-none">{note}</span>
+                                            <div className="w-1 h-1 rounded-full bg-c-gold/30 mt-1" />
+                                        </div>
+                                    </React.Fragment>
+                                );
+                            })}
+                            {raga.avarohanam[raga.avarohanam.length - 1] !== '||' && (
+                                <div className="flex flex-col items-center ml-1">
+                                    <span className="font-mono text-base font-light text-c-gold/40 tracking-widest leading-none">||</span>
+                                    <div className="w-1 h-1 rounded-full bg-transparent mt-1" />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

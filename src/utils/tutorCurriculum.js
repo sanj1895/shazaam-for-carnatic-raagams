@@ -73,8 +73,10 @@ export const CURRICULUM = [
             {
                 id: 'm3_3', title: 'Module 3 Review: Pulse Master', tag: 'Review',
                 exercises: [
-                    { type: 'info', title: 'Consolidating Rhythm', body: 'Let\'s verify your internal rhythm. Follow the beat and tap perfectly on the metronome to unlock pitch calibration.' },
-                    { type: 'taalam', instruction: 'Tap perfectly on the beats to pass the rhythm gate.' }
+                    { type: 'info', title: 'Consolidating Rhythm', body: 'Before we calibrate your vocal range, let\'s verify your internal rhythm and understanding of the Adi Tala structure.' },
+                    { type: 'quiz', question: 'How many beats are in one full cycle of Adi Tala?', choices: ['4 beats', '6 beats', '8 beats', '12 beats'], correct: '8 beats', explanation: 'Adi Tala consists of exactly 8 beats in one complete loop, subdivided as 4 beats (Laghu) and 2 + 2 beats (two Drutams).' },
+                    { type: 'quiz', question: 'On which beats do you perform a thigh pat (Thattu) in Adi Tala?', choices: ['Beats 1, 5, and 7', 'Only on Beat 1', 'Beats 2, 4, 6, and 8', 'Beats 3, 4, and 5'], correct: 'Beats 1, 5, and 7', explanation: 'In Adi Tala, thigh pats (Thattu) are the starting markers for the three sections, occurring exactly on Beat 1, Beat 5, and Beat 7.' },
+                    { type: 'quiz', question: 'What physical gesture corresponds to beats 6 and 8 in Adi Tala?', choices: ['Tapping finger (Pinky or Ring)', 'Clapping both hands', 'Wave — flipping the hand to show its back (Visarjitam)', 'Tapping the thumb'], correct: 'Wave — flipping the hand to show its back (Visarjitam)', explanation: 'Beats 6 and 8 are the waving gestures (Visarjitam), where you flip your hand over to show the back of the hand on the thigh.' }
                 ]
             }
         ]

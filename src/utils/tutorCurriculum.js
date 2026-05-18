@@ -59,7 +59,7 @@ export const CURRICULUM = [
             {
                 id: 'm3_1', title: 'What is Adi Tala?', tag: 'Concept',
                 exercises: [
-                    { type: 'info', title: 'Keeping the Pulse', body: 'Rhythm in Carnatic music is kept manually by the hand using a cycle called Tala. This is taught FIRST because a strong internal clock is required to align your pitch.\n\nThe most popular rhythm is Adi Tala (8 beats). The physical hand gestures are:\n- Beat 1: Clap\n- Beats 2, 3, 4: Tap finger by finger (Pinky, Ring, Middle)\n- Beat 5: Clap\n- Beat 6: Wave (turn hand over)\n- Beat 7: Clap\n- Beat 8: Wave\n\nLet\'s practice keeping the pulse!' },
+                    { type: 'info', title: 'Keeping the Pulse', body: 'Rhythm in Carnatic music is kept manually by the hand using a cycle called Tala. This is taught FIRST because a strong internal clock is required to align your pitch.\n\nThe most popular rhythm is Adi Tala (8 beats). The physical gestures use your RIGHT hand on your RIGHT thigh:\n- Beat 1: Pat your right thigh (Thattu)\n- Beats 2, 3, 4: Tap fingers one by one onto thigh (Pinky → Ring → Middle)\n- Beat 5: Pat your right thigh\n- Beat 6: Wave — flip hand over, show back of hand (Visarjitam)\n- Beat 7: Pat your right thigh\n- Beat 8: Wave again\n\nThis is much easier to learn by watching. Search "Adi Tala hand gestures" on YouTube before practicing here.' },
                     { type: 'taalam', instruction: 'Follow the metronome and tap on each beat. Learn the hand gesture flow.' }
                 ]
             },

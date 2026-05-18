@@ -352,13 +352,13 @@ function ExerciseCompare({ note1, note2, question, choices, correct, sa, onDone 
 
 function ExerciseTaalam({ instruction, onDone }) {
     const gestures = [
-        { label: 'Clap', icon: '👏', gifUrl: '/gestures/clap.gif' },
+        { label: 'Pat', icon: '🦵', gifUrl: '/gestures/pat.gif' },
         { label: 'Pinky', icon: '🖐', gifUrl: '/gestures/pinky.gif' },
         { label: 'Ring', icon: '🖐', gifUrl: '/gestures/ring.gif' },
         { label: 'Middle', icon: '🖐', gifUrl: '/gestures/middle.gif' },
-        { label: 'Clap', icon: '👏', gifUrl: '/gestures/clap.gif' },
+        { label: 'Pat', icon: '🦵', gifUrl: '/gestures/pat.gif' },
         { label: 'Wave', icon: '👋', gifUrl: '/gestures/wave.gif' },
-        { label: 'Clap', icon: '👏', gifUrl: '/gestures/clap.gif' },
+        { label: 'Pat', icon: '🦵', gifUrl: '/gestures/pat.gif' },
         { label: 'Wave', icon: '👋', gifUrl: '/gestures/wave.gif' }
     ];
     

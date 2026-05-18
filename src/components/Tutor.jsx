@@ -1382,19 +1382,42 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
 // ─── Shared: Sing Sequence exercise ──────────────────────────────────────────
 
 function playTick(ctx, time) {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.frequency.value = 800; // woody click sound
-    osc.type = 'triangle';
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    gain.gain.setValueAtTime(0.5, time);
-    gain.gain.exponentialRampToValueAtTime(0.01, time + 0.05);
-    osc.start(time);
-    osc.stop(time + 0.05);
+    // 1. Warm woodbody resonant tone (sine wave for round, sweet organic sound)
+    const oscBody = ctx.createOscillator();
+    const gainBody = ctx.createGain();
+    oscBody.type = 'sine';
+    oscBody.frequency.setValueAtTime(600, time);
+    oscBody.frequency.exponentialRampToValueAtTime(300, time + 0.06);
+    
+    gainBody.gain.setValueAtTime(0.5, time);
+    gainBody.gain.exponentialRampToValueAtTime(0.001, time + 0.06);
+    
+    oscBody.connect(gainBody);
+    gainBody.connect(ctx.destination);
+    
+    // 2. High-pitch clean acoustic transient click to cut through drone & singing
+    const oscClick = ctx.createOscillator();
+    const gainClick = ctx.createGain();
+    oscClick.type = 'sine';
+    oscClick.frequency.setValueAtTime(1600, time);
+    
+    gainClick.gain.setValueAtTime(0.35, time);
+    gainClick.gain.exponentialRampToValueAtTime(0.001, time + 0.015);
+    
+    oscClick.connect(gainClick);
+    gainClick.connect(ctx.destination);
+    
+    oscBody.start(time);
+    oscBody.stop(time + 0.06);
+    
+    oscClick.start(time);
+    oscClick.stop(time + 0.015);
 }
 
 function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swaras', onDone }) {
+    const BEAT_MS = 800;
+    const NOTE_MS = BEAT_MS / speed;
+
     const [phase, setPhase] = useState('idle'); // idle | guide | countdown | singing | success | fail
     const [countdown, setCountdown] = useState(3);
     const [activeIdx, setActiveIdx] = useState(-1);
@@ -1442,18 +1465,23 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             streamRef.current = stream;
             
+            const ctx = getAudioCtx();
+            
             setPhase('countdown');
             setCountdown(3);
+            playTick(ctx, ctx.currentTime); // Play woodblock click on "3"
+            
             let c = 3;
             const iv = setInterval(() => {
                 c--;
                 if (c > 0) {
                     setCountdown(c);
+                    playTick(ctx, ctx.currentTime); // Play woodblock click on "2" and "1"
                 } else {
                     clearInterval(iv);
                     beginListening(stream);
                 }
-            }, 1000);
+            }, BEAT_MS); // Click in perfect sync with the singing beat tempo!
         } catch (err) {
             setMicError('Mic access required. Please allow mic and try again.');
             setPhase('idle');
@@ -1468,44 +1496,40 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
         source.connect(analyser);
 
         setPhase('singing');
-        setActiveIdx(-1);
+        setActiveIdx(0); // Start at first note immediately
+        playTick(ctx, ctx.currentTime); // Play the first singing click instantly
 
-        const BEAT_MS = 800;
-        const NOTE_MS = BEAT_MS / speed;
-        const startMs = Date.now() + 500;
-        
-        let lastBeat = -1;
+        const startMs = Date.now();
+        let lastBeat = 0;
 
         intervalRef.current = setInterval(() => {
             const now = Date.now();
-                if (now < startMs) return; // Wait for countdown
-                
-                const elapsed = now - startMs;
-                const currentIdx = Math.floor(elapsed / NOTE_MS);
-                
-                if (currentIdx >= swaras.length) {
-                    cleanup();
-                    // Evaluate
-                    const finalStatuses = scoresRef.current.map(s => (s.total > 0 && s.hits / s.total > 0.3) ? 'hit' : 'miss');
-                    setStatuses(finalStatuses);
-                    setActiveIdx(-1);
-                    const hitCount = finalStatuses.filter(s => s === 'hit').length;
-                    if (hitCount / swaras.length >= 0.7) {
-                        setPhase('success');
-                    } else {
-                        setPhase('fail');
-                    }
-                    return;
+            const elapsed = now - startMs;
+            const currentIdx = Math.floor(elapsed / NOTE_MS);
+            
+            if (currentIdx >= swaras.length) {
+                cleanup();
+                // Evaluate
+                const finalStatuses = scoresRef.current.map(s => (s.total > 0 && s.hits / s.total > 0.3) ? 'hit' : 'miss');
+                setStatuses(finalStatuses);
+                setActiveIdx(-1);
+                const hitCount = finalStatuses.filter(s => s === 'hit').length;
+                if (hitCount / swaras.length >= 0.7) {
+                    setPhase('success');
+                } else {
+                    setPhase('fail');
                 }
+                return;
+            }
 
-                if (currentIdx !== activeIdx) {
-                    setActiveIdx(currentIdx);
-                    const beatIdx = Math.floor(currentIdx / speed);
-                    if (beatIdx !== lastBeat) {
-                        playTick(ctx, ctx.currentTime);
-                        lastBeat = beatIdx;
-                    }
+            if (currentIdx !== activeIdx) {
+                setActiveIdx(currentIdx);
+                const beatIdx = Math.floor(currentIdx / speed);
+                if (beatIdx !== lastBeat) {
+                    playTick(ctx, ctx.currentTime);
+                    lastBeat = beatIdx;
                 }
+            }
 
                 // Check pitch
                 const swara = swaras[currentIdx];

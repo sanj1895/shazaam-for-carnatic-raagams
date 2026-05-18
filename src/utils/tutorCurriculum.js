@@ -2,29 +2,32 @@
 // Carnatic Foundations Curriculum — Pre-Sarali Readiness
 
 export const CURRICULUM = [
+    // ─── STAGE 1: ORIENTATION ──────────────────────────────────────────
     {
         id: 'stage1', title: 'Orientation to Carnatic Music', symbol: '🌅',
         subtitle: 'Listen, absorb, and find your home note',
         color: '#1a0e3a', tag: 'Module 1',
         lessons: [
             {
-                id: 'm1_1', title: 'What Are We Learning?', tag: 'Concept',
+                id: 'm1_1', title: 'The Vocal Instrument', tag: 'Concept',
                 exercises: [
-                    { type: 'info', title: 'The Voice as an Instrument', body: 'Carnatic music is a system of musical sounds organized around pitch and rhythm. Your voice becomes the instrument.\n\nWe do not begin with songs. We first train the ear and the voice. Repetition and listening are the keys to mastery.' },
-                    { type: 'quiz', question: 'In Carnatic music, what do we focus on before learning songs?', choices: ['Complicated lyrics', 'Ear and voice training', 'Singing as fast as possible', 'Memorizing ragas'], correct: 'Ear and voice training', explanation: 'A strong foundation in listening (ear training) and pitch stability (voice training) is required before singing full compositions.' },
+                    { type: 'info', title: 'The Voice as an Instrument', body: 'Welcome to your Carnatic vocal journey! Carnatic music is an ancient classical art form centered on two pillars: Raga (melodic framework) and Tala (rhythmic cycle).\n\nWe do not begin with songs. We first train the ear and the voice to hold pure pitches. Repetition and active listening are the keys to vocal mastery.' },
+                    { type: 'quiz', question: 'In Carnatic music, what do we focus on before learning full compositions?', choices: ['Complicated lyrics', 'Ear and voice training', 'Singing as fast as possible', 'Memorizing ragas'], correct: 'Ear and voice training', explanation: 'A strong foundation in listening (ear training) and pitch stability (voice training) is required before singing full compositions.' },
                     { type: 'free_sing', duration: 3, instruction: 'Just attempt to make a sound. Don\'t worry about being perfect. Hum "Hmmm" or sing "Aaaaa".' }
                 ]
             },
             {
                 id: 'm1_2', title: 'Understanding Shruti', tag: 'Concept',
                 exercises: [
-                    { type: 'info', title: 'The Musical Home', body: 'Imagine a musical home. No matter where the music travels, it always returns home.\n\nThis home note is your base pitch. The constant drone you hear (the Tambura) plays this note constantly to anchor your ear.' },
-                    { type: 'listen', swara: 'Sa', displayLabel: '♪', instruction: 'Close your eyes. Listen only. Build a familiarity with the drone.' },
+                    { type: 'info', title: 'The Musical Home', body: 'Imagine a musical home. No matter where the music travels, it always returns home.\n\nThis home note is called your Shruti (base pitch). In Carnatic music, all singers have their own unique Shruti that matches their voice. A constant drone instrument (the Tambura) plays this note constantly to anchor your ears.' },
+                    { type: 'listen', swara: 'Sa', displayLabel: '♪', instruction: 'Close your eyes. Listen to the Tambura drone. Let your ears settle into the base note.' },
                     { type: 'free_sing', duration: 4, instruction: 'Hum along with the drone. Place your voice onto the sound.' }
                 ]
             }
         ]
     },
+
+    // ─── STAGE 2: POSTURE & BREATH ─────────────────────────────────────
     {
         id: 'stage2', title: 'Body & Breath Foundations', symbol: '🫁',
         subtitle: 'Posture and relaxed sound production',
@@ -33,207 +36,292 @@ export const CURRICULUM = [
             {
                 id: 'm2_1', title: 'Singing Posture', tag: 'Practice',
                 exercises: [
-                    { type: 'info', title: 'The Body Affects the Sound', body: 'Correct posture:\n- Straight spine\n- Relaxed shoulders\n- Open chest\n- Jaw and tongue relaxed\n\nHunched shoulders or a tight neck will squeeze your sound. Stay loose!' },
-                    { type: 'free_sing', duration: 4, instruction: 'Slouch and sing "Aaaaa". Notice the tension. Now sit up straight, relax your shoulders, and sing again. Hear the difference?' }
+                    { type: 'info', title: 'The Body Affects the Sound', body: 'Correct singing posture:\n- Sit with a straight, vertical spine.\n- Relax your shoulders (no shrugging).\n- Keep your chest naturally open.\n- Relax your jaw and tongue completely.\n\nHunched shoulders or a tight neck will compress your vocal cords. Stay loose!' },
+                    { type: 'free_sing', duration: 4, instruction: 'Slouch and sing "Aaaaa". Notice the tension. Now sit up straight, relax your shoulders, and sing again. Hear the resonance?' }
                 ]
             },
             {
                 id: 'm2_2', title: 'Breath Control', tag: 'Practice',
                 exercises: [
-                    { type: 'info', title: 'Breath is Fuel', body: 'Breath is the fuel for the voice. We never push sound from the throat.\n\nPlace your hands on your stomach. When you inhale, your belly should expand. When you exhale (or sing), it slowly contracts.' },
+                    { type: 'info', title: 'Breath is Fuel', body: 'Your breath is the physical fuel for your voice. We never squeeze sound from the throat.\n\nPlace a hand on your lower belly. When you inhale, your belly should expand outward. As you sing or hum, the belly slowly and smoothly draws inward.' },
                     { type: 'free_sing', duration: 5, instruction: 'Take a deep belly breath and sustain "Hmmmm" for 5 seconds. Keep the airflow absolutely steady.' }
                 ]
             }
         ]
     },
+
+    // ─── STAGE 3: TALA & PULSE FOUNDATIONS ─────────────────────────────
     {
-        id: 'stage3', title: 'Shruti Alignment', symbol: '🎯',
-        subtitle: 'Locking onto the pitch',
-        color: '#311025', tag: 'Module 3',
+        id: 'stage3', title: 'Tala & Pulse Foundations', symbol: '⏱️',
+        subtitle: 'Internal rhythm awareness and physical hand gestures',
+        color: '#3a1313', tag: 'Module 3',
         lessons: [
             {
-                id: 'm3_1', title: 'Finding the Base Pitch', tag: 'Practice',
+                id: 'm3_1', title: 'What is Adi Tala?', tag: 'Concept',
                 exercises: [
-                    { type: 'info', title: 'Hearing the Pitch', body: 'Before singing, you must know what being "in tune" sounds like.\n\nWhen two notes are out of tune, they create a wobbling "interference" sound called beats. When they are perfectly in tune, the wobble disappears and the notes blend into one.' },
-                    { type: 'tune', instruction: 'Match the slider to the drone until the wobbling stops.' },
-                    { type: 'shruti_setup', instruction: "Every voice is unique. Let's calibrate your comfortable home note (Base Sa / Shruti) now!" },
-                    { type: 'info', title: 'Don\'t Search Randomly', body: 'When trying to find the base pitch with your voice, do not search randomly.\n\nListen first. Hear the pitch in your head. Then, deliberately place your voice onto that exact sound.' },
-                    { type: 'sing', swara: 'Sa', displayLabel: '♪', duration: 1, humanAudioUrl: '/audio/sa_human.mp3', instruction: 'Level 1: Match the base pitch for just 1 second.' },
-                    { type: 'sing', swara: 'Sa', displayLabel: '♪', duration: 3, humanAudioUrl: '/audio/sa_human.mp3', instruction: 'Level 2: Match and sustain the pitch for 3 seconds.' },
-                    { type: 'sing', swara: 'Sa', displayLabel: '♪', duration: 5, humanAudioUrl: '/audio/sa_human.mp3', instruction: 'Level 3: Match and sustain the pitch for 5 seconds.' }
+                    { type: 'info', title: 'Keeping the Pulse', body: 'Rhythm in Carnatic music is kept manually by the hand using a cycle called Tala. This is taught FIRST because a strong internal clock is required to align your pitch.\n\nThe most popular rhythm is Adi Tala (8 beats). The physical hand gestures are:\n- Beat 1: Clap\n- Beats 2, 3, 4: Tap finger by finger (Pinky, Ring, Middle)\n- Beat 5: Clap\n- Beat 6: Wave (turn hand over)\n- Beat 7: Clap\n- Beat 8: Wave\n\nLet\'s practice keeping the pulse!' },
+                    { type: 'taalam', instruction: 'Follow the metronome and tap on each beat. Learn the hand gesture flow.' }
                 ]
             },
             {
-                id: 'm3_2', title: 'Staying on Pitch', tag: 'Practice',
+                id: 'm3_2', title: 'Rhythm Keepers', tag: 'Practice',
                 exercises: [
-                    { type: 'info', title: 'The Pitch Lock Game', body: 'Pitch drift happens when your voice slowly moves away from the base pitch. Vocal shake happens when you are nervous.\n\nKeep the needle in the center. Sing a straight tone with absolutely no vibrato or wobbling.' },
-                    { type: 'sing', swara: 'Sa', displayLabel: '♪', duration: 6, instruction: 'Lock the pitch. Keep the indicator perfectly centered for 6 seconds.' }
+                    { type: 'info', title: 'Vocal Tap Alignment', body: 'Before we learn different pitch positions, let\'s practice aligning our vocal onset to the pulse clicks. You will hear snappy woodblock counts first.\n\nSing "Sa" (at any pitch that feels comfortable) exactly on the click. Do not drag or rush.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Sa', 'Sa', 'Sa'], speed: 1, instruction: 'Sing "Sa" exactly on each beat click.' }
                 ]
             },
             {
-                id: 'm3_3', title: 'Loud vs Stable', tag: 'Practice',
+                id: 'm3_3', title: 'Module 3 Review: Pulse Master', tag: 'Review',
                 exercises: [
-                    { type: 'info', title: 'Louder is not Better', body: 'Singing too loudly often causes pitch instability and strain. Singing too softly causes the voice to waver.\n\nA medium-soft volume is usually the most stable.' },
-                    { type: 'sing', swara: 'Sa', displayLabel: 'Aa', duration: 5, instruction: 'Sing at a comfortable, medium volume. Notice how the pitch stabilizes.' }
+                    { type: 'info', title: 'Consolidating Rhythm', body: 'Let\'s verify your internal rhythm. Follow the beat and tap perfectly on the metronome to unlock pitch calibration.' },
+                    { type: 'taalam', instruction: 'Tap perfectly on the beats to pass the rhythm gate.' }
                 ]
             }
         ]
     },
+
+    // ─── STAGE 4: SHRUTI ALIGNMENT & CALIBRATION ───────────────────────
     {
-        id: 'stage4', title: 'Voice Production', symbol: '🗣️',
-        subtitle: 'Building a healthy Carnatic tone',
-        color: '#3a2b0e', tag: 'Module 4',
+        id: 'stage4', title: 'Shruti Alignment & Calibration', symbol: '🎯',
+        subtitle: 'Locking onto your unique base pitch',
+        color: '#311025', tag: 'Module 4',
         lessons: [
             {
-                id: 'm4_1', title: 'Open Throat Sound', tag: 'Practice',
+                id: 'm4_1', title: 'Finding the Base Pitch', tag: 'Practice',
                 exercises: [
-                    { type: 'info', title: 'Avoid Squeezing', body: 'A healthy Carnatic tone is resonant and relaxed. If your throat feels tight or scratchy, you are squeezing the sound.\n\nSing the vowel "Aa" with a wide, relaxed jaw.' },
-                    { type: 'sing', swara: 'Sa', displayLabel: 'Aa', duration: 4, instruction: 'Sing an open, relaxed "Aa".' }
+                    { type: 'info', title: 'Hearing the Wobble', body: 'Now that you have a solid rhythmic pulse, let\'s find your pitch anchor.\n\nWhen two notes are out of tune, they create a wobbling volume fluctuation called acoustic beats. When they are perfectly in tune, the wobble disappears, creating a stable, resonant blend.' },
+                    { type: 'tune', instruction: 'Match the slider to the drone until the wobbling beats stop completely.' },
+                    { type: 'shruti_setup', instruction: "Every voice is unique. Let's calibrate your comfortable home note (Base Sa / Shruti) now!" }
                 ]
             },
             {
-                id: 'm4_2', title: 'Long Note Training', tag: 'Practice',
+                id: 'm4_2', title: 'Sustaining Base Sa', tag: 'Practice',
                 exercises: [
-                    { type: 'info', title: 'The Ultimate Foundation', body: 'Holding long notes is the direct preparation for musical patterns. If you can hold a note perfectly steady, moving between notes becomes much easier.' },
-                    { type: 'sing', swara: 'Sa', displayLabel: 'Aa', duration: 8, instruction: 'Hold the base pitch for 8 seconds. Track your steadiness and breath.' },
-                    { type: 'sing', swara: 'Pa', displayLabel: '5th', duration: 8, instruction: 'Hold the fifth note for 8 seconds.' }
+                    { type: 'info', title: 'Active Vocal Placement', body: 'When singing the base note (Sa), do not search for it randomly. Hear the pitch in your head first, then place your voice directly onto the Tambura drone.' },
+                    { type: 'sing', swara: 'Sa', displayLabel: 'Sa', duration: 2, instruction: 'Match the base pitch (Sa) for just 2 seconds.' },
+                    { type: 'sing', swara: 'Sa', displayLabel: 'Sa', duration: 5, instruction: 'Sustain the base pitch (Sa) steadily for 5 seconds.' }
+                ]
+            },
+            {
+                id: 'm4_3', title: 'Staying on Pitch', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Avoiding Pitch Drift', body: 'Pitch drift happens when your voice slowly sags or rises. Vocal shake happens when your breath is unstable.\n\nTo lock in the pitch, keep your voice steady and direct, without adding any decorative wobble (vibrato).' },
+                    { type: 'sing', swara: 'Sa', displayLabel: 'Sa', duration: 8, instruction: 'Lock the pitch. Sustain Sa steadily for 8 seconds without drifting!' }
+                ]
+            },
+            {
+                id: 'm4_4', title: 'Module 4 Review: Shruti Master', tag: 'Review',
+                exercises: [
+                    { type: 'info', title: 'Module 4 Consolidation', body: 'Let\'s check your base pitch stability before moving forward. You must sustain your calibrated Sa perfectly.' },
+                    { type: 'sing', swara: 'Sa', displayLabel: 'Sa', duration: 6, instruction: 'Sustain Sa for 6 seconds to unlock the next module.' }
                 ]
             }
         ]
     },
+
+    // ─── STAGE 5: THE PERFECT FIFTH ────────────────────────────────────
     {
-        id: 'stage5', title: 'Swara Foundations', symbol: '🪜',
-        subtitle: 'Understanding pitch locations',
-        color: '#1e3a29', tag: 'Module 5',
+        id: 'stage5', title: 'The Perfect Fifth (Sa-Pa)', symbol: '🌊',
+        subtitle: 'The fundamental acoustic interval',
+        color: '#3a2b0e', tag: 'Module 5',
         lessons: [
             {
-                id: 'm5_1', title: 'Intro to Sapta Swaras', tag: 'Concept',
+                id: 'm5_1', title: 'The Power of Pa', tag: 'Concept',
                 exercises: [
-                    { type: 'info', title: 'The Seven Notes', body: 'The Sapta Swaras (7 notes) are Sa, Ri, Ga, Ma, Pa, Da, Ni.\n\nThink of them as specific pitch locations on a staircase, not just syllables to memorize.' },
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri', 'Ga', 'Ma', 'Pa', 'Da', 'Ni', 'Ṡ'], instruction: 'Listen to the swaras ascending the staircase.' }
+                    { type: 'info', title: 'Why Sa and Pa Matter', body: 'In Carnatic music, the relationship between Sa (1st) and Pa (5th) is the most fundamental interval in all of music, known as the Perfect Fifth (Panchama Bhava).\n\nThese two notes are acoustic anchors. The Tambura drone plays both Sa and Pa constantly because they blend in perfect harmony.' },
+                    { type: 'listen', swara: 'Sa', displayLabel: 'Sa', instruction: 'Listen to Sa, the starting root note.' },
+                    { type: 'listen', swara: 'Pa', displayLabel: 'Pa', instruction: 'Listen to Pa. Feel how it blends perfectly with the drone.' }
                 ]
             },
             {
-                id: 'm5_2', title: 'Adjacent Notes', tag: 'Practice',
+                id: 'm5_2', title: 'Matching the Fifth', tag: 'Practice',
                 exercises: [
-                    { type: 'info', title: 'Moving by Step', body: 'When we move from Sa to Ri, we take a small step up. Listen to how close they are.' },
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri'], instruction: 'Listen to the small step.' },
-                    { type: 'quiz', question: 'How many steps are there between Sa and Ri?', choices: ['Zero', 'One step', 'A large leap'], correct: 'One step', explanation: 'Sa and Ri are adjacent, meaning they are next to each other.' }
+                    { type: 'info', title: 'Finding Pa with your Voice', body: 'Now, let\'s practice singing Pa. It is located exactly a fifth above Sa. Imagine it as a clean leap upward.' },
+                    { type: 'sing', swara: 'Pa', displayLabel: 'Pa', duration: 4, instruction: 'Sing and sustain Pa for 4 seconds.' },
+                    { type: 'sing', swara: 'Pa', displayLabel: 'Pa', duration: 8, instruction: 'Sustain the perfect fifth (Pa) for 8 seconds.' }
                 ]
             },
             {
-                id: 'm5_3', title: 'Ascending vs Descending', tag: 'Practice',
+                id: 'm5_3', title: 'Module 5 Review: Sa-Pa Leap', tag: 'Review',
                 exercises: [
-                    { type: 'info', title: 'Emotional Direction', body: 'Ascending notes (going up) create a feeling of lifting or tension. Descending notes (going down) create a feeling of settling or resolving.' },
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri', 'Ga'], instruction: 'Listen to the upward, lifting feeling.' },
-                    { type: 'listen_sequence', swaras: ['Ga', 'Ri', 'Sa'], instruction: 'Listen to the downward, settling feeling.' }
+                    { type: 'info', title: 'Interval Check', body: 'To finish this module, you must leap from Sa to Pa in sequence.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Pa'], speed: 1.5, instruction: 'Sing Sa, then leap directly to Pa.' }
                 ]
             }
         ]
     },
+
+    // ─── STAGE 6: SYSTEMATIC SWARA FOUNDATIONS ────────────────────────
     {
-        id: 'stage6', title: 'Ear Training', symbol: '👂',
-        subtitle: 'Developing internal hearing',
-        color: '#2d1b4e', tag: 'Module 6',
+        id: 'stage6', title: 'Systematic Swara Foundations', symbol: '🪜',
+        subtitle: 'Step-by-step introduction of the scale',
+        color: '#1e3a29', tag: 'Module 6',
         lessons: [
             {
-                id: 'm6_1', title: 'Same or Different?', tag: 'Practice',
+                id: 'm6_1', title: 'Understanding Swara Numbers', tag: 'Concept',
                 exercises: [
-                    { type: 'info', title: 'Internal Hearing', body: 'Before we sing patterns, we must be able to hear them in our mind. Let\'s test your ear.' },
+                    { type: 'info', title: 'The 16 Swarasthanas', body: 'In Carnatic music, there are 7 basic swara names: Sa, Ri, Ga, Ma, Pa, Da, Ni.\n\nHowever, some swaras have multiple variants (frequencies) called Swarasthanas. That is why you see numbers:\n- Ri1 (Suddha Rishabham): Low Ri\n- Ga3 (Antara Gandharam): High Ga\n- Ma1 (Suddha Madhyamam): Low Ma\n- Da1 (Suddha Dhaivatham): Low Da\n- Ni3 (Kakali Nishadham): High Ni\n\nThese numbers represent the precise frequency step on our Mayamalavagowla octave staircase!' },
+                    { type: 'quiz', question: 'What do the numbers on swaras like Ri1 and Ga3 represent?', choices: ['How loud to sing them', 'The exact frequency variants (swarasthanas)', 'Arbitrary label names', 'The octave level'], correct: 'The exact frequency variants (swarasthanas)', explanation: 'Numbers indicate which specific frequency variation of the swara is used in the scale.' }
+                ]
+            },
+            {
+                id: 'm6_2', title: 'The Anchors: Sa, Pa, High Sa', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'The Scale Pillars', body: 'Let\'s start with the three pillars of the Carnatic octave:\n1. Sa (Root)\n2. Pa (Perfect Fifth)\n3. Ṡ (High Sa - Tara Sthayi Sa)\n\nLet\'s hear and practice them!' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Pa', 'Ṡ'], instruction: 'Listen to the pillars: Sa, Pa, Ṡ' },
+                    { type: 'sing', swara: 'Sa', displayLabel: 'Sa', duration: 3, instruction: 'Sing the root note Sa.' },
+                    { type: 'sing', swara: 'Pa', displayLabel: 'Pa', duration: 3, instruction: 'Sing the perfect fifth Pa.' },
+                    { type: 'sing', swara: 'Ṡ', displayLabel: 'Ṡ (High)', duration: 3, instruction: 'Sing the upper-octave Sa (Ṡ).' }
+                ]
+            },
+            {
+                id: 'm6_3', title: 'The Lower Steps: Ri, Ga, Ma', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Meeting Ri1, Ga3, Ma1', body: 'Now, let\'s explore the notes in the lower half of the scale (Purvanga):\n- Ri1: A small, low step above Sa.\n- Ga3: A high, bright Gandharam note.\n- Ma1: The middle bridge note (Madhyamam).\n\nLet\'s learn them individually!' },
+                    { type: 'listen', swara: 'Ri1', displayLabel: 'Ri1', instruction: 'Listen to Suddha Rishabham (Ri1).' },
+                    { type: 'sing', swara: 'Ri1', displayLabel: 'Ri1', duration: 3, instruction: 'Match the pitch of Ri1.' },
+                    { type: 'listen', swara: 'Ga3', displayLabel: 'Ga3', instruction: 'Listen to Antara Gandharam (Ga3).' },
+                    { type: 'sing', swara: 'Ga3', displayLabel: 'Ga3', duration: 3, instruction: 'Match the pitch of Ga3.' },
+                    { type: 'listen', swara: 'Ma1', displayLabel: 'Ma1', instruction: 'Listen to Suddha Madhyamam (Ma1).' },
+                    { type: 'sing', swara: 'Ma1', displayLabel: 'Ma1', duration: 3, instruction: 'Match the pitch of Ma1.' }
+                ]
+            },
+            {
+                id: 'm6_4', title: 'The Upper Steps: Da, Ni', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Meeting Da1, Ni3', body: 'Finally, let\'s explore the notes above Pa (Uttaranga) in the Mayamalavagowla scale:\n- Da1 (Suddha Dhaivatham): A small step above Pa.\n- Ni3 (Kakali Nishadham): A high, bright seventh step located just a semi-tone below Ṡ.\n\nLet\'s hear and match them!' },
+                    { type: 'listen', swara: 'Da1', displayLabel: 'Da1', instruction: 'Listen to Suddha Dhaivatham (Da1).' },
+                    { type: 'sing', swara: 'Da1', displayLabel: 'Da1', duration: 3, instruction: 'Match the pitch of Da1.' },
+                    { type: 'listen', swara: 'Ni3', displayLabel: 'Ni3', instruction: 'Listen to Kakali Nishadham (Ni3).' },
+                    { type: 'sing', swara: 'Ni3', displayLabel: 'Ni3', duration: 3, instruction: 'Match the pitch of Ni3.' }
+                ]
+            },
+            {
+                id: 'm6_5', title: 'Ascending vs Descending (Avarohanam)', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Going Up and Coming Down', body: 'In Carnatic music, scales are practiced in two directions:\n- Arohanam: Ascending sequence (climbing up the stairs).\n- Avarohanam: Descending sequence (walking back down).\n\nDescending is historically harder for beginners because you must relax your throat tension systematically to land on each lower step.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', 'Pa', 'Da1', 'Ni3', 'Ṡ'], instruction: 'Arohanam: Listen to the scale climb UP.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ni3', 'Da1', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa'], instruction: 'Avarohanam: Listen to the scale walk DOWN.' },
+                    { type: 'sing_sequence', swaras: ['Ṡ', 'Ni3', 'Da1', 'Pa'], speed: 1.2, instruction: 'Practice descending: Sing Ṡ down to Pa.' },
+                    { type: 'sing_sequence', swaras: ['Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa'], speed: 1.2, instruction: 'Practice descending: Sing Pa down to Sa.' }
+                ]
+            },
+            {
+                id: 'm6_6', title: 'Module 6 Review: Full Scale Check', tag: 'Review',
+                exercises: [
+                    { type: 'info', title: 'Module 6 Ascent & Descent Check', body: 'To unlock the next module, you must sing both a three-note climb (Arohanam) and a three-note descent (Avarohanam).' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ga3'], speed: 1, instruction: 'Ascending: Sa Ri Ga' },
+                    { type: 'sing_sequence', swaras: ['Ga3', 'Ri1', 'Sa'], speed: 1, instruction: 'Descending: Ga Ri Sa' }
+                ]
+            }
+        ]
+    },
+
+    // ─── STAGE 7: SOLFEGE & EAR TRAINING ────────────────────────────────
+    {
+        id: 'stage7', title: 'Ear Training & Syllables', symbol: '👂',
+        subtitle: 'Syllables, intervals, and echo patterns',
+        color: '#2d1b4e', tag: 'Module 7',
+        lessons: [
+            {
+                id: 'm7_1', title: 'Syllable Singing (Swaram vs Akaram)', tag: 'Concept',
+                exercises: [
+                    { type: 'info', title: 'Sing the Names Out Loud!', body: 'Up until now, you have mostly hummed or held an open "Aaaa" vowel. This is called Akaram.\n\nIn Carnatic music, we must also sing the actual swara syllable names: "Sa", "Ri", "Ga", "Ma", "Pa", "Da", "Ni" out loud! This is called Swaram singing. Saying the names builds muscle memory and rhythm coordination.' },
+                    { type: 'quiz', question: 'What is the difference between Akaram and Swaram singing?', choices: ['Swaram is louder than Akaram', 'Akaram is singing on vowels (Aa); Swaram is singing the syllable names (Sa, Ri, Ga)', 'Swaram is only played on instruments', 'Akaram is for experts only'], correct: 'Akaram is singing on vowels (Aa); Swaram is singing the syllable names (Sa, Ri, Ga)', explanation: 'Akaram uses pure vowel sounds, while Swaram uses the actual names of the notes.' },
+                    { type: 'sing', swara: 'Sa', displayLabel: 'Say "Sa!"', duration: 3, instruction: 'Sustain the pitch while clearly singing the syllable "Sa".' },
+                    { type: 'sing', swara: 'Ri1', displayLabel: 'Say "Ri!"', duration: 3, instruction: 'Sustain the pitch while clearly singing the syllable "Ri".' }
+                ]
+            },
+            {
+                id: 'm7_2', title: 'Same or Different?', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Internal Hearing Test', body: 'Let\'s test your ear accuracy. Listen closely and identify whether the pitches are identical.' },
                     { type: 'compare', note1: 'Sa', note2: 'Sa', question: 'Are these two notes the same or different?', choices: ['Same', 'Different'], correct: 'Same' },
-                    { type: 'compare', note1: 'Sa', note2: 'Ri', question: 'Are these two notes the same or different?', choices: ['Same', 'Different'], correct: 'Different' }
+                    { type: 'compare', note1: 'Sa', note2: 'Ri1', question: 'Are these two notes the same or different?', choices: ['Same', 'Different'], correct: 'Different' }
                 ]
             },
             {
-                id: 'm6_2', title: 'Higher or Lower?', tag: 'Practice',
+                id: 'm7_3', title: 'Higher or Lower?', tag: 'Practice',
                 exercises: [
-                    { type: 'compare', note1: 'Sa', note2: 'Ga', question: 'Is the second note higher or lower than the first?', choices: ['Higher', 'Lower'], correct: 'Higher' },
-                    { type: 'compare', note1: 'Pa', note2: 'Ma', question: 'Is the second note higher or lower than the first?', choices: ['Higher', 'Lower'], correct: 'Lower' }
+                    { type: 'compare', note1: 'Sa', note2: 'Ga3', question: 'Is the second note higher or lower than the first?', choices: ['Higher', 'Lower'], correct: 'Higher' },
+                    { type: 'compare', note1: 'Pa', note2: 'Ma1', question: 'Is the second note higher or lower than the first?', choices: ['Higher', 'Lower'], correct: 'Lower' }
                 ]
             },
             {
-                id: 'm6_3', title: 'Echo Patterns', tag: 'Practice',
+                id: 'm7_4', title: 'Echo Patterns', tag: 'Practice',
                 exercises: [
-                    { type: 'info', title: 'Call and Response', body: 'Now, hear a short pattern and echo it back with your voice.' },
-                    { type: 'sing_sequence', swaras: ['Sa', 'Ri'], speed: 1, instruction: 'Echo this 2-note pattern: Sa Ri' },
-                    { type: 'sing_sequence', swaras: ['Sa', 'Ri', 'Ga'], speed: 1, instruction: 'Echo this 3-note pattern: Sa Ri Ga' },
-                    { type: 'sing_sequence', swaras: ['Ga', 'Ri', 'Sa'], speed: 1, instruction: 'Echo the descending pattern: Ga Ri Sa' }
+                    { type: 'info', title: 'Echoing Swaras', body: 'Listen to a pattern, then sing it back using the actual swara syllable names.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1'], speed: 1, instruction: 'Echo back: Sa Ri' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ga3'], speed: 1, instruction: 'Echo back: Sa Ri Ga' },
+                    { type: 'sing_sequence', swaras: ['Ga3', 'Ri1', 'Sa'], speed: 1, instruction: 'Echo the descending pattern: Ga Ri Sa' }
+                ]
+            },
+            {
+                id: 'm7_5', title: 'Module 7 Review: Ear & Solfege', tag: 'Review',
+                exercises: [
+                    { type: 'info', title: 'Module 7 Gatekeeper', body: 'Prove you can hear the difference and echo a 4-note sequence using swaras.' },
+                    { type: 'compare', note1: 'Ma1', note2: 'Ga3', question: 'Is the second note higher or lower than the first?', choices: ['Higher', 'Lower'], correct: 'Lower' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1'], speed: 1, instruction: 'Echo: Sa Ri Ga Ma' }
                 ]
             }
         ]
     },
+
+    // ─── STAGE 8: THE SARALI BRIDGE ───────────────────────────────────
     {
-        id: 'stage7', title: 'Tala Foundations', symbol: '⏱️',
-        subtitle: 'Internal rhythm awareness',
-        color: '#3a1313', tag: 'Module 7',
-        lessons: [
-            {
-                id: 'm7_1', title: 'What is Adi Tala?', tag: 'Concept',
-                exercises: [
-                    { type: 'info', title: 'The 8-Beat Cycle', body: 'The most common rhythm in Carnatic music is Adi Tala. It is an 8-beat cycle.\n\nWe keep track of the beat using specific hand gestures: Clap, Pinky finger, Ring finger, Middle finger, Clap, Wave, Clap, Wave.' },
-                    { type: 'taalam', instruction: 'Follow the metronome and tap the button exactly on the beat. Watch the gestures so you learn the sequence.' }
-                ]
-            },
-            {
-                id: 'm7_2', title: 'Vocal Rhythm Coordination', tag: 'Practice',
-                exercises: [
-                    { type: 'info', title: 'Singing on the Beat', body: 'The metronome will click. Your goal is to sing exactly on the click, not before or after.' },
-                    { type: 'sing_sequence', swaras: ['Sa', 'Sa', 'Sa', 'Sa'], speed: 1, instruction: 'Say "Sa" exactly on each click.' }
-                ]
-            }
-        ]
-    },
-    {
-        id: 'stage8', title: 'Octaves & Movement', symbol: '🌊',
-        subtitle: 'Voice sliding and jumps',
+        id: 'stage8', title: 'The Sarali Bridge', symbol: '🎹',
+        subtitle: 'Combining pitch patterns and rhythm',
         color: '#0f293a', tag: 'Module 8',
         lessons: [
             {
-                id: 'm8_1', title: 'Understanding Octaves', tag: 'Concept',
+                id: 'm8_1', title: 'Pitch Patterns on the Beat', tag: 'Practice',
                 exercises: [
-                    { type: 'info', title: 'The Three Registers', body: 'Your voice can sing in different ranges (sthayi):\n- Mandra (Lower)\n- Madhya (Middle - where we usually sing)\n- Tara (Higher)' },
-                    { type: 'listen', swara: 'Sa', instruction: 'Listen to Middle Sa.' },
-                    { type: 'listen', swara: 'Ṡ', instruction: 'Listen to Higher Sa (Tara Sthayi).' }
+                    { type: 'info', title: 'Swaras on the Pulse', body: 'This is the ultimate bridge to Sarali Varisai! We are going to change pitches (Swaras) exactly in sync with the rhythmic metronome clicks.\n\nSing the actual syllable names ("Sa", "Ri", "Ga", "Ma") exactly on the woodblock clicks!' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1'], speed: 1, instruction: 'Sing "Sa Ri Ga Ma" in perfect rhythm!' },
+                    { type: 'sing_sequence', swaras: ['Ma1', 'Ga3', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing descending "Ma Ga Ri Sa" in rhythm!' }
                 ]
             },
             {
-                id: 'm8_2', title: 'Jumps', tag: 'Practice',
+                id: 'm8_2', title: 'Module 8 Review: Rhythmic Mastery', tag: 'Review',
                 exercises: [
-                    { type: 'info', title: 'Agility Training', body: 'We will now practice jumping between distant notes to build vocal agility and confidence.' },
-                    { type: 'sing_sequence', swaras: ['Sa', 'Pa'], speed: 1, instruction: 'Jump from Sa to Pa.' },
-                    { type: 'sing_sequence', swaras: ['Sa', 'Ṡ'], speed: 1, instruction: 'Jump from Middle Sa to Higher Sa.' }
+                    { type: 'info', title: 'The Rhythmic Bridge Gate', body: 'Combine ascending and descending swaras in a single continuous rhythmic phrase.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', 'Ma1', 'Ga3', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing Sa Ri Ga Ma Ma Ga Ri Sa on the beats!' }
                 ]
             }
         ]
     },
+
+    // ─── STAGE 9: PRE-SARALI FINAL GATE ────────────────────────────────
     {
-        id: 'stage9', title: 'Pre-Sarali Readiness', symbol: '🎓',
-        subtitle: 'The final gate',
+        id: 'stage9', title: 'Pre-Sarali Readiness Gate', symbol: '🎓',
+        subtitle: 'The absolute foundation checklist',
         color: '#2a2a2a', tag: 'Module 9',
         lessons: [
             {
-                id: 'm9_1', title: 'Final Skill Check', tag: 'Practice',
+                id: 'm9_1', title: 'The Comprehensive Exam', tag: 'Practice',
                 exercises: [
-                    { type: 'info', title: 'Are You Ready?', body: 'To begin Sarali Varisai, you must prove you have mastered the foundations:\n✅ 5-second pitch sustain\n✅ Swara recognition\n✅ Steady rhythm\n✅ Relaxed voice' },
-                    { type: 'sing', swara: 'Sa', duration: 5, instruction: 'Final Test 1: Sustain Sa perfectly for 5 seconds.' },
-                    { type: 'identify', play: 'Ga3', choices: ['Sa', 'Ri1', 'Ga3', 'Ma1'], instruction: 'Final Test 2: Identify this note.' },
-                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1'], speed: 1, instruction: 'Final Test 3: Echo this 4-note pattern steadily.' },
-                    { type: 'info', title: 'Congratulations!', body: 'You have completed the Pre-Sarali curriculum. You now have the ear, the breath, and the pitch stability required to truly learn Carnatic music.\n\nYou are ready for Sarali Varisai!' }
+                    { type: 'info', title: 'Are You Ready?', body: 'To qualify for Sarali Varisai and graduate from foundations, you must pass four specific checkmarks:\n✅ Perfect Shruti Stability (6s sustain)\n✅ Swara Identification\n✅ Avarohanam (Descending pitch accuracy)\n✅ Rhythmic Solfege Coordination' },
+                    { type: 'sing', swara: 'Sa', duration: 6, instruction: 'Test 1: Sustain Sa perfectly for 6 seconds.' },
+                    { type: 'identify', play: 'Ga3', choices: ['Sa', 'Ri1', 'Ga3', 'Ma1'], instruction: 'Test 2: Identify this swarasthana.' },
+                    { type: 'sing_sequence', swaras: ['Ṡ', 'Ni3', 'Da1', 'Pa'], speed: 1.2, instruction: 'Test 3: Descend correctly from Ṡ to Pa.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1'], speed: 1, instruction: 'Test 4: Sing Sa Ri Ga Ma on the beat clicks.' },
+                    { type: 'info', title: 'Foundations Verified!', body: 'Splendid! You have successfully passed the Pre-Sarali Readiness checklist.\n\nYou have built the ear, locked the breath, learned your unique Shruti, and established a solid pulse coordinate.\n\nYou are ready for Raga graduation!' }
                 ]
             }
         ]
     },
+
+    // ─── STAGE 10: GRADUATION ──────────────────────────────────────────
     {
-        id: 'stage10', title: 'Graduation', symbol: '🎓',
-        subtitle: 'The bridge to Sarali Varisai',
+        id: 'stage10', title: 'Graduation', symbol: '🏆',
+        subtitle: 'Entering the universe of Ragas',
         color: '#1a3a1b', tag: 'Module 10',
         lessons: [
             {
-                id: 'm10_1', title: 'You Are Ready', tag: 'Concept',
+                id: 'm10_1', title: 'Unlocking Raga Practice', tag: 'Concept',
                 exercises: [
-                    { type: 'info', title: 'What is Sarali Varisai?', body: 'Congratulations! You have mastered breath, pitch, and pulse. You are now ready to begin the formal Carnatic curriculum starting with Sarali Varisai.\n\nSarali Varisai are fundamental sequences of notes that combine everything you just learned.' },
-                    { type: 'info', title: 'Unlocking the App', body: 'Because you have completed the foundations, the advanced features of this app are now unlocked!\n\nYou can head over to "Sing & Discover" or "Raga Practice" to explore hundreds of real ragas.' },
-                    { type: 'quiz', question: 'What is the most important rule when practicing Sarali Varisai?', choices: ['Sing as loud as possible', 'Always maintain perfect Shruti and Tala', 'Memorize the names quickly', 'Use an instrument'], correct: 'Always maintain perfect Shruti and Tala', explanation: 'Never sacrifice your pitch or rhythm just to finish an exercise. Accuracy is everything.' }
+                    { type: 'info', title: 'The World of Carnatic Music', body: 'Congratulations! You have completed the Foundations curriculum. You are no longer just guessing pitch—you are a trained classical student.\n\nYou have fully unlocked the advanced Raga Practice mode! You can now explore, hear, sing, and master the full scale structures of Carnatic Ragas.' },
+                    { type: 'quiz', question: 'What is the most critical asset for a Carnatic student as they begin Sarali Varisai?', choices: ['Singing as fast as possible', 'Memorizing a song blindly', 'Always maintaining perfect Shruti (pitch) and Tala (rhythm)', 'Singing without a drone'], correct: 'Always maintain perfect Shruti (pitch) and Tala (rhythm)', explanation: 'Accuracy of pitch and rhythm (Shruti and Tala) is the bedrock of classical Carnatic music. speed will follow naturally.' }
                 ]
             }
         ]

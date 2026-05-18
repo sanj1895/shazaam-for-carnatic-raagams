@@ -2867,15 +2867,18 @@ function RagaPractice({ sa }) {
 // ─── Programs catalog ──────────────────────────────────────────────────────────
 
 function ProgramsCatalog({ progress, onSelectCourse }) {
-    // Calculate foundations progress
-    let foundationsTotal = 0;
-    let foundationsCompleted = 0;
-    CURRICULUM.forEach(u => {
-        foundationsTotal += u.lessons.length;
-        u.lessons.forEach(l => {
-            if (progress[`${u.id}/${l.id}`]) foundationsCompleted++;
+    const getCourseStats = (course) => {
+        let total = 0;
+        let completed = 0;
+        const curr = course.curriculum || [];
+        curr.forEach(u => {
+            total += u.lessons.length;
+            u.lessons.forEach(l => {
+                if (progress[`${u.id}/${l.id}`]) completed++;
+            });
         });
-    });
+        return { total, completed };
+    };
 
     return (
         <div className="w-full max-w-2xl flex flex-col gap-6 animate-fade-in relative z-10">
@@ -2891,9 +2894,10 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {COURSES.map(course => {
-                    const isFoundations = course.id === 'foundations';
+                    const isUpcoming = course.upcoming;
                     
-                    if (isFoundations) {
+                    if (!isUpcoming) {
+                        const { total, completed } = getCourseStats(course);
                         return (
                             <button
                                 key={course.id}
@@ -2906,7 +2910,7 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
                                 <div className="heritage-border-corner heritage-corner-br" style={{ bottom: 2, right: 2 }} />
 
                                 <div className="px-5 py-5 flex items-start gap-4 flex-1">
-                                    <div className="text-3xl p-3 bg-c-gold-faint rounded-xl border border-c-border/40 text-c-gold flex-shrink-0 group-hover:scale-105 transition-transform">
+                                    <div className="text-3xl p-3 bg-c-gold-faint rounded-xl border border-c-border/40 text-c-gold flex-shrink-0 group-hover:scale-105 transition-transform animate-pulse" style={{ animationDuration: '3s' }}>
                                         {course.symbol}
                                     </div>
                                     <div className="flex-1 flex flex-col gap-1">
@@ -2923,13 +2927,13 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
                                 
                                 <div className="border-t border-c-border/30 bg-c-card px-5 py-3.5 flex flex-col gap-2">
                                     <div className="flex justify-between items-center text-[10px] font-mono text-c-cream-dark uppercase tracking-wider font-bold">
-                                        <span>🏁 Foundations Path</span>
-                                        <span className="text-c-gold">{foundationsCompleted} / {foundationsTotal} Lessons</span>
+                                        <span>🏁 active Path</span>
+                                        <span className="text-c-gold">{completed} / {total} Lessons</span>
                                     </div>
                                     <div className="w-full h-1.5 bg-c-bg rounded-full overflow-hidden border border-c-border/10">
                                         <div 
                                             className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500" 
-                                            style={{ width: `${(foundationsCompleted / foundationsTotal) * 100}%` }}
+                                            style={{ width: `${total ? (completed / total) * 100 : 0}%` }}
                                         />
                                     </div>
                                 </div>
@@ -2975,10 +2979,10 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
 
 // ─── Curriculum home ──────────────────────────────────────────────────────────
 
-function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset, onBackToCatalog }) {
+function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset, onBackToCatalog, activeCurriculum = CURRICULUM }) {
     let totalLessons = 0;
     let completedLessons = 0;
-    CURRICULUM.forEach(u => {
+    activeCurriculum.forEach(u => {
         totalLessons += u.lessons.length;
         u.lessons.forEach(l => {
             if (progress[`${u.id}/${l.id}`]) completedLessons++;
@@ -3007,7 +3011,7 @@ function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset, onBackToC
                 </div>
             </div>
             
-            {CURRICULUM.map((unit, idx) => {
+            {activeCurriculum.map((unit, idx) => {
                 const unlocked = isUnlocked(idx);
                 const done = unit.lessons.filter(l => progress[`${unit.id}/${l.id}`]).length;
                 const total = unit.lessons.length;
@@ -3151,9 +3155,12 @@ export default function Tutor({ saFrequency }) {
         }
     };
 
+    const activeCourse = COURSES.find(c => c.id === selectedCourseId);
+    const activeCurriculum = activeCourse?.curriculum || CURRICULUM;
+
     const isUnlocked = (unitIdx) => {
         if (unitIdx === 0) return true;
-        const prev = CURRICULUM[unitIdx - 1];
+        const prev = activeCurriculum[unitIdx - 1];
         return prev.lessons.every(l => progress[`${prev.id}/${l.id}`]);
     };
 
@@ -3228,6 +3235,7 @@ export default function Tutor({ saFrequency }) {
                                 onSelectUnit={(unit) => { setActiveUnit(unit); setScreen('unit'); }}
                                 onReset={resetProgress}
                                 onBackToCatalog={() => setSelectedCourseId(null)}
+                                activeCurriculum={activeCurriculum}
                             />
                         )
                     ) : (

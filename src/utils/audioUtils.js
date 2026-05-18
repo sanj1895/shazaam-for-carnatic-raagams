@@ -13,6 +13,14 @@ export const SWARA_SEMITONE = {
   'Da2': 9,  'Ni1': 9,   // enharmonic: Ni1 = Da2
   'Ni2': 10, 'Da3': 10,  // enharmonic: Da3 = Ni2
   'Ni3': 11,
+  
+  // Plain names mapping to standard Mayamalavagowla (first beginner raga) notes for simplified curriculum
+  'Ri': 1,
+  'Ga': 4,
+  'Ma': 5,
+  'Da': 8,
+  'Ni': 11,
+  'Ṡ': 12,
 };
 
 export const SEMITONE_TO_SWARA = Object.fromEntries(

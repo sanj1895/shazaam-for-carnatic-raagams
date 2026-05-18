@@ -156,7 +156,14 @@ export default function GroqPanel({ saFrequency }) {
     const progressPct = Math.round(((RECORD_SECS - countdown) / RECORD_SECS) * 100);
 
     return (
-        <div className="w-full border border-c-border bg-c-surface rounded-xl overflow-hidden">
+        <div className="w-full border border-c-border bg-c-surface rounded-xl overflow-hidden flex flex-col">
+            <div className="bg-c-gold-faint border-b border-c-gold/30 p-3 flex gap-3 items-start">
+                <span className="text-c-gold mt-0.5">ℹ️</span>
+                <p className="text-xs text-c-cream-dim leading-relaxed">
+                    This section is for users who are already well-versed and want to analyze advanced raagams. Beginners should complete the Curriculum first!
+                </p>
+            </div>
+            
             <div className="border-b border-c-border px-5 py-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 flex-shrink-0">
                     <span className="text-c-gold/40 text-xs">✦</span>

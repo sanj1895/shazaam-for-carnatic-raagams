@@ -93,7 +93,7 @@ export const RAGAS = {
         avarohanam:   ['Sa', 'Ni3', 'Ni2', 'Pa', 'Ma1', 'Ga1', 'Ri1', 'Sa'],
         type:         'Melakarta 6',
         mood:         'Unusual · Contemplative',
-        description:  'One of the structurally unusual Melakartas  ·  the upper tetrachord has two consecutive semitones (Ni2-Ni3) mirroring the lower pair (Ri1-Ri2).',
+        description:  'One of the most structurally unusual Melakartas  ·  it skips Da entirely, leaping from Pa straight to Ni2. The consecutive Ni2-Ni3 in the upper register creates a tense, contemplative quality.',
         compositions: [],
         color:        'maroon',
         video:        "https://www.youtube.com/shorts/LBHKpmbiex4",
@@ -855,7 +855,7 @@ export const RAGAS = {
     'Hindolam': {
         arohanam:     ['Sa', 'Ga2', 'Ma1', 'Da1', 'Ni2', 'Sa'],
         avarohanam:   ['Sa', 'Ni2', 'Da1', 'Ma1', 'Ga2', 'Sa'],
-        type:         'Janya · Pentatonic',
+        type:         'Janya · Natabhairavi (20)',
         mood:         'Yearning · Night',
         description:  'Five notes and a universe of feeling. Hindolam is the raga of deep night and unresolved longing  ·  sung after midnight, when everything is quiet and the heart speaks.',
         compositions: ['Alamelumanga  ·  Tyagaraja'],
@@ -895,7 +895,7 @@ export const RAGAS = {
     'Durga': {
         arohanam:     ['Sa', 'Ri2', 'Ma1', 'Pa', 'Da2', 'Sa'],
         avarohanam:   ['Sa', 'Da2', 'Pa', 'Ma1', 'Ri2', 'Sa'],
-        type:         'Janya · Pentatonic',
+        type:         'Janya · Shankarabharanam (29)',
         mood:         'Joy · Auspiciousness',
         description:  'Five bright notes  ·  Durga is used in auspicious settings because of its bright, open quality. Close to the Western pentatonic major scale that appears in folk music across the world.',
         compositions: ['Durgamba  ·  Dikshitar'],
@@ -905,7 +905,7 @@ export const RAGAS = {
     'Revati': {
         arohanam:     ['Sa', 'Ri1', 'Ma1', 'Pa', 'Ni2', 'Sa'],
         avarohanam:   ['Sa', 'Ni2', 'Pa', 'Ma1', 'Ri1', 'Sa'],
-        type:         'Janya · Pentatonic',
+        type:         'Janya · Hanumatodi (8)',
         mood:         'Peaceful · Evening',
         description:  "Simple, pentatonic, and quietly beautiful. Revati doesn't demand  ·  it simply settles in the ear like evening light.",
         compositions: ['Palukavemiridam  ·  Tyagaraja'],
@@ -924,6 +924,22 @@ export const RAGAS = {
     },
 };
 
+// Enharmonic equivalences: pitch detection can only resolve semitones, not swara
+// function. Ri2 and Ga1 are the same pitch (semitone 2), etc. When matching a
+// detected note against a raga's scale, we must treat these pairs as equivalent.
+const ENHARMONIC = {
+    'Ri2': 'Ga1', 'Ga1': 'Ri2',
+    'Ri3': 'Ga2', 'Ga2': 'Ri3',
+    'Da2': 'Ni1', 'Ni1': 'Da2',
+    'Da3': 'Ni2', 'Ni2': 'Da3',
+};
+
+const matchesNote = (detected, ragaNoteSet) => {
+    if (ragaNoteSet.has(detected)) return true;
+    const alt = ENHARMONIC[detected];
+    return alt ? ragaNoteSet.has(alt) : false;
+};
+
 // noteFrequencies: optional map of {note: count} from the rolling pitch history.
 export const identifyRaga = (detectedSwarams, noteFrequencies = {}) => {
     const uniqueNotes = new Set(detectedSwarams);
@@ -936,7 +952,7 @@ export const identifyRaga = (detectedSwarams, noteFrequencies = {}) => {
         let alienCount = 0;
 
         uniqueNotes.forEach(note => {
-            if (ragaNotes.has(note)) matchCount++;
+            if (matchesNote(note, ragaNotes)) matchCount++;
             else alienCount++;
         });
 
@@ -946,18 +962,21 @@ export const identifyRaga = (detectedSwarams, noteFrequencies = {}) => {
         // Janya ragas with skip notes score higher when those skipped notes are rare.
         const arohanamSet = new Set(data.arohanam);
         const arohanamNotes = data.arohanam.filter(n => n !== 'Sa');
+        // Sum frequency for arohanam notes, checking enharmonic equivalents too
+        const getFreq = (n) => (noteFrequencies[n] || 0) + (noteFrequencies[ENHARMONIC[n]] || 0);
         const avgArohanamFreq = arohanamNotes.length
-            ? arohanamNotes.reduce((s, n) => s + (noteFrequencies[n] || 0), 0) / arohanamNotes.length
+            ? arohanamNotes.reduce((s, n) => s + getFreq(n), 0) / arohanamNotes.length
             : 0;
         const avgDetectedFreq = [...uniqueNotes].filter(n => n !== 'Sa')
-            .reduce((s, n) => s + (noteFrequencies[n] || 0), 0) / Math.max(uniqueNotes.size - 1, 1);
+            .reduce((s, n) => s + getFreq(n), 0) / Math.max(uniqueNotes.size - 1, 1);
         const arohanamProminence = avgDetectedFreq > 0 ? avgArohanamFreq / avgDetectedFreq : 1;
 
         // Vakra penalty: notes that appear in avarohanam but NOT arohanam should be rare.
         // If they're sung frequently, this raga is a worse fit (those notes should only appear in descent).
-        const vakraNotes = data.avarohanam.filter(n => !arohanamSet.has(n) && n !== 'Sa');
+        const inArohanam = (n) => arohanamSet.has(n) || (ENHARMONIC[n] && arohanamSet.has(ENHARMONIC[n]));
+        const vakraNotes = data.avarohanam.filter(n => !inArohanam(n) && n !== 'Sa');
         const avgVakraFreq = vakraNotes.length
-            ? vakraNotes.reduce((s, n) => s + (noteFrequencies[n] || 0), 0) / vakraNotes.length
+            ? vakraNotes.reduce((s, n) => s + getFreq(n), 0) / vakraNotes.length
             : 0;
         const vakraPenalty = avgArohanamFreq > 0 ? avgVakraFreq / avgArohanamFreq : 0;
 

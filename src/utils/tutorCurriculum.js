@@ -330,3 +330,102 @@ export const CURRICULUM = [
         ]
     }
 ];
+
+export const COURSES = [
+    {
+        id: 'foundations',
+        title: 'Carnatic Singing Foundations',
+        description: 'Complete training from scratch to align your ear, body, breath, rhythm, and basic swaras.',
+        symbol: '🧘🏽‍♂️',
+        color: '#1a0e3a',
+        curriculum: CURRICULUM
+    },
+    {
+        id: 'sarali_varisai',
+        title: 'Sarali Varisai',
+        description: 'The fundamental vocal exercises in single-beat rhythm to master notes positions.',
+        symbol: '🎶',
+        color: '#0f172a',
+        upcoming: true
+    },
+    {
+        id: 'janta_varisai',
+        title: 'Janta Varisai',
+        description: 'Double-note sequences to practice vocal power, speed shifts, and swift note pulses.',
+        symbol: '⚡',
+        color: '#3a1313',
+        upcoming: true
+    },
+    {
+        id: 'daatu_varisai',
+        title: 'Daatu Varisai',
+        description: 'Leaping note patterns that build high-level pitch accuracy and musical dexterity.',
+        symbol: '🦘',
+        color: '#311025',
+        upcoming: true
+    },
+    {
+        id: 'melsthayi_mandrasthayi',
+        title: 'Melsthayi / Mandrasthayi Varisai',
+        description: 'Sargam in high and low octaves to expand your vocal range.',
+        symbol: '🏔️',
+        color: '#3a2b0e',
+        upcoming: true
+    },
+    {
+        id: 'alankarams',
+        title: 'Alankarams',
+        description: 'Exercises set in different rhythmic cycles (Taalams) to master time signatures.',
+        symbol: '⏱️',
+        color: '#1e3a1f',
+        upcoming: true
+    },
+    {
+        id: 'geetams',
+        title: 'Geetams',
+        description: 'Simple melodic songs that weave lyrics, notes, and rhythm together.',
+        symbol: '🌸',
+        color: '#1a0e3a',
+        upcoming: true
+    },
+    {
+        id: 'swarajathis',
+        title: 'Swarajathis',
+        description: 'Structured, expressive compositions bridging simple geetams and advanced varnams.',
+        symbol: '🎭',
+        color: '#0f172a',
+        upcoming: true
+    },
+    {
+        id: 'varnams',
+        title: 'Varnams',
+        description: 'The ultimate complex blueprints of Ragas, detailing speeds and gamakam glides.',
+        symbol: '🦁',
+        color: '#3a1313',
+        upcoming: true
+    },
+    {
+        id: 'kritis',
+        title: 'Kritis',
+        description: 'Classical, devotional masterworks that are the heart of a performance.',
+        symbol: '🏛️',
+        color: '#311025',
+        upcoming: true
+    },
+    {
+        id: 'manodharma_basics',
+        title: 'Manodharma Basics',
+        description: 'Introduction to creative improvisation, including Alapana and Kalpanaswaras.',
+        symbol: '🌊',
+        color: '#3a2b0e',
+        upcoming: true
+    },
+    {
+        id: 'manodharma_advanced',
+        title: 'Advanced Manodharma',
+        description: 'Advanced classical improvisation techniques, featuring Neraval and Pallavi structures.',
+        symbol: '👑',
+        color: '#1e3a1f',
+        upcoming: true
+    }
+];

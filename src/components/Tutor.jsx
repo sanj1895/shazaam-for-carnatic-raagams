@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { RAGAS, getSwaram } from '../utils/ragaLogic';
-import { CURRICULUM } from '../utils/tutorCurriculum';
+import { CURRICULUM, COURSES } from '../utils/tutorCurriculum';
 import {
     getAudioCtx, playNote, playSequence, detectPitch as detectPitchAudio,
     SWARA_SEMITONE, noteFreq, getOctaveSequence, startDrone,
@@ -2864,9 +2864,118 @@ function RagaPractice({ sa }) {
     );
 }
 
+// ─── Programs catalog ──────────────────────────────────────────────────────────
+
+function ProgramsCatalog({ progress, onSelectCourse }) {
+    // Calculate foundations progress
+    let foundationsTotal = 0;
+    let foundationsCompleted = 0;
+    CURRICULUM.forEach(u => {
+        foundationsTotal += u.lessons.length;
+        u.lessons.forEach(l => {
+            if (progress[`${u.id}/${l.id}`]) foundationsCompleted++;
+        });
+    });
+
+    return (
+        <div className="w-full max-w-2xl flex flex-col gap-6 animate-fade-in relative z-10">
+            {/* Catalog Hero Banner */}
+            <div className="text-center flex flex-col gap-1.5 mb-2 py-4">
+                <h1 className="font-playfair text-2xl md:text-3xl font-extrabold text-c-gold tracking-wide">
+                    Carnatic Vocal Curriculum
+                </h1>
+                <p className="text-xs md:text-sm text-c-cream-dim font-playfair max-w-md mx-auto leading-relaxed">
+                    A comprehensive, step-by-step masterclass path from basic breath to advanced classical improvisation.
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {COURSES.map(course => {
+                    const isFoundations = course.id === 'foundations';
+                    
+                    if (isFoundations) {
+                        return (
+                            <button
+                                key={course.id}
+                                onClick={() => onSelectCourse(course.id)}
+                                className="w-full text-left rounded-xl border border-c-border bg-c-surface hover:border-c-gold/40 hover:shadow-lg hover:shadow-c-gold/5 transition-all duration-300 flex flex-col overflow-hidden group relative heritage-card"
+                            >
+                                <div className="heritage-border-corner heritage-corner-tl" style={{ top: 2, left: 2 }} />
+                                <div className="heritage-border-corner heritage-corner-tr" style={{ top: 2, right: 2 }} />
+                                <div className="heritage-border-corner heritage-corner-bl" style={{ bottom: 2, left: 2 }} />
+                                <div className="heritage-border-corner heritage-corner-br" style={{ bottom: 2, right: 2 }} />
+
+                                <div className="px-5 py-5 flex items-start gap-4 flex-1">
+                                    <div className="text-3xl p-3 bg-c-gold-faint rounded-xl border border-c-border/40 text-c-gold flex-shrink-0 group-hover:scale-105 transition-transform">
+                                        {course.symbol}
+                                    </div>
+                                    <div className="flex-1 flex flex-col gap-1">
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-playfair font-black text-base text-c-cream group-hover:text-c-gold transition-colors">
+                                                {course.title}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-c-cream-dim leading-relaxed font-sans">
+                                            {course.description}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div className="border-t border-c-border/30 bg-c-card px-5 py-3.5 flex flex-col gap-2">
+                                    <div className="flex justify-between items-center text-[10px] font-mono text-c-cream-dark uppercase tracking-wider font-bold">
+                                        <span>🏁 Foundations Path</span>
+                                        <span className="text-c-gold">{foundationsCompleted} / {foundationsTotal} Lessons</span>
+                                    </div>
+                                    <div className="w-full h-1.5 bg-c-bg rounded-full overflow-hidden border border-c-border/10">
+                                        <div 
+                                            className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500" 
+                                            style={{ width: `${(foundationsCompleted / foundationsTotal) * 100}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            </button>
+                        );
+                    }
+
+                    // Upcoming Courses
+                    return (
+                        <div
+                            key={course.id}
+                            className="rounded-xl border border-c-border/30 bg-c-surface/40 flex flex-col overflow-hidden relative opacity-70 group"
+                        >
+                            <div className="px-5 py-5 flex items-start gap-4 flex-1">
+                                <div className="text-3xl p-3 bg-c-border/30 rounded-xl border border-c-border/10 text-c-cream-dim flex-shrink-0">
+                                    {course.symbol}
+                                </div>
+                                <div className="flex-1 flex flex-col gap-1">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <span className="font-playfair font-bold text-sm text-c-cream-dark">
+                                            {course.title}
+                                        </span>
+                                        <span className="text-[8px] font-mono font-extrabold uppercase tracking-widest px-2 py-0.5 rounded bg-c-gold-faint border border-c-gold/20 text-c-gold">
+                                            Coming Soon
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-c-cream-dark/80 leading-relaxed font-sans mt-0.5">
+                                        {course.description}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div className="border-t border-c-border/20 bg-c-card/20 px-5 py-3 text-[10px] font-mono text-c-cream-dark/60 uppercase tracking-wider italic">
+                                🌸 Future Program — Unlock Foundations First!
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 // ─── Curriculum home ──────────────────────────────────────────────────────────
 
-function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset }) {
+function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset, onBackToCatalog }) {
     let totalLessons = 0;
     let completedLessons = 0;
     CURRICULUM.forEach(u => {
@@ -2878,6 +2987,16 @@ function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset }) {
 
     return (
         <div className="w-full max-w-2xl flex flex-col gap-3">
+            {/* Breadcrumb Navigation */}
+            <div className="flex items-center mb-2">
+                <button 
+                    onClick={onBackToCatalog} 
+                    className="flex items-center gap-1.5 text-xs text-c-cream-dim hover:text-c-gold font-playfair transition-colors z-20 group"
+                >
+                    <span className="group-hover:-translate-x-0.5 transition-transform">←</span> Back to Programs Catalog
+                </button>
+            </div>
+
             <div className="flex flex-col gap-1.5 mb-2 bg-c-surface p-4 rounded-xl border border-c-border">
                 <div className="flex justify-between items-end">
                     <span className="font-playfair text-c-gold">Your Journey</span>
@@ -2998,6 +3117,7 @@ export default function Tutor({ saFrequency }) {
     const [screen, setScreen]   = useState('home');       // home | unit | lesson
     const [activeUnit, setActiveUnit]     = useState(null);
     const [activeLesson, setActiveLesson] = useState(null);
+    const [selectedCourseId, setSelectedCourseId] = useState(null);
     const [progress, setProgress] = useState(() => {
         try { return JSON.parse(localStorage.getItem('tutor_progress_v2') || '{}'); } catch { return {}; }
     });
@@ -3096,12 +3216,20 @@ export default function Tutor({ saFrequency }) {
                     </div>
 
                     {tab === 'curriculum' ? (
-                        <CurriculumHome
-                            progress={progress}
-                            isUnlocked={isUnlocked}
-                            onSelectUnit={(unit) => { setActiveUnit(unit); setScreen('unit'); }}
-                            onReset={resetProgress}
-                        />
+                        selectedCourseId === null ? (
+                            <ProgramsCatalog 
+                                progress={progress}
+                                onSelectCourse={(courseId) => setSelectedCourseId(courseId)}
+                            />
+                        ) : (
+                            <CurriculumHome
+                                progress={progress}
+                                isUnlocked={isUnlocked}
+                                onSelectUnit={(unit) => { setActiveUnit(unit); setScreen('unit'); }}
+                                onReset={resetProgress}
+                                onBackToCatalog={() => setSelectedCourseId(null)}
+                            />
+                        )
                     ) : (
                         <RagaPractice sa={sa} setSa={updateSa} />
                     )}

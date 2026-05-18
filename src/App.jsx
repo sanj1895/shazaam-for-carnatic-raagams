@@ -313,12 +313,14 @@ function App() {
                                 minHeight: showFeatures ? '60vh' : 0,
                             }}
                         >
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 w-full">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full max-w-4xl mx-auto">
                                 {FEATURES.map(({ id, label, desc, symbol }, idx) => (
                                     <button
                                         key={id}
                                         onClick={() => goTo(id)}
-                                        className="group relative flex flex-col items-center justify-center p-8 text-center transition-all duration-500 hover:-translate-y-3 h-full"
+                                        className={`group relative flex flex-col items-center justify-center p-8 text-center transition-all duration-500 hover:-translate-y-3 h-full w-full max-w-xs sm:max-w-none mx-auto ${
+                                            idx === FEATURES.length - 1 ? 'sm:col-span-2 lg:col-span-1 sm:max-w-md lg:max-w-none' : ''
+                                        }`}
                                         style={{
                                             transitionDelay: showFeatures ? `${idx * 100}ms` : '0ms',
                                             opacity: showFeatures ? 1 : 0,

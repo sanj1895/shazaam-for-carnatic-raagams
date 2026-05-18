@@ -344,8 +344,8 @@ export function detectPitch(analyserNode, sampleRate) {
   // Reject frequencies outside vocal/instrument range
   if (frequency < 60 || frequency > 2000) return null;
 
-  // Confidence check  ·  lowered significantly for humming/soft singing
-  if (maxVal / correlation[0] < 0.22) return null;
+  // Confidence check  ·  raised to 0.58 to robustly filter out non-periodic room noise, AC hums, and fans
+  if (maxVal / correlation[0] < 0.50) return null;
 
   return frequency;
 }

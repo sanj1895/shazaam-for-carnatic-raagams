@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { RAGAS } from '../utils/ragaLogic';
+import { RAGAS, getSwaram } from '../utils/ragaLogic';
 import { CURRICULUM } from '../utils/tutorCurriculum';
 import {
     getAudioCtx, playNote, playSequence, detectPitch as detectPitchAudio,
@@ -1803,6 +1803,502 @@ function MicCalibration({ onDone }) {
     );
 }
 
+// ─── Sing Along & AI Coaching Feedback Component ─────────────────────────────
+
+function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
+    const GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY;
+    const [phase, setPhase] = useState('idle'); // idle | recording | processing | result | error
+    const [countdown, setCountdown] = useState(8);
+    const [detectedNotes, setDetectedNotes] = useState([]);
+    const [feedback, setFeedback] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
+    const [rmsVolume, setRmsVolume] = useState(0);
+
+    const expectedSwaras = currentExercise?.swaras || (currentExercise?.swara ? [currentExercise.swara] : []);
+    const expectedString = expectedSwaras.length > 0 ? expectedSwaras.join(' - ') : 'Sustain Sa / Hmmm';
+
+    let practiceType = 'Sustained Pitch';
+    const instr = (currentExercise?.instruction || '').toLowerCase();
+    const titleLower = (currentExercise?.title || lesson?.title || '').toLowerCase();
+    if (titleLower.includes('arohanam') || titleLower.includes('ascending') || instr.includes('arohanam') || instr.includes('ascending')) {
+        practiceType = 'Arohanam (Ascending Practice)';
+    } else if (titleLower.includes('avarohanam') || titleLower.includes('descending') || instr.includes('avarohanam') || instr.includes('descending')) {
+        practiceType = 'Avarohanam (Descending Practice)';
+    } else if (expectedSwaras.length > 1) {
+        practiceType = 'Melodic Sequence';
+    } else if (expectedSwaras.length === 1) {
+        practiceType = `Sustaining Swara: ${expectedSwaras[0]}`;
+    }
+
+    const streamRef = useRef(null);
+    const intervalRef = useRef(null);
+    const samplesRef = useRef([]); // holds { note, freq, dev, time }
+    const countdownIntervalRef = useRef(null);
+
+    const cleanup = () => {
+        clearInterval(intervalRef.current);
+        clearInterval(countdownIntervalRef.current);
+        streamRef.current?.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+    };
+
+    useEffect(() => {
+        return () => cleanup();
+    }, []);
+
+    const startRecording = async () => {
+        setErrorMsg('');
+        setFeedback('');
+        setDetectedNotes([]);
+        samplesRef.current = [];
+        setCountdown(8);
+        setRmsVolume(0);
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            streamRef.current = stream;
+
+            const ctx = getAudioCtx();
+            const source = ctx.createMediaStreamSource(stream);
+            const analyser = ctx.createAnalyser();
+            analyser.fftSize = 4096;
+            source.connect(analyser);
+
+            setPhase('recording');
+
+            // Countdown timer
+            let remaining = 8;
+            countdownIntervalRef.current = setInterval(() => {
+                remaining -= 1;
+                setCountdown(remaining);
+                if (remaining <= 0) {
+                    stopAndAnalyze();
+                }
+            }, 1000);
+
+            // Track consecutive candidate swaras to filter out transient background clicks/room noises
+            let currentCandidate = null;
+            let candidateCount = 0;
+            let lastCommittedSwara = null;
+            let silenceCount = 0;
+
+            // Pitch & Volume tracking loop (every 50ms)
+            intervalRef.current = setInterval(() => {
+                const buf = new Float32Array(analyser.fftSize);
+                analyser.getFloatTimeDomainData(buf);
+                const rms = Math.sqrt(buf.reduce((s, v) => s + v * v, 0) / buf.length);
+                setRmsVolume(rms);
+
+                const rawLevel = Math.min(100, rms * 1500);
+                const noiseFloor = window.MIC_NOISE_FLOOR || 4; // default noise floor to 4 if not calibrated
+                const currentLevel = Math.max(0, rawLevel - noiseFloor);
+
+                // Only run pitch detection if current level is above a clear threshold (6),
+                // indicating the user is actually singing, not silent/breathing.
+                if (currentLevel > 6) {
+                    const freq = detectPitchAudio(analyser, ctx.sampleRate);
+                    if (freq && freq >= 80 && freq <= 600) {
+                        let swara = null;
+                        let dev = 0;
+                        let snapped = false;
+
+                        // Try to snap to one of the expected swaras in the current exercise if within 75 cents
+                        for (const exp of expectedSwaras) {
+                            const targetSt = SEMITONES[exp] ?? 0;
+                            const targetFreq = sa * Math.pow(2, targetSt / 12);
+                            const currentDev = centsDiff(freq, targetFreq);
+                            if (Math.abs(currentDev) <= 75) {
+                                swara = exp;
+                                dev = currentDev;
+                                snapped = true;
+                                break;
+                            }
+                        }
+
+                        // Fallback to closest default swara if not snapped to an expected swara
+                        if (!snapped) {
+                            const closestSwara = getSwaram(freq, sa);
+                            if (closestSwara) {
+                                swara = closestSwara;
+                                const targetSt = SEMITONES[swara] ?? 0;
+                                const targetFreq = sa * Math.pow(2, targetSt / 12);
+                                dev = centsDiff(freq, targetFreq);
+                            }
+                        }
+
+                        if (swara) {
+                            silenceCount = 0; // Reset silence since we are actively detecting a swara
+
+                            if (swara === currentCandidate) {
+                                candidateCount++;
+                            } else {
+                                currentCandidate = swara;
+                                candidateCount = 1;
+                            }
+
+                            if (candidateCount === 3) {
+                                // Push raw sample for mathematical accuracy statistics
+                                samplesRef.current.push({
+                                    note: swara,
+                                    freq: freq,
+                                    dev: dev,
+                                    time: Date.now()
+                                });
+
+                                // Push to the chronological detected notes array (duplicates allowed with pauses!)
+                                setDetectedNotes(prev => {
+                                    return [...prev, swara];
+                                });
+
+                                lastCommittedSwara = swara;
+                            }
+                        } else {
+                            silenceCount++;
+                            if (silenceCount >= 3) { // 150ms of unpitched/silence resets committed swara to recognize new Sa notes
+                                lastCommittedSwara = null;
+                                currentCandidate = null;
+                                candidateCount = 0;
+                            }
+                        }
+                    } else {
+                        silenceCount++;
+                        if (silenceCount >= 3) {
+                            lastCommittedSwara = null;
+                            currentCandidate = null;
+                            candidateCount = 0;
+                        }
+                    }
+                } else {
+                    silenceCount++;
+                    if (silenceCount >= 3) {
+                        lastCommittedSwara = null;
+                        currentCandidate = null;
+                        candidateCount = 0;
+                    }
+                }
+            }, 50);
+
+        } catch (err) {
+            setErrorMsg('Mic access required. Please allow microphone access and try again.');
+            setPhase('error');
+        }
+    };
+
+    const stopAndAnalyze = async () => {
+        cleanup();
+        setPhase('processing');
+
+        try {
+            const samples = samplesRef.current;
+            if (samples.length < 5) {
+                throw new Error("No distinct notes detected. Please make sure you sing clearly into the microphone near the base drone!");
+            }
+
+            // Group samples by note to build a rich performance transcript
+            const notesGrouped = {};
+            samples.forEach(s => {
+                if (!notesGrouped[s.note]) {
+                    notesGrouped[s.note] = [];
+                }
+                notesGrouped[s.note].push(s.dev);
+            });
+
+            const stats = Object.entries(notesGrouped).map(([note, devs]) => {
+                const avgDev = devs.reduce((s, v) => s + v, 0) / devs.length;
+                const roundedDev = Math.round(avgDev);
+                
+                // Calculate stability (standard deviation)
+                const variance = devs.reduce((s, v) => s + Math.pow(v - avgDev, 2), 0) / devs.length;
+                const stdDev = Math.sqrt(variance);
+                const stability = stdDev < 15 ? 'highly stable' : stdDev < 35 ? 'moderate stability' : 'wavering';
+
+                return {
+                    note,
+                    avgDev: roundedDev,
+                    stability,
+                    samplesCount: devs.length
+                };
+            });
+
+            const statsString = stats.map(s => {
+                const sign = s.avgDev >= 0 ? '+' : '';
+                return `- Swara: ${s.note} | Cents Deviation: ${sign}${s.avgDev} cents (${Math.abs(s.avgDev) <= 15 ? 'in tune' : s.avgDev > 0 ? 'sharp' : 'flat'}) | Pitch Stability: ${s.stability}`;
+            }).join('\n');
+
+            const chronologicalDetectedSwaras = stats.map(s => s.note).join(' - ');
+
+            // Make Groq request if key is available, else mock dynamic feedback
+            let feedbackText = '';
+            if (GROQ_KEY) {
+                const PROMPT = `You are an expert classical Carnatic vocal coach (guru). 
+The student is practicing a lesson in their foundational curriculum.
+
+LESSON CONTEXT:
+- Lesson Title: "${lesson.title}"
+- Current Exercise: "${currentExercise.title || 'Sing Along'}"
+- Objective/Instruction: "${currentExercise.instruction || 'Sustain the pitches correctly'}"
+- Exercise Practice Type: ${practiceType}
+- Expected Target Swara Sequence to Sing: ${expectedString}
+- Student's Base Sa Frequency: ${sa} Hz
+
+STUDENT PERFORMANCE DATA DETECTED (8-second window):
+- Chronological Swaras Actually Sang: "${chronologicalDetectedSwaras || 'No distinct swaras detected'}"
+- Detailed Swara Statistics:
+${statsString}
+
+CRITICAL INSTRUCTIONS FOR GURU:
+1. Speak with the voice of a warm, wise, kind, and precise Carnatic guru. Greet the student briefly with a warm blessing (e.g., "Namaste, my dear student").
+2. Balance warmth and length. Keep the response moderately concise (between 120 and 180 words, 3 short paragraphs maximum). Avoid long boilerplate lists of generic advice, but do not be dry or overly brief.
+3. Compare what they actually sang with what they were expected to sing. Use classical terms naturally like "Shruti alignment", "Swarasthana accuracy", "Arohanam progression", "Avarohanam descent", or "Akaram resonance".
+4. Highlight 1 key vocal strength (e.g., breath control, stable Sa foundation, or natural resonance).
+5. Highlight 1 clear vocal correction needed (e.g., slight sharp or flat drifts, sequence order mismatch, or pitch stability waver).
+6. Give 1 highly actionable classical vocal tip (e.g., visual pitch onset mapping, abdominal breathing, or anchoring ears to the Tambura drone). Do NOT mention cents or numbers in your final feedback.`;
+
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${GROQ_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.3-70b-versatile',
+                        messages: [{ role: 'user', content: PROMPT }],
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Groq API returned status ${response.status}`);
+                }
+
+                const data = await response.json();
+                feedbackText = data.choices[0]?.message?.content || 'Unable to generate feedback at this time.';
+            } else {
+                // Mock pedagogical feedback using stats for offline/no-key usage
+                const sangNotes = stats.map(s => s.note);
+                const missedNotes = expectedSwaras.filter(n => !sangNotes.includes(n));
+                const extraNotes = sangNotes.filter(n => !expectedSwaras.includes(n));
+
+                feedbackText = `### 🌟 Guru Sing-Along Feedback (${practiceType})
+
+- **Swarasthana Transcription:** You sang: **${sangNotes.join(' - ') || 'No distinct notes'}** (Expected: **${expectedString}**).
+`;
+
+                if (missedNotes.length === 0 && extraNotes.length === 0 && sangNotes.length > 0) {
+                    feedbackText += `- **Key Strength:** Excellent pitch lock! You sang the exact expected sequence with precise Shruti alignment.\n`;
+                } else if (missedNotes.length > 0) {
+                    feedbackText += `- **Area to Improve:** You missed **${missedNotes.join(' & ')}** in your voice. Focus on moving your voice deliberately to hit these steps.\n`;
+                } else if (extraNotes.length > 0) {
+                    feedbackText += `- **Drifting Pitches:** You sang target notes but drifted into unintended notes like **${extraNotes.join(' & ')}** in your Akaram resonance.\n`;
+                } else {
+                    feedbackText += `- **No Pitch Lock:** We couldn't establish a clear pitch lock. Make sure to project your voice clearly and hold your pitches steady!\n`;
+                }
+
+                const mostDeviated = stats.reduce((prev, current) => {
+                    return Math.abs(current.avgDev) > Math.abs(prev.avgDev) ? current : prev;
+                }, stats[0]);
+
+                if (mostDeviated) {
+                    const sign = mostDeviated.avgDev >= 0 ? 'sharp' : 'flat';
+                    if (Math.abs(mostDeviated.avgDev) > 15) {
+                        feedbackText += `- **Actionable Guru Tip:** Your **${mostDeviated.note}** was slightly **${sign}**. Align your tone and lock your ears onto the Tambura drone to settle naturally.\n`;
+                    }
+                }
+            }
+
+            setFeedback(feedbackText);
+            setPhase('result');
+
+        } catch (err) {
+            setErrorMsg(err.message || 'Error compiling vocal feedback.');
+            setPhase('error');
+        }
+    };
+
+    const parseBold = (str) => {
+        const parts = str.split('**');
+        return parts.map((part, index) => {
+            if (index % 2 === 1) {
+                return <strong key={index} className="text-c-cream font-extrabold">{part}</strong>;
+            }
+            return part;
+        });
+    };
+
+    const renderMarkdown = (text) => {
+        return text.split('\n').map((line, i) => {
+            if (line.startsWith('### ')) {
+                return <h4 key={i} className="text-xs font-bold text-c-gold tracking-wide uppercase mt-4 mb-1.5 border-b border-c-border/20 pb-0.5">{line.replace('### ', '')}</h4>;
+            }
+            if (line.startsWith('## ')) {
+                return <h3 key={i} className="text-sm font-playfair font-bold text-c-gold mt-4 mb-2">{line.replace('## ', '')}</h3>;
+            }
+            if (line.startsWith('# ')) {
+                return <h2 key={i} className="text-base font-playfair font-bold text-c-gold-light border-b-2 border-c-border/30 pb-1 mt-4 mb-3">{line.replace('# ', '')}</h2>;
+            }
+            if (line.startsWith('- ') || line.startsWith('* ')) {
+                const cleanLine = line.replace(/^[-*]\s+/, '');
+                return (
+                    <div key={i} className="flex items-start gap-2 text-xs text-c-cream-dim leading-relaxed mb-1.5 pl-2">
+                        <span className="text-c-gold-light mt-1 text-[8px]">✦</span>
+                        <span>{parseBold(cleanLine)}</span>
+                    </div>
+                );
+            }
+            if (line.trim() === '') return <div key={i} className="h-1.5" />;
+            return <p key={i} className="text-xs text-c-cream-dim leading-relaxed mb-2">{parseBold(line)}</p>;
+        });
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+            <div className="bg-c-surface border border-c-border rounded-2xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-4 max-h-[85vh] overflow-y-auto relative heritage-card">
+                {/* Heritage Decorative Corners */}
+                <div className="heritage-border-corner heritage-corner-tl" />
+                <div className="heritage-border-corner heritage-corner-tr" />
+                <div className="heritage-border-corner heritage-corner-bl" />
+                <div className="heritage-border-corner heritage-corner-br" />
+
+                <div className="flex justify-between items-center border-b border-c-border/20 pb-3 relative z-10">
+                    <div>
+                        <h3 className="font-playfair text-base font-bold text-c-gold italic">AI Vocal Coach</h3>
+                        <p className="text-[10px] text-c-cream-dark/80 mt-0.5">Vocal Feedback Guru · Lesson Sing-Along</p>
+                    </div>
+                    <button onClick={onClose} className="text-c-cream-dark hover:text-c-cream text-lg transition-colors">✕</button>
+                </div>
+
+                {phase === 'idle' && (
+                    <div className="flex flex-col items-center gap-5 text-center py-4 relative z-10 w-full">
+                        <div className="w-14 h-14 rounded-full bg-c-gold-faint flex items-center justify-center text-2xl shadow-inner border border-c-border/20">🧘🏽‍♂️</div>
+                        <div className="flex flex-col gap-2">
+                            <p className="text-sm font-playfair font-bold text-c-cream">Sing along with the lesson!</p>
+                            <p className="text-xs text-c-cream-dim leading-relaxed px-2">
+                                Press start, sing along with the active exercise content, and get warm, customized, and mathematically precise feedback from the Carnatic AI Guru.
+                            </p>
+                        </div>
+
+                        {/* Expected target swara display */}
+                        <div className="bg-c-gold-faint border border-c-border/30 rounded-xl p-3 w-full flex flex-col items-center gap-1.5 shadow-inner">
+                            <span className="text-[10px] text-c-cream-dark/70 uppercase tracking-wider font-semibold font-mono">Your Target for this Exercise ({practiceType})</span>
+                            <span className="font-mono text-base font-extrabold text-c-gold tracking-widest uppercase">
+                                {expectedString}
+                            </span>
+                        </div>
+
+                        <button
+                            onClick={startRecording}
+                            className="w-full py-3 bg-c-gold hover:bg-c-gold-light active:scale-[0.98] text-c-bg rounded-xl text-sm font-playfair font-bold italic shadow-lg shadow-c-gold/25 transition-all mt-1"
+                        >
+                            🎙️ Start Sing-Along (8 seconds)
+                        </button>
+                    </div>
+                )}
+
+                {phase === 'recording' && (
+                    <div className="flex flex-col items-center gap-6 py-6 text-center relative z-10">
+                        <div className="relative flex items-center justify-center">
+                            <div className="absolute w-20 h-20 rounded-full bg-red-500/10 animate-ping" />
+                            <div className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-red-500/25 animate-pulse">
+                                {countdown}s
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1 w-full">
+                            <p className="text-xs text-c-cream-dark/70 tracking-widest uppercase font-semibold">Live Transcribing Swaras</p>
+                            <div className="h-8 flex items-center justify-center px-4 py-1.5 bg-c-gold-faint rounded-lg border border-c-border/30 max-w-xs mx-auto w-full overflow-hidden">
+                                <p className="text-xs text-c-gold font-mono tracking-widest uppercase truncate font-bold">
+                                    {detectedNotes.length > 0 ? detectedNotes.join(' - ') : 'Listening for notes…'}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Rms Volume Indicator Bar */}
+                        <div className="w-full flex flex-col gap-1.5 px-4">
+                            <div className="flex justify-between text-[10px] text-c-cream-dark/60 font-mono">
+                                <span>Quiet</span>
+                                <span>Voice Volume</span>
+                                <span>Loud</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-c-gold-faint rounded-full overflow-hidden border border-c-border/10">
+                                <div 
+                                    className="h-full bg-gradient-to-r from-c-gold-light to-c-gold transition-all duration-75 rounded-full" 
+                                    style={{ width: `${Math.min(100, rmsVolume * 1500)}%` }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Manual Stop / Done button */}
+                        <button
+                            onClick={stopAndAnalyze}
+                            className="w-full py-2.5 bg-c-gold hover:bg-c-gold-light active:scale-[0.98] text-c-bg rounded-xl text-xs font-playfair font-bold uppercase tracking-wider transition-all mt-2 shadow-md shadow-c-gold/10"
+                        >
+                            🛑 Stop & Get Feedback
+                        </button>
+                    </div>
+                )}
+
+                {phase === 'processing' && (
+                    <div className="flex flex-col items-center justify-center gap-4 py-10 text-center animate-pulse relative z-10">
+                        <div className="w-10 h-10 border-4 border-c-gold/20 border-t-c-gold rounded-full animate-spin" />
+                        <div className="flex flex-col gap-1">
+                            <p className="text-sm font-playfair font-bold text-c-cream">Guru is listening closely...</p>
+                            <p className="text-xs text-c-cream-dim">Analyzing cents stability, interval shapes, and consulting AI...</p>
+                        </div>
+                    </div>
+                )}
+
+                {phase === 'result' && (
+                    <div className="flex flex-col gap-4 animate-fade-in relative z-10">
+                        <div className="bg-c-gold-faint border border-c-border/20 rounded-xl p-3.5 flex flex-col gap-1.5">
+                            <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-c-gold/80 font-bold">
+                                <span>📊</span> Transcript Summary
+                            </div>
+                            <div className="text-xs text-c-cream leading-relaxed font-playfair">
+                                <span className="font-semibold text-c-cream-dim">Detected Swaras:</span>{' '}
+                                <span className="font-mono bg-c-surface border border-c-border/30 px-2 py-0.5 rounded text-[11px] font-bold text-c-gold">
+                                    {detectedNotes.join(' - ')}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="max-h-[300px] overflow-y-auto pr-1 bg-c-card border border-c-border/30 rounded-xl p-4 shadow-inner">
+                            {renderMarkdown(feedback)}
+                        </div>
+
+                        <div className="flex gap-3 border-t border-c-border/20 pt-3.5 mt-1">
+                            <button
+                                onClick={startRecording}
+                                className="flex-1 py-2.5 bg-c-gold hover:bg-c-gold-light active:scale-[0.98] text-c-bg rounded-xl text-xs font-playfair font-bold italic transition-all shadow-md shadow-c-gold/10"
+                            >
+                                🎙️ Sing Again
+                            </button>
+                            <button
+                                onClick={onClose}
+                                className="px-5 py-2.5 border border-c-border hover:bg-c-card active:scale-[0.98] rounded-xl text-xs text-c-cream-dim font-playfair transition-all"
+                            >
+                                Return to Lesson
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {phase === 'error' && (
+                    <div className="flex flex-col items-center gap-4 py-6 text-center relative z-10">
+                        <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-xl text-red-600 border border-red-200">⚠️</div>
+                        <p className="text-xs text-red-700 leading-relaxed px-4 font-semibold">{errorMsg}</p>
+                        <button
+                            onClick={startRecording}
+                            className="w-full py-2.5 bg-c-gold hover:bg-c-gold-light text-c-bg rounded-xl text-xs font-playfair font-bold italic transition-all"
+                        >
+                            Try Again
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
 // ─── Lesson runner ────────────────────────────────────────────────────────────
 
 function LessonRunner({ lesson, sa, setSa, onComplete, onBack }) {
@@ -1810,6 +2306,8 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack }) {
     const exercises = lesson.exercises;
     const ex = exercises[idx];
     const pct = Math.round((idx / exercises.length) * 100);
+
+    const [showAIFeedback, setShowAIFeedback] = useState(false);
 
     const requiresMic = exercises.some(e => e.type === 'sing' || e.type === 'free_sing' || e.type === 'sing_sequence');
     const [calibrated, setCalibrated] = useState(!!window.MIC_NOISE_FLOOR);
@@ -1845,7 +2343,7 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack }) {
     };
 
     return (
-        <div className="w-full max-w-lg mx-auto flex flex-col gap-5">
+        <div className="w-full max-w-lg mx-auto flex flex-col gap-5 relative">
             <div className="flex items-center gap-3">
                 <button onClick={prev} className="text-c-cream-dark hover:text-c-gold text-xl leading-none transition-colors" title="Previous Exercise">←</button>
                 <div className="flex-1 h-2 bg-c-border rounded-full overflow-hidden">
@@ -1858,6 +2356,28 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack }) {
             <div className="min-h-[340px] flex items-center justify-center py-4">
                 {renderEx()}
             </div>
+
+            {/* Sing Along & AI Coaching Button */}
+            {ex && (ex.type === 'sing' || ex.type === 'sing_sequence') && (
+                <div className="border-t border-c-border/20 pt-4 mt-2 flex flex-col gap-3 animate-fade-in">
+                    <button 
+                        onClick={() => setShowAIFeedback(true)} 
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-c-gold-faint via-c-surface to-c-gold-faint hover:from-c-gold/10 hover:to-c-gold/15 border border-c-border/40 hover:border-c-gold/40 rounded-xl text-c-gold text-xs tracking-wide transition-all font-playfair italic shadow-sm active:scale-[0.98]"
+                    >
+                        <span className="text-c-gold animate-pulse">✨</span> Sing Along & Get AI Coaching
+                    </button>
+                </div>
+            )}
+
+            {/* Slide up / Modal Feedback Overlay */}
+            {showAIFeedback && (
+                <SingAlongFeedback 
+                    lesson={lesson}
+                    currentExercise={ex}
+                    sa={sa}
+                    onClose={() => setShowAIFeedback(false)}
+                />
+            )}
         </div>
     );
 }

@@ -59,8 +59,13 @@ function alignSequence(detected, expected) {
 
 // ── Main component ───────────────────────────────────────────────────────────
 
-export default function RagaPracticePanel({ raga, initialSaHz = 293.66 }) {
+export default function RagaPracticePanel({ raga, initialSaHz = 293.66, compactMode = false, externalSaHz = null }) {
   const [saHz, setSaHz]         = useState(initialSaHz || 293.66);
+
+  useEffect(() => {
+    if (externalSaHz) setSaHz(externalSaHz);
+  }, [externalSaHz]);
+
   const [droneOn, setDroneOn]   = useState(false);
   const [phase, setPhase]       = useState('idle');
   const [countdown, setCountdown] = useState(RECORD_SECS);
@@ -68,11 +73,13 @@ export default function RagaPracticePanel({ raga, initialSaHz = 293.66 }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [liveNotes, setLiveNotes] = useState([]);
   const [playingNote, setPlayingNote] = useState(null);
+  const [playingScale, setPlayingScale] = useState(false);
 
   const streamRef      = useRef(null);
   const droneStopRef   = useRef(null);
   const analysisRef    = useRef(null);
   const countdownRef   = useRef(null);
+  const scaleTimeoutsRef = useRef([]);
 
   // Data collection
   const pitchHistRef    = useRef([]); // { swara, devCents, freq, time }
@@ -86,6 +93,7 @@ export default function RagaPracticePanel({ raga, initialSaHz = 293.66 }) {
   const cleanup = () => {
     clearInterval(analysisRef.current);
     clearInterval(countdownRef.current);
+    scaleTimeoutsRef.current.forEach(clearTimeout);
     streamRef.current?.getTracks().forEach(t => t.stop());
     streamRef.current = null;
   };
@@ -328,6 +336,27 @@ Tone: warm but direct. Address them as a serious student. Do not mention numbers
     setTimeout(() => setPlayingNote(null), durationMs);
   };
 
+  const handlePlayScale = async () => {
+    if (playingScale) return;
+    setPlayingScale(true);
+    scaleTimeoutsRef.current.forEach(clearTimeout);
+    scaleTimeoutsRef.current = [];
+
+    const sequence = [...expectedAro, ...expectedAva];
+    const octaves = getOctaveSequence(sequence);
+
+    const { promise, abort } = playSequence(sequence, saHz, {
+      gapMs: 600,
+      duration: 0.5,
+      gamakam: false,
+      onNote: (note, idx) => setPlayingNote({ note, octaveShift: octaves[idx] }),
+    });
+    scaleTimeoutsRef.current.push(abort);
+    try { await promise; } catch (e) {}
+    setPlayingNote(null);
+    setPlayingScale(false);
+  };
+
   const NoteKey = ({ note, octaveShift = 0 }) => {
     const isPlaying = playingNote?.note === note && playingNote?.octaveShift === octaveShift;
     const isSpecial = note === 'Sa' || note === 'Pa';
@@ -359,81 +388,99 @@ Tone: warm but direct. Address them as a serious student. Do not mention numbers
     <div className="flex flex-col gap-5">
 
       {/* Sa selector */}
-      <div className="bg-c-surface border border-c-border rounded-xl p-4 flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-playfair text-c-cream-dim italic">Set your Sa (root note)</span>
-          <span className="font-mono text-xs text-c-gold">{currentPitch?.label ?? '—'} · {Math.round(saHz)} Hz</span>
+      {!compactMode && (
+        <div className="bg-c-surface border border-c-border rounded-xl p-4 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-playfair text-c-cream-dim italic">Set your Sa (root note)</span>
+            <span className="font-mono text-xs text-c-gold">{currentPitch?.label ?? '—'} · {Math.round(saHz)} Hz</span>
+          </div>
+          <div className="grid grid-cols-6 sm:grid-cols-12 gap-1">
+            {PITCHES.map(p => {
+              const sel = Math.abs(p.hz - saHz) < 1;
+              const isSharp = p.label.includes('#');
+              return (
+                <button
+                  key={p.label}
+                  onClick={() => changeSa(p.hz)}
+                  className={`py-2 rounded text-[10px] font-mono font-bold transition-all ${
+                    sel
+                      ? 'bg-c-gold text-c-bg border border-c-gold'
+                      : isSharp
+                      ? 'bg-c-bg border border-c-border text-c-cream-dark hover:border-c-gold/40'
+                      : 'bg-c-surface border border-c-border text-c-cream hover:border-c-gold/40'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <div className="grid grid-cols-6 sm:grid-cols-12 gap-1">
-          {PITCHES.map(p => {
-            const sel = Math.abs(p.hz - saHz) < 1;
-            const isSharp = p.label.includes('#');
-            return (
-              <button
-                key={p.label}
-                onClick={() => changeSa(p.hz)}
-                className={`py-2 rounded text-[10px] font-mono font-bold transition-all ${
-                  sel
-                    ? 'bg-c-gold text-c-bg border border-c-gold'
-                    : isSharp
-                    ? 'bg-c-bg border border-c-border text-c-cream-dark hover:border-c-gold/40'
-                    : 'bg-c-surface border border-c-border text-c-cream hover:border-c-gold/40'
-                }`}
-              >
-                {p.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      )}
 
       {/* Drone toggle */}
-      <button
-        onClick={toggleDrone}
-        disabled={phase === 'recording' || phase === 'processing'}
-        className={`flex items-center gap-2 self-start px-4 py-2 rounded-full border text-xs font-playfair transition-all disabled:opacity-40 ${
-          droneOn
-            ? 'border-c-gold bg-c-gold/10 text-c-gold'
-            : 'border-c-border text-c-cream-dark hover:border-c-gold/40'
-        }`}
-      >
-        <span className={`w-1.5 h-1.5 rounded-full ${droneOn ? 'bg-c-gold animate-pulse' : 'bg-c-cream-dark'}`} />
-        {droneOn ? 'Drone playing — click to stop' : 'Play drone while you sing (recommended)'}
-      </button>
+      {!compactMode && (
+        <button
+          onClick={toggleDrone}
+          disabled={phase === 'recording' || phase === 'processing'}
+          className={`flex items-center gap-2 self-start px-4 py-2 rounded-full border text-xs font-playfair transition-all disabled:opacity-40 ${
+            droneOn
+              ? 'border-c-gold bg-c-gold/10 text-c-gold'
+              : 'border-c-border text-c-cream-dark hover:border-c-gold/40'
+          }`}
+        >
+          <span className={`w-1.5 h-1.5 rounded-full ${droneOn ? 'bg-c-gold animate-pulse' : 'bg-c-cream-dark'}`} />
+          {droneOn ? 'Drone playing — click to stop' : 'Play drone while you sing (recommended)'}
+        </button>
+      )}
 
       {/* Idle / Practice setup */}
       {phase === 'idle' && (
         <div className="flex flex-col gap-6 py-2">
-          <div className="space-y-4 border border-c-gold/20 rounded-xl p-4 bg-c-card/30">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-playfair font-bold text-c-gold uppercase tracking-widest">Arohanam</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {expectedAro.map((note, idx) => (
-                <NoteKey key={`aro-${idx}`} note={note} octaveShift={aroOctaves[idx]} />
-              ))}
-            </div>
+          {!compactMode && (
+            <div className="space-y-4 border border-c-gold/20 rounded-xl p-4 bg-c-card/30">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-playfair font-bold text-c-gold uppercase tracking-widest">Arohanam</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {expectedAro.map((note, idx) => (
+                  <NoteKey key={`aro-${idx}`} note={note} octaveShift={aroOctaves[idx]} />
+                ))}
+              </div>
 
-            <div className="flex items-center justify-between mt-4">
-              <span className="text-xs font-playfair font-bold text-c-gold uppercase tracking-widest">Avarohanam</span>
+              <div className="flex items-center justify-between mt-4">
+                <span className="text-xs font-playfair font-bold text-c-gold uppercase tracking-widest">Avarohanam</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {expectedAva.map((note, idx) => (
+                  <NoteKey key={`ava-${idx}`} note={note} octaveShift={avaOctaves[idx]} />
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {expectedAva.map((note, idx) => (
-                <NoteKey key={`ava-${idx}`} note={note} octaveShift={avaOctaves[idx]} />
-              ))}
-            </div>
-          </div>
+          )}
 
-          <div className="flex flex-col items-center gap-4 py-2 border-t border-c-border pt-6">
-            <p className="text-xs text-c-cream-dim font-playfair italic text-center max-w-xs leading-relaxed">
-              Listen to the notes above, then sing the arohanam and avarohanam of {raga.name} at your own pace. Recording is {RECORD_SECS} seconds.
+          <div className={`flex flex-col items-center gap-4 py-2 ${compactMode ? '' : 'border-t border-c-border pt-6'}`}>
+            <h4 className="font-playfair text-c-gold text-lg font-bold mb-1">Practice with AI Guru</h4>
+            <p className="text-xs text-c-cream-dim font-playfair italic text-center max-w-sm leading-relaxed mb-2">
+              Sing the arohanam and avarohanam of {raga.name} at your own pace. The AI Guru will listen to 6 key elements of your singing—pitch accuracy, intonation stability, shruthi alignment, resonance, breath support, and gamakam—and provide personalized feedback. Recording is {RECORD_SECS} seconds.
             </p>
-            <button
-              onClick={startRecording}
-              className="px-8 py-2.5 border border-c-gold/60 hover:border-c-gold hover:bg-c-gold-faint text-c-gold text-sm rounded transition-all font-playfair tracking-wide"
-            >
-              Start Recording
-            </button>
+            <div className="flex flex-wrap justify-center gap-3 w-full max-w-xs">
+              {!compactMode && (
+                <button
+                  onClick={handlePlayScale}
+                  disabled={playingScale}
+                  className="flex-1 py-2.5 border border-c-gold/40 hover:border-c-gold text-c-gold text-xs rounded transition-all font-playfair tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {playingScale ? 'Playing Scale…' : 'Play Full Scale'}
+                </button>
+              )}
+              <button
+                onClick={startRecording}
+                className={`${compactMode ? 'w-full' : 'flex-1'} py-2.5 bg-c-gold hover:bg-c-gold-light text-c-bg font-bold text-xs rounded transition-all font-playfair tracking-wide shadow-md`}
+              >
+                Start Recording
+              </button>
+            </div>
           </div>
         </div>
       )}

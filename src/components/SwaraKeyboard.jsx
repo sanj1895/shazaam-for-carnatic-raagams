@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { RAGAS, toSargam } from '../utils/ragaLogic';
 import { playNote, startDrone, getAudioCtx, playSequence, getOctaveSequence } from '../utils/audioUtils';
+import RagaPracticePanel from './RagaPracticePanel';
 
 const SA_PRESETS = [
   { label: 'C', hz: 261.63 },
@@ -11,8 +12,12 @@ const SA_PRESETS = [
 
 const ragaNames = Object.keys(RAGAS).sort();
 
-export default function SwaraKeyboard() {
-  const [selectedRaga, setSelectedRaga] = useState(ragaNames[0] || 'Shankarabharanam');
+export default function SwaraKeyboard({ forceRaga = null, compact = false }) {
+  const [selectedRaga, setSelectedRaga] = useState(forceRaga || ragaNames[0] || 'Shankarabharanam');
+
+  useEffect(() => {
+    if (forceRaga) setSelectedRaga(forceRaga);
+  }, [forceRaga]);
   const [saHz, setSaHz] = useState(261.63);
   const [droneActive, setDroneActive] = useState(false);
   const [playingNote, setPlayingNote] = useState(null);
@@ -126,23 +131,25 @@ export default function SwaraKeyboard() {
   return (
     <div className="w-full max-w-2xl mx-auto px-4 py-8 space-y-8 relative z-10">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-c-gold/20 pb-4">
-        <h2 className="font-playfair text-3xl font-bold text-c-gold tracking-tight">
-          Swara Keyboard
-        </h2>
-        <div className="relative">
-          <select
-            value={selectedRaga}
-            onChange={(e) => setSelectedRaga(e.target.value)}
-            className="appearance-none bg-c-card border border-c-gold/40 text-c-gold font-playfair font-bold rounded-lg px-4 py-2 pr-10 text-sm focus:outline-none focus:border-c-gold shadow-sm"
-          >
-            {ragaNames.map((name) => (
-              <option key={name} value={name}>{name}</option>
-            ))}
-          </select>
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-c-gold opacity-50 text-[10px]">▼</div>
+      {!compact && (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-c-gold/20 pb-4">
+          <h2 className="font-playfair text-3xl font-bold text-c-gold tracking-tight">
+            Swara Keyboard
+          </h2>
+          <div className="relative">
+            <select
+              value={selectedRaga}
+              onChange={(e) => setSelectedRaga(e.target.value)}
+              className="appearance-none bg-c-card border border-c-gold/40 text-c-gold font-playfair font-bold rounded-lg px-4 py-2 pr-10 text-sm focus:outline-none focus:border-c-gold shadow-sm"
+            >
+              {ragaNames.map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-c-gold opacity-50 text-[10px]">▼</div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Sa selector */}
       <div className="heritage-card rounded-lg p-6 space-y-4 shadow-xl">
@@ -251,6 +258,16 @@ export default function SwaraKeyboard() {
             ? '♫ Playing scale…'
             : gamakamEnabled ? '▶ Play Scale (with Gamakam)' : '▶ Play Scale'}
         </button>
+      </div>
+
+      {/* AI Guru Practice Embedded */}
+      <div className="pt-8 mt-8 border-t border-c-gold/20">
+        <RagaPracticePanel 
+          raga={raga} 
+          initialSaHz={saHz} 
+          externalSaHz={saHz} 
+          compactMode={true} 
+        />
       </div>
     </div>
   );

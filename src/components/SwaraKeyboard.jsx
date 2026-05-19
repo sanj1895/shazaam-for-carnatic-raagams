@@ -4,10 +4,12 @@ import { playNote, startDrone, getAudioCtx, playSequence, getOctaveSequence } fr
 import RagaPracticePanel from './RagaPracticePanel';
 
 const SA_PRESETS = [
-  { label: 'C', hz: 261.63 },
-  { label: 'D', hz: 293.66 },
-  { label: 'E', hz: 329.63 },
-  { label: 'F', hz: 349.23 },
+  { label: 'C',  hz: 261.63 }, { label: 'C#', hz: 277.18 },
+  { label: 'D',  hz: 293.66 }, { label: 'D#', hz: 311.13 },
+  { label: 'E',  hz: 329.63 }, { label: 'F',  hz: 349.23 },
+  { label: 'F#', hz: 369.99 }, { label: 'G',  hz: 392.00 },
+  { label: 'G#', hz: 415.30 }, { label: 'A',  hz: 440.00 },
+  { label: 'A#', hz: 466.16 }, { label: 'B',  hz: 493.88 },
 ];
 
 const ragaNames = Object.keys(RAGAS).sort();

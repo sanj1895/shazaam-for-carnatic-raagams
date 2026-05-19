@@ -132,7 +132,7 @@ function SpeakerGrille() {
 
 // ── Main component ───────────────────────────────────────────────────────────
 
-export default function ShruthiBox() {
+export default function ShruthiBox({ onSadhanaComplete }) {
   const [saHz, setSaHz] = useState(293.66);
   const [activeStrings, setActiveStrings] = useState(new Set(['sa', 'pa']));
   const [playing, setPlaying] = useState(false);
@@ -147,7 +147,36 @@ export default function ShruthiBox() {
   const tamburaTimerRef  = useRef(null);
   const pluckIndexRef    = useRef(0);
 
-  useEffect(() => () => stopAll(true), []);
+  const sadhanaCompleteCalledRef = useRef(false);
+  const sadhanaTimerRef = useRef(null);
+
+  useEffect(() => {
+    if (playing) {
+      if (!sadhanaCompleteCalledRef.current) {
+        sadhanaTimerRef.current = setTimeout(() => {
+          onSadhanaComplete?.('shruthi');
+          sadhanaCompleteCalledRef.current = true;
+        }, 30000); // 30 seconds continuous play
+      }
+    } else {
+      if (sadhanaTimerRef.current) {
+        clearTimeout(sadhanaTimerRef.current);
+        sadhanaTimerRef.current = null;
+      }
+    }
+    return () => {
+      if (sadhanaTimerRef.current) {
+        clearTimeout(sadhanaTimerRef.current);
+      }
+    };
+  }, [playing, onSadhanaComplete]);
+
+  useEffect(() => () => {
+    stopAll(true);
+    if (sadhanaTimerRef.current) {
+      clearTimeout(sadhanaTimerRef.current);
+    }
+  }, []);
 
   function stopAll(immediate = false) {
     if (tamburaTimerRef.current) {

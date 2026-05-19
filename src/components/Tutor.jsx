@@ -2027,7 +2027,7 @@ function MicCalibration({ onDone }) {
 
 // ─── Sing Along & AI Coaching Feedback Component ─────────────────────────────
 
-function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
+function SingAlongFeedback({ lesson, currentExercise, sa, onClose, onSadhanaComplete }) {
     const GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY;
     const [phase, setPhase] = useState('idle'); // idle | recording | processing | result | error
     const [countdown, setCountdown] = useState(30);
@@ -2353,6 +2353,7 @@ You did a wonderful job bringing a bright and sweet energy to your singing. To m
 
             setFeedback(feedbackText);
             setPhase('result');
+            onSadhanaComplete?.('tutor');
 
         } catch (err) {
             setErrorMsg(err.message || 'Error compiling vocal feedback.');
@@ -2570,7 +2571,7 @@ You did a wonderful job bringing a bright and sweet energy to your singing. To m
 
 // ─── Lesson runner ────────────────────────────────────────────────────────────
 
-function LessonRunner({ lesson, sa, setSa, onComplete, onBack }) {
+function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete }) {
     const [idx, setIdx] = useState(0);
     const exercises = lesson.exercises;
     const ex = exercises[idx];
@@ -2645,6 +2646,7 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack }) {
                     currentExercise={ex}
                     sa={sa}
                     onClose={() => setShowAIFeedback(false)}
+                    onSadhanaComplete={onSadhanaComplete}
                 />
             )}
         </div>
@@ -3328,7 +3330,7 @@ function UnitView({ unit, progress, onSelectLesson, onBack }) {
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export default function Tutor({ saFrequency }) {
+export default function Tutor({ saFrequency, onSadhanaComplete }) {
     const [sa, setSa] = useState(() => {
         try {
             return Number(localStorage.getItem('tutor_base_sa') || saFrequency || 261.63);
@@ -3484,6 +3486,7 @@ export default function Tutor({ saFrequency }) {
                         setScreen('unit');
                     }}
                     onBack={() => setScreen('unit')}
+                    onSadhanaComplete={onSadhanaComplete}
                 />
             )}
         </div>

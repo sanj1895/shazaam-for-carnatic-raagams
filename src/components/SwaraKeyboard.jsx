@@ -12,7 +12,7 @@ const SA_PRESETS = [
 
 const ragaNames = Object.keys(RAGAS).sort();
 
-export default function SwaraKeyboard({ forceRaga = null, compact = false }) {
+export default function SwaraKeyboard({ forceRaga = null, compact = false, onSadhanaComplete }) {
   const [selectedRaga, setSelectedRaga] = useState(forceRaga || ragaNames[0] || 'Shankarabharanam');
   const [showGuide, setShowGuide] = useState(false);
 
@@ -27,6 +27,8 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false }) {
 
   const droneStopRef = useRef(null);
   const scaleTimeoutsRef = useRef([]);
+  const playedSwarasRef = useRef(new Set());
+  const keyboardSadhanaDoneRef = useRef(false);
 
   const raga = RAGAS[selectedRaga] || {};
   const arohanam = raga.arohanam || [];
@@ -78,8 +80,18 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false }) {
     const ctx = getAudioCtx();
     const durationMs = playNote(note, saHz, ctx, { octaveShift });
     setPlayingNote({ note, octaveShift });
+
+    // Track unique notes for daily sadhana
+    if (!keyboardSadhanaDoneRef.current) {
+      playedSwarasRef.current.add(note);
+      if (playedSwarasRef.current.size >= 5) {
+        onSadhanaComplete?.('keyboard');
+        keyboardSadhanaDoneRef.current = true;
+      }
+    }
+
     setTimeout(() => setPlayingNote(null), durationMs);
-  }, [saHz]);
+  }, [saHz, onSadhanaComplete]);
 
   const handlePlayScale = async () => {
     if (playingScale) return;

@@ -74,6 +74,7 @@ function App() {
     const [activeMode, setActiveMode] = useState('standard');
     const [tourActive, setTourActive] = useState(false);
     const [sadhana, setSadhana] = useState(loadSadhanaState);
+    const [sadhanaToast, setSadhanaToast] = useState(null); // { title, stepName }
     const [selectedRaga, setSelectedRaga] = useState(null); // { raga, hasClearMatch, type: 'library' | 'identify' | 'melakarta' }
 
     const noteHistory = useRef([]);
@@ -139,12 +140,31 @@ function App() {
     };
 
     const markSadhanaStep = (tab) => {
+        const detailsMap = {
+            shruthi: { title: 'Warm-Up Complete', stepName: 'Step 1' },
+            tutor: { title: 'AI Vocal Practice Complete', stepName: 'Step 2' },
+            keyboard: { title: 'Scale Exploration Complete', stepName: 'Step 3' },
+            singback: { title: 'Ear Training Challenge Complete', stepName: 'Step 4' },
+        };
+
+        let didCompleteNew = false;
         setSadhana(prev => {
             if (prev.completed.includes(tab)) return prev;
+            didCompleteNew = true;
             const next = { ...prev, completed: [...prev.completed, tab] };
             localStorage.setItem('alapana_sadhana_v1', JSON.stringify(next));
             return next;
         });
+
+        if (didCompleteNew && detailsMap[tab]) {
+            setSadhanaToast({
+                title: detailsMap[tab].title,
+                stepName: detailsMap[tab].stepName
+            });
+            setTimeout(() => {
+                setSadhanaToast(null);
+            }, 4000);
+        }
     };
 
     const viewRef = useRef(view);
@@ -527,7 +547,7 @@ function App() {
             )}
 
                 {/* ══ TUTOR ══ */}
-                {view === 'tutor' && <Tutor saFrequency={saFrequency} />}
+                {view === 'tutor' && <Tutor saFrequency={saFrequency} onSadhanaComplete={markSadhanaStep} />}
 
                 {/* ══ LISTEN ══ */}
                 {view === 'listen' && (
@@ -666,7 +686,7 @@ function App() {
                 )}
                 {view === 'keyboard' && (
                     <div className="w-full p-4 md:p-8 flex flex-col items-center animate-fade-in swara-keyboard-container">
-                        <SwaraKeyboard />
+                        <SwaraKeyboard onSadhanaComplete={markSadhanaStep} />
                     </div>
                 )}
                 {view === 'bhedam' && (
@@ -676,12 +696,12 @@ function App() {
                 )}
                 {view === 'singback' && (
                     <div className="w-full p-4 md:p-8 flex flex-col items-center animate-fade-in">
-                        <SingBackChallenge />
+                        <SingBackChallenge onSadhanaComplete={markSadhanaStep} />
                     </div>
                 )}
                 {view === 'shruthi' && (
                     <div className="w-full p-4 md:p-8 flex flex-col items-center animate-fade-in">
-                        <ShruthiBox />
+                        <ShruthiBox onSadhanaComplete={markSadhanaStep} />
                     </div>
                 )}
                 {view === 'talam' && (
@@ -804,6 +824,49 @@ function App() {
                 Alapana · Carnatic Music
             </footer>
         </div>
+
+        {/* ── GORGEOUS GOLDEN SADHANA TOAST ── */}
+        {sadhanaToast && (
+            <>
+                <style>{`
+                    @keyframes sadhanaSlideUp {
+                        0% { transform: translate(-50%, 30px); opacity: 0; }
+                        100% { transform: translate(-50%, 0); opacity: 1; }
+                    }
+                `}</style>
+                <div 
+                    className="fixed bottom-24 left-1/2 z-[11000] max-w-sm w-[90%] pointer-events-none"
+                    style={{
+                        transform: 'translateX(-50%)',
+                        animation: 'sadhanaSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    }}
+                >
+                    <div className="bg-[#1e0c04]/95 border-2 border-[#f7d686] rounded-xl shadow-[0_10px_35px_rgba(247,214,134,0.3),_0_0_20px_rgba(0,0,0,0.8)] p-4 flex items-center gap-3.5 relative overflow-hidden backdrop-blur-md">
+                        {/* Heritage Corners */}
+                        <div className="absolute inset-0 pointer-events-none">
+                            <div className="heritage-border-corner heritage-corner-tl opacity-65" />
+                            <div className="heritage-border-corner heritage-corner-tr opacity-65" />
+                            <div className="heritage-border-corner heritage-corner-bl opacity-65" />
+                            <div className="heritage-border-corner heritage-corner-br opacity-65" />
+                        </div>
+                        
+                        {/* Gold pulsing symbol */}
+                        <div className="w-10 h-10 rounded-full bg-[#f7d686]/10 border border-[#f7d686]/30 flex items-center justify-center text-[#f7d686] text-xl font-bold flex-shrink-0 animate-pulse">
+                            ✨
+                        </div>
+
+                        <div className="flex-1 min-w-0 z-10">
+                            <div className="text-[9px] font-mono text-[#f7d686]/80 uppercase tracking-[0.2em] font-bold">
+                                Sadhana {sadhanaToast.stepName} Done
+                            </div>
+                            <h4 className="font-playfair text-white text-xs font-bold mt-0.5 leading-tight tracking-wide">
+                                {sadhanaToast.title}!
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+            </>
+        )}
     </>
   );
 }

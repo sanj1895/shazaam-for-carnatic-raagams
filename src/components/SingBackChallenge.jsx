@@ -29,7 +29,7 @@ function isCovered(targetNote, detectedList) {
     });
 }
 
-export default function SingBackChallenge() {
+export default function SingBackChallenge({ onSadhanaComplete }) {
     const [selectedRaga, setSelectedRaga] = useState(ragaNames[0]);
     const [difficulty, setDifficulty]     = useState('easy');
     const [state, setState]               = useState(STATES.IDLE);
@@ -71,8 +71,11 @@ export default function SingBackChallenge() {
             correct: isCovered(target, detected),
         }));
         setScores(noteScores);
-        setTimeout(() => setState(STATES.RESULT), 400);
-    }, []);
+        setTimeout(() => {
+            setState(STATES.RESULT);
+            onSadhanaComplete?.('singback');
+        }, 400);
+    }, [onSadhanaComplete]);
 
     const startChallenge = useCallback(async () => {
         const newPhrase = generatePhrase(raga, diff.noteCount);

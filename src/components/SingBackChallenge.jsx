@@ -38,6 +38,8 @@ export default function SingBackChallenge() {
     const [detectedNotes, setDetectedNotes] = useState([]); // all unique notes heard
     const [countdown, setCountdown]       = useState(LISTEN_SECS);
     const [scores, setScores]             = useState([]);
+    const [playbackSpeed, setPlaybackSpeed] = useState(1.0); // 0.75 | 1.0 | 1.25
+    const [revealSargam, setRevealSargam]   = useState(false);
 
     const abortRef        = useRef(null);
     const streamRef       = useRef(null);
@@ -77,13 +79,16 @@ export default function SingBackChallenge() {
         setPhrase(newPhrase);
         setDetectedNotes([]);
         setScores([]);
+        setRevealSargam(false);
         detectedRef.current = [];
         setCountdown(LISTEN_SECS);
 
         // Phase 1: play the phrase
         setState(STATES.PLAYING);
+        const speedFactor = 1 / playbackSpeed;
         const { promise, abort } = playSequence(newPhrase, 261.63, {
-            gapMs: 650, duration: 0.5,
+            gapMs: 650 * speedFactor, 
+            duration: 0.5 * speedFactor,
             onNote: (_, idx) => setPlayingIdx(idx),
         });
         abortRef.current = abort;
@@ -145,7 +150,7 @@ export default function SingBackChallenge() {
         } catch {
             setState(STATES.IDLE);
         }
-    }, [raga, diff, finishListening]);
+    }, [raga, diff, finishListening, playbackSpeed]);
 
     const reset = () => {
         abortRef.current?.();
@@ -190,6 +195,7 @@ export default function SingBackChallenge() {
                             </select>
                         </div>
                     </div>
+
                     <div className="heritage-card rounded-lg p-6 space-y-4 shadow-lg">
                          {/* Heritage Corners */}
                         <div className="absolute inset-0 pointer-events-none">
@@ -216,6 +222,32 @@ export default function SingBackChallenge() {
                             ))}
                         </div>
                     </div>
+
+                    {/* Symmetrical Tempo Control Card */}
+                    <div className="heritage-card rounded-lg p-6 space-y-4 shadow-lg">
+                        {/* Heritage Corners */}
+                        <div className="absolute inset-0 pointer-events-none">
+                            <div className="heritage-border-corner heritage-corner-tl" />
+                            <div className="heritage-border-corner heritage-corner-tr" />
+                            <div className="heritage-border-corner heritage-corner-bl" />
+                            <div className="heritage-border-corner heritage-corner-br" />
+                        </div>
+
+                        <p className="text-xs font-playfair font-bold text-c-gold uppercase tracking-[0.2em] border-b border-c-gold/10 pb-2 relative z-10">Playback Tempo</p>
+                        <div className="flex gap-3 relative z-10">
+                            {[0.75, 1.0, 1.25].map(speed => (
+                                <button key={speed} onClick={() => setPlaybackSpeed(speed)}
+                                    className={`flex-1 px-5 py-2.5 rounded border font-mono font-bold text-xs tracking-wider transition-all duration-300 ${
+                                        playbackSpeed === speed
+                                            ? 'bg-c-gold border-c-gold text-c-bg shadow-md'
+                                            : 'border-c-gold/20 text-c-gold hover:bg-c-gold/5'
+                                    }`}>
+                                    {speed === 1.0 ? '1.0x (Normal)' : `${speed}x`}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     <button onClick={startChallenge}
                         className="w-full py-3 rounded-xl border border-c-gold text-c-gold hover:bg-c-gold hover:text-c-bg font-playfair text-base tracking-wide transition-colors">
                         ▶ Start Challenge
@@ -225,7 +257,7 @@ export default function SingBackChallenge() {
 
             {/* ── PLAYING ── */}
             {state === STATES.PLAYING && (
-                <div className="flex flex-col items-center gap-5 py-8 animate-fade-in">
+                <div className="flex flex-col items-center gap-6 py-8 animate-fade-in">
                     <p className="text-c-cream font-playfair text-lg italic">Listen carefully…</p>
                     <div className="flex flex-wrap justify-center gap-2">
                         {phrase.map((note, i) => (
@@ -236,16 +268,28 @@ export default function SingBackChallenge() {
                                     ? 'border-c-gold/40 bg-c-gold-faint text-c-gold'
                                     : 'border-c-border text-c-cream-dark'
                             }`}>
-                                {toSargam(note)}
+                                {revealSargam || i === playingIdx ? toSargam(note) : '❓'}
                             </span>
                         ))}
                     </div>
+
+                    {/* Sargam Cheat-Sheet Toggle */}
+                    <button 
+                        onClick={() => setRevealSargam(prev => !prev)}
+                        className={`px-4 py-1.5 rounded-full border text-[10px] font-mono tracking-wider uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                            revealSargam 
+                                ? 'bg-c-gold/20 border-c-gold text-c-gold shadow-[0_0_8px_rgba(200,148,31,0.15)] hover:bg-c-gold/30' 
+                                : 'bg-c-card border-c-border/40 text-c-cream-dim hover:border-c-gold/50 hover:text-c-gold'
+                        }`}
+                    >
+                        {revealSargam ? '👁️ Sargam Revealed' : '🙈 Reveal Sargam Cheat-Sheet'}
+                    </button>
                 </div>
             )}
 
             {/* ── LISTENING ── */}
             {state === STATES.LISTENING && (
-                <div className="flex flex-col items-center gap-5 py-6 animate-fade-in">
+                <div className="flex flex-col items-center gap-6 py-6 animate-fade-in">
                     <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
                         <p className="text-c-cream font-playfair text-base italic">Sing any of these notes</p>
@@ -261,12 +305,25 @@ export default function SingBackChallenge() {
                                         ? 'bg-c-gold border-c-gold text-c-bg scale-105'
                                         : 'border-c-border text-c-cream-dark'
                                 }`}>
-                                    {toSargam(note)}
+                                    {revealSargam ? toSargam(note) : '❓'}
                                     {covered && <span className="ml-1 text-[10px]">✓</span>}
                                 </span>
                             );
                         })}
                     </div>
+                    
+                    {/* Sargam Cheat-Sheet Toggle */}
+                    <button 
+                        onClick={() => setRevealSargam(prev => !prev)}
+                        className={`px-4 py-1.5 rounded-full border text-[10px] font-mono tracking-wider uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                            revealSargam 
+                                ? 'bg-c-gold/20 border-c-gold text-c-gold shadow-[0_0_8px_rgba(200,148,31,0.15)] hover:bg-c-gold/30' 
+                                : 'bg-c-card border-c-border/40 text-c-cream-dim hover:border-c-gold/50 hover:text-c-gold'
+                        }`}
+                    >
+                        {revealSargam ? '👁️ Sargam Revealed' : '🙈 Reveal Sargam Cheat-Sheet'}
+                    </button>
+
                     <p className="text-[11px] text-c-cream-dark font-playfair italic">
                         {detectedNotes.length} note{detectedNotes.length !== 1 ? 's' : ''} heard so far
                     </p>

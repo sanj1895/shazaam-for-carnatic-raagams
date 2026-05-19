@@ -147,27 +147,24 @@ function App() {
         });
     };
 
-    // Listen for hashchange events (back / forward navigation)
+    const viewRef = useRef(view);
+    viewRef.current = view;
+
+    // Listen for hashchange events (back/forward navigation only — not goTo-triggered changes)
     useEffect(() => {
         const handleHashChange = () => {
             const hash = window.location.hash.replace(/^#\/?/, '');
             const targetView = hash || 'home';
-            if (targetView !== view) {
+            if (targetView !== viewRef.current) {
                 if (targetView !== 'listen') handleReset();
                 setView(targetView);
-                if (targetView === 'home') {
-                    setShowFeatures(false);
-                } else {
-                    setShowFeatures(true);
-                }
+                setShowFeatures(targetView !== 'home');
             }
         };
 
         window.addEventListener('hashchange', handleHashChange);
-        return () => {
-            window.removeEventListener('hashchange', handleHashChange);
-        };
-    }, [view]);
+        return () => window.removeEventListener('hashchange', handleHashChange);
+    }, []);
 
     const goTo = (id) => {
         if (id !== 'listen') handleReset();
@@ -461,41 +458,39 @@ function App() {
 
                         {/* Feature grid  ·  revelation transition */}
                         <div
-                            className="relative z-10 w-full max-w-5xl px-3 sm:px-5 flex flex-col items-center justify-center transition-all duration-1000 ease-out"
+                            className="relative z-10 w-full max-w-6xl px-3 sm:px-5 flex flex-col items-center justify-center transition-all duration-1000 ease-out"
                             style={{
                                 opacity: showFeatures ? 1 : 0,
                                 transform: showFeatures ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.98)',
                                 pointerEvents: showFeatures ? 'auto' : 'none',
                                 flexGrow: showFeatures ? 1 : 0,
-                                minHeight: showFeatures ? '60vh' : 0,
-                                paddingBottom: showFeatures ? '2rem' : 0,
+                                minHeight: showFeatures ? '50vh' : 0,
+                                paddingBottom: showFeatures ? '1rem' : 0,
                             }}
                         >
                             {/* Suggested path banner */}
-                            <div className="w-full max-w-4xl mb-8 px-1">
+                            <div className="w-full max-w-5xl mb-4 px-1">
                                 <p className="text-white/35 text-[10px] font-playfair italic text-center tracking-wide">
                                     Suggested path for beginners: <span className="text-c-gold/60">Sadhana → Tutor → Shruthi → Talam</span>
                                 </p>
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 md:gap-8 w-full max-w-4xl mx-auto">
+                            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4 w-full max-w-5xl mx-auto">
                                 {FEATURES.map(({ id, label, desc, symbol, level }, idx) => (
                                     <button
                                         key={id}
                                         onClick={() => goTo(id)}
-                                        className={`group relative flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 text-center transition-all duration-500 hover:-translate-y-3 h-full w-full ${
-                                            idx === FEATURES.length - 1 ? 'col-span-2 lg:col-span-1' : ''
-                                        }`}
+                                        className="group relative flex flex-col items-center justify-center p-3.5 sm:p-4 md:p-5 text-center transition-all duration-500 hover:-translate-y-1.5 h-full w-full"
                                         style={{
-                                            transitionDelay: showFeatures ? `${idx * 60}ms` : '0ms',
+                                            transitionDelay: showFeatures ? `${idx * 50}ms` : '0ms',
                                             opacity: showFeatures ? 1 : 0,
                                             transform: showFeatures ? 'translateY(0)' : 'translateY(20px)',
                                         }}
                                     >
                                     {/* The Plaque Base — extra glow for Tutor */}
-                                    <div className={`absolute inset-0 rounded-lg shadow-2xl transition-all duration-300 ${
+                                    <div className={`absolute inset-0 rounded-lg shadow-xl transition-all duration-300 ${
                                         level === 'start'
-                                            ? 'bg-[#1e0c04] border border-c-gold/60 shadow-[0_0_24px_rgba(200,148,31,0.15)] group-hover:border-c-gold'
+                                            ? 'bg-[#1e0c04] border border-c-gold/60 shadow-[0_0_20px_rgba(200,148,31,0.15)] group-hover:border-c-gold'
                                             : 'bg-[#1e0c04] border border-c-gold/30 group-hover:border-c-gold/70'
                                     }`} />
 
@@ -503,21 +498,21 @@ function App() {
                                     <div className="absolute inset-1.5 border border-c-gold/10 rounded-md pointer-events-none" />
 
                                     {/* Ornate Corners */}
-                                    <div className="absolute top-0 left-0 w-5 h-5 border-t border-l border-c-gold/40 rounded-tl-lg group-hover:w-7 group-hover:h-7 transition-all duration-500" />
-                                    <div className="absolute top-0 right-0 w-5 h-5 border-t border-r border-c-gold/40 rounded-tr-lg group-hover:w-7 group-hover:h-7 transition-all duration-500" />
-                                    <div className="absolute bottom-0 left-0 w-5 h-5 border-b border-l border-c-gold/40 rounded-bl-lg group-hover:w-7 group-hover:h-7 transition-all duration-500" />
-                                    <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-c-gold/40 rounded-br-lg group-hover:w-7 group-hover:h-7 transition-all duration-500" />
+                                    <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-c-gold/40 rounded-tl-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
+                                    <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-c-gold/40 rounded-tr-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
+                                    <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-c-gold/40 rounded-bl-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
+                                    <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-c-gold/40 rounded-br-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
 
                                     {/* Symbol with shadow */}
-                                    <div className="relative z-10 text-c-gold text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 group-hover:text-[#f7d686] transition-all duration-500">
+                                    <div className="relative z-10 text-c-gold text-xl sm:text-2xl mb-1.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 group-hover:text-[#f7d686] transition-all duration-500">
                                         {symbol}
                                     </div>
 
                                     {/* Text with vintage spacing */}
-                                    <h3 className="relative z-10 font-playfair text-[#f7d686] text-[10px] sm:text-xs md:text-base font-bold tracking-[0.1em] sm:tracking-[0.15em] uppercase mb-1 sm:mb-1.5 group-hover:text-white transition-colors duration-300">
+                                    <h3 className="relative z-10 font-playfair text-[#f7d686] text-xs sm:text-sm font-bold tracking-[0.1em] sm:tracking-[0.12em] uppercase mb-1 group-hover:text-white transition-colors duration-300">
                                         {label}
                                     </h3>
-                                    <p className="relative z-10 text-white/50 text-[9px] sm:text-[10px] md:text-xs leading-relaxed italic max-w-[120px] sm:max-w-[140px] opacity-70 group-hover:opacity-100 transition-opacity hidden sm:block">
+                                    <p className="relative z-10 text-white/50 text-[9px] sm:text-[10px] leading-relaxed italic max-w-[130px] opacity-70 group-hover:opacity-100 transition-opacity hidden sm:block">
                                         {desc}
                                     </p>
 

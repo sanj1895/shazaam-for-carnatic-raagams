@@ -17,9 +17,55 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
     const [status, setStatus]         = useState(STATUS.READY);
     const [statusMsg, setStatusMsg]   = useState('');
     const [currentFreq, setCurrentFreq] = useState(0);
+    const [activePreset, setActivePreset] = useState(null);
 
     const onPitchDetectedRef = useRef(onPitchDetected);
+    const activeOscRef = useRef(null);
+
     useEffect(() => { onPitchDetectedRef.current = onPitchDetected; }, [onPitchDetected]);
+    useEffect(() => {
+        return () => stopReferenceTone();
+    }, []);
+
+    const playReferenceTone = (freq) => {
+        stopReferenceTone();
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            
+            gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.1);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            
+            activeOscRef.current = { osc, gain, ctx: audioCtx };
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const stopReferenceTone = () => {
+        if (activeOscRef.current) {
+            const { osc, gain, ctx } = activeOscRef.current;
+            try {
+                gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+                setTimeout(() => {
+                    try {
+                        osc.stop();
+                        ctx.close();
+                    } catch(e){}
+                }, 200);
+            } catch(e){}
+            activeOscRef.current = null;
+        }
+    };
 
     const startAudio = async () => {
         try {
@@ -127,9 +173,9 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
 
             <div className="p-6 flex flex-col items-center gap-5">
                 {!stream ? (
-                    <div className="flex flex-col items-center gap-4">
+                    <div className="flex flex-col items-center gap-4 w-full">
                         <p className="text-c-cream-dark text-sm text-center max-w-xs font-playfair italic">
-                            Allow mic access, then hum your Sa  ·  make it feel like home.
+                            Allow mic access and hum your Sa  ·  or choose a preset below:
                         </p>
                         <button
                             onClick={startAudio}
@@ -137,6 +183,58 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
                         >
                             Start Microphone
                         </button>
+
+                        <div className="w-full flex items-center gap-2 mt-2">
+                            <div className="flex-1 h-px bg-c-border/40" />
+                            <span className="text-[10px] uppercase tracking-widest text-c-cream-dark/60 font-mono">Reference Presets</span>
+                            <div className="flex-1 h-px bg-c-border/40" />
+                        </div>
+
+                        <div className="flex flex-wrap justify-center gap-3 w-full">
+                            {[
+                                { label: 'Gents (C / 130.8 Hz)', freq: 130.81 },
+                                { label: 'Ladies (G / 196.0 Hz)', freq: 196.00 },
+                                { label: 'Ladies (G# / 207.7 Hz)', freq: 207.65 },
+                            ].map((preset) => {
+                                const isPlaying = activePreset === preset.freq;
+                                return (
+                                    <div key={preset.freq} className="flex flex-col gap-1 items-center bg-c-card/25 border border-c-border/30 rounded-lg p-2.5 w-[140px] sm:w-[150px] transition-all">
+                                        <span className="text-[10px] font-bold text-c-cream font-mono text-center">{preset.label.split(' ')[0]} Key</span>
+                                        <span className="text-[8px] text-c-cream-dark font-mono text-center">({preset.label.split('(')[1].split(')')[0]})</span>
+                                        <div className="flex gap-1.5 w-full mt-2">
+                                            <button
+                                                onClick={() => {
+                                                    if (isPlaying) {
+                                                        stopReferenceTone();
+                                                        setActivePreset(null);
+                                                    } else {
+                                                        playReferenceTone(preset.freq);
+                                                        setActivePreset(preset.freq);
+                                                    }
+                                                }}
+                                                className={`flex-1 py-1 text-[9px] font-mono rounded transition-colors ${
+                                                    isPlaying 
+                                                        ? 'bg-red-800 text-c-bg' 
+                                                        : 'bg-c-surface text-c-cream-dim hover:bg-c-gold-faint border border-c-border/40'
+                                                }`}
+                                            >
+                                                {isPlaying ? '■ Stop' : '🔈 Hear'}
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    stopReferenceTone();
+                                                    setActivePreset(null);
+                                                    onSaSet(preset.freq);
+                                                }}
+                                                className="flex-1 py-1 text-[9px] bg-c-gold hover:bg-c-gold-light text-c-bg font-bold rounded transition-all active:scale-95"
+                                            >
+                                                Select
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 ) : (
                     <div className="flex flex-col items-center gap-5 w-full">
@@ -161,7 +259,7 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
                         </div>
 
                         {/* Set Sa */}
-                        <div className="flex flex-col items-center gap-2">
+                        <div className="flex flex-col items-center gap-2 w-full">
                             {!saFrequency ? (
                                 <>
                                     <p className="text-[11px] text-c-cream-dark text-center max-w-[220px] font-playfair italic">
@@ -174,6 +272,54 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
                                     >
                                         Set as Sa
                                     </button>
+
+                                    <div className="w-full flex items-center gap-2 mt-4">
+                                        <div className="flex-1 h-px bg-c-border/40" />
+                                        <span className="text-[10px] uppercase tracking-widest text-c-cream-dark/60 font-mono">Or Use Reference Preset</span>
+                                        <div className="flex-1 h-px bg-c-border/40" />
+                                    </div>
+
+                                    <div className="flex flex-wrap justify-center gap-2 w-full mt-1">
+                                        {[
+                                            { label: 'Gents (C / 130.8 Hz)', freq: 130.81 },
+                                            { label: 'Ladies (G / 196.0 Hz)', freq: 196.00 },
+                                            { label: 'Ladies (G# / 207.7 Hz)', freq: 207.65 },
+                                        ].map((preset) => {
+                                            const isPlaying = activePreset === preset.freq;
+                                            return (
+                                                <div key={preset.freq} className="flex items-center gap-1.5 bg-c-card/20 border border-c-border/30 rounded-lg p-1.5 transition-all">
+                                                    <button
+                                                        onClick={() => {
+                                                            if (isPlaying) {
+                                                                stopReferenceTone();
+                                                                setActivePreset(null);
+                                                            } else {
+                                                                playReferenceTone(preset.freq);
+                                                                setActivePreset(preset.freq);
+                                                            }
+                                                        }}
+                                                        className={`px-2 py-1 text-[9px] font-mono rounded transition-colors ${
+                                                            isPlaying 
+                                                                ? 'bg-red-800 text-c-bg' 
+                                                                : 'bg-c-surface text-c-cream-dim hover:bg-c-gold-faint border border-c-border/40'
+                                                        }`}
+                                                    >
+                                                        {isPlaying ? '■' : '🔈'} {preset.label.split(' ')[0]}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            stopReferenceTone();
+                                                            setActivePreset(null);
+                                                            onSaSet(preset.freq);
+                                                        }}
+                                                        className="px-2 py-1 text-[9px] bg-c-gold hover:bg-c-gold-light text-c-bg font-bold rounded transition-colors"
+                                                    >
+                                                        Use
+                                                    </button>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </>
                             ) : (
                                 <div className="flex items-center gap-3">
@@ -182,8 +328,11 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
                                         Sa is home at <span className="text-c-gold-dim not-italic font-mono">{saFrequency.toFixed(2)} Hz</span>
                                     </p>
                                     <button
-                                        onClick={handleSetSa}
-                                        disabled={!currentFreq}
+                                        onClick={() => {
+                                            stopReferenceTone();
+                                            setActivePreset(null);
+                                            onSaSet(0);
+                                        }}
                                         className="text-[10px] text-c-cream-dark hover:text-c-gold disabled:opacity-25 underline underline-offset-2 transition-colors"
                                     >
                                         reset

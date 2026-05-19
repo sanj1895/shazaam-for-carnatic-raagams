@@ -14,6 +14,7 @@ const ragaNames = Object.keys(RAGAS).sort();
 
 export default function SwaraKeyboard({ forceRaga = null, compact = false }) {
   const [selectedRaga, setSelectedRaga] = useState(forceRaga || ragaNames[0] || 'Shankarabharanam');
+  const [showGuide, setShowGuide] = useState(false);
 
   useEffect(() => {
     if (forceRaga) setSelectedRaga(forceRaga);
@@ -133,9 +134,17 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false }) {
       {/* Header */}
       {!compact && (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-c-gold/20 pb-4">
-          <h2 className="font-playfair text-3xl font-bold text-c-gold tracking-tight">
-            Swara Keyboard
-          </h2>
+          <div className="flex items-center gap-3">
+            <h2 className="font-playfair text-3xl font-bold text-c-gold tracking-tight">
+              Swara Keyboard
+            </h2>
+            <button 
+              onClick={() => setShowGuide(true)}
+              className="px-3 py-1 rounded-full border border-c-gold/40 hover:bg-c-gold/5 text-c-gold text-xs font-playfair italic transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+            >
+              <span>📖</span> Swara Guide
+            </button>
+          </div>
           <div className="relative">
             <select
               value={selectedRaga}
@@ -274,6 +283,83 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false }) {
         />
       </div>
       </div>
+
+      {/* Swara Guide Modal */}
+      {showGuide && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-c-bg border-2 border-c-gold rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative shadow-2xl">
+            {/* Heritage Corners */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="heritage-border-corner heritage-corner-tl" />
+              <div className="heritage-border-corner heritage-corner-tr" />
+              <div className="heritage-border-corner heritage-corner-bl" />
+              <div className="heritage-border-corner heritage-corner-br" />
+            </div>
+
+            <button 
+              onClick={() => setShowGuide(false)}
+              className="absolute top-4 right-4 text-c-cream-dark hover:text-c-gold text-lg transition-colors font-mono cursor-pointer"
+            >
+              ✕
+            </button>
+
+            <div className="space-y-6">
+              <div className="text-center">
+                <span className="text-[10px] uppercase tracking-widest text-c-gold font-mono">Theoretical Companion</span>
+                <h3 className="font-playfair text-2xl font-bold text-c-gold mt-1">Understanding the Swaras</h3>
+                <div className="w-16 h-px bg-c-gold/30 mx-auto mt-2" />
+              </div>
+
+              <div className="space-y-4 text-sm text-c-cream leading-relaxed">
+                <p>
+                  Welcome to the <strong>Swara Keyboard</strong>! Unlike Western music where notes are absolute (like C, D, or E), Carnatic music is built on <strong>relative tuning</strong>.
+                </p>
+                
+                <div className="bg-c-surface border border-c-border/30 rounded-lg p-4 space-y-2">
+                  <h4 className="font-playfair font-bold text-c-gold">What are the 7 Notes (Swaras)?</h4>
+                  <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div><strong>Sa (Shadjama):</strong> The tonic / home key.</div>
+                    <div><strong>Ri (Rishabha):</strong> The 2nd note.</div>
+                    <div><strong>Ga (Gandhara):</strong> The 3rd note.</div>
+                    <div><strong>Ma (Madhyama):</strong> The 4th note.</div>
+                    <div><strong>Pa (Panchama):</strong> The perfect 5th note.</div>
+                    <div><strong>Da (Dhaivata):</strong> The 6th note.</div>
+                    <div><strong>Ni (Nishada):</strong> The 7th note.</div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-playfair font-bold text-c-gold">What do the numbers (Ri1, Ga2, etc.) mean?</h4>
+                  <p>
+                    In Carnatic music, the space between <strong>Sa</strong> and <strong>Pa</strong> is divided into 16 microtonal subdivisions called <strong>Swarasthanas</strong>. The numbers (1, 2, 3) represent microtonal pitch positions of that note:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 text-xs">
+                    <li><strong>Ri1 / Ga1:</strong> Lower, flatter microtones.</li>
+                    <li><strong>Ri2 / Ga2:</strong> Normal or middle pitch positions.</li>
+                    <li><strong>Ri3 / Ga3:</strong> Higher, sharper pitch positions.</li>
+                  </ul>
+                  <p className="text-xs italic text-c-cream-dim">
+                    Depending on the raga you select, the keyboard automatically configures the active pitches to match that raga's exact scale structure!
+                  </p>
+                </div>
+
+                <div className="bg-c-gold/5 border border-c-gold/20 rounded-lg p-3 text-xs text-c-gold italic">
+                  <strong>Pro Tip:</strong> Turn on the <strong>Drone</strong> to establish a stable reference key, then play individual notes to hear how they blend beautifully with the tonic home!
+                </div>
+              </div>
+
+              <div className="flex justify-center pt-2">
+                <button 
+                  onClick={() => setShowGuide(false)}
+                  className="px-6 py-2 bg-c-gold text-c-bg hover:bg-c-gold-light rounded font-playfair font-bold text-sm transition-all cursor-pointer active:scale-95"
+                >
+                  Got it! Let's Explore
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

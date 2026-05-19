@@ -13,7 +13,7 @@ const SEMITONES = { ...SWARA_SEMITONE, 'Ṡ': 12 };
 
 const swaraFreq = (swara, sa) => noteFreq(swara === 'Ṡ' ? 'Sa' : swara, sa) * (swara === 'Ṡ' ? 2 : 1);
 
-const playSingleTone = (freq, duration = 0.7) => {
+const playSingleTone = (freq, duration = 0.7, prevFreq = null) => {
     try {
         const ctx = getAudioCtx();
         // Use raw oscillator approach for the tutor's simpler sound
@@ -21,29 +21,43 @@ const playSingleTone = (freq, duration = 0.7) => {
         master.connect(ctx.destination);
         const harmonics = [1, 2, 3, 4, 5, 6, 7];
         const amps      = [0.48, 0.26, 0.14, 0.07, 0.03, 0.015, 0.008];
+        const now = ctx.currentTime;
+        
         harmonics.forEach((mult, i) => {
             const osc = ctx.createOscillator();
             const g   = ctx.createGain();
             osc.type = 'sine';
-            osc.frequency.value = freq * mult;
+            
+            if (prevFreq) {
+                // Soulful Carnatic legato slide (Jaaru) from previous note to current note!
+                const startFreq = prevFreq * mult;
+                const targetFreq = freq * mult;
+                osc.frequency.setValueAtTime(startFreq, now);
+                osc.frequency.exponentialRampToValueAtTime(targetFreq, now + 0.20);
+            } else {
+                osc.frequency.setValueAtTime(freq * mult, now);
+            }
+            
             g.gain.value = amps[i];
             osc.connect(g);
             g.connect(master);
             osc.start();
-            osc.stop(ctx.currentTime + duration);
+            osc.stop(now + duration);
         });
-        master.gain.setValueAtTime(0, ctx.currentTime);
-        master.gain.linearRampToValueAtTime(0.28, ctx.currentTime + 0.07);
-        master.gain.setValueAtTime(0.28, ctx.currentTime + Math.max(0.07, duration - 0.12));
-        master.gain.linearRampToValueAtTime(0, ctx.currentTime + duration);
+        master.gain.setValueAtTime(0, now);
+        master.gain.linearRampToValueAtTime(0.28, now + 0.07);
+        master.gain.setValueAtTime(0.28, now + Math.max(0.07, duration - 0.12));
+        master.gain.linearRampToValueAtTime(0, now + duration);
     } catch (err) {
         console.warn('Tutor playTone failed:', err);
     }
 };
 
-const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750) => {
+const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamakam = false) => {
     const octaves = getOctaveSequence(swaras);
     const toneDur = Math.min((delayMs / 1000) * 0.85, 1.1);
+    let prevFreq = null;
+    
     for (let i = 0; i < swaras.length; i++) {
         if (signal?.aborted) return;
         const swara = swaras[i];
@@ -51,12 +65,14 @@ const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750) => {
         if (swara === ',') {
             // silence/rest beat — highlight nothing, just wait
             onIdx(-1);
+            prevFreq = null;
             await new Promise(r => setTimeout(r, delayMs));
             continue;
         }
         onIdx(i);
         const freq = swaraFreq(swara, sa) * Math.pow(2, octaves[i]);
-        playSingleTone(freq, toneDur);
+        playSingleTone(freq, toneDur, gamakam ? prevFreq : null);
+        prevFreq = freq;
         await new Promise(r => setTimeout(r, delayMs));
     }
     onIdx(-1);
@@ -1306,7 +1322,7 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
     const holdMs = duration * 1000;
     const [phase, setPhase] = useState('idle');
     const [micError, setMicError] = useState('');
-    const [gamakamEnabled, setGamakamEnabled] = useState(false);
+    const gamakamEnabled = false; // Steady intonation only for static individual swaras
     const [tracingAccuracy, setTracingAccuracy] = useState(100);
 
     const streamRef  = useRef(null);
@@ -1515,35 +1531,10 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
 
             {phase === 'idle' && (
                 <div className="flex flex-col items-center gap-4 w-full">
-                    {/* Symmetrical Gamakam Guide Toggle Switch */}
-                    <button 
-                        onClick={() => setGamakamEnabled(prev => !prev)}
-                        className={`px-5 py-1.5 rounded-full border text-[10px] font-mono tracking-wider uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
-                            gamakamEnabled 
-                                ? 'bg-c-gold/20 border-c-gold text-c-gold shadow-[0_0_12px_rgba(200,148,31,0.2)] hover:bg-c-gold/30' 
-                                : 'bg-c-card border-c-border/40 text-c-cream-dim hover:border-c-gold/50 hover:text-c-gold'
-                        }`}
-                    >
-                        <span className="animate-pulse">🌊</span> {gamakamEnabled ? 'Gamakam Mode: ACTIVE' : 'Gamakam Mode: OFF'}
-                    </button>
-
                     <button onClick={startMic}
-                            className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors">
+                            className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors cursor-pointer">
                         Start singing
                     </button>
-                    {gamakamEnabled && (
-                        <div className="bg-c-gold/5 border border-c-gold/25 rounded-xl p-3.5 max-w-sm text-left animate-fade-in space-y-1.5 shadow-sm">
-                            <h5 className="text-[11px] font-playfair font-bold text-c-gold tracking-wider uppercase flex items-center gap-1.5">
-                                🌊 Soulful Gamakam Mode
-                            </h5>
-                            <p className="text-[10px] text-c-cream font-playfair italic leading-relaxed">
-                                Gamakam is the beautiful ornamentation, sliding, and breathing between notes. In Carnatic music, it is deeply personal and expressive—there is no single mechanical way to sing it!
-                            </p>
-                            <p className="text-[10px] text-[#b8831a] font-playfair italic leading-relaxed font-semibold">
-                                ✦ Practice your personal glides and slides inside the glowing golden visual corridor. The AI Guru will check your core swara anchor while celebrating your creative expression!
-                            </p>
-                        </div>
-                    )}
                 </div>
             )}
 
@@ -1627,6 +1618,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
     const [activeIdx, setActiveIdx] = useState(-1);
     const [statuses, setStatuses] = useState(swaras.map(() => null));
     const [micError, setMicError] = useState('');
+    const [gamakamEnabled, setGamakamEnabled] = useState(false);
     
     const [isPlayingGuide, setIsPlayingGuide] = useState(false);
     
@@ -1670,7 +1662,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             const ctrl = new AbortController();
             guideAbortRef.current = ctrl;
             const beatMs = Math.round(800 / tempoMultRef.current) / speed;
-            await playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal, beatMs);
+            await playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal, beatMs, gamakamEnabled);
             if (!ctrl.signal.aborted) {
                 setActiveIdx(-1);
             }
@@ -1774,7 +1766,9 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                 scoresRef.current[currentIdx].total++;
                 if (freq && rms > 0.003) {
                     const diff = Math.abs(centsToNearest(freq, targetSt, sa));
-                    if (diff <= 50) {
+                    // Relaxed expressive tolerance (+/- 85 cents) in Gamakam Mode to validate sliding transitions!
+                    const allowedTol = gamakamEnabled ? 85 : 50;
+                    if (diff <= allowedTol) {
                         scoresRef.current[currentIdx].hits++;
                     }
                 }
@@ -1880,20 +1874,46 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                         />
                     </div>
                     
+                    {/* Symmetrical Gamakam Guide Toggle Switch */}
+                    <button 
+                        onClick={() => setGamakamEnabled(prev => !prev)}
+                        className={`px-5 py-1.5 rounded-full border text-[10px] font-mono tracking-wider uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                            gamakamEnabled 
+                                ? 'bg-c-gold/20 border-c-gold text-c-gold shadow-[0_0_12px_rgba(200,148,31,0.2)] hover:bg-c-gold/30' 
+                                : 'bg-c-card border-c-border/40 text-c-cream-dim hover:border-c-gold/50 hover:text-c-gold'
+                        }`}
+                    >
+                        <span className="animate-pulse">🌊</span> {gamakamEnabled ? 'Gamakam Glide: ACTIVE' : 'Gamakam Glide: OFF'}
+                    </button>
+                    
+                    {gamakamEnabled && (
+                        <div className="bg-c-gold/5 border border-c-gold/25 rounded-xl p-3.5 max-w-sm text-left animate-fade-in space-y-1.5 shadow-sm mx-4">
+                            <h5 className="text-[11px] font-playfair font-bold text-c-gold tracking-wider uppercase flex items-center gap-1.5">
+                                🌊 Soulful Legato Glide Mode
+                            </h5>
+                            <p className="text-[10px] text-c-cream font-playfair italic leading-relaxed">
+                                In Carnatic music, gamakams represent the emotional slides (Jaaru) and transitions between notes of a raga.
+                            </p>
+                            <p className="text-[10px] text-[#b8831a] font-playfair italic leading-relaxed font-semibold">
+                                ✦ Practice sliding gracefully from swara to swara. The AI Guru expands its evaluation tolerance (+/- 85 cents) to celebrate your beautiful, smooth voice-like glides!
+                            </p>
+                        </div>
+                    )}
+                    
                     <div className="flex gap-4 items-center">
                         {isPlayingGuide ? (
                             <button onClick={stopPlayback}
-                                    className="px-6 py-2.5 border border-red-500/40 bg-red-950/10 text-red-400 hover:bg-red-500 hover:text-c-bg rounded-full text-xs font-playfair transition-colors flex items-center gap-1.5 shadow-sm">
+                                    className="px-6 py-2.5 border border-red-500/40 bg-red-950/10 text-red-400 hover:bg-red-500 hover:text-c-bg rounded-full text-xs font-playfair transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer">
                                 <span>■ Stop Guide</span>
                             </button>
                         ) : (
                             <button onClick={playGuide}
-                                    className="px-6 py-2.5 border border-c-border bg-c-surface text-c-cream-dim text-sm rounded-full font-playfair hover:border-c-gold/40 hover:text-c-gold transition-all flex items-center gap-1.5">
+                                    className="px-6 py-2.5 border border-c-border bg-c-surface text-c-cream-dim text-sm rounded-full font-playfair hover:border-c-gold/40 hover:text-c-gold transition-all flex items-center gap-1.5 cursor-pointer">
                                 <span>🔈 Hear Sequence</span>
                             </button>
                         )}
                         <button onClick={startRecording}
-                                className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors flex items-center gap-1.5">
+                                className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors flex items-center gap-1.5 cursor-pointer">
                             <span>🎙️ Start Singing</span>
                         </button>
                     </div>

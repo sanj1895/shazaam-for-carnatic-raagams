@@ -403,12 +403,9 @@ function App() {
                         {/* Glow */}
                         <div className="absolute left-1/2 top-[30%] -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-c-gold/10 blur-[160px] pointer-events-none rounded-full z-0" />
 
-                        {/* Rotating mandala — radial mask on desktop to remove rectangle edge, rounded circle on mobile to save GPU */}
-                        <div className="absolute left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[90vw] md:w-[160vw] h-[90vw] md:h-[160vw] opacity-[0.12] z-0 overflow-hidden rounded-full"
-                            style={window.innerWidth >= 768 ? {
-                                maskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)',
-                                WebkitMaskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)'
-                            } : {}}
+                        {/* Rotating mandala — radial mask to remove hard rectangle edge */}
+                        <div className="absolute left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[160vw] h-[160vw] opacity-[0.12] z-0"
+                            style={{ maskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)', WebkitMaskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)' }}
                         >
                             <img
                                 src="/hero-mandala.jpg"
@@ -473,7 +470,15 @@ function App() {
 
                                 {/* Tour Trigger Option */}
                                 <button
-                                    onClick={() => setTourActive(true)}
+                                    onClick={() => {
+                                        if (window.innerWidth < 768) {
+                                            const confirmTour = window.confirm(
+                                                "💻 Laptop Recommended!\n\nFor the best experience, we highly recommend taking the Guided Tour on a laptop or desktop computer, as it can cause performance issues or lag on some mobile devices.\n\nWould you like to try it on mobile anyway?"
+                                            );
+                                            if (!confirmTour) return;
+                                        }
+                                        setTourActive(true);
+                                    }}
                                     className="text-c-gold/80 hover:text-c-gold font-playfair px-6 py-2 text-xs tracking-[0.15em] uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer mt-1 hover:scale-105 active:scale-95"
                                 >
                                     <span>🪔</span> Take a Guided Tour

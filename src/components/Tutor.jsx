@@ -3287,7 +3287,7 @@ export default function Tutor({ saFrequency }) {
     };
 
     return (
-        <div className="w-full px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 flex flex-col items-center gap-4 sm:gap-6 animate-fade-in">
+        <div id="tour-tutor-container" className="w-full px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 flex flex-col items-center gap-4 sm:gap-6 animate-fade-in">
 
             {/* Base Sa (Shruti) quick setup bar */}
             {screen === 'home' && (

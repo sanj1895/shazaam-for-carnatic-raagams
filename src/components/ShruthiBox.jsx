@@ -291,7 +291,7 @@ export default function ShruthiBox() {
   };
 
   return (
-    <div style={s.body} className="max-w-[640px] lg:max-w-5xl mx-auto">
+    <div id="tour-shruthi-box" style={s.body} className="max-w-[640px] lg:max-w-5xl mx-auto">
       {/* Heritage Corners */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="heritage-border-corner heritage-corner-tl" />

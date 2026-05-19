@@ -51,6 +51,7 @@ function App() {
     const [possibleRagas, setPossibleRagas] = useState([]);
     const [isListening, setIsListening] = useState(false);
     const [activeMode, setActiveMode] = useState('standard');
+    const [tourActive, setTourActive] = useState(false);
     const [selectedRaga, setSelectedRaga] = useState(null); // { raga, hasClearMatch, type: 'library' | 'identify' | 'melakarta' }
 
     const noteHistory = useRef([]);
@@ -118,11 +119,28 @@ function App() {
     const goTo = (id) => {
         if (id !== 'listen') handleReset();
         setView(id);
+        if (id === 'home') {
+            setShowFeatures(false);
+        } else {
+            setShowFeatures(true);
+        }
     };
 
     return (
         <>
-            <OnboardingTour onStartLearning={() => goTo('tutor')} onGoTo={goTo} />
+            <OnboardingTour 
+                active={tourActive} 
+                onDismiss={() => {
+                    setTourActive(false);
+                    setShowFeatures(false);
+                    goTo('home');
+                }} 
+                onStartLearning={() => {
+                    setTourActive(false);
+                    goTo('tutor');
+                }} 
+                onGoTo={goTo} 
+            />
 
             {/* ══ UNIFIED MODAL (PORTAL) ══ */}
             {selectedRaga && createPortal(
@@ -342,6 +360,7 @@ function App() {
                             </div>
 
                             <h1
+                                id="tour-logo"
                                 className="font-playfair text-5xl sm:text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-br from-c-gold-light via-[#f7d686] to-[#b88014] tracking-wider uppercase leading-none mb-3 drop-shadow-xl"
                                 style={{ textShadow: '0 4px 30px rgba(227,168,33,0.4)' }}
                             >
@@ -356,13 +375,13 @@ function App() {
 
                             {/* CTAs  ·  fade out once features are shown */}
                             <div
-                                className="transition-all duration-500 flex flex-col items-center gap-4"
+                                className="transition-all duration-500 flex flex-col items-center gap-4 animate-fade-in"
                                 style={{ opacity: showFeatures ? 0 : 1, pointerEvents: showFeatures ? 'none' : 'auto', height: showFeatures ? 0 : 'auto', overflow: showFeatures ? 'hidden' : 'visible' }}
                             >
                                 {/* Primary: Start Learning */}
                                 <button
                                     onClick={() => goTo('tutor')}
-                                    className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-14 py-4 rounded-full text-sm md:text-base tracking-[0.2em] uppercase transition-all duration-500 transform hover:scale-105 shadow-[0_0_40px_rgba(200,148,31,0.35)]"
+                                    className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-14 py-4 rounded-full text-sm md:text-base tracking-[0.2em] uppercase transition-all duration-500 transform hover:scale-105 shadow-[0_0_40px_rgba(200,148,31,0.35)] cursor-pointer"
                                 >
                                     Start Learning
                                 </button>
@@ -371,9 +390,17 @@ function App() {
                                 {/* Secondary: All tools */}
                                 <button
                                     onClick={() => setShowFeatures(true)}
-                                    className="border border-c-gold/30 hover:border-c-gold/60 text-white/50 hover:text-[#f7d686] font-playfair px-8 py-2.5 rounded-full text-xs tracking-[0.2em] uppercase transition-all duration-500"
+                                    className="border border-c-gold/30 hover:border-c-gold/60 text-white/50 hover:text-[#f7d686] font-playfair px-8 py-2.5 rounded-full text-xs tracking-[0.2em] uppercase transition-all duration-500 cursor-pointer"
                                 >
                                     I already know Carnatic music →
+                                </button>
+
+                                {/* Tour Trigger Option */}
+                                <button
+                                    onClick={() => setTourActive(true)}
+                                    className="text-c-gold/80 hover:text-c-gold font-playfair px-6 py-2 text-xs tracking-[0.15em] uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer mt-1 hover:scale-105 active:scale-95"
+                                >
+                                    <span>🪔</span> Take a Guided Tour
                                 </button>
                             </div>
                         </div>

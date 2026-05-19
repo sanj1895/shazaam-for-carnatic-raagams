@@ -130,7 +130,7 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false }) {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 py-8 relative z-10">
+    <div id="tour-swara-keyboard" className="w-full max-w-5xl mx-auto px-4 py-8 relative z-10">
       {/* Header */}
       {!compact && (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-c-gold/20 pb-4">

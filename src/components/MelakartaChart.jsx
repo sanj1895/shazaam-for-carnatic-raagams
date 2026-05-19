@@ -172,12 +172,13 @@ const MelakartaChart = ({ onSelectRaga }) => {
                         placeholder="Search raga name or number..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-c-surface border border-c-gold/30 hover:border-c-gold/50 focus:border-c-gold text-c-cream text-xs px-3.5 py-2 rounded-xl focus:outline-none transition-all placeholder-white/20"
+                        className="w-full bg-c-surface border border-c-gold/30 hover:border-c-gold/50 focus:border-c-gold !text-c-cream text-xs px-3.5 py-2 rounded-xl focus:outline-none transition-all placeholder-c-cream-dark/45"
+                        style={{ color: '#1E0C04' }}
                     />
                     {searchQuery && (
                         <button 
                             onClick={() => setSearchQuery('')}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-white/40 hover:text-white"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-c-cream-dark/60 hover:text-c-cream transition-colors"
                         >
                             ✕
                         </button>

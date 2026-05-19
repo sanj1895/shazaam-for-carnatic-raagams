@@ -1477,7 +1477,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
     const NOTE_MS = BEAT_MS / speed;
 
     const [phase, setPhase] = useState('idle'); // idle | guide | countdown | singing | success | fail
-    const [countdown, setCountdown] = useState(3);
+    const [countdown, setCountdown] = useState(4);
     const [activeIdx, setActiveIdx] = useState(-1);
     const [statuses, setStatuses] = useState(swaras.map(() => null));
     const [micError, setMicError] = useState('');
@@ -1528,10 +1528,10 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             const ctx = getAudioCtx();
             
             setPhase('countdown');
-            setCountdown(3);
-            playTick(ctx, ctx.currentTime); // Play woodblock click on "3"
-            
-            let c = 3;
+            setCountdown(4);
+            playTick(ctx, ctx.currentTime); // Play woodblock click on "4"
+
+            let c = 4;
             const iv = setInterval(() => {
                 c--;
                 if (c > 0) {

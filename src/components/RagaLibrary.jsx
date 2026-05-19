@@ -191,29 +191,31 @@ const RagaLibrary = ({ onSelectRaga }) => {
 
     return (
         <div className="w-full max-w-5xl raga-library-container">
-            {/* Branded Header Section */}
-            <div className="flex flex-col items-center text-center gap-2 mb-8 border-b border-c-border/40 pb-6">
-                <div className="w-16 h-16 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-lg backdrop-blur-md relative group overflow-hidden">
-                    <div className="absolute inset-0 bg-c-gold/5 rounded-full animate-ping opacity-20 pointer-events-none" />
-                    <KoshaIcon className="w-10 h-10 relative z-10 transition-transform duration-500 group-hover:scale-110" />
+            {/* Compact Space-Efficient Dashboard Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-c-border pb-4 mb-5">
+                <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md backdrop-blur-md relative flex-shrink-0">
+                        <KoshaIcon className="w-7 h-7 relative z-10" />
+                    </div>
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                            <h1 className="font-playfair text-2xl font-bold tracking-wider text-[#f7d686] uppercase leading-none">Raga Kosha</h1>
+                            <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-[#f7d686] px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">The Treasury</span>
+                        </div>
+                        <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
+                            Practice and explore all 72 Melakarta parents and derived Janya ragams.
+                        </p>
+                    </div>
                 </div>
-                <h1 className="font-playfair text-3xl font-bold tracking-widest text-[#f7d686] uppercase mt-2">Raga Kosha</h1>
-                <p className="text-c-cream-dark text-xs uppercase tracking-[0.2em] font-medium opacity-80">The Treasury of Carnatic Music</p>
-                <p className="text-c-cream-dim text-[11px] max-w-md mt-1 leading-relaxed">
-                    Explore, search, and practice scales for all 72 Melakarta parent ragas and their hundreds of derived Janya ragams.
-                </p>
-            </div>
 
-            <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                
                 {/* Search Bar */}
-                <div className="relative w-full md:w-64">
+                <div className="relative w-full md:w-56">
                     <input
                         type="text"
                         placeholder="Search raagams..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-c-surface border border-c-border rounded-full py-2 pl-4 pr-10 text-xs text-c-cream focus:outline-none focus:border-c-gold/60 transition-colors shadow-inner"
+                        className="w-full bg-c-surface border border-c-border rounded-full py-1.5 pl-4 pr-10 text-xs text-c-cream focus:outline-none focus:border-c-gold/60 transition-colors shadow-inner"
                     />
                     {searchQuery && (
                         <button 

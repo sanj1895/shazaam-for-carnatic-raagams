@@ -667,15 +667,22 @@ function App() {
                     <main className="w-full max-w-2xl mx-auto flex flex-col items-center gap-7 px-4 md:px-8 py-10 animate-fade-in">
                         <div className="w-full flex flex-col items-center gap-7">
 
-                            {/* Branded Header Section */}
-                            <div className="flex flex-col items-center text-center gap-2 mb-2">
-                                <div className="w-16 h-16 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-lg backdrop-blur-md relative group overflow-hidden">
-                                    <div className="absolute inset-0 bg-c-gold/5 rounded-full animate-ping opacity-30 pointer-events-none" />
-                                    <DhwaniIcon className="w-10 h-10 relative z-10 transition-transform duration-500 group-hover:scale-110" />
+                            {/* Branded Header Section - Compact */}
+                            <div className="w-full flex items-center justify-between border-b border-c-border pb-3 mb-2">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md backdrop-blur-md relative flex-shrink-0">
+                                        <DhwaniIcon className="w-6 h-6 relative z-10" />
+                                    </div>
+                                    <div className="flex flex-col text-left">
+                                        <div className="flex items-center gap-2">
+                                            <h1 className="font-playfair text-xl font-bold tracking-wider text-[#f7d686] uppercase leading-none">Dhwani</h1>
+                                            <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-[#f7d686] px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Vocal</span>
+                                        </div>
+                                        <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-none">
+                                            Real-time vocal resonance and raga identifier.
+                                        </p>
+                                    </div>
                                 </div>
-                                <h1 className="font-playfair text-3xl font-bold tracking-widest text-[#f7d686] uppercase mt-2">Dhwani</h1>
-                                <p className="text-c-cream-dark text-xs uppercase tracking-[0.2em] font-medium opacity-80">Real-time Vocal Resonance</p>
-                                <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-c-gold/40 to-transparent mt-1" />
                             </div>
 
                             {/* How-to card */}

@@ -164,7 +164,7 @@ const RagaLibrary = ({ onSelectRaga }) => {
     });
 
     return (
-        <div className="w-full max-w-5xl">
+        <div className="w-full max-w-5xl raga-library-container">
             <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                     <h2 className="font-playfair text-2xl text-c-gold">Raagam Library</h2>

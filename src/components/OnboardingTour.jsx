@@ -7,7 +7,7 @@ const STEPS = [
     selector: '#tour-logo',
     icon: '🪔',
     title: 'Welcome to Alapana',
-    body: "Your complete digital Carnatic music companion. Let's take a quick guided tour to explore the practice console step-by-step!",
+    body: "Your premium, comprehensive digital Carnatic music companion. Let's take a deep-dive guided tour to explore all interactive features step-by-step!",
     isWelcome: true,
   },
   {
@@ -15,36 +15,99 @@ const STEPS = [
     selector: '.tour-sadhana-console',
     symbol: '🧘‍♀️',
     feature: 'Daily Sadhana',
-    title: 'Your Practice Path',
+    title: 'Daily Practice Path',
     body: "Every day, Alapana builds a custom vocal sequence for you — from warmups to ear training. Complete this routine to build your daily streak!",
-    hint: "Best way to build muscle memory and stay consistent",
+    hint: "Click practices below to mark them complete",
+  },
+  {
+    view: 'shruthi',
+    selector: '.shruthi-keypad-panel',
+    symbol: '🎹',
+    feature: 'Shruthi Tuning',
+    title: 'Tonic Pitch (Sa) Keys',
+    body: "Select your fundamental root key on the mini-keyboard or adjust tuning frequency. The continuous reference drones calibrate instantly to your vocal range!",
+    hint: "Calibrate men's preset to C4 and ladies' to G4 or G#4",
   },
   {
     view: 'shruthi',
     selector: '#tour-shruthi-box',
     symbol: '〜',
-    feature: 'Shruthi Box',
-    title: 'Continuous Reference Drone',
-    body: "The Shruthi Box plays high-fidelity reference drones. Singing along with the drone trains your ear and is the absolute foundation of Carnatic singing.",
+    feature: 'Reference Drone',
+    title: 'High-Fidelity Tambura Drones',
+    body: "Tambura reference drones play 4 classical strings (Low Sa, Pa, Sa, High Sa). Adjust individual volume sliders to blend strings into your dream backing baseline.",
     hint: 'Lock in your comfort pitch baseline first',
   },
   {
     view: 'tutor',
     selector: '#tour-tutor-container',
-    symbol: '◈',
-    feature: 'AI Vocal Tutor',
-    title: 'Step-by-Step AI Guide',
-    body: "Learn classical scales like Sarali Varisais. The AI Guru tracks your vocal pitch line in real time to evaluate stability, timing, and gamakam.",
+    symbol: '🎓',
+    feature: 'Vocal Tutor',
+    title: 'AI Vocal Tutor Curriculum',
+    body: "Learn classical lessons like Sarali Varisais. The AI Guru tracks your vocal pitch line in real time to evaluate stability, timing, and gamakam.",
     hint: 'Look for the golden real-time scrolling pitch wave!',
+  },
+  {
+    view: 'talam',
+    selector: '.talam-container',
+    symbol: '🥁',
+    feature: 'Talam',
+    title: 'Rhythmic Beat Visualizer',
+    body: "Carnatic music is governed by rhythmic cycles called Talam. Practice feeling the 8-beat Adi Tala and view dynamic visual hand taps!",
+    hint: 'Calibrate tempo with the BPM slider',
+  },
+  {
+    view: 'listen',
+    selector: '.pitch-detector-container',
+    symbol: '🎙️',
+    feature: 'Real-time Detector',
+    title: 'Sing to Identify Ragas',
+    body: "Sing any classical melody and Alapana will analyze your vocal frequency in real time, map it to relative swaras, and suggest matching Carnatic ragas!",
+    hint: "Hold notes steadily to see matching suggestions",
+  },
+  {
+    view: 'listen',
+    selector: '.groq-ai-container',
+    symbol: '🤖',
+    feature: 'Groq AI Analysis',
+    title: 'AI Guru Deep Analysis',
+    body: "Switch to Groq AI mode, record 30 seconds of your singing, and get deep qualitative feedback on voice quality, posture, and swara precision from your AI Guru.",
+    hint: 'Uses state-of-the-art models for feedback',
   },
   {
     view: 'keyboard',
     selector: '#tour-swara-keyboard',
-    symbol: '♩',
+    symbol: '🎹',
     feature: 'Swara Keyboard',
-    title: 'Microtonal Swaras Keyboard',
-    body: "Play individual relative swaras on a virtual keyboard and explore Sanskrit translations in the Swara Guide to understand scales deeply.",
-    hint: 'Tap "Swara Guide" to explore Sanskrit definitions',
+    title: 'Interactive Relative Swaras',
+    body: "Play individual swara steps on a virtual keyboard and toggle Gamakam ornamentation to understand scale dynamics and play along.",
+    hint: 'Play specific notes by clicking the keyboard pads',
+  },
+  {
+    view: 'keyboard',
+    selector: '.swara-guide-button',
+    symbol: '📖',
+    feature: 'Swara Guide',
+    title: 'Sanskrit & Western Translation',
+    body: "Tap the Swara Guide button to view detailed translations. It displays western frequencies alongside Sanskrit swarasthana definitions!",
+    hint: 'Perfect for beginners translating western scales',
+  },
+  {
+    view: 'library',
+    selector: '.raga-library-container',
+    symbol: '📚',
+    feature: 'Raga Library',
+    title: 'Raga Scale Library',
+    body: "Browse all major Carnatic ragas — including scale structures, famous compositions, moods, and standard practice templates with professional audio feedback!",
+    hint: 'Search by typing any raga name',
+  },
+  {
+    view: 'melakarta',
+    selector: '.raga-melakarta-chart',
+    symbol: '🗂️',
+    feature: '72 Melakarta',
+    title: 'Parent Melakarta Chart',
+    body: "Explore the foundational parent raga system. Learn the mathematical division of Carnatic scales and practice Graha Bhedam modal shifts!",
+    hint: 'Tap any melakarta card to view its scale',
   },
   {
     view: 'home',
@@ -56,7 +119,7 @@ const STEPS = [
   },
 ];
 
-export default function OnboardingTour({ active, onDismiss, onStartLearning, onGoTo }) {
+export default function OnboardingTour({ active, onDismiss, onStartLearning, onGoTo, onStepChange }) {
   const [step, setStep]       = useState(0);
   const [exiting, setExiting] = useState(false);
   const [highlightRect, setHighlightRect] = useState(null);
@@ -67,6 +130,7 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
       setStep(0);
       setExiting(false);
       onGoTo?.('home');
+      onStepChange?.(0);
     }
   }, [active]);
 
@@ -128,6 +192,7 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
       onGoTo?.(next.view);
     }
     setStep(nextIdx);
+    onStepChange?.(nextIdx);
   };
 
   const progressDots = (

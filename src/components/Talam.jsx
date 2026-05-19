@@ -171,7 +171,7 @@ export default function Talam() {
   });
 
   return (
-    <div className="w-full max-w-xl mx-auto px-4 py-8 space-y-8 relative z-10">
+    <div className="w-full max-w-xl mx-auto px-4 py-8 space-y-8 relative z-10 talam-container">
 
       {/* Header */}
       <div className="border-b border-c-gold/20 pb-4">

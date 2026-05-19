@@ -140,7 +140,7 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false }) {
             </h2>
             <button 
               onClick={() => setShowGuide(true)}
-              className="px-3 py-1 rounded-full border border-c-gold/40 hover:bg-c-gold/5 text-c-gold text-xs font-playfair italic transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+              className="px-3 py-1 rounded-full border border-c-gold/40 hover:bg-c-gold/5 text-c-gold text-xs font-playfair italic transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer swara-guide-button"
             >
               <span>📖</span> Swara Guide
             </button>

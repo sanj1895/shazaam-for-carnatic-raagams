@@ -165,6 +165,16 @@ function App() {
                     goTo('tutor');
                 }} 
                 onGoTo={goTo} 
+                onStepChange={(stepIndex) => {
+                    if (stepIndex === 6) {
+                        if (!saFrequency) setSaFrequency(240);
+                        setActiveMode('standard');
+                    }
+                    if (stepIndex === 7) {
+                        if (!saFrequency) setSaFrequency(240);
+                        setActiveMode('groq');
+                    }
+                }}
             />
 
             {/* ══ UNIFIED MODAL (PORTAL) ══ */}
@@ -604,7 +614,7 @@ function App() {
 
                                     <div className="w-full animate-fade-in">
                                         {activeMode === 'standard' ? (
-                                            <div className="flex flex-col items-center w-full">
+                                            <div className="flex flex-col items-center w-full pitch-detector-container">
                                                 <p className="text-[11px] text-c-cream-dark text-center font-playfair italic mb-5 opacity-80 max-w-sm">
                                                     Detects notes in real time as you sing. Great for beginners — just hold each note clearly and the raga builds up live.
                                                 </p>
@@ -616,7 +626,7 @@ function App() {
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="flex flex-col w-full">
+                                            <div className="flex flex-col w-full groq-ai-container">
                                                 <p className="text-[11px] text-c-cream-dark text-center font-playfair italic mb-5 opacity-80 max-w-sm mx-auto">
                                                     Records a 30-second phrase, then sends the note sequence to Groq AI for deeper analysis — better at catching fluid ornaments and complex phrases.
                                                 </p>
@@ -631,17 +641,17 @@ function App() {
                 )}
 
                 {view === 'library' && (
-                    <div className="w-full p-4 md:p-8 flex flex-col items-center animate-fade-in">
+                    <div className="w-full p-4 md:p-8 flex flex-col items-center animate-fade-in raga-library-container">
                         <RagaLibrary onSelectRaga={(r) => setSelectedRaga({ raga: r, hasClearMatch: true, type: 'library' })} />
                     </div>
                 )}
                 {view === 'melakarta' && (
-                    <div className="w-full p-4 md:p-8 flex flex-col items-center animate-fade-in">
+                    <div className="w-full p-4 md:p-8 flex flex-col items-center animate-fade-in raga-melakarta-chart">
                         <MelakartaChart onSelectRaga={(r) => setSelectedRaga({ raga: r, type: 'melakarta' })} />
                     </div>
                 )}
                 {view === 'keyboard' && (
-                    <div className="w-full p-4 md:p-8 flex flex-col items-center animate-fade-in">
+                    <div className="w-full p-4 md:p-8 flex flex-col items-center animate-fade-in swara-keyboard-container">
                         <SwaraKeyboard />
                     </div>
                 )}
@@ -686,7 +696,7 @@ function App() {
                         </div>
 
                         {/* Progress card — light theme */}
-                        <div className="w-full border border-c-border bg-c-card rounded-xl p-5 relative overflow-hidden mb-6">
+                        <div className="w-full border border-c-border bg-c-card rounded-xl p-5 relative overflow-hidden mb-6 tour-sadhana-console">
                             <div className="absolute inset-0 pointer-events-none">
                                 <div className="heritage-border-corner heritage-corner-tl" />
                                 <div className="heritage-border-corner heritage-corner-tr" />

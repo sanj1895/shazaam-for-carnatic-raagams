@@ -304,7 +304,7 @@ export default function ShruthiBox() {
       <div className="lg:flex lg:items-stretch">
 
       {/* ══════════════ TOP CONTROL PANEL (left col on desktop) ══════════════ */}
-      <div style={s.panel} className="lg:flex-1 [border-bottom:3px_solid_#b4a464] lg:[border-bottom:0] lg:[border-right:3px_solid_#b4a464]">
+      <div style={s.panel} className="lg:flex-1 [border-bottom:3px_solid_#b4a464] lg:[border-bottom:0] lg:[border-right:3px_solid_#b4a464] shruthi-keypad-panel">
 
         {/* Header strip */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 12 }}>

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { getAudioCtx, detectPitch, startDrone, SWARA_SEMITONE } from '../utils/audioUtils';
-import { getSwaram } from '../utils/ragaLogic';
+import { getAudioCtx, detectPitch, startDrone, SWARA_SEMITONE, playNote, getOctaveSequence } from '../utils/audioUtils';
+import { getSwaram, toSargam } from '../utils/ragaLogic';
 
 const GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY;
 const RECORD_SECS = 20;
@@ -67,6 +67,7 @@ export default function RagaPracticePanel({ raga, initialSaHz = 293.66 }) {
   const [feedback, setFeedback] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [liveNotes, setLiveNotes] = useState([]);
+  const [playingNote, setPlayingNote] = useState(null);
 
   const streamRef      = useRef(null);
   const droneStopRef   = useRef(null);
@@ -210,9 +211,6 @@ export default function RagaPracticePanel({ raga, initialSaHz = 293.66 }) {
       );
 
       // 2. Sequence alignment
-      const clean = arr => arr.filter(n => n !== '|' && n !== '||');
-      const expectedAro = clean(raga.arohanam);
-      const expectedAva = clean(raga.avarohanam);
       const detected = sequenceRef.current;
 
       const formatAlignment = (aligned) => aligned.map(({ note, hit }) => {
@@ -316,6 +314,47 @@ Tone: warm but direct. Address them as a serious student. Do not mention numbers
   const currentPitch = PITCHES.find(p => Math.abs(p.hz - saHz) < 1);
   const progressPct  = Math.round(((RECORD_SECS - countdown) / RECORD_SECS) * 100);
 
+  const clean = arr => arr.filter(n => n !== '|' && n !== '||');
+  const expectedAro = clean(raga.arohanam);
+  const expectedAva = clean(raga.avarohanam);
+
+  const aroOctaves = getOctaveSequence(expectedAro);
+  const avaOctaves = getOctaveSequence([...expectedAro, ...expectedAva]).slice(expectedAro.length);
+
+  const handleNotePlay = (note, octaveShift = 0) => {
+    const ctx = getAudioCtx();
+    const durationMs = playNote(note, saHz, ctx, { octaveShift });
+    setPlayingNote({ note, octaveShift });
+    setTimeout(() => setPlayingNote(null), durationMs);
+  };
+
+  const NoteKey = ({ note, octaveShift = 0 }) => {
+    const isPlaying = playingNote?.note === note && playingNote?.octaveShift === octaveShift;
+    const isSpecial = note === 'Sa' || note === 'Pa';
+    const sargam = toSargam ? toSargam(note) : note;
+
+    return (
+      <button
+        onMouseDown={() => handleNotePlay(note, octaveShift)}
+        onTouchStart={(e) => { e.preventDefault(); handleNotePlay(note, octaveShift); }}
+        className={[
+          'flex flex-col items-center justify-center',
+          'w-11 h-12 rounded border select-none cursor-pointer',
+          'transition-all duration-100 active:scale-95',
+          'font-playfair',
+          isPlaying
+            ? 'bg-c-gold border-c-gold text-c-bg scale-95 shadow-inner'
+            : isSpecial
+            ? 'bg-c-gold-faint border-c-gold text-c-gold'
+            : 'bg-c-card border-c-border text-c-cream hover:bg-c-surface hover:border-c-gold',
+        ].join(' ')}
+      >
+        <span className="text-sm font-bold leading-none mb-1">{sargam}</span>
+        <span className="text-[9px] opacity-70 leading-none">{note}</span>
+      </button>
+    );
+  };
+
   return (
     <div className="flex flex-col gap-5">
 
@@ -362,18 +401,40 @@ Tone: warm but direct. Address them as a serious student. Do not mention numbers
         {droneOn ? 'Drone playing — click to stop' : 'Play drone while you sing (recommended)'}
       </button>
 
-      {/* Idle */}
+      {/* Idle / Practice setup */}
       {phase === 'idle' && (
-        <div className="flex flex-col items-center gap-4 py-4">
-          <p className="text-xs text-c-cream-dim font-playfair italic text-center max-w-xs leading-relaxed">
-            Sing the arohanam and avarohanam of {raga.name} at your own pace. Hold each note clearly for at least one beat. Recording is {RECORD_SECS} seconds.
-          </p>
-          <button
-            onClick={startRecording}
-            className="px-8 py-2.5 border border-c-gold/60 hover:border-c-gold hover:bg-c-gold-faint text-c-gold text-sm rounded transition-all font-playfair tracking-wide"
-          >
-            Start Recording
-          </button>
+        <div className="flex flex-col gap-6 py-2">
+          <div className="space-y-4 border border-c-gold/20 rounded-xl p-4 bg-c-card/30">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-playfair font-bold text-c-gold uppercase tracking-widest">Arohanam</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {expectedAro.map((note, idx) => (
+                <NoteKey key={`aro-${idx}`} note={note} octaveShift={aroOctaves[idx]} />
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between mt-4">
+              <span className="text-xs font-playfair font-bold text-c-gold uppercase tracking-widest">Avarohanam</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {expectedAva.map((note, idx) => (
+                <NoteKey key={`ava-${idx}`} note={note} octaveShift={avaOctaves[idx]} />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center gap-4 py-2 border-t border-c-border pt-6">
+            <p className="text-xs text-c-cream-dim font-playfair italic text-center max-w-xs leading-relaxed">
+              Listen to the notes above, then sing the arohanam and avarohanam of {raga.name} at your own pace. Recording is {RECORD_SECS} seconds.
+            </p>
+            <button
+              onClick={startRecording}
+              className="px-8 py-2.5 border border-c-gold/60 hover:border-c-gold hover:bg-c-gold-faint text-c-gold text-sm rounded transition-all font-playfair tracking-wide"
+            >
+              Start Recording
+            </button>
+          </div>
         </div>
       )}
 

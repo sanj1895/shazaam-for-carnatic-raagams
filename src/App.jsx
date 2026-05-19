@@ -389,11 +389,56 @@ function App() {
                                 paddingBottom: showFeatures ? '2rem' : 0,
                             }}
                         >
-                            {/* Suggested path banner */}
-                            <div className="w-full max-w-4xl mb-5 px-1">
-                                <p className="text-white/35 text-[10px] font-playfair italic text-center tracking-wide">
-                                    Suggested path for beginners: <span className="text-c-gold/60">Tutor → Shruthi → Talam → Sing</span>
-                                </p>
+                            {/* Daily Guided Sadhana Dashboard Widget */}
+                            <div className="w-full max-w-4xl mb-6 border border-c-gold/30 bg-[#1e0c04] rounded-xl p-5 shadow-2xl relative overflow-hidden backdrop-blur-md z-10">
+                              {/* Heritage Corners */}
+                              <div className="absolute inset-0 pointer-events-none">
+                                <div className="heritage-border-corner heritage-corner-tl opacity-40" />
+                                <div className="heritage-border-corner heritage-corner-tr opacity-40" />
+                                <div className="heritage-border-corner heritage-corner-bl opacity-40" />
+                                <div className="heritage-border-corner heritage-corner-br opacity-40" />
+                              </div>
+
+                              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-c-gold/20 pb-3 mb-4">
+                                <div>
+                                  <span className="text-[9px] uppercase tracking-widest text-c-gold font-mono">Recommended Daily Sadhana</span>
+                                  <h3 className="font-playfair text-lg font-bold text-c-cream flex items-center gap-1.5 mt-0.5">
+                                    <span>🧘‍♀️</span> Guided Practice Path
+                                  </h3>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] text-c-cream-dim font-mono">Practice Streak: <strong>🔥 3 Days</strong></span>
+                                  <div className="w-20 h-1.5 bg-c-border/40 rounded-full overflow-hidden">
+                                    <div className="h-full bg-c-gold rounded-full w-[25%]" />
+                                  </div>
+                                  <span className="text-[9px] font-mono text-c-gold">25% Done</span>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                                {[
+                                  { step: '1', name: 'Tune & Warm Up', tab: 'shruthi', desc: 'Lock in your baseline with Shruthi Box', icon: '🎶' },
+                                  { step: '2', name: 'AI Vocal Tutor', tab: 'tutor', desc: 'Practice Sarali Varisai 1 (AI Guru)', icon: '🎓' },
+                                  { step: '3', name: 'Explore Scales', tab: 'keyboard', desc: 'Explore Shankarabharanam on Keyboard', icon: '🎹' },
+                                  { step: '4', name: 'Ear Training', tab: 'singback', desc: 'Test your pitch in Singback challenge', icon: '🎯' },
+                                ].map((item) => (
+                                  <button
+                                    key={item.step}
+                                    onClick={() => goTo(item.tab)}
+                                    className="flex gap-3 items-start p-3 bg-c-card/20 hover:bg-c-card/70 border border-c-border/15 hover:border-c-gold/40 rounded-lg text-left transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+                                  >
+                                    <div className="w-6 h-6 flex items-center justify-center rounded-full bg-c-gold/15 text-c-gold text-xs font-mono font-bold flex-shrink-0 mt-0.5">
+                                      {item.step}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="font-playfair text-xs font-bold text-c-cream flex items-center gap-1">
+                                        <span>{item.icon}</span> {item.name}
+                                      </div>
+                                      <p className="text-[10px] text-c-cream-dark leading-snug mt-0.5">{item.desc}</p>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
                             </div>
 
                             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 md:gap-8 w-full max-w-4xl mx-auto">

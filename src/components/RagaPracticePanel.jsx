@@ -74,6 +74,7 @@ export default function RagaPracticePanel({ raga, initialSaHz = 293.66, compactM
   const [liveNotes, setLiveNotes] = useState([]);
   const [playingNote, setPlayingNote] = useState(null);
   const [playingScale, setPlayingScale] = useState(false);
+  const [livePitchHistory, setLivePitchHistory] = useState([]);
 
   const streamRef      = useRef(null);
   const droneStopRef   = useRef(null);
@@ -120,6 +121,7 @@ export default function RagaPracticePanel({ raga, initialSaHz = 293.66, compactM
     setErrorMsg('');
     setFeedback('');
     setLiveNotes([]);
+    setLivePitchHistory([]);
     pitchHistRef.current  = [];
     harmonicHist.current  = [];
     rmsHist.current       = [];
@@ -154,11 +156,16 @@ export default function RagaPracticePanel({ raga, initialSaHz = 293.66, compactM
         rmsHist.current.push(rms);
 
         const isSinging = rms * 1200 > 5;
+        let activeFreq = 0;
+        let activeSwara = '';
+
         if (isSinging) {
           const freq = detectPitch(analyser, ctx.sampleRate);
           if (freq && freq >= 80 && freq <= 800) {
             const swara = getSwaram(freq, saHz);
             if (swara) {
+              activeFreq = freq;
+              activeSwara = swara;
               const targetFreq = saHz * Math.pow(2, (SWARA_SEMITONE[swara] ?? 0) / 12);
               const devCents = 1200 * Math.log2(freq / targetFreq);
               pitchHistRef.current.push({ swara, devCents, freq, time: Date.now() });
@@ -178,12 +185,20 @@ export default function RagaPracticePanel({ raga, initialSaHz = 293.66, compactM
                   setLiveNotes([...sequenceRef.current].slice(-7));
                 }
               }
-              return;
             }
           }
         }
-        silenceCt.current++;
-        if (silenceCt.current >= 4) { candidateRef.current = null; candidateCt.current = 0; }
+
+        if (!activeFreq) {
+          silenceCt.current++;
+          if (silenceCt.current >= 4) { candidateRef.current = null; candidateCt.current = 0; }
+        }
+
+        setLivePitchHistory(prev => {
+          const next = [...prev, { freq: activeFreq, swara: activeSwara, time: Date.now() }];
+          if (next.length > 50) return next.slice(-50);
+          return next;
+        });
       }, 50);
     } catch {
       setErrorMsg('Microphone access required. Please allow mic and try again.');
@@ -487,7 +502,7 @@ Tone: warm but direct. Address them as a serious student. Do not mention numbers
 
       {/* Recording */}
       {phase === 'recording' && (
-        <div className="flex flex-col items-center gap-4 py-2">
+        <div className="flex flex-col items-center gap-4 py-2 w-full">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
             <span className="text-c-cream text-sm font-playfair italic">Recording…</span>
@@ -496,14 +511,90 @@ Tone: warm but direct. Address them as a serious student. Do not mention numbers
           <div className="w-full h-1 bg-c-border rounded-full overflow-hidden">
             <div className="h-full bg-c-gold transition-all duration-1000 rounded-full" style={{ width: `${progressPct}%` }} />
           </div>
-          <div className="h-5 flex items-center justify-center w-full">
+
+          {/* Scrolling Pitch Ribbon SVG */}
+          <div className="w-full bg-c-card/40 border border-c-border/30 rounded-xl p-4 shadow-inner relative overflow-hidden mt-1 backdrop-blur-sm">
+            <span className="absolute top-2.5 left-3 text-[9px] uppercase tracking-widest text-c-gold/60 font-mono z-10">Live Pitch Ribbon</span>
+            <svg viewBox="0 0 400 120" className="w-full h-[120px] overflow-visible">
+              {/* Guidelines for expected swaras in the scale */}
+              {(() => {
+                const uniqueNotes = Array.from(new Set([...expectedAro, ...expectedAva]));
+                return uniqueNotes.map((note) => {
+                  const semi = SWARA_SEMITONE[note] ?? 0;
+                  const y = 100 - (semi / 12) * 85; // Map relative semitones up to octave Sa (12 semitones)
+                  if (y < 5 || y > 115) return null;
+                  const sargam = toSargam ? toSargam(note) : note;
+                  return (
+                    <g key={note}>
+                      <line 
+                        x1="35" y1={y} x2="400" y2={y} 
+                        stroke="#b88014" strokeWidth="0.5" strokeDasharray="3,3" className="opacity-30" 
+                      />
+                      <text 
+                        x="5" y={y + 3} 
+                        fill="#f7d686" className="font-playfair text-[9px] font-bold opacity-75"
+                      >
+                        {sargam}
+                      </text>
+                    </g>
+                  );
+                });
+              })()}
+
+              {/* Scrolling pitch wave path */}
+              {(() => {
+                const points = [];
+                livePitchHistory.forEach((pt, idx) => {
+                  if (pt.freq > 0) {
+                    const semi = 12 * Math.log2(pt.freq / saHz);
+                    const x = 40 + (idx / 50) * 350;
+                    const y = 100 - (semi / 12) * 85;
+                    if (y >= 0 && y <= 120) {
+                      points.push(`${x},${y}`);
+                    }
+                  }
+                });
+
+                if (points.length < 2) return null;
+                const pathData = `M ${points.join(' L ')}`;
+                const lastPoint = points[points.length - 1].split(',');
+
+                return (
+                  <g>
+                    {/* Glowing background path */}
+                    <path 
+                      d={pathData} 
+                      fill="none" stroke="#f7d686" strokeWidth="3" 
+                      className="opacity-20 blur-sm" 
+                    />
+                    {/* Sharp foreground path */}
+                    <path 
+                      d={pathData} 
+                      fill="none" stroke="#c8941f" strokeWidth="1.8" 
+                      strokeLinecap="round" strokeLinejoin="round" 
+                    />
+                    {/* Current location pulsing cursor */}
+                    {lastPoint && (
+                      <circle 
+                        cx={lastPoint[0]} cy={lastPoint[1]} r="3.5" 
+                        fill="#f7d686" className="animate-pulse shadow-md"
+                        style={{ filter: 'drop-shadow(0 0 6px #c8941f)' }}
+                      />
+                    )}
+                  </g>
+                );
+              })()}
+            </svg>
+          </div>
+
+          <div className="h-5 flex items-center justify-center w-full mt-1">
             <p className="text-[11px] text-c-cream-dim tracking-widest">
               {liveNotes.length > 0 ? liveNotes.join(' · ') : 'Listening…'}
             </p>
           </div>
           <button
             onClick={stopAndAnalyze}
-            className="text-xs text-c-cream-dark hover:text-c-gold transition-colors underline underline-offset-2"
+            className="text-xs text-c-cream-dark hover:text-c-gold transition-colors underline underline-offset-2 mt-1"
           >
             Done early · analyze now
           </button>

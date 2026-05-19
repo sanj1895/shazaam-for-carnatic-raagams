@@ -3105,14 +3105,10 @@ function RagaPractice({ sa }) {
     return (
         <div className="w-full max-w-2xl flex flex-col gap-4">
             <div className="bg-c-gold-faint border border-c-gold/30 p-3 rounded-lg flex gap-3 items-start mb-2">
-                <span className="text-c-gold mt-0.5">ℹ️</span>
+                <svg className="w-4 h-4 text-c-gold mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <p className="text-xs text-c-cream-dim leading-relaxed">
                     This section is for users who are already well-versed and want to practice different raagams. Beginners should complete the Curriculum first!
                 </p>
-            </div>
-            <div>
-                <h3 className="font-playfair text-xl text-c-gold">Raga Practice</h3>
-                <p className="text-c-cream-dark text-xs mt-1">Choose any raga — hear its scale, then sing each note.</p>
             </div>
             <input
                 type="text"
@@ -3529,12 +3525,12 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
                 <div className="w-full max-w-2xl">
                     <div className="flex gap-1 border-b border-c-border mb-6">
                         {[
-                            { id: 'curriculum', label: 'Svara Sadhana (Curriculum)', icon: (
+                            { id: 'curriculum', label: 'Curriculum', icon: (
                                 <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
                                 </svg>
                             )},
-                            { id: 'practice', label: 'Scale Flow (Arohanam/Avarohanam)', icon: (
+                            { id: 'practice', label: 'Raga Practice', icon: (
                                 <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M2 12 C5 6, 9 6, 12 12 S19 18, 22 12" />
                                 </svg>

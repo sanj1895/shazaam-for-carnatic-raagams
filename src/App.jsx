@@ -49,7 +49,7 @@ const GurukulIcon = ({ className = "w-5 h-5" }) => (
     </svg>
 );
 
-const AlaapIcon = ({ className = "w-5 h-5" }) => (
+const DhwaniIcon = ({ className = "w-5 h-5" }) => (
     <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
         {/* The Flute (Pullanguzhal) slanting across */}
         <line x1="12" y1="52" x2="52" y2="12" stroke="currentColor" strokeWidth="3.5" />
@@ -94,7 +94,7 @@ const KoshaIcon = ({ className = "w-5 h-5" }) => (
 
 const FEATURES = [
     { id: 'tutor',     label: 'Gurukul',      desc: 'Classical vocal academy & scale flow', symbol: '📿',  mobileSymbol: '📿', level: 'beginner', highlight: true },
-    { id: 'listen',    label: 'Alaap',        desc: 'Sing a melody & identify the raga',       symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
+    { id: 'listen',    label: 'Dhwani',       desc: 'Sing a melody & identify the raga',       symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
     { id: 'library',   label: 'Raga Kosha',   desc: 'Explore & practice every raga scale',    symbol: '◈',  mobileSymbol: '◈', level: 'all', highlight: true },
     { id: 'sadhana',   label: 'Sadhana',      desc: 'Your recommended daily practice path',    symbol: '🧘‍♀️', mobileSymbol: '🧘‍♀️', level: 'start' },
     { id: 'shruthi',   label: 'Shruthi',      desc: 'Continuous drone for practice',          symbol: '〜', mobileSymbol: '🎵', level: 'beginner' },
@@ -440,7 +440,7 @@ function App() {
                             {mobileSymbol === '📿' ? (
                                 <GurukulIcon className="w-4 h-4" />
                             ) : mobileSymbol === '♬' ? (
-                                <AlaapIcon className="w-4 h-4" />
+                                <DhwaniIcon className="w-4 h-4" />
                             ) : mobileSymbol === '◈' ? (
                                 <KoshaIcon className="w-4 h-4" />
                             ) : (
@@ -618,7 +618,7 @@ function App() {
                                         {symbol === '📿' ? (
                                             <GurukulIcon className="w-8 h-8 sm:w-10 sm:h-10" />
                                         ) : symbol === '♬' ? (
-                                            <AlaapIcon className="w-8 h-8 sm:w-10 sm:h-10" />
+                                            <DhwaniIcon className="w-8 h-8 sm:w-10 sm:h-10" />
                                         ) : symbol === '◈' ? (
                                             <KoshaIcon className="w-8 h-8 sm:w-10 sm:h-10" />
                                         ) : (
@@ -655,10 +655,10 @@ function App() {
                             {/* How-to card */}
                             <div className="w-full bg-c-gold-faint border border-c-gold/25 rounded-xl p-4 flex gap-3.5 items-start">
                                 <div className="text-c-gold flex-shrink-0 mt-0.5">
-                                    <AlaapIcon className="w-5 h-5" />
+                                    <DhwaniIcon className="w-5 h-5" />
                                 </div>
                                 <div className="flex flex-col gap-2.5">
-                                    <p className="font-playfair text-c-cream text-sm font-bold">Alaap: Real-time Raga Recognition</p>
+                                    <p className="font-playfair text-c-cream text-sm font-bold">Dhwani: Real-time Raga Recognition</p>
                                     <p className="text-c-cream-dim text-xs leading-relaxed">
                                         Sing any Carnatic melody and Alapana listens in real time, detecting each note and matching them to a raga.
                                     </p>

@@ -52,9 +52,9 @@ const STEPS = [
   {
     view: 'listen',
     symbol: '♬',
-    feature: 'Alaap',
+    feature: 'Dhwani',
     title: 'Real-time AI Identification',
-    body: "Sing any Carnatic melody and Alaap listens in real time, detecting your notes and matching them to a raga. There's also an advanced Groq AI mode to capture subtle ornamentations.",
+    body: "Sing any Carnatic melody and Dhwani listens in real time, detecting your notes and matching them to a raga. There's also an advanced Groq AI mode to capture subtle ornamentations.",
     hint: 'Set your Sa first — it calibrates to your voice',
   },
   {

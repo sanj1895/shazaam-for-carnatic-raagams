@@ -181,23 +181,22 @@ function App() {
             singback: { title: 'Ear Training Challenge Complete', stepName: 'Step 4' },
         };
 
-        let didCompleteNew = false;
+        // Read current state synchronously before the update — reliable in React 18 concurrent mode
+        if (sadhana.completed.includes(tab)) return;
+
         setSadhana(prev => {
             if (prev.completed.includes(tab)) return prev;
-            didCompleteNew = true;
             const next = { ...prev, completed: [...prev.completed, tab] };
             localStorage.setItem('alapana_sadhana_v1', JSON.stringify(next));
             return next;
         });
 
-        if (didCompleteNew && detailsMap[tab]) {
+        if (detailsMap[tab]) {
             setSadhanaToast({
                 title: detailsMap[tab].title,
                 stepName: detailsMap[tab].stepName
             });
-            setTimeout(() => {
-                setSadhanaToast(null);
-            }, 4000);
+            setTimeout(() => setSadhanaToast(null), 4000);
         }
     };
 

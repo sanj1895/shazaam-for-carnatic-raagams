@@ -1632,7 +1632,7 @@ function playTick(ctx, time) {
     oscClick.stop(time + 0.015);
 }
 
-function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swaras', onDone }) {
+function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swaras', _slowPass = false, onDone }) {
     const [tempoMult, setTempoMult] = useState(1);
     const tempoMultRef = useRef(1); // ref so startRecording/playGuide always read the latest value
 
@@ -1823,6 +1823,11 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
 
     return (
         <div className="flex flex-col items-center gap-6 w-full">
+            {_slowPass && (
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest bg-c-gold/15 border border-c-gold/40 text-c-gold px-3 py-1 rounded-full">
+                    ◎ Slow Practice Pass
+                </span>
+            )}
             <p className="text-c-cream-dark text-sm font-playfair italic text-center leading-relaxed">{instruction}</p>
             
             {(() => {
@@ -2640,7 +2645,25 @@ You did a wonderful job bringing a bright and sweet energy to your singing. To m
 
 function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete }) {
     const [idx, setIdx] = useState(0);
-    const exercises = lesson.exercises;
+
+    // Scaffold: insert a slow-tempo warm-up pass before every sing_sequence that
+    // directly follows a listen_sequence, so learners have time to absorb before
+    // performing at full speed.
+    const exercises = [];
+    for (let i = 0; i < lesson.exercises.length; i++) {
+        const ex = lesson.exercises[i];
+        const prev = lesson.exercises[i - 1];
+        if (ex.type === 'sing_sequence' && prev?.type === 'listen_sequence') {
+            exercises.push({
+                ...ex,
+                speed: 0.65,
+                instruction: 'Slow practice — find each note carefully at a relaxed pace. Accuracy over tempo.',
+                _slowPass: true,
+            });
+        }
+        exercises.push(ex);
+    }
+
     const ex = exercises[idx];
     const pct = Math.round((idx / exercises.length) * 100);
 
@@ -2673,7 +2696,8 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete
             }
             return <ExerciseListen key={key} {...ex} sa={sa} onDone={next} />;
         }
-        if (ex.type === 'listen_sequence') return <ExerciseListenSequence key={key} {...ex} sa={sa} onDone={next} />;
+        if (ex.type === 'listen_sequence') return <ExerciseListenSequence key={key} {...ex} sa={sa} onDone={next}
+            instruction={(ex.instruction || '') + ' Replay as many times as you need, and use the speed slider to go slower.'} />;
         if (ex.type === 'identify')        return <ExerciseIdentify       key={key} {...ex} sa={sa} onDone={next} />;
         if (ex.type === 'compare')         return <ExerciseCompare        key={key} {...ex} sa={sa} onDone={next} />;
         if (ex.type === 'free_sing')       return <ExerciseFreeSing       key={key} {...ex} sa={sa} onDone={next} />;

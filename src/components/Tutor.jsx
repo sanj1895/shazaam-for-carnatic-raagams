@@ -1359,94 +1359,71 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
                     c.fillStyle = 'rgba(16, 185, 129, 0.1)';
                     c.fillRect(0, H/2 - (H*pTol/2), W, H*pTol);
                 } else {
-                    // Draw glowing, oscillating golden Gamakam guideline path!
-                    c.beginPath();
-                    c.lineWidth = 3.5;
-                    c.strokeStyle = 'rgba(247, 214, 134, 0.3)'; // Golden transparent
-                    c.shadowColor = '#f7d686';
-                    c.shadowBlur = 10;
-                    c.lineJoin = 'round';
+                    // Draw a gorgeous, wide, glowing golden "Expressive Corridor"!
+                    // This visually signals: "This is your soulful playground where you can slide, oscillate, and breathe!"
+                    const corridorCents = 85; 
+                    const hTol = (corridorCents / 150) * (H / 2);
                     
-                    let firstGuide = true;
-                    const MAX_PTS = 150;
-                    
-                    for (let i = 0; i < MAX_PTS; i++) {
-                        const x = (i / MAX_PTS) * W;
-                        // Map expected wave position based on historical timestamp of each point in grid
-                        const ageMs = (MAX_PTS - i) * 40;
-                        const pointTime = Date.now() - ageMs;
-                        // Perfect 4.5Hz Carnatic oscillation wave between -35 and +35 cents
-                        const targetCents = 35 * Math.sin(pointTime / 220);
-                        const y = H/2 - (targetCents / 150) * (H/2);
-                        
-                        if (firstGuide) {
-                            c.moveTo(x, y);
-                            firstGuide = false;
-                        } else {
-                            c.lineTo(x, y);
-                        }
-                    }
-                    c.stroke();
-                    c.shadowBlur = 0; // reset glow
+                    // Semi-transparent golden glow fill
+                    c.fillStyle = 'rgba(247, 214, 134, 0.07)';
+                    c.fillRect(0, H/2 - hTol, W, hTol * 2);
 
-                    // Dynamic tolerance shadow envelope around the wave
+                    // Dual golden outline borders for the expressive corridor
                     c.beginPath();
-                    c.strokeStyle = 'rgba(16, 185, 129, 0.04)';
-                    c.lineWidth = H * (TOLERANCE / 150);
-                    let firstEnv = true;
-                    const MAX_PTS_ENV = 150;
-                    for (let i = 0; i < MAX_PTS_ENV; i++) {
-                        const x = (i / MAX_PTS_ENV) * W;
-                        const ageMs = (MAX_PTS_ENV - i) * 40;
-                        const pointTime = Date.now() - ageMs;
-                        const targetCents = 35 * Math.sin(pointTime / 220);
-                        const y = H/2 - (targetCents / 150) * (H/2);
-                        if (firstEnv) {
-                            c.moveTo(x, y);
-                            firstEnv = false;
-                        } else {
-                            c.lineTo(x, y);
-                        }
-                    }
+                    c.strokeStyle = 'rgba(247, 214, 134, 0.3)';
+                    c.lineWidth = 1.5;
+                    c.moveTo(0, H/2 - hTol);
+                    c.lineTo(W, H/2 - hTol);
+                    c.moveTo(0, H/2 + hTol);
+                    c.lineTo(W, H/2 + hTol);
                     c.stroke();
+
+                    // Center line anchor (highly transparent/dashed)
+                    c.beginPath();
+                    c.strokeStyle = 'rgba(247, 214, 134, 0.15)';
+                    c.setLineDash([5, 5]);
+                    c.moveTo(0, H/2);
+                    c.lineTo(W, H/2);
+                    c.stroke();
+                    c.setLineDash([]);
                 }
 
-                // History line
-                c.beginPath();
-                c.lineWidth = 3;
-                c.lineJoin = 'round';
-                let first = true;
+                // Draw user history line segment-by-segment to show dynamic, glowing colors
                 const pts = historyRef.current;
                 const MAX_PTS = 150;
                 
-                for (let i = 0; i < pts.length; i++) {
-                    if (pts[i] === 999) {
-                        first = true;
-                        continue;
-                    }
-                    const x = (i / MAX_PTS) * W;
-                    const clamped = Math.max(-150, Math.min(150, pts[i]));
-                    const y = H/2 - (clamped / 150) * (H/2);
+                for (let i = 1; i < pts.length; i++) {
+                    if (pts[i] === 999 || pts[i-1] === 999) continue;
                     
-                    // Highlight green if they match the active target curve within tolerance!
-                    const ageMs = (pts.length - i) * 40;
-                    const pointTime = Date.now() - ageMs;
-                    const targetCents = gamakamEnabled ? 35 * Math.sin(pointTime / 220) : 0;
+                    const x1 = ((i - 1) / MAX_PTS) * W;
+                    const y1 = H/2 - (Math.max(-150, Math.min(150, pts[i-1])) / 150) * (H/2);
+                    const x2 = (i / MAX_PTS) * W;
+                    const y2 = H/2 - (Math.max(-150, Math.min(150, pts[i])) / 150) * (H/2);
                     
-                    if (Math.abs(pts[i] - targetCents) <= TOLERANCE) {
-                        c.strokeStyle = '#10b981';
+                    // Relaxed tolerance in Gamakam Mode (+/- 85 cents) to accommodate beautiful personal expression
+                    const devLimit = gamakamEnabled ? 85 : TOLERANCE;
+                    const isWithin = Math.abs(pts[i]) <= devLimit;
+                    
+                    c.beginPath();
+                    c.lineWidth = 3.5;
+                    c.lineCap = 'round';
+                    c.lineJoin = 'round';
+                    
+                    if (isWithin) {
+                        c.strokeStyle = 'rgba(16, 185, 129, 0.9)'; // Glowing emerald
+                        c.shadowColor = '#10b981';
+                        c.shadowBlur = 6;
                     } else {
-                        c.strokeStyle = '#ef4444';
+                        c.strokeStyle = 'rgba(239, 68, 68, 0.8)'; // Red
+                        c.shadowColor = '#ef4444';
+                        c.shadowBlur = 2;
                     }
                     
-                    if (first) {
-                        c.moveTo(x, y);
-                        first = false;
-                    } else {
-                        c.lineTo(x, y);
-                    }
+                    c.moveTo(x1, y1);
+                    c.lineTo(x2, y2);
+                    c.stroke();
                 }
-                c.stroke();
+                c.shadowBlur = 0; // reset glow
             };
 
             const loop = (time) => {
@@ -1459,9 +1436,11 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
                     if (freq && freq > 50 && freq < 2200) {
                         diff = centsToNearest(freq, targetSt, sa);
                         
-                        // Compare voice pitch against the golden target wave
-                        const targetCents = gamakamEnabled ? 35 * Math.sin(Date.now() / 220) : 0;
-                        const matchError = Math.abs(diff - targetCents);
+                        // In Gamakam Mode, we evaluate how beautifully they anchor around the core swara 
+                        // while allowing fluid artistic ornamentation (+/- 85 cents deviation). 
+                        // We also apply a supportive cushion of 20 cents so expressive glides are rewarded!
+                        const devLimit = gamakamEnabled ? 85 : TOLERANCE;
+                        const matchError = Math.max(0, Math.abs(diff) - (gamakamEnabled ? 20 : 0));
                         
                         // Real-time tracking accuracy
                         const currentAcc = Math.max(0, 100 - (matchError / 1.5));
@@ -1470,7 +1449,7 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
                             return Math.round(prev * 0.9 + currentAcc * 0.1); // Smooth EMA
                         });
 
-                        if (matchError <= TOLERANCE) {
+                        if (Math.abs(diff) <= devLimit) {
                             heldRef.current += 40;
                         } else {
                             heldRef.current = Math.max(0, heldRef.current - 15);
@@ -1553,9 +1532,17 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
                         Start singing
                     </button>
                     {gamakamEnabled && (
-                        <p className="text-[11px] text-[#b8831a] font-playfair italic text-center animate-fade-in font-semibold">
-                            ✦ Trace the glowing golden curve with your voice.
-                        </p>
+                        <div className="bg-c-gold/5 border border-c-gold/25 rounded-xl p-3.5 max-w-sm text-left animate-fade-in space-y-1.5 shadow-sm">
+                            <h5 className="text-[11px] font-playfair font-bold text-c-gold tracking-wider uppercase flex items-center gap-1.5">
+                                🌊 Soulful Gamakam Mode
+                            </h5>
+                            <p className="text-[10px] text-c-cream font-playfair italic leading-relaxed">
+                                Gamakam is the beautiful ornamentation, sliding, and breathing between notes. In Carnatic music, it is deeply personal and expressive—there is no single mechanical way to sing it!
+                            </p>
+                            <p className="text-[10px] text-[#b8831a] font-playfair italic leading-relaxed font-semibold">
+                                ✦ Practice your personal glides and slides inside the glowing golden visual corridor. The AI Guru will check your core swara anchor while celebrating your creative expression!
+                            </p>
+                        </div>
                     )}
                 </div>
             )}

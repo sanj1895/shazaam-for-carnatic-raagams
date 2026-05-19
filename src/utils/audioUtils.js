@@ -79,43 +79,30 @@ export function playNote(note, saHz, ctx, options = {}) {
   masterGain.connect(bodyFilter);
   bodyFilter.connect(audioCtx.destination);
 
-  const vibratoLfo = gamakam ? audioCtx.createOscillator() : null;
-  const vibratoGain = gamakam ? audioCtx.createGain() : null;
-
-  if (gamakam) {
-    // Melodic Vibrato: variable speed for human drift
-    const lfoFreq = 5.1 + Math.random() * 0.9;
-    vibratoLfo.type = 'sine';
-    vibratoLfo.frequency.setValueAtTime(lfoFreq, now);
-    vibratoLfo.frequency.linearRampToValueAtTime(lfoFreq + 0.6, now + duration);
-    vibratoLfo.connect(vibratoGain);
-    vibratoLfo.start(now);
-    vibratoLfo.stop(now + duration + 0.2);
-  }
-
   const makeOsc = (targetFreq, type, gainAmt, detune = 0) => {
     const osc = audioCtx.createOscillator();
     osc.type = type;
     osc.detune.setValueAtTime(detune, now);
 
     if (gamakam) {
-      // Fluid Jaaru: wide, vocal-like slides
-      const jaaruOffset = slideDir >= 0 ? -50 : 45;
+      // Organic Vocal slide (Jaaru) & Expressive Breath Curve
+      // Instead of robotic continuous wobbling, we do a beautiful slide-in, 
+      // followed by a single-cycle warm breath oscillation that gently settles back.
+      const jaaruOffset = slideDir >= 0 ? -70 : 60; // Wider slide for natural legato
       const startFreq = targetFreq * Math.pow(2, jaaruOffset / 1200);
-      const slideDuration = 0.22; // Longer slide for flute-like fluidity
+      const slideDuration = 0.22;
       
       osc.frequency.setValueAtTime(startFreq, now);
-      osc.frequency.exponentialRampToValueAtTime(targetFreq * 1.004, now + slideDuration * 0.8);
-      osc.frequency.linearRampToValueAtTime(targetFreq, now + slideDuration);
-
-      const depth = targetFreq * (0.01 + Math.random() * 0.005);
-      const individualGain = audioCtx.createGain();
-      individualGain.gain.setValueAtTime(0.0001, now);
-      individualGain.gain.linearRampToValueAtTime(0.0001, now + slideDuration * 0.5);
-      individualGain.gain.exponentialRampToValueAtTime(depth, now + slideDuration + 0.2);
+      // Legato slide in
+      osc.frequency.exponentialRampToValueAtTime(targetFreq, now + slideDuration);
       
-      vibratoLfo.connect(individualGain);
-      individualGain.connect(osc.frequency);
+      // Soulful micro-ornamentation: single-cycle breath swell
+      if (duration > 0.5) {
+        const ornamentStart = now + slideDuration + 0.05;
+        osc.frequency.linearRampToValueAtTime(targetFreq * 1.012, ornamentStart + 0.12);
+        osc.frequency.linearRampToValueAtTime(targetFreq * 0.988, ornamentStart + 0.24);
+        osc.frequency.exponentialRampToValueAtTime(targetFreq, ornamentStart + 0.4);
+      }
     } else {
       osc.frequency.setValueAtTime(targetFreq, now);
     }

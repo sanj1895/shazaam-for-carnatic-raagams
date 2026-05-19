@@ -199,8 +199,8 @@ const RagaLibrary = ({ onSelectRaga }) => {
                     </div>
                     <div className="flex flex-col">
                         <div className="flex items-center gap-2">
-                            <h1 className="font-playfair text-2xl font-bold tracking-wider text-[#f7d686] uppercase leading-none">Raga Kosha</h1>
-                            <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-[#f7d686] px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">The Treasury</span>
+                            <h1 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Raga Kosha</h1>
+                            <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">The Treasury</span>
                         </div>
                         <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
                             Practice and explore all 72 Melakarta parents and derived Janya ragams.

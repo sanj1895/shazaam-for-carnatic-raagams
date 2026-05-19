@@ -676,8 +676,8 @@ function App() {
                                     </div>
                                     <div className="flex flex-col text-left">
                                         <div className="flex items-center gap-2">
-                                            <h1 className="font-playfair text-xl font-bold tracking-wider text-[#f7d686] uppercase leading-none">Dhwani</h1>
-                                            <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-[#f7d686] px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Vocal</span>
+                                            <h1 className="font-playfair text-xl font-bold tracking-wider text-c-gold uppercase leading-none">Dhwani</h1>
+                                            <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Vocal</span>
                                         </div>
                                         <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-none">
                                             Real-time vocal resonance and raga identifier.
@@ -688,10 +688,10 @@ function App() {
                                 {/* Collapsible guide toggler button */}
                                 <button
                                     onClick={() => setShowGuide(!showGuide)}
-                                    className="px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider bg-c-gold/15 text-[#f7d686] border border-c-gold/20 hover:bg-c-gold/25 transition-all flex items-center gap-1.5"
+                                    className="px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider bg-c-gold/15 text-c-gold border border-c-gold/30 hover:bg-c-gold/25 transition-all flex items-center gap-1.5 cursor-pointer"
                                 >
                                     <span>🛈 {showGuide ? "Hide Guide" : "How to Sing"}</span>
-                                    <span className="opacity-70">{showGuide ? "▲" : "▼"}</span>
+                                    <span className="opacity-80">{showGuide ? "▲" : "▼"}</span>
                                 </button>
                             </div>
 

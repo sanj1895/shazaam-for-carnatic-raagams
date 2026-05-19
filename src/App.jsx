@@ -121,7 +121,7 @@ function App() {
 
     return (
         <>
-            <OnboardingTour onStartLearning={() => goTo('tutor')} />
+            <OnboardingTour onStartLearning={() => goTo('tutor')} onGoTo={goTo} />
 
             {/* ══ UNIFIED MODAL (PORTAL) ══ */}
             {selectedRaga && createPortal(

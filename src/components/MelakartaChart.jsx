@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CuratedIcon } from './IconLibrary';
+import SketchyRule from './SketchyRule';
 
 // All 72 Melakarta ragas in order (row = Ri/Ga group, col = Da/Ni group)
 const MELAKARTA_NAMES = [
@@ -193,6 +194,7 @@ const MelakartaChart = ({ onSelectRaga }) => {
                     )}
                 </div>
             </div>
+            <SketchyRule className="mb-4 opacity-60" />
 
             {/* Ma1 section */}
             <div className="mb-8">

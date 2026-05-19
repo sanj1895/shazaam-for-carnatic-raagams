@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { RAGAS, toSargam } from '../utils/ragaLogic';
 import { playSequence, getAudioCtx, detectPitch, SWARA_SEMITONE } from '../utils/audioUtils';
 import { CuratedIcon } from './IconLibrary';
+import SketchyRule from './SketchyRule';
 
 const ragaNames = Object.keys(RAGAS).sort();
 const DIFFICULTIES = [
@@ -172,7 +173,7 @@ export default function SingBackChallenge({ onSadhanaComplete }) {
 
     return (
         <div className="w-full max-w-2xl mx-auto px-4 py-8 space-y-8 relative z-10">
-            <div className="w-full flex items-center gap-4 border-b border-c-border pb-4">
+            <div className="w-full flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
                     <CuratedIcon icon="singback" className="w-7 h-7" />
                 </div>
@@ -186,6 +187,7 @@ export default function SingBackChallenge({ onSadhanaComplete }) {
                     </p>
                 </div>
             </div>
+            <SketchyRule className="mt-2 opacity-60" />
 
             {/* ── IDLE ── */}
             {state === STATES.IDLE && (

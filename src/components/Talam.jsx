@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { getAudioCtx } from '../utils/audioUtils';
 import { CuratedIcon } from './IconLibrary';
+import SketchyRule from './SketchyRule';
 
 const TALAS = [
   {
@@ -175,7 +176,7 @@ export default function Talam() {
     <div className="w-full max-w-xl mx-auto px-4 py-8 space-y-8 relative z-10 talam-container">
 
       {/* Header */}
-      <div className="w-full flex items-center gap-4 border-b border-c-border pb-4">
+      <div className="w-full flex items-center gap-4">
         <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
           <CuratedIcon icon="talam" className="w-7 h-7" />
         </div>
@@ -189,6 +190,7 @@ export default function Talam() {
           </p>
         </div>
       </div>
+      <SketchyRule className="mt-2 opacity-60" />
 
       {/* Tala selector */}
       <div className="flex flex-wrap gap-2">

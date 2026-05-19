@@ -3,6 +3,7 @@ import { RAGAS, toSargam } from '../utils/ragaLogic';
 import { playNote, startDrone, getAudioCtx, playSequence, getOctaveSequence } from '../utils/audioUtils';
 import RagaPracticePanel from './RagaPracticePanel';
 import { CuratedIcon, PlayIcon, StopIcon } from './IconLibrary';
+import SketchyRule from './SketchyRule';
 
 const SA_PRESETS = [
   { label: 'C',  hz: 261.63 }, { label: 'C#', hz: 277.18 },
@@ -148,7 +149,7 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false, onSad
     <div id="tour-swara-keyboard" className="w-full max-w-5xl mx-auto px-4 py-8 relative z-10">
       {/* Header */}
       {!compact && (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-c-border pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
               <CuratedIcon icon="keyboard" className="w-7 h-7" />
@@ -184,6 +185,7 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false, onSad
             </div>
           </div>
         </div>
+        <SketchyRule className="mt-2 opacity-60" />
       )}
 
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">

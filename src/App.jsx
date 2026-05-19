@@ -15,6 +15,7 @@ import { getSwaram, identifyRaga, RAGAS } from './utils/ragaLogic';
 import RagaDetail from './components/RagaDetail';
 import OnboardingTour from './components/OnboardingTour';
 import { CuratedIcon, FireIcon, DhwaniIcon, SadhanaIcon } from './components/IconLibrary';
+import SketchyRule from './components/SketchyRule';
 
 const VeenaIcon = () => (
     <svg width="22" height="68" viewBox="0 0 22 68" fill="none" className="text-c-gold-dim">
@@ -436,6 +437,21 @@ function App() {
                         {/* Glow */}
                         <div className="absolute left-1/2 top-[30%] -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-c-gold/10 blur-[160px] pointer-events-none rounded-full z-0" />
 
+                        {/* Ghost veena — large centrepiece watermark */}
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1] overflow-hidden">
+                            <svg viewBox="0 0 22 68" fill="none" className="text-c-gold opacity-[0.09]" style={{ width: 'min(52vw, 370px)', height: 'auto' }}>
+                                <ellipse cx="11" cy="57" rx="10" ry="9" stroke="currentColor" strokeWidth="1.2"/>
+                                <rect x="9.5" y="10" width="3" height="47" rx="1.5" fill="currentColor" opacity="0.35"/>
+                                <line x1="10.5" y1="10" x2="10.5" y2="48" stroke="currentColor" strokeWidth="0.7" opacity="0.5"/>
+                                <line x1="12.5" y1="10" x2="12.5" y2="48" stroke="currentColor" strokeWidth="0.7" opacity="0.5"/>
+                                <line x1="8.5" y1="40" x2="13.5" y2="40" stroke="currentColor" strokeWidth="0.9"/>
+                                <line x1="8.5" y1="28" x2="13.5" y2="28" stroke="currentColor" strokeWidth="0.9"/>
+                                <line x1="8.5" y1="18" x2="13.5" y2="18" stroke="currentColor" strokeWidth="0.9"/>
+                                <path d="M11 10 Q5 6 7 2 Q9 -1 11 1.5 Q13 4 11 7" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+                                <ellipse cx="11" cy="7" rx="4" ry="3" stroke="currentColor" strokeWidth="1" opacity="0.5"/>
+                            </svg>
+                        </div>
+
                         {/* Rotating mandala — radial mask to remove hard rectangle edge */}
                         <div className="absolute left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[160vw] h-[160vw] opacity-[0.12] z-0"
                             style={{ maskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)', WebkitMaskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)' }}
@@ -531,68 +547,53 @@ function App() {
                                 paddingBottom: showFeatures ? '1rem' : 0,
                             }}
                         >
-                            {/* Suggested path banner */}
-                            <div className="w-full max-w-5xl mb-4 px-1">
-                                <p className="text-white/35 text-[10px] font-playfair italic text-center tracking-wide">
-                                    Suggested path for beginners: <span className="text-c-gold/60">Sadhana → Gurukul → Shruthi → Talam</span>
-                                </p>
-                            </div>
-
-                            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4 w-full max-w-5xl mx-auto">
-                                {FEATURES.map(({ id, label, desc, symbol, level, highlight }, idx) => (
-                                    <button
-                                        key={id}
-                                        onClick={() => goTo(id)}
-                                        className="group relative flex flex-col items-center justify-center p-3.5 sm:p-4 md:p-5 text-center transition-all duration-500 hover:-translate-y-1.5 h-full w-full"
-                                        style={{
-                                            transitionDelay: showFeatures ? `${idx * 50}ms` : '0ms',
-                                            opacity: showFeatures ? 1 : 0,
-                                            transform: showFeatures ? 'translateY(0)' : 'translateY(20px)',
-                                        }}
-                                    >
-                                    {/* The Plaque Base — extra premium gradient glow for highlighted features */}
-                                    <div className={`absolute inset-0 rounded-lg shadow-xl transition-all duration-300 ${
-                                        highlight
-                                            ? 'bg-gradient-to-b from-[#2b1206] to-[#140602] border-2 border-c-gold shadow-[0_0_20px_rgba(200,148,31,0.22)] group-hover:shadow-[0_0_30px_rgba(200,148,31,0.35)] group-hover:border-[#f7d686]'
-                                            : 'bg-[#1e0c04] border border-c-gold/30 group-hover:border-c-gold/70'
-                                    }`} />
-
-                                    {/* Inner Decorative Border */}
-                                    <div className="absolute inset-1.5 border border-c-gold/10 rounded-md pointer-events-none" />
-
-                                    {/* Ornate Corners */}
-                                    <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-c-gold/40 rounded-tl-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
-                                    <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-c-gold/40 rounded-tr-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
-                                    <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-c-gold/40 rounded-bl-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
-                                    <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-c-gold/40 rounded-br-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
-
-                                    {/* Core Indicator Star */}
-                                    {highlight && (
-                                        <div className="absolute top-1.5 right-1.5 text-[8px] text-c-gold/80 animate-pulse pointer-events-none font-mono">
-                                            ✦
+                            <div className="flex flex-col gap-8 w-full max-w-4xl mx-auto kolam-bg rounded-2xl px-4 py-6">
+                                {[
+                                    { label: 'Start Here', hint: 'New to Carnatic? Begin with these.', ids: ['sadhana', 'tutor'] },
+                                    { label: 'Practice', hint: 'Your daily toolkit.', ids: ['shruthi', 'talam', 'keyboard', 'singback'] },
+                                    { label: 'Explore', hint: 'Discover the full tradition.', ids: ['listen', 'library', 'melakarta', 'bhedam'] },
+                                ].map(({ label, hint, ids }, groupIdx) => {
+                                    const group = FEATURES.filter(f => ids.includes(f.id));
+                                    return (
+                                        <div key={label} className="flex flex-col gap-3">
+                                            {/* Hand-drawn group separator */}
+                                            <div className="flex items-center gap-3">
+                                                <svg className="flex-1 text-c-gold/30" height="6" viewBox="0 0 100 6" preserveAspectRatio="none"><path d="M0 3 Q25 1, 50 3 Q75 5, 100 3" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round"/></svg>
+                                                <span className="text-[8px] font-mono uppercase tracking-[0.3em] text-c-gold/55 flex-shrink-0">{label}</span>
+                                                <svg className="flex-1 text-c-gold/30" height="6" viewBox="0 0 100 6" preserveAspectRatio="none"><path d="M0 3 Q25 1, 50 3 Q75 5, 100 3" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round"/></svg>
+                                            </div>
+                                            <p className="text-center text-white/28 text-[9px] font-playfair italic -mt-1">{hint}</p>
+                                            <div className={`grid gap-3 ${ids.length === 2 ? 'grid-cols-2 max-w-xs mx-auto w-full' : 'grid-cols-2 sm:grid-cols-4'}`}>
+                                                {group.map(({ id, label: fLabel, desc, highlight }, idx) => (
+                                                    <button
+                                                        key={id}
+                                                        onClick={() => goTo(id)}
+                                                        className="group relative flex flex-col items-center justify-center p-3.5 sm:p-4 text-center transition-all duration-500 hover:-translate-y-1.5 h-full w-full"
+                                                        style={{
+                                                            transitionDelay: showFeatures ? `${(groupIdx * 4 + idx) * 55}ms` : '0ms',
+                                                            opacity: showFeatures ? 1 : 0,
+                                                            transform: showFeatures ? 'translateY(0)' : 'translateY(20px)',
+                                                        }}
+                                                    >
+                                                        <div className={`absolute inset-0 rounded-lg shadow-xl transition-all duration-300 ${highlight ? 'bg-gradient-to-b from-[#2b1206] to-[#140602] border-2 border-c-gold shadow-[0_0_20px_rgba(200,148,31,0.22)] group-hover:shadow-[0_0_30px_rgba(200,148,31,0.35)] group-hover:border-[#f7d686]' : 'bg-[#1e0c04] border border-c-gold/30 group-hover:border-c-gold/70'}`} />
+                                                        <div className="absolute inset-1.5 border border-c-gold/10 rounded-md pointer-events-none" />
+                                                        <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-c-gold/40 rounded-tl-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
+                                                        <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-c-gold/40 rounded-tr-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
+                                                        <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-c-gold/40 rounded-bl-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
+                                                        <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-c-gold/40 rounded-br-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
+                                                        {highlight && <div className="absolute top-1.5 right-1.5 text-[8px] text-c-gold/80 animate-pulse pointer-events-none font-mono">✦</div>}
+                                                        <div className={`relative z-10 mb-1.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-all duration-500 flex items-center justify-center ${highlight ? 'text-[#f7d686]' : 'text-c-gold group-hover:text-[#f7d686]'}`}>
+                                                            {renderTabIcon(id, "w-8 h-8 sm:w-10 sm:h-10")}
+                                                        </div>
+                                                        <h3 className="relative z-10 font-playfair text-[#f7d686] text-xs sm:text-sm font-bold tracking-[0.1em] uppercase mb-1 group-hover:text-white transition-colors duration-300">{fLabel}</h3>
+                                                        <p className="relative z-10 text-white/50 text-[9px] sm:text-[10px] leading-relaxed italic max-w-[120px] opacity-70 group-hover:opacity-100 transition-opacity hidden sm:block">{desc}</p>
+                                                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-lg pointer-events-none" />
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
-                                    )}
-
-                                    {/* Symbol with shadow */}
-                                    <div className={`relative z-10 text-xl sm:text-2xl mb-1.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-all duration-500 flex items-center justify-center ${
-                                        highlight ? 'text-[#f7d686]' : 'text-c-gold group-hover:text-[#f7d686]'
-                                    }`}>
-                                        {renderTabIcon(id, "w-8 h-8 sm:w-10 sm:h-10")}
-                                    </div>
-
-                                    {/* Text with vintage spacing */}
-                                    <h3 className="relative z-10 font-playfair text-[#f7d686] text-xs sm:text-sm font-bold tracking-[0.1em] sm:tracking-[0.12em] uppercase mb-1 group-hover:text-white transition-colors duration-300">
-                                        {label}
-                                    </h3>
-                                    <p className="relative z-10 text-white/50 text-[9px] sm:text-[10px] leading-relaxed italic max-w-[130px] opacity-70 group-hover:opacity-100 transition-opacity hidden sm:block">
-                                        {desc}
-                                    </p>
-
-                                    {/* Subtle Teak Texture Overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-lg pointer-events-none" />
-                                    <div className="absolute inset-0 bg-c-gold/0 group-hover:bg-c-gold/5 transition-colors duration-500 rounded-lg pointer-events-none" />
-                                </button>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>
@@ -607,7 +608,7 @@ function App() {
                         <div className="w-full flex flex-col items-center gap-7">
 
                             {/* Branded Header Section - Compact */}
-                            <div className="w-full flex items-center justify-between border-b border-c-border pb-3 mb-2">
+                            <div className="w-full flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md backdrop-blur-md relative flex-shrink-0">
                                         <DhwaniIcon className="w-6 h-6 relative z-10" />
@@ -632,6 +633,7 @@ function App() {
                                     <span className="opacity-80">{showGuide ? "▲" : "▼"}</span>
                                 </button>
                             </div>
+                            <SketchyRule className="mt-2 opacity-60" />
 
                             {/* Collapsible How-to card */}
                             {showGuide && (
@@ -803,7 +805,7 @@ function App() {
                     const pct = Math.round((doneCount / steps.length) * 100);
                     return (
                     <div className="w-full max-w-3xl p-4 md:p-8 flex flex-col items-center animate-fade-in mx-auto">
-                        <div className="w-full flex items-center gap-4 border-b border-c-border pb-4 mb-2">
+                        <div className="w-full flex items-center gap-4">
                             <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
                                 <SadhanaIcon className="w-7 h-7" />
                             </div>
@@ -817,6 +819,7 @@ function App() {
                                 </p>
                             </div>
                         </div>
+                        <SketchyRule className="mt-2 mb-2 opacity-60" />
 
                         {/* Progress card — light theme */}
                         <div className="w-full border border-c-border bg-c-card rounded-xl p-5 relative overflow-hidden mb-6 tour-sadhana-console">
@@ -854,6 +857,23 @@ function App() {
                             </div>
                         </div>
 
+                        {/* VeenaMark divider */}
+                        <div className="flex items-center gap-3 w-full mb-2">
+                            <div className="flex-1"><SketchyRule className="opacity-40" /></div>
+                            <svg viewBox="0 0 22 68" fill="none" className="text-c-gold/30 w-5 h-auto flex-shrink-0">
+                                <ellipse cx="11" cy="57" rx="10" ry="9" stroke="currentColor" strokeWidth="1.2"/>
+                                <rect x="9.5" y="10" width="3" height="47" rx="1.5" fill="currentColor" opacity="0.35"/>
+                                <line x1="10.5" y1="10" x2="10.5" y2="48" stroke="currentColor" strokeWidth="0.7" opacity="0.5"/>
+                                <line x1="12.5" y1="10" x2="12.5" y2="48" stroke="currentColor" strokeWidth="0.7" opacity="0.5"/>
+                                <line x1="8.5" y1="40" x2="13.5" y2="40" stroke="currentColor" strokeWidth="0.9"/>
+                                <line x1="8.5" y1="28" x2="13.5" y2="28" stroke="currentColor" strokeWidth="0.9"/>
+                                <line x1="8.5" y1="18" x2="13.5" y2="18" stroke="currentColor" strokeWidth="0.9"/>
+                                <path d="M11 10 Q5 6 7 2 Q9 -1 11 1.5 Q13 4 11 7" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+                                <ellipse cx="11" cy="7" rx="4" ry="3" stroke="currentColor" strokeWidth="1" opacity="0.5"/>
+                            </svg>
+                            <div className="flex-1"><SketchyRule className="opacity-40" /></div>
+                        </div>
+
                         {/* Steps grid — light theme */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                             {steps.map((item) => {
@@ -869,8 +889,13 @@ function App() {
                                 >
                                     <div className="space-y-2.5">
                                         <div className="flex items-center justify-between">
-                                            <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-mono font-bold ${done ? 'bg-emerald-600 text-white' : 'bg-c-gold/15 text-c-gold'}`}>
-                                                {done ? '✓' : item.n}
+                                            <span className="relative w-7 h-7 flex items-center justify-center flex-shrink-0">
+                                                <svg viewBox="0 0 28 28" fill="none" className={`absolute inset-0 w-full h-full ${done ? 'text-emerald-600' : 'text-c-gold'}`}>
+                                                    <path d="M14 2.5 C20.5 1.8, 26.2 7.5, 26.5 14 C26.8 20.5, 21 26.3, 14 26.5 C7 26.7, 1.7 21, 1.8 14 C1.9 7 7.5 3.2 14 2.5Z" stroke="currentColor" strokeWidth="1.4" fill="currentColor" style={{ fillOpacity: done ? 0.9 : 0.12 }}/>
+                                                </svg>
+                                                <span className={`relative z-10 text-[10px] font-mono font-bold ${done ? 'text-white' : 'text-c-gold'}`}>
+                                                    {done ? '✓' : item.n}
+                                                </span>
                                             </span>
                                             <span className={`text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border ${
                                                 done

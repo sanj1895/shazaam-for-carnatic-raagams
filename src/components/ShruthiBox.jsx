@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { getAudioCtx } from '../utils/audioUtils';
 import { DroneIcon } from './IconLibrary';
+import SketchyRule from './SketchyRule';
 
 const PITCHES = [
   { label: 'C',  hz: 261.63 },
@@ -472,7 +473,7 @@ export default function ShruthiBox({ onSadhanaComplete }) {
     <div className="w-full max-w-5xl flex flex-col gap-5">
 
       {/* Branded header */}
-      <div className="w-full flex items-center gap-4 border-b border-c-border pb-4">
+      <div className="w-full flex items-center gap-4">
         <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
           <DroneIcon className="w-7 h-7" />
         </div>
@@ -486,6 +487,7 @@ export default function ShruthiBox({ onSadhanaComplete }) {
           </p>
         </div>
       </div>
+      <SketchyRule className="mt-2 mb-2 opacity-60" />
 
     <div id="tour-shruthi-box" style={s.body} className="max-w-[640px] lg:max-w-5xl mx-auto">
       {/* Heritage Corners */}

@@ -546,10 +546,18 @@ Tone: warm but direct. Address them as a serious student. Do not mention numbers
                 const points = [];
                 livePitchHistory.forEach((pt, idx) => {
                   if (pt.freq > 0) {
-                    const semi = 12 * Math.log2(pt.freq / saHz);
+                    let freq = pt.freq;
+                    // Octave folding: gracefully bring frequency into the primary visual octave bounds.
+                    // Allows low-pitched singers to see their trace perfectly mapped to the relative swara guides.
+                    while (freq < saHz * 0.7) freq *= 2;
+                    while (freq > saHz * 1.9) freq /= 2;
+
+                    const semi = 12 * Math.log2(freq / saHz);
                     const x = 40 + (idx / 50) * 350;
                     const y = 100 - (semi / 12) * 85;
-                    if (y >= 0 && y <= 120) {
+                    
+                    // Relaxed bounds to allow Mandra sthayi (lower octave) to render
+                    if (y >= -50 && y <= 200) {
                       points.push(`${x},${y}`);
                     }
                   }

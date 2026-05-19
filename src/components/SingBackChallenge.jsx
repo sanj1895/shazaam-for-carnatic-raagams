@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { RAGAS, toSargam } from '../utils/ragaLogic';
 import { playSequence, getAudioCtx, detectPitch, SWARA_SEMITONE } from '../utils/audioUtils';
+import { CuratedIcon } from './IconLibrary';
 
 const ragaNames = Object.keys(RAGAS).sort();
 const DIFFICULTIES = [
@@ -171,11 +172,19 @@ export default function SingBackChallenge({ onSadhanaComplete }) {
 
     return (
         <div className="w-full max-w-2xl mx-auto px-4 py-8 space-y-8 relative z-10">
-            <div className="border-b border-c-gold/20 pb-4">
-                <h2 className="font-playfair text-3xl font-bold text-c-gold tracking-tight">Sing-Back Challenge</h2>
-                <p className="text-c-cream-dark text-sm mt-2 font-playfair italic leading-relaxed">
-                    Listen to the phrase, then sing any of those notes back  ·  order doesn't matter.
-                </p>
+            <div className="w-full flex items-center gap-4 border-b border-c-border pb-4">
+                <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
+                    <CuratedIcon icon="singback" className="w-7 h-7" />
+                </div>
+                <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                        <h2 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Sing-Back</h2>
+                        <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Ear Training</span>
+                    </div>
+                    <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
+                        Listen to the phrase, then sing any of those notes back — order doesn't matter.
+                    </p>
+                </div>
             </div>
 
             {/* ── IDLE ── */}

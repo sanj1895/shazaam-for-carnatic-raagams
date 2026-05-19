@@ -148,29 +148,40 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false, onSad
     <div id="tour-swara-keyboard" className="w-full max-w-5xl mx-auto px-4 py-8 relative z-10">
       {/* Header */}
       {!compact && (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-c-gold/20 pb-4">
-          <div className="flex items-center gap-3">
-            <h2 className="font-playfair text-3xl font-bold text-c-gold tracking-tight">
-              Swara Keyboard
-            </h2>
-            <button 
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-c-border pb-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
+              <CuratedIcon icon="keyboard" className="w-7 h-7" />
+            </div>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <h2 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Swara Keyboard</h2>
+                <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Scales</span>
+              </div>
+              <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
+                Hear and internalize each swara interval — play the scale, then sing along.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
               onClick={() => setShowGuide(true)}
               className="px-3 py-1 rounded-full border border-c-gold/40 hover:bg-c-gold/5 text-c-gold text-xs font-playfair italic transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer swara-guide-button"
             >
               <CuratedIcon icon="library" className="w-3 h-3" /> Swara Guide
             </button>
-          </div>
-          <div className="relative">
-            <select
-              value={selectedRaga}
-              onChange={(e) => setSelectedRaga(e.target.value)}
-              className="appearance-none bg-c-card border border-c-gold/40 text-c-gold font-playfair font-bold rounded-lg px-4 py-2 pr-10 text-sm focus:outline-none focus:border-c-gold shadow-sm"
-            >
-              {ragaNames.map((name) => (
-                <option key={name} value={name}>{name}</option>
-              ))}
-            </select>
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-c-gold opacity-50 text-[10px]">▼</div>
+            <div className="relative">
+              <select
+                value={selectedRaga}
+                onChange={(e) => setSelectedRaga(e.target.value)}
+                className="appearance-none bg-c-card border border-c-gold/40 text-c-gold font-playfair font-bold rounded-lg px-4 py-2 pr-10 text-sm focus:outline-none focus:border-c-gold shadow-sm"
+              >
+                {ragaNames.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-c-gold opacity-50 text-[10px]">▼</div>
+            </div>
           </div>
         </div>
       )}

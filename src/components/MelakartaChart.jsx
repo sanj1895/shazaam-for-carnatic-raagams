@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CuratedIcon } from './IconLibrary';
 
 // All 72 Melakarta ragas in order (row = Ri/Ga group, col = Da/Ni group)
 const MELAKARTA_NAMES = [
@@ -156,13 +157,20 @@ const MelakartaChart = ({ onSelectRaga }) => {
     return (
         <div className="w-full max-w-4xl px-1 sm:px-0">
             {/* Header + Search box */}
-            <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4 px-2 sm:px-0">
-                <div>
-                    <h2 className="font-playfair text-2xl text-c-gold">Melakarta Chart</h2>
-                    <p className="text-c-cream-dark text-xs mt-1">
-                        The 72 parent ragas of Carnatic music  ·  organized mathematically by Ri/Ga (rows) and Da/Ni (columns).
-                        Tap any raga to practice.
-                    </p>
+            <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2 sm:px-0">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
+                        <CuratedIcon icon="melakarta" className="w-7 h-7" />
+                    </div>
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                            <h2 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Melakarta</h2>
+                            <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">72 Ragas</span>
+                        </div>
+                        <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
+                            All 72 parent ragas organized by scale structure — tap any to practice.
+                        </p>
+                    </div>
                 </div>
                 
                 {/* Search Bar */}

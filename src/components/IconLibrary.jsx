@@ -317,6 +317,17 @@ export const BhedamIcon = ({ className = "w-5 h-5" }) => (
     </svg>
 );
 
+export const TalamIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 20 Q 32 14, 50 20 L 50 44 Q 32 50, 14 44 Z" fill="currentColor" fillOpacity="0.06" strokeWidth="1.5" />
+        <ellipse cx="14" cy="32" rx="5" ry="13" strokeWidth="1.5" />
+        <ellipse cx="50" cy="32" rx="5" ry="13" strokeWidth="1.5" />
+        <line x1="19" y1="21" x2="45" y2="21" strokeWidth="0.8" opacity="0.4" />
+        <line x1="19" y1="43" x2="45" y2="43" strokeWidth="0.8" opacity="0.4" />
+        <circle cx="46" cy="32" r="3" fill="currentColor" fillOpacity="0.7" strokeWidth="0" />
+    </svg>
+);
+
 export const HomeIcon = ({ className = "w-5 h-5" }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -343,6 +354,7 @@ export const CuratedIcon = ({ icon, className = "w-5 h-5" }) => {
     if (icon === 'singback') return <TargetIcon className={className} />;
     if (icon === 'listen') return <DhwaniIcon className={className} />;
     if (icon === 'library') return <KoshaIcon className={className} />;
+    if (icon === 'talam') return <TalamIcon className={className} />;
     if (icon === 'melakarta') return <MelakartaIcon className={className} />;
     if (icon === 'bhedam') return <BhedamIcon className={className} />;
 

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { RAGAS, toSargam } from '../utils/ragaLogic';
 import { SWARA_SEMITONE, SEMITONE_TO_SWARA, playSequence } from '../utils/audioUtils';
-import { PlayIcon, StopIcon } from './IconLibrary';
+import { PlayIcon, StopIcon, CuratedIcon } from './IconLibrary';
 
 const ragaNames = Object.keys(RAGAS).sort();
 
@@ -173,19 +173,23 @@ export default function GrahaBhedam() {
 
     return (
         <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-8 sm:space-y-10 relative z-10">
-            {/* Header section with simplified explanation */}
-            <div className="text-center space-y-4">
-                <h2 className="font-playfair text-3xl sm:text-4xl md:text-5xl text-c-gold tracking-tight">Graha Bhedam</h2>
-                <div className="flex items-center justify-center gap-3">
-                    <div className="h-px w-12 bg-c-gold/30" />
-                    <p className="text-c-cream-dim text-sm italic font-playfair tracking-wide uppercase">The Art of Modal Shifting</p>
-                    <div className="h-px w-12 bg-c-gold/30" />
+            {/* Header */}
+            <div className="w-full flex items-center gap-4 border-b border-c-border pb-4">
+                <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
+                    <CuratedIcon icon="bhedam" className="w-7 h-7" />
                 </div>
-                <p className="text-c-cream-dark text-sm md:text-base max-w-2xl mx-auto leading-relaxed font-playfair opacity-80">
-                    Imagine taking a melody and simply changing which note you call "Home" (Sa). 
-                    Suddenly, a familiar raagam transforms into an entirely new one.
-                </p>
+                <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                        <h2 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Graha Bhedam</h2>
+                        <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Modal Shift</span>
+                    </div>
+                    <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
+                        Shift which note you call Sa — and watch one raga transform into another.
+                    </p>
+                </div>
+            </div>
 
+            <div className="text-center space-y-4">
                 {/* Control Panel: Gamakam and Playback Mode selectors */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 pt-4 pb-2 border-t border-b border-c-border/30 max-w-2xl mx-auto">
                     {/* Gamakam Toggle */}

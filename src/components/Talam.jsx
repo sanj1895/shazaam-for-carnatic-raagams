@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { getAudioCtx } from '../utils/audioUtils';
+import { CuratedIcon } from './IconLibrary';
 
 const TALAS = [
   {
@@ -174,9 +175,19 @@ export default function Talam() {
     <div className="w-full max-w-xl mx-auto px-4 py-8 space-y-8 relative z-10 talam-container">
 
       {/* Header */}
-      <div className="border-b border-c-gold/20 pb-4">
-        <h2 className="font-playfair text-3xl font-bold text-c-gold tracking-tight">Talam</h2>
-        <p className="text-xs text-c-cream-dark italic mt-1">Keep the cycle  ·  select a tala and set your tempo</p>
+      <div className="w-full flex items-center gap-4 border-b border-c-border pb-4">
+        <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
+          <CuratedIcon icon="talam" className="w-7 h-7" />
+        </div>
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2">
+            <h2 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Talam</h2>
+            <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Rhythm</span>
+          </div>
+          <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
+            Keep the cycle — select a tala, set your tempo, and feel the pulse.
+          </p>
+        </div>
       </div>
 
       {/* Tala selector */}

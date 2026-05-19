@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 const STEPS = [
@@ -6,7 +6,7 @@ const STEPS = [
     view: 'home',
     icon: '🪔',
     title: 'Welcome to Alapana',
-    body: "Your complete Carnatic music practice tool. Let me take you on a quick tour — I'll navigate to each feature so you can see it for yourself.",
+    body: "Your complete Carnatic music practice tool. Let me take you on a quick tour of each feature.",
     isWelcome: true,
   },
   {
@@ -30,7 +30,7 @@ const STEPS = [
     symbol: '〜',
     feature: 'Shruthi',
     title: 'Your practice drone',
-    body: "The Shruthi Box plays a continuous drone tone while you practice. Singing against a drone trains your ear to stay in tune — an essential part of every Carnatic session.",
+    body: "The Shruthi Box plays a continuous drone tone while you practice. Choose between a bellows Harmonium or plucked Tambura sound to stay in tune.",
     hint: 'Keep this running in the background while you sing',
   },
   {
@@ -70,9 +70,12 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
   const [step, setStep]       = useState(0);
   const [exiting, setExiting] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const portalRef = useRef(null);
 
   useEffect(() => {
-    setMounted(true);
+    // Delay mount until next frame to guarantee document.body exists on mobile
+    const raf = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   useEffect(() => {
@@ -84,6 +87,9 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
 
   if (!active || !mounted) return null;
 
+  // Safety check for mobile SSR / early render
+  if (typeof document === 'undefined' || !document.body) return null;
+
   const current = STEPS[step];
   const isFirst = step === 0;
   const isLast  = step === STEPS.length - 1;
@@ -93,13 +99,16 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
     setTimeout(() => {
       setExiting(false);
       onDismiss?.();
-    }, 250);
+    }, 200);
   };
 
   const goToStep = (nextIdx) => {
     if (nextIdx < 0 || nextIdx >= STEPS.length) return;
     const next = STEPS[nextIdx];
-    if (next?.view) onGoTo?.(next.view);
+    // Navigate to view — but don't navigate if same view (avoids re-mounting heavy components)
+    if (next?.view && next.view !== STEPS[step]?.view) {
+      onGoTo?.(next.view);
+    }
     setStep(nextIdx);
   };
 
@@ -109,7 +118,7 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
         <button
           key={i}
           onClick={() => goToStep(i)}
-          className={`rounded-full transition-all duration-200 ${
+          className={`rounded-full transition-all duration-150 ${
             i === step ? 'w-5 h-1.5 bg-[#f7d686]' : 'w-1.5 h-1.5 bg-white/25 hover:bg-white/50'
           }`}
           aria-label={`Go to step ${i + 1}`}
@@ -120,16 +129,15 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
 
   return createPortal(
     <>
-      {/* Backdrop — simple dark overlay, no SVG */}
+      {/* Backdrop — simple dark overlay, NO blur for mobile performance */}
       <div
-        className={`fixed inset-0 z-[9990] bg-black/60 transition-opacity duration-250 ${exiting ? 'opacity-0' : 'opacity-100'}`}
+        className={`fixed inset-0 z-[9990] bg-black/55 transition-opacity duration-200 ${exiting ? 'opacity-0' : 'opacity-100'}`}
         onClick={handleDismiss}
-        style={{ backdropFilter: 'blur(2px)' }}
       />
 
-      {/* Tour card — bottom of screen on mobile, bottom-right corner on desktop */}
+      {/* Tour card */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-[9995] flex justify-center px-4 pb-[76px] md:inset-x-auto md:bottom-6 md:right-6 md:left-auto md:pb-0 md:block pointer-events-none transition-all duration-250 ${exiting ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}
+        className={`fixed inset-x-0 bottom-0 z-[9995] flex justify-center px-4 pb-[76px] md:inset-x-auto md:bottom-6 md:right-6 md:left-auto md:pb-0 md:block pointer-events-none transition-all duration-200 ${exiting ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}
       >
         <div className="pointer-events-auto w-full max-w-[400px] relative bg-[#1e0c04] border border-[#f7d686]/30 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden p-5 flex flex-col gap-4">
 

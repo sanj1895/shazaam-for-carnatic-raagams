@@ -899,7 +899,7 @@ function App() {
                                         </p>
                                     </div>
                                     <button
-                                        onClick={() => { markSadhanaStep(item.tab); goTo(item.tab); }}
+                                        onClick={() => goTo(item.tab)}
                                         className={`w-full mt-4 py-2.5 rounded font-playfair font-bold text-xs tracking-wider uppercase transition-all active:scale-[0.98] cursor-pointer ${
                                             done
                                                 ? 'bg-c-card border border-c-border text-c-cream-dim hover:bg-c-surface'

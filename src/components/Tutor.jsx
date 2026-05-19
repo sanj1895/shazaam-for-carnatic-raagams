@@ -47,7 +47,13 @@ const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750) => {
     for (let i = 0; i < swaras.length; i++) {
         if (signal?.aborted) return;
         const swara = swaras[i];
-        if (swara === '|' || swara === '||') continue;
+        if (swara === '|' || swara === '||') continue;  // skip bar lines — no delay
+        if (swara === ',') {
+            // silence/rest beat — highlight nothing, just wait
+            onIdx(-1);
+            await new Promise(r => setTimeout(r, delayMs));
+            continue;
+        }
         onIdx(i);
         const freq = swaraFreq(swara, sa) * Math.pow(2, octaves[i]);
         playSingleTone(freq, toneDur);

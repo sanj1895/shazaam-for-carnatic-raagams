@@ -534,20 +534,19 @@ function App() {
                         >
                             <div className="flex flex-col gap-8 w-full max-w-4xl mx-auto kolam-bg rounded-2xl px-4 py-6">
                                 {[
-                                    { label: 'Start Here', hint: 'New to Carnatic? Begin with these.', ids: ['sadhana', 'tutor'] },
-                                    { label: 'Practice', hint: 'Your daily toolkit.', ids: ['shruthi', 'talam', 'keyboard', 'singback'] },
-                                    { label: 'Explore', hint: 'Discover the full tradition.', ids: ['listen', 'library', 'melakarta', 'bhedam'] },
-                                ].map(({ label, hint, ids }, groupIdx) => {
+                                    { label: 'Start Here', ids: ['sadhana', 'tutor'] },
+                                    { label: 'Practice', ids: ['shruthi', 'talam', 'keyboard', 'singback'] },
+                                    { label: 'Explore', ids: ['listen', 'library', 'melakarta', 'bhedam'] },
+                                ].map(({ label, ids }, groupIdx) => {
                                     const group = FEATURES.filter(f => ids.includes(f.id));
                                     return (
                                         <div key={label} className="flex flex-col gap-3">
-                                            {/* Hand-drawn group separator */}
+                                            {/* Group label */}
                                             <div className="flex items-center gap-3">
-                                                <svg className="flex-1 text-c-gold/30" height="6" viewBox="0 0 100 6" preserveAspectRatio="none"><path d="M0 3 Q25 1, 50 3 Q75 5, 100 3" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round"/></svg>
-                                                <span className="text-[8px] font-mono uppercase tracking-[0.3em] text-c-gold/55 flex-shrink-0">{label}</span>
-                                                <svg className="flex-1 text-c-gold/30" height="6" viewBox="0 0 100 6" preserveAspectRatio="none"><path d="M0 3 Q25 1, 50 3 Q75 5, 100 3" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round"/></svg>
+                                                <div className="flex-1 h-px bg-c-gold/20" />
+                                                <span className="bg-c-gold/15 border border-c-gold/45 rounded-full px-4 py-1 text-[9px] font-mono uppercase tracking-[0.25em] text-c-gold font-bold flex-shrink-0">{label}</span>
+                                                <div className="flex-1 h-px bg-c-gold/20" />
                                             </div>
-                                            <p className="text-center text-white/28 text-[9px] font-playfair italic -mt-1">{hint}</p>
                                             <div className={`grid gap-3 ${ids.length === 2 ? 'grid-cols-2 max-w-xs mx-auto w-full' : 'grid-cols-2 sm:grid-cols-4'}`}>
                                                 {group.map(({ id, label: fLabel, desc, highlight }, idx) => (
                                                     <button

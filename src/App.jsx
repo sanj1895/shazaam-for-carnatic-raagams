@@ -403,9 +403,12 @@ function App() {
                         {/* Glow */}
                         <div className="absolute left-1/2 top-[30%] -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-c-gold/10 blur-[160px] pointer-events-none rounded-full z-0" />
 
-                        {/* Rotating mandala — radial mask to remove hard rectangle edge */}
-                        <div className="absolute left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[160vw] h-[160vw] opacity-[0.12] z-0"
-                            style={{ maskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)', WebkitMaskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)' }}
+                        {/* Rotating mandala — radial mask on desktop to remove rectangle edge, rounded circle on mobile to save GPU */}
+                        <div className="absolute left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[90vw] md:w-[160vw] h-[90vw] md:h-[160vw] opacity-[0.12] z-0 overflow-hidden rounded-full"
+                            style={window.innerWidth >= 768 ? {
+                                maskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)',
+                                WebkitMaskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)'
+                            } : {}}
                         >
                             <img
                                 src="/hero-mandala.jpg"

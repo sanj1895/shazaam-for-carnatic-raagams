@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import RagaPracticePanel from './RagaPracticePanel';
 
 const parseYouTubeId = (url) => {
     if (!url) return null;
@@ -50,7 +51,8 @@ const KolamLarge = () => (
     </svg>
 );
 
-const RagaDetail = ({ raga, hasClearMatch }) => {
+const RagaDetail = ({ raga, hasClearMatch, initialSaHz }) => {
+    const [tab, setTab] = useState('about');
     if (!raga) return null;
 
     const getConfidence = () => {
@@ -111,7 +113,27 @@ const RagaDetail = ({ raga, hasClearMatch }) => {
                 </div>
             </div>
 
+            {/* Tab bar */}
+            <div className="flex border-b border-c-border">
+                {[{ id: 'about', label: 'About' }, { id: 'practice', label: 'Practice' }].map(({ id, label }) => (
+                    <button
+                        key={id}
+                        onClick={() => setTab(id)}
+                        className={`px-6 py-3 text-xs font-playfair font-bold tracking-widest uppercase transition-all relative ${
+                            tab === id ? 'text-c-gold' : 'text-c-cream-dark hover:text-c-cream'
+                        }`}
+                    >
+                        {label}
+                        {tab === id && <span className="absolute bottom-0 left-4 right-4 h-[2px] bg-c-gold rounded-full" />}
+                    </button>
+                ))}
+            </div>
+
             <div className="p-6">
+                {tab === 'practice' && (
+                    <RagaPracticePanel raga={raga} initialSaHz={initialSaHz} />
+                )}
+                {tab === 'about' && (<>
                 {/* AI source disclaimer */}
                 {raga.type?.startsWith('Groq') && (
                     <div className="flex items-start gap-2 mb-4 px-3 py-2 rounded-lg bg-amber-950/30 border border-amber-700/30">
@@ -261,6 +283,7 @@ const RagaDetail = ({ raga, hasClearMatch }) => {
                         </div>
                     )}
                 </div>
+                </>)}
             </div>
         </div>
     );

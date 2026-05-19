@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { getAudioCtx, detectPitch, startDrone, SWARA_SEMITONE, playNote, getOctaveSequence } from '../utils/audioUtils';
+import { getAudioCtx, detectPitch, startDrone, SWARA_SEMITONE, playNote, getOctaveSequence, playSequence } from '../utils/audioUtils';
 import { getSwaram, toSargam } from '../utils/ragaLogic';
 
 const GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY;
@@ -441,6 +441,15 @@ Tone: warm but direct. Address them as a serious student. Do not mention numbers
             <div className="space-y-4 border border-c-gold/20 rounded-xl p-4 bg-c-card/30">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-playfair font-bold text-c-gold uppercase tracking-widest">Arohanam</span>
+                <button
+                  onClick={handlePlayScale}
+                  disabled={playingScale}
+                  className="px-4 py-1.5 border border-c-gold/40 hover:border-c-gold text-c-gold text-[10px] rounded-full transition-all font-playfair tracking-wide disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                >
+                  {playingScale ? (
+                    <><span className="w-1.5 h-1.5 rounded-full bg-c-gold animate-pulse" /> Playing…</>
+                  ) : '▶ Play Full Scale'}
+                </button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {expectedAro.map((note, idx) => (
@@ -465,18 +474,9 @@ Tone: warm but direct. Address them as a serious student. Do not mention numbers
               Sing the arohanam and avarohanam of {raga.name} at your own pace. The AI Guru will listen to 6 key elements of your singing—pitch accuracy, intonation stability, shruthi alignment, resonance, breath support, and gamakam—and provide personalized feedback. Recording is {RECORD_SECS} seconds.
             </p>
             <div className="flex flex-wrap justify-center gap-3 w-full max-w-xs">
-              {!compactMode && (
-                <button
-                  onClick={handlePlayScale}
-                  disabled={playingScale}
-                  className="flex-1 py-2.5 border border-c-gold/40 hover:border-c-gold text-c-gold text-xs rounded transition-all font-playfair tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {playingScale ? 'Playing Scale…' : 'Play Full Scale'}
-                </button>
-              )}
               <button
                 onClick={startRecording}
-                className={`${compactMode ? 'w-full' : 'flex-1'} py-2.5 bg-c-gold hover:bg-c-gold-light text-c-bg font-bold text-xs rounded transition-all font-playfair tracking-wide shadow-md`}
+                className={`${compactMode ? 'w-full' : 'w-48'} py-3 bg-c-gold hover:bg-c-gold-light text-c-bg font-bold text-xs rounded transition-all font-playfair tracking-wide shadow-md transform hover:scale-105 active:scale-95`}
               >
                 Start Recording
               </button>

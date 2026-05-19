@@ -188,13 +188,11 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
         <div
           className={`fixed pointer-events-none z-[9991] rounded-2xl border-2 border-c-gold/80 transition-all duration-300 shadow-[0_0_24px_rgba(200,148,31,0.45)] ${exiting ? 'opacity-0' : 'opacity-100'}`}
           style={{
-            x: highlightRect.x - 12,
-            y: highlightRect.y - 12,
+            left: highlightRect.x - 12,
+            top: highlightRect.y - 12,
             width: highlightRect.width + 24,
             height: highlightRect.height + 24,
             position: 'fixed',
-            left: 0,
-            top: 0,
           }}
         />
       )}

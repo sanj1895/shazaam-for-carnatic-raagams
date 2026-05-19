@@ -3177,22 +3177,6 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
 
     return (
         <div className="w-full max-w-2xl flex flex-col gap-6 animate-fade-in relative z-10">
-            {/* Compact Space-Efficient Dashboard Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-c-border pb-4 mb-1">
-                <div className="flex items-center gap-3">
-                    <div className="flex flex-col text-left">
-                        <div className="flex items-center gap-2.5">
-                            <GurukulIcon className="w-8 h-8 text-c-gold animate-pulse flex-shrink-0" />
-                            <h1 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Svara Gurukul</h1>
-                            <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Academy</span>
-                        </div>
-                        <p className="text-c-cream-dim text-[11px] mt-1.5 font-light leading-relaxed pl-1.5">
-                            Structured, progressive vocal training curriculum from foundations to advanced improvisation.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {COURSES.map(course => {
                     const isUpcoming = course.upcoming;
@@ -3498,7 +3482,11 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
                     
                     <div className="flex items-center justify-between gap-2 z-10">
                         <div className="flex items-center gap-2">
-                            <span className="text-base sm:text-lg">🎼</span>
+                            <svg className="w-5 h-5 text-c-gold flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M9 18V5l12-2v13" />
+                                <circle cx="6" cy="18" r="3" />
+                                <circle cx="18" cy="16" r="3" />
+                            </svg>
                             <div>
                                 <div className="text-[8px] sm:text-[9px] text-c-cream-dark uppercase tracking-widest font-mono font-extrabold">Base Sa (Shruti)</div>
                                 <div className="text-sm font-playfair font-black text-c-gold">
@@ -3511,7 +3499,15 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
                             onClick={() => setTunerOpen(!tunerOpen)}
                             className="px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs border border-c-gold/40 text-c-gold rounded-full hover:bg-c-gold hover:text-c-bg font-playfair font-bold transition-all z-20 flex-shrink-0"
                         >
-                            {tunerOpen ? 'Close' : '🔧 Tune'}
+                            {tunerOpen ? 'Close' : (
+                                <span className="flex items-center gap-1.5">
+                                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="14" y2="12" /><line x1="4" y1="18" x2="20" y2="18" />
+                                        <circle cx="17" cy="6" r="3" /><circle cx="17" cy="18" r="3" />
+                                    </svg>
+                                    Tune
+                                </span>
+                            )}
                         </button>
                     </div>
                     
@@ -3532,12 +3528,23 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
             {screen === 'home' && (
                 <div className="w-full max-w-2xl">
                     <div className="flex gap-1 border-b border-c-border mb-6">
-                        {[['curriculum', '📿 Svara Sadhana (Curriculum)'], ['practice', '🌊 Scale Flow (Arohanam/Avarohanam)']].map(([id, label]) => (
+                        {[
+                            { id: 'curriculum', label: 'Svara Sadhana (Curriculum)', icon: (
+                                <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                                </svg>
+                            )},
+                            { id: 'practice', label: 'Scale Flow (Arohanam/Avarohanam)', icon: (
+                                <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M2 12 C5 6, 9 6, 12 12 S19 18, 22 12" />
+                                </svg>
+                            )},
+                        ].map(({ id, label, icon }) => (
                             <button key={id} onClick={() => setTab(id)}
-                                    className={`px-5 py-2 text-xs font-playfair tracking-wide transition-colors relative ${
+                                    className={`px-5 py-2 text-xs font-playfair tracking-wide transition-colors relative flex items-center gap-1.5 ${
                                         tab === id ? 'text-c-gold' : 'text-c-cream-dim hover:text-c-cream'
                                     }`}>
-                                {label}
+                                {icon}{label}
                                 {tab === id && <span className="absolute bottom-0 left-0 right-0 h-px bg-c-gold" />}
                             </button>
                         ))}

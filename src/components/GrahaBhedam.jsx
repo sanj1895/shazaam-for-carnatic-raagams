@@ -4,6 +4,22 @@ import { SWARA_SEMITONE, SEMITONE_TO_SWARA, playSequence } from '../utils/audioU
 
 const ragaNames = Object.keys(RAGAS).sort();
 
+const PITCH_MAP = {
+    0: { name: 'C4', freq: '261.6 Hz' },
+    1: { name: 'C#4', freq: '277.2 Hz' },
+    2: { name: 'D4', freq: '293.7 Hz' },
+    3: { name: 'D#4', freq: '311.1 Hz' },
+    4: { name: 'E4', freq: '329.6 Hz' },
+    5: { name: 'F4', freq: '349.2 Hz' },
+    6: { name: 'F#4', freq: '370.0 Hz' },
+    7: { name: 'G4', freq: '392.0 Hz' },
+    8: { name: 'G#4', freq: '415.3 Hz' },
+    9: { name: 'A4', freq: '440.0 Hz' },
+    10: { name: 'A#4', freq: '466.2 Hz' },
+    11: { name: 'B4', freq: '493.9 Hz' },
+    12: { name: 'C5', freq: '523.3 Hz' },
+};
+
 /**
  * Given a raga's arohanam, compute intervals (semitone distances from Sa).
  * Returns a Set of intervals like {0, 2, 4, 5, 7, 9, 11}.
@@ -49,6 +65,7 @@ export default function GrahaBhedam() {
     const [selectedRaga, setSelectedRaga] = useState(ragaNames[0]);
     const [playingShift, setPlayingShift] = useState(null);
     const [gamakamEnabled, setGamakamEnabled] = useState(false);
+    const [playbackMode, setPlaybackMode] = useState('theoretical'); // 'theoretical' | 'vocal'
     const abortRef = useRef(null);
 
     useEffect(() => {
@@ -137,7 +154,12 @@ export default function GrahaBhedam() {
             playbackNotes.push('Sa');
         }
 
-        const { promise, abort } = playSequence(playbackNotes, 261.63, {
+        // Calculate absolute frequency if in theoretical/absolute keys mode, or home Sa if in vocal alignment!
+        const finalSaHz = playbackMode === 'theoretical'
+            ? 261.63 * Math.pow(2, shiftEntry.shiftSemi / 12)
+            : 261.63;
+
+        const { promise, abort } = playSequence(playbackNotes, finalSaHz, {
             gapMs: 600,
             duration: 0.55,
             gamakam: gamakamEnabled,
@@ -163,33 +185,64 @@ export default function GrahaBhedam() {
                     Suddenly, a familiar raagam transforms into an entirely new one.
                 </p>
 
-                {/* Gamakam Toggle - Global for this view */}
-                <div className="flex items-center justify-center pt-2">
-                    <div
-                        onClick={() => setGamakamEnabled(g => !g)}
-                        className="flex items-center gap-4 cursor-pointer select-none"
-                    >
-                        <span className={`text-[10px] uppercase tracking-[0.2em] font-bold transition-all duration-300 ${
-                            !gamakamEnabled ? 'text-c-gold opacity-100' : 'text-c-cream-dark opacity-40'
-                        }`}>
-                            Simple Scale
-                        </span>
-                        <div className={`relative w-12 h-6 rounded-full overflow-hidden transition-all duration-500 flex-shrink-0 border-2 shadow-inner pointer-events-none ${
-                            gamakamEnabled
-                                ? 'bg-c-gold/20 border-c-gold'
-                                : 'bg-transparent border-c-gold/30'
-                        }`}>
-                            <span className={`absolute top-0.5 w-4 h-4 rounded-full transition-all duration-500 ${
+                {/* Control Panel: Gamakam and Playback Mode selectors */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 pt-4 pb-2 border-t border-b border-c-border/30 max-w-2xl mx-auto">
+                    {/* Gamakam Toggle */}
+                    <div className="flex flex-col items-center gap-1.5">
+                        <span className="text-[9px] text-c-gold font-bold uppercase tracking-[0.2em] opacity-70">Aesthetic Ornamentation</span>
+                        <div
+                            onClick={() => setGamakamEnabled(g => !g)}
+                            className="flex items-center gap-3.5 cursor-pointer select-none bg-c-card/35 border border-c-border/40 px-4 py-2 rounded-full hover:border-c-gold/40 hover:bg-c-card/60 transition-all duration-300 shadow-sm"
+                        >
+                            <span className={`text-[9px] uppercase tracking-wider font-bold transition-all duration-300 ${
+                                !gamakamEnabled ? 'text-c-gold opacity-100' : 'text-c-cream-dark opacity-40'
+                            }`}>
+                                Simple
+                            </span>
+                            <div className={`relative w-10 h-5 rounded-full overflow-hidden transition-all duration-300 flex-shrink-0 border shadow-inner pointer-events-none ${
                                 gamakamEnabled
-                                    ? 'left-6 bg-c-gold'
-                                    : 'left-0.5 bg-c-cream-dark/60'
-                            }`} />
+                                    ? 'bg-c-gold/20 border-c-gold'
+                                    : 'bg-transparent border-c-gold/30'
+                            }`}>
+                                <span className={`absolute top-0.5 w-3.5 h-3.5 rounded-full transition-all duration-300 ${
+                                    gamakamEnabled
+                                        ? 'left-5.5 bg-c-gold'
+                                        : 'left-0.5 bg-c-cream-dark/60'
+                                }`} />
+                            </div>
+                            <span className={`text-[9px] uppercase tracking-wider font-bold transition-all duration-300 ${
+                                gamakamEnabled ? 'text-c-gold opacity-100' : 'text-c-cream-dark opacity-40'
+                            }`}>
+                                Gamakam
+                            </span>
                         </div>
-                        <span className={`text-[10px] uppercase tracking-[0.2em] font-bold transition-all duration-300 ${
-                            gamakamEnabled ? 'text-c-gold opacity-100' : 'text-c-cream-dark opacity-40'
-                        }`}>
-                            With Gamakam
-                        </span>
+                    </div>
+
+                    {/* Playback Mode Selector */}
+                    <div className="flex flex-col items-center gap-1.5">
+                        <span className="text-[9px] text-c-gold font-bold uppercase tracking-[0.2em] opacity-70">Shift Playback Mode</span>
+                        <div className="flex p-0.5 bg-c-card/45 border border-c-border/40 rounded-full shadow-inner">
+                            <button
+                                onClick={() => setPlaybackMode('theoretical')}
+                                className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                                    playbackMode === 'theoretical'
+                                        ? 'bg-c-gold text-c-bg shadow-md'
+                                        : 'text-c-cream-dim hover:text-c-gold'
+                                }`}
+                            >
+                                Theoretical (Absolute Keys)
+                            </button>
+                            <button
+                                onClick={() => setPlaybackMode('vocal')}
+                                className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                                    playbackMode === 'vocal'
+                                        ? 'bg-c-gold text-c-bg shadow-md'
+                                        : 'text-c-cream-dim hover:text-c-gold'
+                                }`}
+                            >
+                                Vocal (Tonic Aligned)
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -296,6 +349,24 @@ export default function GrahaBhedam() {
                                             {toSargam(entry.shiftNote)}
                                         </span>
                                         <span className="text-c-cream-dim text-xs italic font-playfair">as Sa</span>
+                                    </div>
+                                    <div className="mt-1.5 animate-fade-in">
+                                        {(() => {
+                                            const pInfo = PITCH_MAP[entry.shiftSemi] || { name: 'C4', freq: '261.6 Hz' };
+                                            if (playbackMode === 'theoretical') {
+                                                return (
+                                                    <span className="text-[8px] font-mono font-bold text-[#b8831a] bg-c-gold/15 border border-c-gold/20 px-1.5 py-0.5 rounded block text-center max-w-[110px] truncate shadow-sm">
+                                                        🎯 {pInfo.name} ({pInfo.freq})
+                                                    </span>
+                                                );
+                                            } else {
+                                                return (
+                                                    <span className="text-[8px] font-mono text-c-cream-dark/60 bg-c-bg border border-c-border/40 px-1.5 py-0.5 rounded block text-center max-w-[110px] truncate">
+                                                        🏠 C4 (261.6 Hz)
+                                                    </span>
+                                                );
+                                            }
+                                        })()}
                                     </div>
                                 </div>
 

@@ -1619,6 +1619,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
     const [statuses, setStatuses] = useState(swaras.map(() => null));
     const [micError, setMicError] = useState('');
     const [gamakamEnabled, setGamakamEnabled] = useState(false);
+    const [showGamakamInfo, setShowGamakamInfo] = useState(false);
     
     const [isPlayingGuide, setIsPlayingGuide] = useState(false);
     
@@ -1874,21 +1875,42 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                         />
                     </div>
                     
-                    {/* Symmetrical Gamakam Guide Toggle Switch */}
-                    <button 
-                        onClick={() => setGamakamEnabled(prev => !prev)}
-                        className={`px-5 py-1.5 rounded-full border text-[10px] font-mono tracking-wider uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
-                            gamakamEnabled 
-                                ? 'bg-c-gold/20 border-c-gold text-c-gold shadow-[0_0_12px_rgba(200,148,31,0.2)] hover:bg-c-gold/30' 
-                                : 'bg-c-card border-c-border/40 text-c-cream-dim hover:border-c-gold/50 hover:text-c-gold'
-                        }`}
-                    >
-                        <span className="animate-pulse">🌊</span> {gamakamEnabled ? 'Gamakam Glide: ACTIVE' : 'Gamakam Glide: OFF'}
-                    </button>
+                    {/* Symmetrical Gamakam Guide Toggle Switch + Info Icon */}
+                    <div className="flex items-center gap-2">
+                        <button 
+                            onClick={() => setGamakamEnabled(prev => !prev)}
+                            className={`px-5 py-1.5 rounded-full border text-[10px] font-mono tracking-wider uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                                gamakamEnabled 
+                                    ? 'bg-c-gold/20 border-c-gold text-c-gold shadow-[0_0_12px_rgba(200,148,31,0.2)] hover:bg-c-gold/30' 
+                                    : 'bg-c-card border-c-border/40 text-c-cream-dim hover:border-c-gold/50 hover:text-c-gold'
+                            }`}
+                        >
+                            <span className="animate-pulse">🌊</span> {gamakamEnabled ? 'Gamakam Glide: ACTIVE' : 'Gamakam Glide: OFF'}
+                        </button>
+                        {gamakamEnabled && (
+                            <button 
+                                onClick={() => setShowGamakamInfo(prev => !prev)}
+                                className={`w-5 h-5 rounded-full border text-[10px] flex items-center justify-center font-mono transition-all cursor-pointer ${
+                                    showGamakamInfo 
+                                        ? 'bg-c-gold border-c-gold text-c-bg shadow-[0_0_8px_rgba(200,148,31,0.2)]' 
+                                        : 'border-c-gold/40 text-c-gold hover:bg-c-gold/10'
+                                }`}
+                                title="How does Gamakam Glide work?"
+                            >
+                                i
+                            </button>
+                        )}
+                    </div>
                     
-                    {gamakamEnabled && (
-                        <div className="bg-c-gold/5 border border-c-gold/25 rounded-xl p-3.5 max-w-sm text-left animate-fade-in space-y-1.5 shadow-sm mx-4">
-                            <h5 className="text-[11px] font-playfair font-bold text-c-gold tracking-wider uppercase flex items-center gap-1.5">
+                    {gamakamEnabled && showGamakamInfo && (
+                        <div className="bg-c-gold/5 border border-c-gold/25 rounded-xl p-3.5 max-w-sm text-left animate-fade-in space-y-1.5 shadow-sm mx-4 relative">
+                            <button 
+                                onClick={() => setShowGamakamInfo(false)}
+                                className="absolute top-2 right-2 text-c-gold/40 hover:text-c-gold text-[10px] font-mono cursor-pointer"
+                            >
+                                ✕
+                            </button>
+                            <h5 className="text-[11px] font-playfair font-bold text-c-gold tracking-wider uppercase flex items-center gap-1.5 pr-4">
                                 🌊 Soulful Legato Glide Mode
                             </h5>
                             <p className="text-[10px] text-c-cream font-playfair italic leading-relaxed">

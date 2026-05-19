@@ -42,6 +42,21 @@ const FEATURES = [
     { id: 'bhedam',    label: 'Graha Bhedam', desc: 'Discover modal shifts between ragas',    symbol: '↻',  mobileSymbol: '🔄', level: 'advanced' },
 ];
 
+const SADHANA_TABS = ['shruthi', 'tutor', 'keyboard', 'singback'];
+
+function loadSadhanaState() {
+    const today = new Date().toISOString().slice(0, 10);
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    try {
+        const s = JSON.parse(localStorage.getItem('alapana_sadhana_v1') || 'null');
+        if (!s) return { date: today, completed: [], streak: 0 };
+        if (s.date === today) return s;
+        const streak = (s.date === yesterday && s.completed.length >= SADHANA_TABS.length)
+            ? (s.streak || 0) + 1 : 0;
+        return { date: today, completed: [], streak };
+    } catch { return { date: today, completed: [], streak: 0 }; }
+}
+
 function App() {
     const [view, setView] = useState('home');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -52,6 +67,7 @@ function App() {
     const [isListening, setIsListening] = useState(false);
     const [activeMode, setActiveMode] = useState('standard');
     const [tourActive, setTourActive] = useState(false);
+    const [sadhana, setSadhana] = useState(loadSadhanaState);
     const [selectedRaga, setSelectedRaga] = useState(null); // { raga, hasClearMatch, type: 'library' | 'identify' | 'melakarta' }
 
     const noteHistory = useRef([]);
@@ -112,6 +128,15 @@ function App() {
             const next = prev.filter(n => n !== note);
             if (next.length >= 3) setPossibleRagas(identifyRaga(next, sessionFreq.current));
             else setPossibleRagas([]);
+            return next;
+        });
+    };
+
+    const markSadhanaStep = (tab) => {
+        setSadhana(prev => {
+            if (prev.completed.includes(tab)) return prev;
+            const next = { ...prev, completed: [...prev.completed, tab] };
+            localStorage.setItem('alapana_sadhana_v1', JSON.stringify(next));
             return next;
         });
     };
@@ -640,136 +665,115 @@ function App() {
                         <Talam />
                     </div>
                 )}
-                {view === 'sadhana' && (
-                    <div className="w-full max-w-4xl p-4 md:p-8 flex flex-col items-center animate-fade-in mx-auto">
-                        <div className="text-center mb-8">
+                {view === 'sadhana' && (() => {
+                    const steps = [
+                        { n: 1, name: 'Tune & Warm Up',  tab: 'shruthi',  icon: '🎶', desc: 'Drone Baseline Alignment',    longDesc: 'Open the Shruthi Box and sustain a warm "ah" sound along with the drone for 30 seconds to lock in your pitch center.', btnText: 'Launch Shruthi Box' },
+                        { n: 2, name: 'AI Vocal Tutor',  tab: 'tutor',    icon: '🎓', desc: 'Classical Scale Practice',    longDesc: 'Sing ascending/descending scales under real-time guidance from the AI Guru to build pitch stability and timing.', btnText: 'Start AI Tutor' },
+                        { n: 3, name: 'Explore Scales',  tab: 'keyboard', icon: '🎹', desc: 'Swarasthana Visualization',   longDesc: 'Play individual swaras on the virtual keyboard to hear and internalize the exact intervals of a scale.', btnText: 'Open Swara Keyboard' },
+                        { n: 4, name: 'Ear Training',    tab: 'singback', icon: '🎯', desc: 'Phrase Reproduction',         longDesc: 'Listen to a phrase and reproduce it by ear. Aim for 80 %+ to sharpen pitch memory and muscle memory together.', btnText: 'Launch Sing-Back' },
+                    ];
+                    const doneCount = sadhana.completed.length;
+                    const pct = Math.round((doneCount / steps.length) * 100);
+                    return (
+                    <div className="w-full max-w-3xl p-4 md:p-8 flex flex-col items-center animate-fade-in mx-auto">
+                        <div className="text-center mb-6">
                             <span className="text-[10px] uppercase tracking-widest text-c-gold font-mono">Daily Vocal Routine</span>
-                            <h2 className="font-playfair text-4xl font-bold text-c-gold mt-1">Sadhana Console</h2>
+                            <h2 className="font-playfair text-3xl font-bold text-c-cream mt-1">Daily Sadhana</h2>
                             <div className="w-16 h-px bg-c-gold/30 mx-auto mt-2" />
                             <p className="text-c-cream-dim text-xs font-playfair italic max-w-md mx-auto mt-3">
-                                A curated daily routine designed to build relative pitch, scale accuracy, and raga memory systematically.
+                                A daily sequence to build pitch, scale accuracy, and raga memory step by step. Resets each morning.
                             </p>
                         </div>
 
-                        {/* Progress Dashboard Card */}
-                        <div className="w-full border border-c-gold/30 bg-[#1e0c04] rounded-xl p-6 shadow-2xl relative overflow-hidden backdrop-blur-md mb-8">
-                            {/* Heritage Corners */}
+                        {/* Progress card — light theme */}
+                        <div className="w-full border border-c-border bg-c-card rounded-xl p-5 relative overflow-hidden mb-6">
                             <div className="absolute inset-0 pointer-events-none">
-                                <div className="heritage-border-corner heritage-corner-tl opacity-40" />
-                                <div className="heritage-border-corner heritage-corner-tr opacity-40" />
-                                <div className="heritage-border-corner heritage-corner-bl opacity-40" />
-                                <div className="heritage-border-corner heritage-corner-br opacity-40" />
+                                <div className="heritage-border-corner heritage-corner-tl" />
+                                <div className="heritage-border-corner heritage-corner-tr" />
+                                <div className="heritage-border-corner heritage-corner-bl" />
+                                <div className="heritage-border-corner heritage-corner-br" />
                             </div>
-
-                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-c-gold/20 pb-4 mb-5">
-                                <div className="text-center sm:text-left">
-                                    <span className="text-[9px] uppercase tracking-widest text-c-gold font-mono">Your Status</span>
-                                    <h3 className="font-playfair text-xl font-bold text-c-cream mt-0.5">Sadhana Progress</h3>
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-c-border/50 pb-4 mb-4 relative z-10">
+                                <div>
+                                    <span className="text-[9px] uppercase tracking-widest text-c-gold font-mono">Today's Progress</span>
+                                    <h3 className="font-playfair text-lg font-bold text-c-cream mt-0.5">{doneCount} of {steps.length} steps done</h3>
                                 </div>
-                                <div className="flex items-center gap-3 bg-c-card/45 px-4 py-2 border border-c-border/20 rounded-full">
-                                    <span className="text-xs text-c-cream font-mono">Daily Streak: <strong>🔥 3 Days</strong></span>
+                                <div className="flex items-center gap-2 px-4 py-1.5 border border-c-border rounded-full bg-c-surface">
+                                    <span className="text-xs text-c-cream font-mono">Streak: <strong>🔥 {sadhana.streak} {sadhana.streak === 1 ? 'day' : 'days'}</strong></span>
                                 </div>
                             </div>
-
-                            <div className="space-y-2">
+                            <div className="space-y-1.5 relative z-10">
                                 <div className="flex justify-between text-xs font-mono text-c-cream-dim">
-                                    <span>Daily Target Completed</span>
-                                    <span className="text-c-gold font-bold">25% Done</span>
+                                    <span>Daily target</span>
+                                    <span className="text-c-gold font-bold">{pct}%</span>
                                 </div>
-                                <div className="w-full h-3 bg-c-bg border border-c-border/40 rounded-full overflow-hidden shadow-inner p-[1px]">
-                                    <div 
-                                        className="h-full bg-gradient-to-r from-c-gold-dim to-c-gold-light rounded-full transition-all duration-1000 shadow-[0_0_12px_rgba(200,148,31,0.5)]" 
-                                        style={{ width: '25%' }} 
+                                <div className="w-full h-2.5 bg-c-surface border border-c-border/50 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-gradient-to-r from-c-gold-dim to-c-gold rounded-full transition-all duration-700"
+                                        style={{ width: `${pct}%` }}
                                     />
                                 </div>
-                                <p className="text-[10px] text-c-cream-dark italic text-center pt-2">
-                                    Nailed today's vocal warm-up in the Shruthi Box! Complete the remaining steps to power up your streak.
-                                </p>
+                                {doneCount === steps.length && (
+                                    <p className="text-[11px] text-emerald-700 font-playfair italic text-center pt-1">
+                                        ✦ Today's sadhana complete — well done!
+                                    </p>
+                                )}
                             </div>
                         </div>
 
-                        {/* Interactive Steps Grid */}
+                        {/* Steps grid — light theme */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                            {[
-                                { 
-                                    step: '1', 
-                                    name: 'Tune & Warm Up', 
-                                    tab: 'shruthi', 
-                                    desc: 'Drone Baseline Alignment', 
-                                    icon: '🎶', 
-                                    longDesc: 'Open the Shruthi Box, set your home key presets, and sustain a warm AKARAM (ah) sound along with the drone for 30 seconds to lock in pitch center.',
-                                    btnText: 'Launch Shruthi Box',
-                                    status: '✓ Completed'
-                                },
-                                { 
-                                    step: '2', 
-                                    name: 'AI Vocal Tutor', 
-                                    tab: 'tutor', 
-                                    desc: 'Classical Scale Practice', 
-                                    icon: '🎓', 
-                                    longDesc: 'Sing standard ascending/descending scales under real-time guidance from the AI Guru to improve pitch stability and timing.',
-                                    btnText: 'Start AI Tutor',
-                                    status: 'Pending'
-                                },
-                                { 
-                                    step: '3', 
-                                    name: 'Explore Scales', 
-                                    tab: 'keyboard', 
-                                    desc: 'Swarasthana Visualization', 
-                                    icon: '🎹', 
-                                    longDesc: 'Play and listen to specific microtones of Shankarabharanam or Kanakangi on the virtual Swara Keyboard to internalize scale shapes.',
-                                    btnText: 'Open Swara Keyboard',
-                                    status: 'Pending'
-                                },
-                                { 
-                                    step: '4', 
-                                    name: 'Ear Training', 
-                                    tab: 'singback', 
-                                    desc: 'Phrase Reproduction', 
-                                    icon: '🎯', 
-                                    longDesc: 'Listen to phrases sung by the computer and reproduce them cleanly. Aim to score over 80% to sharpen muscle memory.',
-                                    btnText: 'Launch Sing-Back',
-                                    status: 'Pending'
-                                },
-                            ].map((item) => (
-                                <div 
-                                    key={item.step} 
-                                    className="border border-c-border/40 bg-c-card/25 rounded-xl p-5 hover:border-c-gold/40 transition-all duration-300 flex flex-col justify-between"
+                            {steps.map((item) => {
+                                const done = sadhana.completed.includes(item.tab);
+                                return (
+                                <div
+                                    key={item.n}
+                                    className={`border rounded-xl p-5 flex flex-col justify-between transition-all duration-300 ${
+                                        done
+                                            ? 'border-emerald-600/30 bg-emerald-50/60'
+                                            : 'border-c-border bg-c-surface hover:border-c-gold/50'
+                                    }`}
                                 >
-                                    <div className="space-y-3">
+                                    <div className="space-y-2.5">
                                         <div className="flex items-center justify-between">
-                                            <span className="w-6 h-6 flex items-center justify-center rounded-full bg-c-gold/15 text-c-gold text-xs font-mono font-bold">
-                                                {item.step}
+                                            <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-mono font-bold ${done ? 'bg-emerald-600 text-white' : 'bg-c-gold/15 text-c-gold'}`}>
+                                                {done ? '✓' : item.n}
                                             </span>
                                             <span className={`text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border ${
-                                                item.status === '✓ Completed' 
-                                                    ? 'border-emerald-500/30 bg-emerald-500/5 text-emerald-500' 
+                                                done
+                                                    ? 'border-emerald-600/30 bg-emerald-600/10 text-emerald-700'
                                                     : 'border-c-gold/30 bg-c-gold/5 text-c-gold'
                                             }`}>
-                                                {item.status}
+                                                {done ? '✓ Done' : 'Pending'}
                                             </span>
                                         </div>
                                         <div>
-                                            <h4 className="font-playfair text-base font-bold text-c-cream flex items-center gap-1.5">
+                                            <h4 className="font-playfair text-sm font-bold text-c-cream flex items-center gap-1.5">
                                                 <span>{item.icon}</span> {item.name}
                                             </h4>
                                             <span className="text-[10px] text-c-gold font-mono uppercase tracking-wider block mt-0.5">{item.desc}</span>
                                         </div>
-                                        <p className="text-xs text-c-cream-dim leading-relaxed font-playfair italic">
+                                        <p className="text-xs text-c-cream-dim leading-relaxed font-playfair">
                                             {item.longDesc}
                                         </p>
                                     </div>
                                     <button
-                                        onClick={() => goTo(item.tab)}
-                                        className="w-full mt-5 py-2.5 bg-c-gold text-c-bg hover:bg-c-gold-light rounded font-playfair font-bold text-xs tracking-wider uppercase transition-all duration-300 transform active:scale-[0.98] cursor-pointer"
+                                        onClick={() => { markSadhanaStep(item.tab); goTo(item.tab); }}
+                                        className={`w-full mt-4 py-2.5 rounded font-playfair font-bold text-xs tracking-wider uppercase transition-all active:scale-[0.98] cursor-pointer ${
+                                            done
+                                                ? 'bg-c-card border border-c-border text-c-cream-dim hover:bg-c-surface'
+                                                : 'bg-c-gold text-c-bg hover:bg-c-gold-light'
+                                        }`}
                                     >
-                                        {item.btnText} →
+                                        {done ? 'Practice again →' : `${item.btnText} →`}
                                     </button>
                                 </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
-                )}
+                    );
+                })()}
             </div>
 
             <footer className="py-6 text-center text-c-cream-dark text-xs font-playfair italic border-t border-c-border">

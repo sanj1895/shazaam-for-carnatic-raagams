@@ -29,15 +29,15 @@ const VeenaIcon = () => (
 );
 
 const FEATURES = [
-    { id: 'tutor',     label: 'Tutor',        desc: 'Learn Carnatic singing from scratch',    symbol: '◈',  mobileSymbol: '🎓' },
-    { id: 'listen',    label: 'Sing',         desc: 'Sing a melody  ·  find the raga',       symbol: '♬',  mobileSymbol: '🎤' },
-    { id: 'library',   label: 'Library',      desc: 'Browse every Carnatic raga',             symbol: '◈',  mobileSymbol: '📚' },
-    { id: 'melakarta', label: 'Melakarta',    desc: 'The complete 72-raga parent chart',      symbol: '⊹',  mobileSymbol: '🗂️' },
-    { id: 'keyboard',  label: 'Keyboard',     desc: 'Play swaras on virtual keys',            symbol: '♩',  mobileSymbol: '🎹' },
-    { id: 'bhedam',    label: 'Graha Bhedam', desc: 'Discover modal shifts between ragas',    symbol: '↻',  mobileSymbol: '🔄' },
-    { id: 'singback',  label: 'Sing-Back',    desc: 'Challenge your raga memory',             symbol: '◎',  mobileSymbol: '🎯' },
-    { id: 'shruthi',   label: 'Shruthi',      desc: 'Continuous drone for practice',          symbol: '〜', mobileSymbol: '🎵' },
-    { id: 'talam',     label: 'Talam',        desc: 'Keep the rhythmic cycle',                symbol: '॥',  mobileSymbol: '🥁' },
+    { id: 'tutor',     label: 'Tutor',        desc: 'Learn Carnatic singing from scratch',    symbol: '◈',  mobileSymbol: '🎓', level: 'start' },
+    { id: 'shruthi',   label: 'Shruthi',      desc: 'Continuous drone for practice',          symbol: '〜', mobileSymbol: '🎵', level: 'beginner' },
+    { id: 'talam',     label: 'Talam',        desc: 'Keep the rhythmic cycle',                symbol: '॥',  mobileSymbol: '🥁', level: 'beginner' },
+    { id: 'listen',    label: 'Sing',         desc: 'Sing a melody  ·  find the raga',       symbol: '♬',  mobileSymbol: '🎤', level: 'intermediate' },
+    { id: 'keyboard',  label: 'Keyboard',     desc: 'Play swaras on virtual keys',            symbol: '♩',  mobileSymbol: '🎹', level: 'intermediate' },
+    { id: 'singback',  label: 'Sing-Back',    desc: 'Challenge your raga memory',             symbol: '◎',  mobileSymbol: '🎯', level: 'intermediate' },
+    { id: 'library',   label: 'Library',      desc: 'Browse every Carnatic raga',             symbol: '◈',  mobileSymbol: '📚', level: 'all' },
+    { id: 'melakarta', label: 'Melakarta',    desc: 'The complete 72-raga parent chart',      symbol: '⊹',  mobileSymbol: '🗂️', level: 'advanced' },
+    { id: 'bhedam',    label: 'Graha Bhedam', desc: 'Discover modal shifts between ragas',    symbol: '↻',  mobileSymbol: '🔄', level: 'advanced' },
 ];
 
 function App() {
@@ -349,82 +349,117 @@ function App() {
                                 From discovering ragas to refining every note, everything you need for Carnatic practice lives here.
                             </p>
 
-                            {/* Explore button  ·  fades out once features are shown */}
+                            {/* CTAs  ·  fade out once features are shown */}
                             <div
-                                className="transition-all duration-500"
+                                className="transition-all duration-500 flex flex-col items-center gap-4"
                                 style={{ opacity: showFeatures ? 0 : 1, pointerEvents: showFeatures ? 'none' : 'auto', height: showFeatures ? 0 : 'auto', overflow: 'hidden' }}
                             >
+                                {/* Primary: Start Learning */}
+                                <button
+                                    onClick={() => goTo('tutor')}
+                                    className="relative overflow-hidden group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-14 py-4 rounded-full text-sm md:text-base tracking-[0.2em] uppercase transition-all duration-500 transform hover:scale-105 shadow-[0_0_40px_rgba(200,148,31,0.35)]"
+                                >
+                                    <span className="relative z-10">Start Learning</span>
+                                </button>
+                                <p className="text-white/40 text-[11px] font-playfair italic">New to Carnatic music? Start here.</p>
+
+                                {/* Secondary: All tools */}
                                 <button
                                     onClick={() => setShowFeatures(true)}
-                                    className="relative overflow-hidden group border border-c-gold/60 bg-c-gold/5 hover:bg-c-gold/20 hover:border-c-gold hover:shadow-[0_0_50px_rgba(200,148,31,0.3)] backdrop-blur-md text-[#f7d686] font-playfair font-bold px-16 py-5 rounded-full text-sm md:text-base tracking-[0.3em] uppercase transition-all duration-700 transform hover:scale-105"
+                                    className="border border-c-gold/30 hover:border-c-gold/60 text-white/50 hover:text-[#f7d686] font-playfair px-8 py-2.5 rounded-full text-xs tracking-[0.2em] uppercase transition-all duration-500"
                                 >
-                                    <span className="relative z-10">Explore</span>
-                                    {/* Ornamental flourishes inside button */}
-                                    <div className="absolute top-0 left-4 w-4 h-px bg-c-gold/40" />
-                                    <div className="absolute bottom-0 right-4 w-4 h-px bg-c-gold/40" />
+                                    I already know Carnatic music →
                                 </button>
                             </div>
                         </div>
 
                         {/* Feature grid  ·  revelation transition */}
                         <div
-                            className="relative z-10 w-full max-w-5xl px-3 sm:px-5 flex items-center justify-center transition-all duration-1000 ease-out"
-                            style={{ 
-                                opacity: showFeatures ? 1 : 0, 
-                                transform: showFeatures ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.98)', 
+                            className="relative z-10 w-full max-w-5xl px-3 sm:px-5 flex flex-col items-center justify-center transition-all duration-1000 ease-out"
+                            style={{
+                                opacity: showFeatures ? 1 : 0,
+                                transform: showFeatures ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.98)',
                                 pointerEvents: showFeatures ? 'auto' : 'none',
                                 flexGrow: showFeatures ? 1 : 0,
                                 minHeight: showFeatures ? '60vh' : 0,
                                 paddingBottom: showFeatures ? '2rem' : 0,
                             }}
                         >
+                            {/* Suggested path banner */}
+                            <div className="w-full max-w-4xl mb-5 px-1">
+                                <p className="text-white/35 text-[10px] font-playfair italic text-center tracking-wide">
+                                    Suggested path for beginners: <span className="text-c-gold/60">Tutor → Shruthi → Talam → Sing</span>
+                                </p>
+                            </div>
+
                             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 md:gap-8 w-full max-w-4xl mx-auto">
-                                {FEATURES.map(({ id, label, desc, symbol }, idx) => (
-                                    <button
-                                        key={id}
-                                        onClick={() => goTo(id)}
-                                        className={`group relative flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 text-center transition-all duration-500 hover:-translate-y-3 h-full w-full ${
-                                            idx === FEATURES.length - 1 ? 'col-span-2 lg:col-span-1' : ''
-                                        }`}
-                                        style={{
-                                            transitionDelay: showFeatures ? `${idx * 60}ms` : '0ms',
-                                            opacity: showFeatures ? 1 : 0,
-                                            transform: showFeatures ? 'translateY(0)' : 'translateY(20px)',
-                                        }}
-                                    >
-                                    {/* The Plaque Base */}
-                                    <div className="absolute inset-0 bg-[#1e0c04] border border-c-gold/30 rounded-lg shadow-2xl group-hover:border-c-gold/70 transition-all duration-300" />
-                                    
-                                    {/* Inner Decorative Border */}
-                                    <div className="absolute inset-1.5 border border-c-gold/10 rounded-md pointer-events-none" />
-                                    
-                                    {/* Ornate Corners */}
-                                    <div className="absolute top-0 left-0 w-5 h-5 border-t border-l border-c-gold/40 rounded-tl-lg group-hover:w-7 group-hover:h-7 transition-all duration-500" />
-                                    <div className="absolute top-0 right-0 w-5 h-5 border-t border-r border-c-gold/40 rounded-tr-lg group-hover:w-7 group-hover:h-7 transition-all duration-500" />
-                                    <div className="absolute bottom-0 left-0 w-5 h-5 border-b border-l border-c-gold/40 rounded-bl-lg group-hover:w-7 group-hover:h-7 transition-all duration-500" />
-                                    <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-c-gold/40 rounded-br-lg group-hover:w-7 group-hover:h-7 transition-all duration-500" />
+                                {FEATURES.map(({ id, label, desc, symbol, level }, idx) => {
+                                    const levelBadge = {
+                                        start:        { text: 'Start here',    color: 'text-emerald-400 border-emerald-500/40 bg-emerald-900/30' },
+                                        beginner:     { text: 'Beginner',      color: 'text-sky-400 border-sky-500/40 bg-sky-900/20' },
+                                        intermediate: { text: 'Intermediate',  color: 'text-amber-400 border-amber-500/40 bg-amber-900/20' },
+                                        advanced:     { text: 'Advanced',      color: 'text-rose-400 border-rose-500/40 bg-rose-900/20' },
+                                        all:          { text: 'All levels',    color: 'text-white/40 border-white/20 bg-white/5' },
+                                    }[level] || null;
 
-                                    {/* Symbol with shadow */}
-                                    <div className="relative z-10 text-c-gold text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 group-hover:text-[#f7d686] transition-all duration-500">
-                                        {symbol}
-                                    </div>
+                                    return (
+                                        <button
+                                            key={id}
+                                            onClick={() => goTo(id)}
+                                            className={`group relative flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 text-center transition-all duration-500 hover:-translate-y-3 h-full w-full ${
+                                                idx === FEATURES.length - 1 ? 'col-span-2 lg:col-span-1' : ''
+                                            }`}
+                                            style={{
+                                                transitionDelay: showFeatures ? `${idx * 60}ms` : '0ms',
+                                                opacity: showFeatures ? 1 : 0,
+                                                transform: showFeatures ? 'translateY(0)' : 'translateY(20px)',
+                                            }}
+                                        >
+                                        {/* The Plaque Base — extra glow for "Start here" */}
+                                        <div className={`absolute inset-0 rounded-lg shadow-2xl transition-all duration-300 ${
+                                            level === 'start'
+                                                ? 'bg-[#1e0c04] border border-c-gold/60 shadow-[0_0_24px_rgba(200,148,31,0.15)] group-hover:border-c-gold'
+                                                : 'bg-[#1e0c04] border border-c-gold/30 group-hover:border-c-gold/70'
+                                        }`} />
 
-                                    {/* Text with vintage spacing */}
-                                    <h3 className="relative z-10 font-playfair text-[#f7d686] text-[10px] sm:text-xs md:text-base font-bold tracking-[0.1em] sm:tracking-[0.15em] uppercase mb-1 sm:mb-1.5 group-hover:text-white transition-colors duration-300">
-                                        {label}
-                                    </h3>
-                                    <p className="relative z-10 text-white/50 text-[9px] sm:text-[10px] md:text-xs leading-relaxed italic max-w-[120px] sm:max-w-[140px] opacity-70 group-hover:opacity-100 transition-opacity hidden sm:block">
-                                        {desc}
-                                    </p>
+                                        {/* Inner Decorative Border */}
+                                        <div className="absolute inset-1.5 border border-c-gold/10 rounded-md pointer-events-none" />
 
-                                    {/* Subtle Teak Texture Overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-lg pointer-events-none" />
-                                    <div className="absolute inset-0 bg-c-gold/0 group-hover:bg-c-gold/5 transition-colors duration-500 rounded-lg pointer-events-none" />
-                                </button>
-                            ))}
+                                        {/* Ornate Corners */}
+                                        <div className="absolute top-0 left-0 w-5 h-5 border-t border-l border-c-gold/40 rounded-tl-lg group-hover:w-7 group-hover:h-7 transition-all duration-500" />
+                                        <div className="absolute top-0 right-0 w-5 h-5 border-t border-r border-c-gold/40 rounded-tr-lg group-hover:w-7 group-hover:h-7 transition-all duration-500" />
+                                        <div className="absolute bottom-0 left-0 w-5 h-5 border-b border-l border-c-gold/40 rounded-bl-lg group-hover:w-7 group-hover:h-7 transition-all duration-500" />
+                                        <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-c-gold/40 rounded-br-lg group-hover:w-7 group-hover:h-7 transition-all duration-500" />
+
+                                        {/* Level badge */}
+                                        {levelBadge && (
+                                            <div className={`absolute top-2.5 right-2.5 z-10 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wide border ${levelBadge.color}`}>
+                                                {levelBadge.text}
+                                            </div>
+                                        )}
+
+                                        {/* Symbol with shadow */}
+                                        <div className="relative z-10 text-c-gold text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 group-hover:text-[#f7d686] transition-all duration-500">
+                                            {symbol}
+                                        </div>
+
+                                        {/* Text with vintage spacing */}
+                                        <h3 className="relative z-10 font-playfair text-[#f7d686] text-[10px] sm:text-xs md:text-base font-bold tracking-[0.1em] sm:tracking-[0.15em] uppercase mb-1 sm:mb-1.5 group-hover:text-white transition-colors duration-300">
+                                            {label}
+                                        </h3>
+                                        <p className="relative z-10 text-white/50 text-[9px] sm:text-[10px] md:text-xs leading-relaxed italic max-w-[120px] sm:max-w-[140px] opacity-70 group-hover:opacity-100 transition-opacity hidden sm:block">
+                                            {desc}
+                                        </p>
+
+                                        {/* Subtle Teak Texture Overlay */}
+                                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-lg pointer-events-none" />
+                                        <div className="absolute inset-0 bg-c-gold/0 group-hover:bg-c-gold/5 transition-colors duration-500 rounded-lg pointer-events-none" />
+                                    </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
-                </div>
             )}
 
                 {/* ══ TUTOR ══ */}

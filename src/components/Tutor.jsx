@@ -1473,8 +1473,7 @@ function playTick(ctx, time) {
 
 function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swaras', onDone }) {
     const [tempoMult, setTempoMult] = useState(1);
-    const BEAT_MS = Math.round(800 / tempoMult);
-    const NOTE_MS = BEAT_MS / speed;
+    const tempoMultRef = useRef(1); // ref so startRecording/playGuide always read the latest value
 
     const [phase, setPhase] = useState('idle'); // idle | guide | countdown | singing | success | fail
     const [countdown, setCountdown] = useState(4);
@@ -1506,7 +1505,8 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
         try {
             const ctrl = new AbortController();
             guideAbortRef.current = ctrl;
-            await playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal);
+            const beatMs = Math.round(800 / tempoMultRef.current) / speed;
+            await playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal, beatMs);
             if (!ctrl.signal.aborted) {
                 setActiveIdx(-1);
             }
@@ -1531,24 +1531,26 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             setCountdown(4);
             playTick(ctx, ctx.currentTime); // Play woodblock click on "4"
 
+            const beatMs = Math.round(800 / tempoMultRef.current);
+            const noteMs = beatMs / speed;
             let c = 4;
             const iv = setInterval(() => {
                 c--;
                 if (c > 0) {
                     setCountdown(c);
-                    playTick(ctx, ctx.currentTime); // Play woodblock click on "2" and "1"
+                    playTick(ctx, ctx.currentTime);
                 } else {
                     clearInterval(iv);
-                    beginListening(stream);
+                    beginListening(stream, noteMs);
                 }
-            }, BEAT_MS); // Click in perfect sync with the singing beat tempo!
+            }, beatMs);
         } catch (err) {
             setMicError('Mic access required. Please allow mic and try again.');
             setPhase('idle');
         }
     };
     
-    const beginListening = (stream) => {
+    const beginListening = (stream, noteMs) => {
         const ctx = getAudioCtx();
         const source = ctx.createMediaStreamSource(stream);
         const analyser = ctx.createAnalyser();
@@ -1556,8 +1558,8 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
         source.connect(analyser);
 
         setPhase('singing');
-        setActiveIdx(0); // Start at first note immediately
-        playTick(ctx, ctx.currentTime); // Play the first singing click instantly
+        setActiveIdx(0);
+        playTick(ctx, ctx.currentTime);
 
         const startMs = Date.now();
         let lastBeat = 0;
@@ -1565,7 +1567,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
         intervalRef.current = setInterval(() => {
             const now = Date.now();
             const elapsed = now - startMs;
-            const currentBeat = Math.floor(elapsed / NOTE_MS);
+            const currentBeat = Math.floor(elapsed / noteMs);
             
             if (currentBeat >= beatToSwaraIdx.length) {
                 cleanup();
@@ -1686,7 +1688,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                 <div className="flex flex-col items-center gap-3">
                     <div className="flex items-center gap-1">
                         {TEMPO_OPTIONS.map(({ label, mult }) => (
-                            <button key={mult} onClick={() => setTempoMult(mult)}
+                            <button key={mult} onClick={() => { tempoMultRef.current = mult; setTempoMult(mult); }}
                                     className={`px-3 py-1 rounded-full text-[10px] font-mono border transition-colors ${
                                         tempoMult === mult
                                             ? 'bg-c-gold/20 text-c-gold border-c-gold/40'

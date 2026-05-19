@@ -177,49 +177,38 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false, onSad
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
         {/* Left Column: Keyboard */}
         <div className="space-y-8">
-          {/* Sa selector */}
-      <div className="heritage-card rounded-lg p-6 space-y-4 shadow-xl">
-        {/* Heritage Corners */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="heritage-border-corner heritage-corner-tl" />
-          <div className="heritage-border-corner heritage-corner-tr" />
-          <div className="heritage-border-corner heritage-corner-bl" />
-          <div className="heritage-border-corner heritage-corner-br" />
-        </div>
+          {/* Sa selector and Drone */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 bg-c-surface border border-c-gold/20 rounded-lg p-3 shadow-sm">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <span className="text-[11px] font-playfair font-bold text-c-gold tracking-widest uppercase">Tonic (Sa):</span>
+              <div className="relative flex-1 sm:flex-none">
+                <select
+                  value={saHz}
+                  onChange={(e) => handleSaChange(Number(e.target.value))}
+                  className="w-full appearance-none bg-c-card border border-c-gold/40 text-c-gold font-playfair font-bold rounded flex items-center px-3 py-1.5 pr-8 text-sm focus:outline-none focus:border-c-gold shadow-sm cursor-pointer"
+                >
+                  {SA_PRESETS.map(({ label, hz }) => (
+                    <option key={label} value={hz}>{label} ({hz.toFixed(0)}Hz)</option>
+                  ))}
+                </select>
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-c-gold opacity-50 text-[9px]">▼</div>
+              </div>
+            </div>
 
-        <p className="text-xs font-playfair font-bold text-c-gold uppercase tracking-[0.2em] border-b border-c-gold/10 pb-2">
-          Select Tonic (Sa)
-        </p>
-        <div className="flex flex-wrap items-center gap-3 relative z-10">
-          {SA_PRESETS.map(({ label, hz }) => (
+            <div className="hidden sm:block w-px h-6 bg-c-gold/20" />
+
             <button
-              key={label}
-              onClick={() => handleSaChange(hz)}
+              onClick={handleToggleDrone}
               className={[
-                'px-5 py-2 rounded border font-playfair font-bold text-xs tracking-widest transition-all duration-300',
-                saHz === hz
-                  ? 'bg-c-gold border-c-gold text-c-bg shadow-lg scale-105'
-                  : 'border-c-gold/40 text-c-gold hover:bg-c-gold/5',
+                'w-full sm:w-auto ml-auto sm:ml-0 px-5 py-1.5 rounded-full border font-playfair font-bold text-[11px] tracking-widest uppercase transition-all duration-300 shadow-sm cursor-pointer active:scale-95 flex items-center justify-center',
+                droneActive
+                  ? 'bg-c-maroon border-c-maroon text-white shadow-[0_0_10px_rgba(122,30,20,0.3)]'
+                  : 'bg-c-card border-c-gold/30 text-c-gold hover:border-c-gold hover:bg-c-gold/10',
               ].join(' ')}
             >
-              {label}
-              <span className="ml-2 text-[10px] opacity-60 font-mono">{hz.toFixed(0)}Hz</span>
+              {droneActive ? '◼ Drone On' : '♬ Drone Off'}
             </button>
-          ))}
-
-          <button
-            onClick={handleToggleDrone}
-            className={[
-              'ml-auto px-6 py-2 rounded-full border font-playfair font-bold text-xs tracking-widest uppercase transition-all duration-500',
-              droneActive
-                ? 'bg-c-maroon border-c-maroon text-white shadow-[0_0_15px_rgba(122,30,20,0.4)]'
-                : 'border-c-gold/30 text-c-gold hover:border-c-gold hover:bg-c-gold/5',
-            ].join(' ')}
-          >
-            {droneActive ? '◼ Drone On' : '♬ Drone Off'}
-          </button>
-        </div>
-      </div>
+          </div>
 
       {/* Arohanam */}
       <div className="space-y-2">

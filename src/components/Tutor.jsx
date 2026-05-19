@@ -3439,6 +3439,21 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
     return (
         <div id="tour-tutor-container" className="w-full px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 flex flex-col items-center gap-4 sm:gap-6 animate-fade-in">
 
+            {/* Header: Svara Gurukul Rebrand */}
+            {screen === 'home' && (
+                <div className="text-center space-y-3 mb-2 animate-fade-in">
+                    <h2 className="font-playfair text-3xl sm:text-4xl md:text-5xl text-c-gold tracking-tight">Svara Gurukul</h2>
+                    <div className="flex items-center justify-center gap-3">
+                        <div className="h-px w-10 bg-c-gold/30" />
+                        <p className="text-c-cream-dim text-[10px] sm:text-xs italic font-playfair tracking-[0.2em] uppercase">Vocal Academy & Scale Mastery</p>
+                        <div className="h-px w-10 bg-c-gold/30" />
+                    </div>
+                    <p className="text-c-cream-dark text-xs sm:text-sm max-w-xl mx-auto leading-relaxed font-playfair opacity-80">
+                        Embark on a traditional Carnatic vocal journey. Learn structured warm-up exercises (Varisais) or practice ascending and descending scales under real-time guidance from the AI Guru.
+                    </p>
+                </div>
+            )}
+
             {/* Base Sa (Shruti) quick setup bar */}
             {screen === 'home' && (
                 <div className="w-full max-w-2xl bg-c-surface border border-c-border/60 rounded-xl p-3.5 flex flex-col gap-3 transition-all duration-300 shadow-sm relative overflow-hidden heritage-card">
@@ -3483,7 +3498,7 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
             {screen === 'home' && (
                 <div className="w-full max-w-2xl">
                     <div className="flex gap-1 border-b border-c-border mb-6">
-                        {[['curriculum', 'Curriculum'], ['practice', 'Raga Practice']].map(([id, label]) => (
+                        {[['curriculum', '📿 Svara Sadhana (Curriculum)'], ['practice', '🌊 Scale Flow (Arohanam/Avarohanam)']].map(([id, label]) => (
                             <button key={id} onClick={() => setTab(id)}
                                     className={`px-5 py-2 text-xs font-playfair tracking-wide transition-colors relative ${
                                         tab === id ? 'text-c-gold' : 'text-c-cream-dim hover:text-c-cream'

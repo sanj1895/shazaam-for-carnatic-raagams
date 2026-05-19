@@ -29,8 +29,28 @@ const VeenaIcon = () => (
     </svg>
 );
 
+const GurukulIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        {/* Temple Arch / Aureole (Prabhavali) */}
+        <path d="M12 52C12 28 20 12 32 12C44 12 52 28 52 52" strokeWidth="2" stroke="currentColor" opacity="0.8" />
+        <path d="M8 56C8 24 18 8 32 8C46 8 56 24 56 56" strokeWidth="1" stroke="currentColor" opacity="0.4" strokeDasharray="3 3" />
+        
+        {/* Traditional Lighted Diya (Oil Lamp) symbolizing classical knowledge */}
+        <path d="M18 46C18 51.5 24.3 56 32 56C39.7 56 46 51.5 46 46C46 46 41 46 32 46C23 46 18 46 18 46Z" fill="currentColor" fillOpacity="0.15" strokeWidth="1.8" />
+        <path d="M32 46C32 46 36 43 36 39C36 35 32 30 32 30C32 30 28 35 28 39C28 43 32 46 32 46Z" fill="currentColor" className="text-c-gold animate-pulse" />
+        
+        {/* Radiating sound rays of wisdom */}
+        <line x1="32" y1="25" x2="32" y2="20" stroke="currentColor" strokeWidth="1.5" />
+        <line x1="22" y1="29" x2="18" y2="26" stroke="currentColor" strokeWidth="1.5" />
+        <line x1="42" y1="29" x2="46" y2="26" stroke="currentColor" strokeWidth="1.5" />
+        
+        {/* Base steps */}
+        <rect x="6" y="56" width="52" height="4" rx="2" fill="currentColor" strokeWidth="1" />
+    </svg>
+);
+
 const FEATURES = [
-    { id: 'tutor',     label: 'Tutor',        desc: 'Learn Carnatic singing from scratch',    symbol: '◈',  mobileSymbol: '🎓', level: 'beginner', highlight: true },
+    { id: 'tutor',     label: 'Gurukul',      desc: 'Classical vocal academy & scale flow', symbol: '📿',  mobileSymbol: '📿', level: 'beginner', highlight: true },
     { id: 'listen',    label: 'Sing',         desc: 'Sing a melody & identify the raga',       symbol: '♬',  mobileSymbol: '🎤', level: 'intermediate', highlight: true },
     { id: 'library',   label: 'Discover',     desc: 'Explore & practice every raga scale',    symbol: '◈',  mobileSymbol: '📚', level: 'all', highlight: true },
     { id: 'sadhana',   label: 'Sadhana',      desc: 'Your recommended daily practice path',    symbol: '🧘‍♀️', mobileSymbol: '🧘‍♀️', level: 'start' },
@@ -374,7 +394,11 @@ function App() {
                                     : 'text-c-cream-dark border-t-2 border-transparent -mt-0.5'
                             }`}
                         >
-                            <span className="text-base">{mobileSymbol}</span>
+                            {mobileSymbol === '📿' ? (
+                                <GurukulIcon className="w-4 h-4" />
+                            ) : (
+                                <span className="text-base">{mobileSymbol}</span>
+                            )}
                             <span className="text-[8px] font-bold uppercase tracking-tight leading-none">{label}</span>
                         </button>
                     ))}
@@ -501,7 +525,7 @@ function App() {
                             {/* Suggested path banner */}
                             <div className="w-full max-w-5xl mb-4 px-1">
                                 <p className="text-white/35 text-[10px] font-playfair italic text-center tracking-wide">
-                                    Suggested path for beginners: <span className="text-c-gold/60">Sadhana → Tutor → Shruthi → Talam</span>
+                                    Suggested path for beginners: <span className="text-c-gold/60">Sadhana → Gurukul → Shruthi → Talam</span>
                                 </p>
                             </div>
 
@@ -541,10 +565,14 @@ function App() {
                                     )}
 
                                     {/* Symbol with shadow */}
-                                    <div className={`relative z-10 text-xl sm:text-2xl mb-1.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-all duration-500 ${
+                                    <div className={`relative z-10 text-xl sm:text-2xl mb-1.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-all duration-500 flex items-center justify-center ${
                                         highlight ? 'text-[#f7d686]' : 'text-c-gold group-hover:text-[#f7d686]'
                                     }`}>
-                                        {symbol}
+                                        {symbol === '📿' ? (
+                                            <GurukulIcon className="w-8 h-8 sm:w-10 sm:h-10" />
+                                        ) : (
+                                            symbol
+                                        )}
                                     </div>
 
                                     {/* Text with vintage spacing */}
@@ -731,7 +759,7 @@ function App() {
                 {view === 'sadhana' && (() => {
                     const steps = [
                         { n: 1, name: 'Tune & Warm Up',  tab: 'shruthi',  icon: '🎶', desc: 'Drone Baseline Alignment',    longDesc: 'Open the Shruthi Box and sustain a warm "ah" sound along with the drone for 30 seconds to lock in your pitch center.', btnText: 'Launch Shruthi Box' },
-                        { n: 2, name: 'AI Vocal Tutor',  tab: 'tutor',    icon: '🎓', desc: 'Classical Scale Practice',    longDesc: 'Sing ascending/descending scales under real-time guidance from the AI Guru to build pitch stability and timing.', btnText: 'Start AI Tutor' },
+                        { n: 2, name: 'Svara Gurukul',  tab: 'tutor',    icon: '📿', desc: 'Vocal Academy & Scale Flow',  longDesc: 'Master structured vocal exercises (Varisais) or practice ascending and descending scales under real-time guidance from the AI Guru.', btnText: 'Enter Svara Gurukul' },
                         { n: 3, name: 'Explore Scales',  tab: 'keyboard', icon: '🎹', desc: 'Swarasthana Visualization',   longDesc: 'Play individual swaras on the virtual keyboard to hear and internalize the exact intervals of a scale.', btnText: 'Open Swara Keyboard' },
                         { n: 4, name: 'Ear Training',    tab: 'singback', icon: '🎯', desc: 'Phrase Reproduction',         longDesc: 'Listen to a phrase and reproduce it by ear. Aim for 80 %+ to sharpen pitch memory and muscle memory together.', btnText: 'Launch Sing-Back' },
                     ];

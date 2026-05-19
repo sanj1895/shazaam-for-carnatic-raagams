@@ -13,6 +13,7 @@ import Talam from './components/Talam';
 import Tutor from './components/Tutor';
 import { getSwaram, identifyRaga, RAGAS } from './utils/ragaLogic';
 import RagaDetail from './components/RagaDetail';
+import OnboardingTour from './components/OnboardingTour';
 
 const VeenaIcon = () => (
     <svg width="22" height="68" viewBox="0 0 22 68" fill="none" className="text-c-gold-dim">
@@ -120,6 +121,8 @@ function App() {
 
     return (
         <>
+            <OnboardingTour onStartLearning={() => goTo('tutor')} />
+
             {/* ══ UNIFIED MODAL (PORTAL) ══ */}
             {selectedRaga && createPortal(
                 <div 

@@ -362,7 +362,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_1', title: 'Varisai 1: The Ascent and Descent', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'Namaste, my student. Welcome to the first Sarali Varisai. We walk straight up the scale (Arohanam) and walk straight back down (Avarohanam) in single-beat measures.\n\nFocus on maintaining an open throat, standard Akaram resonance, and a steady pitch.' },
-                    { type: 'listen', swaras: parseMmg('s r g m | p d | n S || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen closely to the ascending and descending notes.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s r g m | p d | n S || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen closely to the ascending and descending notes.' },
                     { type: 'sing_sequence', swaras: parseMmg('s r g m | p d | n S || S n d p | m g | r s ||'), speed: 1, instruction: 'Now sing it back in perfect sync with the beat clicks.' }
                 ]
             },
@@ -370,7 +370,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_2', title: 'Varisai 2: The Staggered Steps', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'In this second lesson, we introduce staggered steps: "Sa-Ri-Sa-Ri" and then rise. This pattern tests your pitch recall and stability.\n\nSing each swara clearly, ensuring your Ri is stable and Sa is grounded.' },
-                    { type: 'listen', swaras: parseMmg('s r s r | s r | g m || s r g m | p d | n S || S n S n | S n | d p || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the staggered movement.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s r s r | s r | g m || s r g m | p d | n S || S n S n | S n | d p || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the staggered movement.' },
                     { type: 'sing_sequence', swaras: parseMmg('s r s r | s r | g m || s r g m | p d | n S || S n S n | S n | d p || S n d p | m g | r s ||'), speed: 1, instruction: 'Sing the staggered steps back with absolute focus.' }
                 ]
             },
@@ -378,7 +378,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_3', title: 'Varisai 3: The Zig-Zag Leap', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'Now, we skip! We sing "Sa-Ri-Ga-Sa" and "Ri-Ga-Sa-Ri". Skipping back to the home note requires you to coordinate your breath without sliding.\n\nKeep the notes separated and crisp.' },
-                    { type: 'listen', swaras: parseMmg('s r g s | r g | s r || s r g m | p d | n S || S n d S | n d | S n || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the leaps.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s r g s | r g | s r || s r g m | p d | n S || S n d S | n d | S n || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the leaps.' },
                     { type: 'sing_sequence', swaras: parseMmg('s r g s | r g | s r || s r g m | p d | n S || S n d S | n d | S n || S n d p | m g | r s ||'), speed: 1, instruction: 'Sing the zig-zag leaps on the beats.' }
                 ]
             },
@@ -386,7 +386,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_4', title: 'Varisai 4: Double Steps', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'In this fourth pattern, we repeat the first tetrachord ("Sa-Ri-Ga-Ma") twice before rising to the upper octave. This reinforces the core notes.\n\nLet the pulse click guide your tempo perfectly.' },
-                    { type: 'listen', swaras: parseMmg('s r g m | s r | g m || s r g m | p d | n S || S n d p | S n | d p || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the doubled tetrachords.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s r g m | s r | g m || s r g m | p d | n S || S n d p | S n | d p || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the doubled tetrachords.' },
                     { type: 'sing_sequence', swaras: parseMmg('s r g m | s r | g m || s r g m | p d | n S || S n d p | S n | d p || S n d p | m g | r s ||'), speed: 1, instruction: 'Sing it back in sync.' }
                 ]
             }
@@ -401,7 +401,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_5', title: 'Varisai 5: The Silent Pulse', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'Silence is as beautiful as sound. We introduce a one-beat pause (represented by the comma ,) after Pa.\n\nDo not sing during the pause—hold your breath in absolute, restful stillness before re-entering on Sa.' },
-                    { type: 'listen', swaras: parseMmg('s r g m | p , | s r || s r g m | p d | n S || S n d p | m , | S n || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the silent pause after Pa.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s r g m | p , | s r || s r g m | p d | n S || S n d p | m , | S n || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the silent pause after Pa.' },
                     { type: 'sing_sequence', swaras: parseMmg('s r g m | p , | s r || s r g m | p d | n S || S n d p | m , | S n || S n d p | m g | r s ||'), speed: 1, instruction: 'Sing the sequence, maintaining perfect silence on the pause.' }
                 ]
             },
@@ -409,7 +409,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_6', title: 'Varisai 6: High and Low Octaves', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'We return to the lower octave "Sa-Ri" after rising to Pa and Da. This shifts your vocal posture back and forth, training octave agility.\n\nMaintain a light, floating voice in both registers.' },
-                    { type: 'listen', swaras: parseMmg('s r g m | p d | s r || s r g m | p d | n S || S n d p | m g | S n || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the octave changes.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s r g m | p d | s r || s r g m | p d | n S || S n d p | m g | S n || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the octave changes.' },
                     { type: 'sing_sequence', swaras: parseMmg('s r g m | p d | s r || s r g m | p d | n S || S n d p | m g | S n || S n d p | m g | r s ||'), speed: 1, instruction: 'Sing the octave shifts cleanly.' }
                 ]
             },
@@ -417,7 +417,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_7', title: 'Varisai 7: The Final Silent Step', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'We place a pause right before the high Ṡ note. This tests your rhythmic control: do not rush into the high note. Honor the silence first!\n\nKeep your high Ṡ soft and resonant.' },
-                    { type: 'listen', swaras: parseMmg('s r g m | p d | n , || s r g m | p d | n S || S n d p | m g | r , || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the pause before the high Sa.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s r g m | p d | n , || s r g m | p d | n S || S n d p | m g | r , || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the pause before the high Sa.' },
                     { type: 'sing_sequence', swaras: parseMmg('s r g m | p d | n , || s r g m | p d | n S || S n d p | m g | r , || S n d p | m g | r s ||'), speed: 1, instruction: 'Sing it back with the final pause.' }
                 ]
             }
@@ -432,7 +432,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_8', title: 'Varisai 8: The Retrograde Turn', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'A retrograde turn! Singing "Pa-Ma-Ga-Ri" inside the ascent teaches the vocal cords to pivot backward gracefully before resuming the climb.\n\nKeep the notes flowing smoothly like river water.' },
-                    { type: 'listen', swaras: parseMmg('s r g m | p m | g r || s r g m | p d | n S || S n d p | m p | d n || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the retrograde turn.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s r g m | p m | g r || s r g m | p d | n S || S n d p | m p | d n || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the retrograde turn.' },
                     { type: 'sing_sequence', swaras: parseMmg('s r g m | p m | g r || s r g m | p d | n S || S n d p | m p | d n || S n d p | m g | r s ||'), speed: 1, instruction: 'Sing the retrograde turn.' }
                 ]
             },
@@ -440,7 +440,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_9', title: 'Varisai 9: The Double Turn', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'This is a complex double turn: "Pa-Ma-Da-Pa" in ascent, and "Ma-Pa-Ga-Ma" in descent.\n\nObserve how the melody doubles back twice. Relax your neck and let your core support the breath.' },
-                    { type: 'listen', swaras: parseMmg('s r g m | p m | d p || s r g m | p d | n S || S n d p | m p | g m || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the double turn.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s r g m | p m | d p || s r g m | p d | n S || S n d p | m p | g m || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the double turn.' },
                     { type: 'sing_sequence', swaras: parseMmg('s r g m | p m | d p || s r g m | p d | n S || S n d p | m p | g m || S n d p | m g | r s ||'), speed: 1, instruction: 'Sing the double turn sequence.' }
                 ]
             },
@@ -448,7 +448,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_10', title: 'Varisai 10: The Triple Pause', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'A magnificent test of timing! We sing "Pa", then pause for three entire beats: "p , , ,".\n\nYour mind must hold the inner metronome steady during this long silence.' },
-                    { type: 'listen', swaras: parseMmg('s r g m | p , | g m || p , , , | p , | , , || g m p d | n d | p m || g m p , | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the long triple pause.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s r g m | p , | g m || p , , , | p , | , , || g m p d | n d | p m || g m p , | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the long triple pause.' },
                     { type: 'sing_sequence', swaras: parseMmg('s r g m | p , | g m || p , , , | p , | , , || g m p d | n d | p m || g m p , | m g | r s ||'), speed: 1, instruction: 'Sing the triple pause sequence.' }
                 ]
             },
@@ -456,7 +456,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_11', title: 'Varisai 11: The Upper Octave Anchor', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'We turn the scale upside down! We begin directly in the high octave on Ṡ and anchor our descent from above.\n\nKeep your voice light, float on the notes, and let the high Sa ring pure.' },
-                    { type: 'listen', swaras: parseMmg('S , n d | n , | d p || d , p m | p , | p , || g m p d | n d | p m || g m p g | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the high octave descent.' },
+                    { type: 'listen_sequence', swaras: parseMmg('S , n d | n , | d p || d , p m | p , | p , || g m p d | n d | p m || g m p g | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the high octave descent.' },
                     { type: 'sing_sequence', swaras: parseMmg('S , n d | n , | d p || d , p m | p , | p , || g m p d | n d | p m || g m p g | m g | r s ||'), speed: 1, instruction: 'Sing the high octave sequence.' }
                 ]
             }
@@ -471,7 +471,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_12', title: 'Varisai 12: High Double Beats', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'A beautiful challenge! We combine high-register double strikes with sudden single-beat pauses.\n\nKeep your notes crystalline, sharp, and focused.' },
-                    { type: 'listen', swaras: parseMmg('S S n d | n n | d p || d d p m | p , | p , || g m p d | n d | p m || g m p g | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the high double beats.' },
+                    { type: 'listen_sequence', swaras: parseMmg('S S n d | n n | d p || d d p m | p , | p , || g m p d | n d | p m || g m p g | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the high double beats.' },
                     { type: 'sing_sequence', swaras: parseMmg('S S n d | n n | d p || d d p m | p , | p , || g m p d | n d | p m || g m p g | m g | r s ||'), speed: 1, instruction: 'Sing the high double beats.' }
                 ]
             },
@@ -479,7 +479,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_13', title: 'Varisai 13: Staggered Ascent & Descent', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'This staggered, swinging pattern walks back and forth like a pendulum. It tests your breath capacity and your alignment with the Tambura drone.\n\nAnchor your ears to the drone constantly.' },
-                    { type: 'listen', swaras: parseMmg('s r g r | g , | g m || p m p , | d p | d , || m p d p | d n | d p || m p d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the swinging pattern.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s r g r | g , | g m || p m p , | d p | d , || m p d p | d n | d p || m p d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the swinging pattern.' },
                     { type: 'sing_sequence', swaras: parseMmg('s r g r | g , | g m || p m p , | d p | d , || m p d p | d n | d p || m p d p | m g | r s ||'), speed: 1, instruction: 'Sing the staggered swinging pattern.' }
                 ]
             },
@@ -487,7 +487,7 @@ export const SARALI_CURRICULUM = [
                 id: 's_14', title: 'Varisai 14: The Grand Review', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'My dear student, you have reached the summit of Sarali Varisai. This grand review combines all patterns: doubled notes, silent beats, and leaps.\n\nBring all your training to this final sequence. Keep your posture upright, breathe deeply, and sing with joy!' },
-                    { type: 'listen', swaras: parseMmg('s r g m | p , | p , || d d p , | m m | p , || d n S , | S n | d p || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the grand review.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s r g m | p , | p , || d d p , | m m | p , || d n S , | S n | d p || S n d p | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the grand review.' },
                     { type: 'sing_sequence', swaras: parseMmg('s r g m | p , | p , || d d p , | m m | p , || d n S , | S n | d p || S n d p | m g | r s ||'), speed: 1, instruction: 'Sing the grand review sequence.' }
                 ]
             }
@@ -505,7 +505,7 @@ export const JANTA_CURRICULUM = [
                 id: 'j_1', title: 'Varisai 1: The Steady Twins', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'The Sphuritha Gamakam', body: 'Welcome to Janta Varisai—the twin-note exercises.\n\nHere, we sing each note twice. But do not just slide or sing a single long note! Use a gentle, active contraction of your solar plexus (nabhi) to accent the second strike clearly. This sacred ornament is called "Sphuritha".' },
-                    { type: 'listen', swaras: parseMmg('s s r r | g g | m m || p p d d | n n | S S || S S n n | d d | p p || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the crisp twin-note strikes.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s s r r | g g | m m || p p d d | n n | S S || S S n n | d d | p p || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the crisp twin-note strikes.' },
                     { type: 'sing_sequence', swaras: parseMmg('s s r r | g g | m m || p p d d | n n | S S || S S n n | d d | p p || m m g g | r r | s s ||'), speed: 1, instruction: 'Sing the twins, accenting the second strike of each pair.' }
                 ]
             },
@@ -513,7 +513,7 @@ export const JANTA_CURRICULUM = [
                 id: 'j_2', title: 'Varisai 2: Climbing the Twin Mountain', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'We climb staggered twins! Each melodic phrase walks up a note and repeats the twin sequence.\n\nKeep your core engaged, relax your shoulders, and ensure every note strike is clean.' },
-                    { type: 'listen', swaras: parseMmg('s s r r | g g | m m || r r g g | m m | p p || g g m m | p p | d d || m m p p | d d | n n || p p d d | n n | S S || S S n n | d d | p p || n n d d | p p | m m || d d p p | m m | g g || p p m m | g g | r r || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the mountain climb.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s s r r | g g | m m || r r g g | m m | p p || g g m m | p p | d d || m m p p | d d | n n || p p d d | n n | S S || S S n n | d d | p p || n n d d | p p | m m || d d p p | m m | g g || p p m m | g g | r r || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the mountain climb.' },
                     { type: 'sing_sequence', swaras: parseMmg('s s r r | g g | m m || r r g g | m m | p p || g g m m | p p | d d || m m p p | d d | n n || p p d d | n n | S S || S S n n | d d | p p || n n d d | p p | m m || d d p p | m m | g g || p p m m | g g | r r || m m g g | r r | s s ||'), speed: 1, instruction: 'Sing the twin mountain climb.' }
                 ]
             },
@@ -521,7 +521,7 @@ export const JANTA_CURRICULUM = [
                 id: 'j_3', title: 'Varisai 3: The Returning Twins', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'A long, zig-zag pattern of twin notes. This is an exceptional exercise for developing vocal stamina, keeping pitch accuracy high, and staying locked to the Tambura drone.' },
-                    { type: 'listen', swaras: parseMmg('s s r r | g g | r r || s s r r | g g | m m || r r g g | m m | g g || r r g g | m m | p p || g g m m | p p | m m || g g m m | p p | d d || m m p p | d d | p p || m m p p | d d | n n || p p d d | n n | d d || p p d d | n n | S S || S S n n | d d | n n || S S n n | d d | p p || n n d d | p p | d d || n n d d | p p | m m || d d p p | m m | p p || d d p p | m m | g g || p p m m | g g | m m || p p m m | g g | r r || m m g g | r r | g g || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the long returning twins.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s s r r | g g | r r || s s r r | g g | m m || r r g g | m m | g g || r r g g | m m | p p || g g m m | p p | m m || g g m m | p p | d d || m m p p | d d | p p || m m p p | d d | n n || p p d d | n n | d d || p p d d | n n | S S || S S n n | d d | n n || S S n n | d d | p p || n n d d | p p | d d || n n d d | p p | m m || d d p p | m m | p p || d d p p | m m | g g || p p m m | g g | m m || p p m m | g g | r r || m m g g | r r | g g || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the long returning twins.' },
                     { type: 'sing_sequence', swaras: parseMmg('s s r r | g g | r r || s s r r | g g | m m || r r g g | m m | g g || r r g g | m m | p p || g g m m | p p | m m || g g m m | p p | d d || m m p p | d d | p p || m m p p | d d | n n || p p d d | n n | d d || p p d d | n n | S S || S S n n | d d | n n || S S n n | d d | p p || n n d d | p p | d d || n n d d | p p | m m || d d p p | m m | p p || d d p p | m m | g g || p p m m | g g | m m || p p m m | g g | r r || m m g g | r r | g g || m m g g | r r | s s ||'), speed: 1, instruction: 'Sing the returning twins sequence.' }
                 ]
             }
@@ -536,7 +536,7 @@ export const JANTA_CURRICULUM = [
                 id: 'j_4', title: 'Varisai 4: Syncopated Twin Pause', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'A beautiful challenge! We introduce a syncopated pause right in the middle of a twin strike: "Sa Sa Ri [pause] Sa".\n\nThis trains rapid note re-striking and strict rhythmic discipline.' },
-                    { type: 'listen', swaras: parseMmg('s s r , s | s r | s r || s s r r | g g | m m || r r g , r | r g | r g || r r g g | m m | p p || g g m , g | g m | g m || g g m m | p p | d d || m m p , m | m p | m p || m m p p | d d | n n || p p d , p | p d | p d || p p d d | n n | S S || S S n , S | S n | S n || S S n n | d d | p p || n n d , n | n d | n d || n n d d | p p | m m || d d p , d | d p | d p || d d p p | m m | g g || p p m , p | p m | p m || p p m m | g g | r r || m m g , m | m g | m g || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the syncopated pauses.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s s r , s | s r | s r || s s r r | g g | m m || r r g , r | r g | r g || r r g g | m m | p p || g g m , g | g m | g m || g g m m | p p | d d || m m p , m | m p | m p || m m p p | d d | n n || p p d , p | p d | p d || p p d d | n n | S S || S S n , S | S n | S n || S S n n | d d | p p || n n d , n | n d | n d || n n d d | p p | m m || d d p , d | d p | d p || d d p p | m m | g g || p p m , p | p m | p m || p p m m | g g | r r || m m g , m | m g | m g || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the syncopated pauses.' },
                     { type: 'sing_sequence', swaras: parseMmg('s s r , s | s r | s r || s s r r | g g | m m || r r g , r | r g | r g || r r g g | m m | p p || g g m , g | g m | g m || g g m m | p p | d d || m m p , m | m p | m p || m m p p | d d | n n || p p d , p | p d | p d || p p d d | n n | S S || S S n , S | S n | S n || S S n n | d d | p p || n n d , n | n d | n d || n n d d | p p | m m || d d p , d | d p | d p || d d p p | m m | g g || p p m , p | p m | p m || p p m m | g g | r r || m m g , m | m g | m g || m m g g | r r | s s ||'), speed: 1, instruction: 'Sing the syncopated pauses sequence.' }
                 ]
             },
@@ -544,7 +544,7 @@ export const JANTA_CURRICULUM = [
                 id: 'j_5', title: 'Varisai 5: Staggered Twin Pause', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'A variation of syncopated twin pauses where the gap shifts: "Sa Sa Ri Ri | Ga , Sa | Ri Ga".\n\nEnsure each restrike is crisp, soft, and driven by abdominal breathing.' },
-                    { type: 'listen', swaras: parseMmg('s s r r | g , s | r g || s s r r | g g | m m || r r g g | m , r | g m || r r g g | m m | p p || g g m m | p , g | m p || g g m m | p p | d d || m m p p | d , m | p d || m m p p | d d | n n || p p d d | n , p | d n || p p d d | n n | S S || S S n n | d , S | n d || S S n n | d d | p p || n n d d | p , n | d p || n n d d | p p | m m || d d p p | m , d | p m || d d p p | m m | g g || p p m m | g , p | m g || p p m m | g g | r r || m m g g | r , m | g r || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the staggered twin pauses.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s s r r | g , s | r g || s s r r | g g | m m || r r g g | m , r | g m || r r g g | m m | p p || g g m m | p , g | m p || g g m m | p p | d d || m m p p | d , m | p d || m m p p | d d | n n || p p d d | n , p | d n || p p d d | n n | S S || S S n n | d , S | n d || S S n n | d d | p p || n n d d | p , n | d p || n n d d | p p | m m || d d p p | m , d | p m || d d p p | m m | g g || p p m m | g , p | m g || p p m m | g g | r r || m m g g | r , m | g r || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the staggered twin pauses.' },
                     { type: 'sing_sequence', swaras: parseMmg('s s r r | g , s | r g || s s r r | g g | m m || r r g g | m , r | g m || r r g g | m m | p p || g g m m | p , g | m p || g g m m | p p | d d || m m p p | d , m | p d || m m p p | d d | n n || p p d d | n , p | d n || p p d d | n n | S S || S S n n | d , S | n d || S S n n | d d | p p || n n d d | p , n | d p || n n d d | p p | m m || d d p p | m , d | p m || d d p p | m m | g g || p p m m | g , p | m g || p p m m | g g | r r || m m g g | r , m | g r || m m g g | r r | s s ||'), speed: 1, instruction: 'Sing the staggered pauses back.' }
                 ]
             },
@@ -552,7 +552,7 @@ export const JANTA_CURRICULUM = [
                 id: 'j_6', title: 'Varisai 6: The Silent Heart Twin', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'A silent pause placed directly between the twin strikes: "Sa Sa , Ri | Ri , | Ga Ga".\n\nThis tests your ability to feel the silent pulse inside your heart before striking the second note.' },
-                    { type: 'listen', swaras: parseMmg('s s , r | r , | g g || s s r r | g g | m m || r r , g | g , | m m || r r g g | m m | p p || g g , m | m , | p p || g g m m | p p | d d || m m , p | p , | d d || m m p p | d d | n n || p p , d | d , | n n || p p d d | n n | S S || S S , n | n , | d d || S S n n | d d | p p || n n , d | d , | p p || n n d d | p p | m m || d d , p | p , | m m || d d p p | m m | g g || p p , m | m , | g g || p p m m | g g | r r || m m , g | g , | r r || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the silent heart twins.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s s , r | r , | g g || s s r r | g g | m m || r r , g | g , | m m || r r g g | m m | p p || g g , m | m , | p p || g g m m | p p | d d || m m , p | p , | d d || m m p p | d d | n n || p p , d | d , | n n || p p d d | n n | S S || S S , n | n , | d d || S S n n | d d | p p || n n , d | d , | p p || n n d d | p p | m m || d d , p | p , | m m || d d p p | m m | g g || p p , m | m , | g g || p p m m | g g | r r || m m , g | g , | r r || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the silent heart twins.' },
                     { type: 'sing_sequence', swaras: parseMmg('s s , r | r , | g g || s s r r | g g | m m || r r , g | g , | m m || r r g g | m m | p p || g g , m | m , | p p || g g m m | p p | d d || m m , p | p , | d d || m m p p | d d | n n || p p , d | d , | n n || p p d d | n n | S S || S S , n | n , | d d || S S n n | d d | p p || n n , d | d , | p p || n n d d | p p | m m || d d , p | p , | m m || d d p p | m m | g g || p p , m | m , | g g || p p m m | g g | r r || m m , g | g , | r r || m m g g | r r | s s ||'), speed: 1, instruction: 'Sing the silent heart twins sequence.' }
                 ]
             }
@@ -567,7 +567,7 @@ export const JANTA_CURRICULUM = [
                 id: 'j_7', title: 'Varisai 7: Syncopated Single Twin', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'Here, the pause precedes the strike: "Sa , Sa Ri | , Ri | Ga Ga".\n\nThis syncopated alignment tests your core sense of timing. Keep your foot tap or hand clap perfectly aligned with the beat click.' },
-                    { type: 'listen', swaras: parseMmg('s , s r | , r | g g || s s r r | g g | m m || r , r g | , g | m m || r r g g | m m | p p || g , g m | , m | p p || g g m m | p p | d d || m , m p | , p | d d || m m p p | d d | n n || p , p d | , d | n n || p p d d | n n | S S || S , S n | , n | d d || S S n n | d d | p p || n , n d | , d | p p || n n d d | p p | m m || d , d p | , p | m m || d d p p | m m | g g || p , p m | , m | g g || p p m m | g g | r r || m , m g | , g | r r || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the syncopated single twins.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s , s r | , r | g g || s s r r | g g | m m || r , r g | , g | m m || r r g g | m m | p p || g , g m | , m | p p || g g m m | p p | d d || m , m p | , p | d d || m m p p | d d | n n || p , p d | , d | n n || p p d d | n n | S S || S , S n | , n | d d || S S n n | d d | p p || n , n d | , d | p p || n n d d | p p | m m || d , d p | , p | m m || d d p p | m m | g g || p , p m | , m | g g || p p m m | g g | r r || m , m g | , g | r r || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the syncopated single twins.' },
                     { type: 'sing_sequence', swaras: parseMmg('s , s r | , r | g g || s s r r | g g | m m || r , r g | , g | m m || r r g g | m m | p p || g , g m | , m | p p || g g m m | p p | d d || m , m p | , p | d d || m m p p | d d | n n || p , p d | , d | n n || p p d d | n n | S S || S , S n | , n | d d || S S n n | d d | p p || n , n d | , d | p p || n n d d | p p | m m || d , d p | , p | m m || d d p p | m m | g g || p , p m | , m | g g || p p m m | g g | r r || m , m g | , g | r r || m m g g | r r | s s ||'), speed: 1, instruction: 'Sing the syncopated single twins.' }
                 ]
             },
@@ -575,7 +575,7 @@ export const JANTA_CURRICULUM = [
                 id: 'j_8', title: 'Varisai 8: The Triple Strike', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Pedagogy from the Guru', body: 'The absolute summit of Janta Varisai: triple note strikes!\n\n"Sa Sa Sa" followed by "Ri Ri Ri". Strike each of the three notes with crisp, solar plexus clarity from your core. Keep the notes in perfect alignment with the beat.' },
-                    { type: 'listen', swaras: parseMmg('s s s r | r r | g g || s s r r | g g | m m || r r r g | g g | m m || r r g g | m m | p p || g g g m | m m | p p || g g m m | p p | d d || m m m p | p p | d d || m m p p | d d | n n || p p p d | d d | n n || p p d d | n n | S S || S S S n | n n | d d || S S n n | d d | p p || n n n d | d d | p p || n n d d | p p | m m || d d d p | p p | m m || d d p p | m m | g g || p p p m | m m | g g || p p m m | g g | r r || m m m g | g g | r r || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the triple strikes.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s s s r | r r | g g || s s r r | g g | m m || r r r g | g g | m m || r r g g | m m | p p || g g g m | m m | p p || g g m m | p p | d d || m m m p | p p | d d || m m p p | d d | n n || p p p d | d d | n n || p p d d | n n | S S || S S S n | n n | d d || S S n n | d d | p p || n n n d | d d | p p || n n d d | p p | m m || d d d p | p p | m m || d d p p | m m | g g || p p p m | m m | g g || p p m m | g g | r r || m m m g | g g | r r || m m g g | r r | s s ||'), displayLabel: '♪', instruction: 'Listen to the triple strikes.' },
                     { type: 'sing_sequence', swaras: parseMmg('s s s r | r r | g g || s s r r | g g | m m || r r r g | g g | m m || r r g g | m m | p p || g g g m | m m | p p || g g m m | p p | d d || m m m p | p p | d d || m m p p | d d | n n || p p p d | d d | n n || p p d d | n n | S S || S S S n | n n | d d || S S n n | d d | p p || n n n d | d d | p p || n n d d | p p | m m || d d d p | p p | m m || d d p p | m m | g g || p p p m | m m | g g || p p m m | g g | r r || m m m g | g g | r r || m m g g | r r | s s ||'), speed: 1, instruction: 'Sing the triple strikes sequence.' }
                 ]
             }
@@ -593,7 +593,7 @@ export const DAATU_CURRICULUM = [
                 id: 'd_1_1', title: 'Varisai 1: Introduction to Leaps', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Guru Introduction', body: 'Namaste, my dear student. Welcome to Daatu Varisai, the "kangaroo leaps" of Carnatic music. Unlike Sarali (straight steps) or Janta (double steps), Daatu introduces interval leaps. We skip notes to build high-level pitch agility.\n\nLet\'s start with the first four ascending phrases of the first Varisai. Maintain stable, pure notes.' },
-                    { type: 'listen', swaras: parseMmg('s r s g | r g | r m || s m g r | s r | g m || r g r m | g m | g p || r p m g | r g | m p ||'), displayLabel: '♪', instruction: 'Listen to the first 4 ascending phrases.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s r s g | r g | r m || s m g r | s r | g m || r g r m | g m | g p || r p m g | r g | m p ||'), displayLabel: '♪', instruction: 'Listen to the first 4 ascending phrases.' },
                     { type: 'sing_sequence', swaras: parseMmg('s r s g | r g | r m || s m g r | s r | g m || r g r m | g m | g p || r p m g | r g | m p ||'), speed: 1, instruction: 'Sing the first 4 ascending phrases.' }
                 ]
             },
@@ -601,7 +601,7 @@ export const DAATU_CURRICULUM = [
                 id: 'd_1_2', title: 'Varisai 1: Mid-Range Ascent', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Guru Pedagogy', body: 'Very good! Now we move up the scale into the middle octaves. Notice the leap from G to P (Ga to Pa), which requires an exact interval of a major third.\n\nKeep your posture relaxed and lean on the Tambura drone.' },
-                    { type: 'listen', swaras: parseMmg('g m g p | m p | m d || g d p m | g m | p d || m p m d | p d | p n || m n d p | m p | d n ||'), displayLabel: '♪', instruction: 'Listen to the middle ascending phrases.' },
+                    { type: 'listen_sequence', swaras: parseMmg('g m g p | m p | m d || g d p m | g m | p d || m p m d | p d | p n || m n d p | m p | d n ||'), displayLabel: '♪', instruction: 'Listen to the middle ascending phrases.' },
                     { type: 'sing_sequence', swaras: parseMmg('g m g p | m p | m d || g d p m | g m | p d || m p m d | p d | p n || m n d p | m p | d n ||'), speed: 1, instruction: 'Sing the middle ascending phrases.' }
                 ]
             },
@@ -609,7 +609,7 @@ export const DAATU_CURRICULUM = [
                 id: 'd_1_3', title: 'Varisai 1: High Octave Ascent Peak', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Guru Pedagogy', body: 'We now reach the peak of the ascent! These phrases leap into the high octave: p d p n (Pa to Ni) and p Ṡ n d (Pa to High Sa).\n\nLet your voice open naturally, without squeezing your throat.' },
-                    { type: 'listen', swaras: parseMmg('p d p n | d n | d S || p S n d | p d | n S ||'), displayLabel: '♪', instruction: 'Listen to the ascending peak.' },
+                    { type: 'listen_sequence', swaras: parseMmg('p d p n | d n | d S || p S n d | p d | n S ||'), displayLabel: '♪', instruction: 'Listen to the ascending peak.' },
                     { type: 'sing_sequence', swaras: parseMmg('p d p n | d n | d S || p S n d | p d | n S ||'), speed: 1, instruction: 'Sing the peak ascending phrases.' }
                 ]
             }
@@ -624,7 +624,7 @@ export const DAATU_CURRICULUM = [
                 id: 'd_1_4', title: 'Varisai 1: Upper-Range Descent', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Guru Pedagogy', body: 'We begin our descent from the high octave. Descending with leaps is highly challenging, as we must drop pitches without losing pitch centering.\n\nFocus on dropping your jaw relaxed as you descend.' },
-                    { type: 'listen', swaras: parseMmg('S n S d | n d | n p || S p d n | S n | d p || n d n p | d p | d m || n m p d | n d | p m ||'), displayLabel: '♪', instruction: 'Listen to the first 4 descending phrases.' },
+                    { type: 'listen_sequence', swaras: parseMmg('S n S d | n d | n p || S p d n | S n | d p || n d n p | d p | d m || n m p d | n d | p m ||'), displayLabel: '♪', instruction: 'Listen to the first 4 descending phrases.' },
                     { type: 'sing_sequence', swaras: parseMmg('S n S d | n d | n p || S p d n | S n | d p || n d n p | d p | d m || n m p d | n d | p m ||'), speed: 1, instruction: 'Sing the first 4 descending phrases.' }
                 ]
             },
@@ -632,7 +632,7 @@ export const DAATU_CURRICULUM = [
                 id: 'd_1_5', title: 'Varisai 1: Mid to Low-Range Descent', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Guru Pedagogy', body: 'We conclude the first Daatu Varisai descending back to the root Sa. These final phrases feature the wide leap from Pa to Ri (p r g m).\n\nAlign your voice carefully with the Tambura drone.' },
-                    { type: 'listen', swaras: parseMmg('d p d m | p m | p g || d g m p | d p | m g || p m p g | m g | m r || p r g m | p m | g r || m g m r | g r | g s || m s r g | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the remaining descending phrases.' },
+                    { type: 'listen_sequence', swaras: parseMmg('d p d m | p m | p g || d g m p | d p | m g || p m p g | m g | m r || p r g m | p m | g r || m g m r | g r | g s || m s r g | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the remaining descending phrases.' },
                     { type: 'sing_sequence', swaras: parseMmg('d p d m | p m | p g || d g m p | d p | m g || p m p g | m g | m r || p r g m | p m | g r || m g m r | g r | g s || m s r g | m g | r s ||'), speed: 1, instruction: 'Sing the remaining descending phrases.' }
                 ]
             }
@@ -647,7 +647,7 @@ export const DAATU_CURRICULUM = [
                 id: 'd_2_1', title: 'Varisai 2: Intro to Cross-Leaps', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Guru Pedagogy', body: 'Excellent progress, my student. The second Daatu Varisai is even more beautiful! It uses alternate leap structures (Sa to Ma: s m g m).\n\nKeep the notes crisp and precise in time.' },
-                    { type: 'listen', swaras: parseMmg('s m g m | r g | s r || s g r g | s r | g m || r p m p | g m | r g || r m g m | r g | m p ||'), displayLabel: '♪', instruction: 'Listen to the first 4 phrases.' },
+                    { type: 'listen_sequence', swaras: parseMmg('s m g m | r g | s r || s g r g | s r | g m || r p m p | g m | r g || r m g m | r g | m p ||'), displayLabel: '♪', instruction: 'Listen to the first 4 phrases.' },
                     { type: 'sing_sequence', swaras: parseMmg('s m g m | r g | s r || s g r g | s r | g m || r p m p | g m | r g || r m g m | r g | m p ||'), speed: 1, instruction: 'Sing the first 4 phrases.' }
                 ]
             },
@@ -655,7 +655,7 @@ export const DAATU_CURRICULUM = [
                 id: 'd_2_2', title: 'Varisai 2: Mid-Range Leaps', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Guru Pedagogy', body: 'Moving further up! We transition from middle to high register, leaping to Da and Ni. Let your breath expand naturally to support the higher range.' },
-                    { type: 'listen', swaras: parseMmg('g d p d | m p | g m || g p m p | g m | p d || m n d n | p d | m p || m d p d | m p | d n ||'), displayLabel: '♪', instruction: 'Listen to these phrases.' },
+                    { type: 'listen_sequence', swaras: parseMmg('g d p d | m p | g m || g p m p | g m | p d || m n d n | p d | m p || m d p d | m p | d n ||'), displayLabel: '♪', instruction: 'Listen to these phrases.' },
                     { type: 'sing_sequence', swaras: parseMmg('g d p d | m p | g m || g p m p | g m | p d || m n d n | p d | m p || m d p d | m p | d n ||'), speed: 1, instruction: 'Sing the phrases.' }
                 ]
             },
@@ -663,7 +663,7 @@ export const DAATU_CURRICULUM = [
                 id: 'd_2_3', title: 'Varisai 2: Peak Ascent to High Sa', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Guru Pedagogy', body: 'Here is the peak of the second ascent. A majestic cross-leap to high Sa (p Ṡ n Ṡ) and (p n d n).\n\nLet the notes be light and clear.' },
-                    { type: 'listen', swaras: parseMmg('p S n S | d n | p d || p n d n | p d | n S ||'), displayLabel: '♪', instruction: 'Listen to the peak ascending phrases.' },
+                    { type: 'listen_sequence', swaras: parseMmg('p S n S | d n | p d || p n d n | p d | n S ||'), displayLabel: '♪', instruction: 'Listen to the peak ascending phrases.' },
                     { type: 'sing_sequence', swaras: parseMmg('p S n S | d n | p d || p n d n | p d | n S ||'), speed: 1, instruction: 'Sing the peak ascending phrases.' }
                 ]
             }
@@ -678,7 +678,7 @@ export const DAATU_CURRICULUM = [
                 id: 'd_2_4', title: 'Varisai 2: Descending Cross-Leaps', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Guru Pedagogy', body: 'We begin the final descent of the second Varisai. The leap from high Sa to Pa (Ṡ p d p) requires extremely quick vocal adjustment.\n\nSing with focus and inner calm.' },
-                    { type: 'listen', swaras: parseMmg('S p d p | n d | S n || S d n d | S n | d p || n m p m | d p | n d || n p d p | n d | p m ||'), displayLabel: '♪', instruction: 'Listen to the first 4 descending phrases.' },
+                    { type: 'listen_sequence', swaras: parseMmg('S p d p | n d | S n || S d n d | S n | d p || n m p m | d p | n d || n p d p | n d | p m ||'), displayLabel: '♪', instruction: 'Listen to the first 4 descending phrases.' },
                     { type: 'sing_sequence', swaras: parseMmg('S p d p | n d | S n || S d n d | S n | d p || n m p m | d p | n d || n p d p | n d | p m ||'), speed: 1, instruction: 'Sing the first 4 descending phrases.' }
                 ]
             },
@@ -686,7 +686,7 @@ export const DAATU_CURRICULUM = [
                 id: 'd_2_5', title: 'Varisai 2: Complete Mastery & Graduation', tag: 'Practice',
                 exercises: [
                     { type: 'info', title: 'Guru Pedagogy', body: 'The absolute final stretch! Descending back to our root Sa with the ultimate cross-leap patterns. Once completed, you will have fully mastered the Daatu Varisais.\n\nKeep your focus, and graduate with pure grace.' },
-                    { type: 'listen', swaras: parseMmg('d g m g | p m | d p || d m p m | d p | m g || p r g r | m g | p m || p g m g | p m | g r || m s r s | g r | m g || m r g r | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the final descending phrases.' },
+                    { type: 'listen_sequence', swaras: parseMmg('d g m g | p m | d p || d m p m | d p | m g || p r g r | m g | p m || p g m g | p m | g r || m s r s | g r | m g || m r g r | m g | r s ||'), displayLabel: '♪', instruction: 'Listen to the final descending phrases.' },
                     { type: 'sing_sequence', swaras: parseMmg('d g m g | p m | d p || d m p m | d p | m g || p r g r | m g | p m || p g m g | p m | g r || m s r s | g r | m g || m r g r | m g | r s ||'), speed: 1, instruction: 'Sing the final descending phrases and graduate!' }
                 ]
             }

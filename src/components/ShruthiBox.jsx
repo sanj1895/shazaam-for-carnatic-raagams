@@ -137,15 +137,23 @@ export default function ShruthiBox() {
   const [activeStrings, setActiveStrings] = useState(new Set(['sa', 'pa']));
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.7);
+  const [droneStyle, setDroneStyle] = useState('harmonium'); // 'harmonium' | 'tambura'
 
-  const masterRef    = useRef(null);
-  const oscsRef      = useRef([]);
-  const lfoRef       = useRef(null);
-  const lfoGainRef   = useRef(null);
+  const masterRef        = useRef(null);
+  const oscsRef          = useRef([]);
+  const lfoRef           = useRef(null);
+  const lfoGainRef       = useRef(null);
+  const tamburaNodesRef  = useRef([]);
+  const tamburaTimerRef  = useRef(null);
+  const pluckIndexRef    = useRef(0);
 
   useEffect(() => () => stopAll(true), []);
 
   function stopAll(immediate = false) {
+    if (tamburaTimerRef.current) {
+      clearInterval(tamburaTimerRef.current);
+      tamburaTimerRef.current = null;
+    }
     const ctx = getAudioCtx();
     const t = ctx.currentTime;
     if (masterRef.current) {
@@ -155,6 +163,13 @@ export default function ShruthiBox() {
       if (!immediate) g.linearRampToValueAtTime(0, t + 0.6);
       else g.setValueAtTime(0, t);
     }
+
+    // Stop all active tambura string nodes
+    tamburaNodesRef.current.forEach(node => {
+      node.oscs.forEach(osc => { try { osc.stop(); } catch (_) {} });
+    });
+    tamburaNodesRef.current = [];
+
     setTimeout(() => {
       oscsRef.current.forEach(o => { try { o.stop(); } catch (_) {} });
       try { lfoRef.current?.stop(); } catch (_) {}
@@ -165,7 +180,7 @@ export default function ShruthiBox() {
     }, immediate ? 0 : 700);
   }
 
-  function startAll(stringsSet, saFreq, vol) {
+  function startAll(stringsSet, saFreq, vol, style = droneStyle) {
     const ctx = getAudioCtx();
     const now = ctx.currentTime;
     const tv = vol * 0.32;
@@ -178,31 +193,154 @@ export default function ShruthiBox() {
 
     const lfo = ctx.createOscillator();
     lfo.type = 'sine';
-    lfo.frequency.setValueAtTime(0.1, now);
+    lfo.frequency.setValueAtTime(0.12, now);
     const lfoGain = ctx.createGain();
-    lfoGain.gain.setValueAtTime(tv * 0.08, now);
+    lfoGain.gain.setValueAtTime(tv * 0.06, now);
     lfo.connect(lfoGain);
     lfoGain.connect(master.gain);
     lfo.start(now);
     lfoRef.current = lfo;
     lfoGainRef.current = lfoGain;
 
-    const oscs = [];
-    for (const id of stringsSet) {
-      const str = STRINGS.find(s => s.id === id);
-      if (!str) continue;
-      const freq = saFreq * Math.pow(2, str.semitones / 12);
-      [[1.0, 1], [0.18, 2], [0.06, 3]].forEach(([gain, mult]) => {
-        const osc = ctx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq * mult, now);
-        const g = ctx.createGain();
-        g.gain.setValueAtTime(gain, now);
-        osc.connect(g); g.connect(master); osc.start(now);
-        oscs.push(osc);
-      });
+    if (style === 'harmonium') {
+      const oscs = [];
+      for (const id of stringsSet) {
+        const str = STRINGS.find(s => s.id === id);
+        if (!str) continue;
+        const freq = saFreq * Math.pow(2, str.semitones / 12);
+        
+        // Reed 1: Warm low-end detuned triangle/saw blend
+        const osc1 = ctx.createOscillator();
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(freq - 0.18, now);
+        
+        // Reed 2: Rich brassy saw/triangle octave
+        const osc2 = ctx.createOscillator();
+        osc2.type = 'sawtooth';
+        osc2.frequency.setValueAtTime(freq * 2 + 0.25, now);
+        
+        const g1 = ctx.createGain();
+        g1.gain.setValueAtTime(0.35, now);
+        
+        const g2 = ctx.createGain();
+        g2.gain.setValueAtTime(0.06, now);
+        
+        // Filter out harsh high-end for warm woodiness
+        const lowpass = ctx.createBiquadFilter();
+        lowpass.type = 'lowpass';
+        lowpass.frequency.setValueAtTime(freq * 3.8, now);
+        lowpass.Q.setValueAtTime(0.8, now);
+        
+        osc1.connect(g1);
+        osc2.connect(g2);
+        
+        g1.connect(lowpass);
+        g2.connect(lowpass);
+        lowpass.connect(master);
+        
+        osc1.start(now);
+        osc2.start(now);
+        
+        oscs.push(osc1, osc2);
+      }
+      oscsRef.current = oscs;
+    } else {
+      // Tambura Plucked String loop physical modeling
+      tamburaNodesRef.current = [];
+      pluckIndexRef.current = 0;
+
+      const pluckOrder = ['pa', 'hi_sa', 'hi_sa', 'sa'];
+      
+      const pluckNext = () => {
+        const activeArray = Array.from(stringsSet);
+        if (activeArray.length === 0) return;
+        
+        const idealId = pluckOrder[pluckIndexRef.current];
+        const id = stringsSet.has(idealId) ? idealId : activeArray[0];
+        
+        const str = STRINGS.find(s => s.id === id);
+        if (str) {
+          const freq = saFreq * Math.pow(2, str.semitones / 12);
+          const ctxNow = ctx.currentTime;
+          
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          const osc3 = ctx.createOscillator();
+          
+          osc1.type = 'sawtooth';
+          osc1.frequency.setValueAtTime(freq, ctxNow);
+          
+          osc2.type = 'triangle';
+          osc2.frequency.setValueAtTime(freq * 2 + 0.35, ctxNow);
+          
+          osc3.type = 'sawtooth';
+          osc3.frequency.setValueAtTime(freq * 3 - 0.22, ctxNow);
+          
+          const pg1 = ctx.createGain();
+          const pg2 = ctx.createGain();
+          const pg3 = ctx.createGain();
+          
+          // Exquisite decaying envelope for copper string
+          pg1.gain.setValueAtTime(0, ctxNow);
+          pg1.gain.linearRampToValueAtTime(0.38, ctxNow + 0.012);
+          pg1.gain.exponentialRampToValueAtTime(0.001, ctxNow + 3.4);
+          
+          pg2.gain.setValueAtTime(0, ctxNow);
+          pg2.gain.linearRampToValueAtTime(0.20, ctxNow + 0.009);
+          pg2.gain.exponentialRampToValueAtTime(0.001, ctxNow + 2.4);
+          
+          pg3.gain.setValueAtTime(0, ctxNow);
+          pg3.gain.linearRampToValueAtTime(0.14, ctxNow + 0.006);
+          pg3.gain.exponentialRampToValueAtTime(0.001, ctxNow + 1.4);
+          
+          // Buzz filter (Javari bridge resonance thread effect)
+          const buzzFilter = ctx.createBiquadFilter();
+          buzzFilter.type = 'bandpass';
+          buzzFilter.frequency.setValueAtTime(freq * 4.6, ctxNow);
+          buzzFilter.frequency.exponentialRampToValueAtTime(freq * 1.6, ctxNow + 2.6);
+          buzzFilter.Q.setValueAtTime(4.0, ctxNow);
+          
+          const directGain = ctx.createGain();
+          directGain.gain.setValueAtTime(0.78, ctxNow);
+          
+          const buzzyGain = ctx.createGain();
+          buzzyGain.gain.setValueAtTime(0.62, ctxNow);
+          
+          osc1.connect(pg1);
+          osc2.connect(pg2);
+          osc3.connect(pg3);
+          
+          pg1.connect(directGain); pg1.connect(buzzFilter);
+          pg2.connect(directGain); pg2.connect(buzzFilter);
+          pg3.connect(directGain); pg3.connect(buzzFilter);
+          
+          buzzFilter.connect(buzzyGain);
+          
+          const stringOut = ctx.createGain();
+          stringOut.gain.setValueAtTime(1.0, ctxNow);
+          
+          directGain.connect(stringOut);
+          buzzyGain.connect(stringOut);
+          
+          stringOut.connect(master);
+          
+          osc1.start(ctxNow);
+          osc2.start(ctxNow);
+          osc3.start(ctxNow);
+          
+          osc1.stop(ctxNow + 4.2);
+          osc2.stop(ctxNow + 4.2);
+          osc3.stop(ctxNow + 4.2);
+          
+          tamburaNodesRef.current.push({ oscs: [osc1, osc2, osc3], gains: [pg1, pg2, pg3], buzzFilter, directGain, buzzyGain, stringOut });
+        }
+        
+        pluckIndexRef.current = (pluckIndexRef.current + 1) % 4;
+      };
+
+      pluckNext();
+      tamburaTimerRef.current = setInterval(pluckNext, 1050);
     }
-    oscsRef.current = oscs;
   }
 
   const handleTogglePlay = () => {
@@ -229,6 +367,16 @@ export default function ShruthiBox() {
       return next;
     });
     if (playing) { stopAll(); setPlaying(false); }
+  };
+
+  const handleStyleChange = (style) => {
+    setDroneStyle(style);
+    if (playing) {
+      stopAll();
+      setTimeout(() => {
+        startAll(activeStrings, saHz, volume, style);
+      }, 120);
+    }
   };
 
   const adjustVolume = (delta) => {
@@ -456,6 +604,49 @@ export default function ShruthiBox() {
 
         {/* Right panel */}
         <div className="w-full flex-1 flex flex-col gap-3">
+
+          {/* Drone Engine selector plaque */}
+          <div style={{
+            background: 'linear-gradient(148deg, #e8e0c6, #d4cab0)',
+            border: '1px solid #b4a460',
+            borderRadius: 8, padding: '8px 10px',
+            boxShadow: 'inset 0 1px 5px rgba(0,0,0,0.13)',
+          }}>
+            <div style={{ fontSize: 9, color: '#5c2c0a', letterSpacing: '0.15em', fontWeight: 'bold', marginBottom: 8, textTransform: 'uppercase' }}>
+              Drone Engine
+            </div>
+            <div className="flex gap-2 w-full">
+              {['harmonium', 'tambura'].map((style) => {
+                const active = droneStyle === style;
+                return (
+                  <button 
+                    key={style}
+                    onClick={() => handleStyleChange(style)}
+                    style={{
+                      flex: 1,
+                      padding: '7px 0',
+                      borderRadius: 6,
+                      fontSize: 8.5,
+                      fontWeight: 'bold',
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      fontFamily: '"Courier New", monospace',
+                      cursor: 'pointer',
+                      border: active ? '1px solid #be6c10' : '1px solid #afa880',
+                      boxShadow: active ? 'inset 0 1.5px 3px rgba(0,0,0,0.25)' : '0 1px 2px rgba(0,0,0,0.08)',
+                      background: active 
+                        ? 'linear-gradient(to bottom, #ffc050, #df7e18)' 
+                        : 'linear-gradient(to bottom, #f5ecd2, #e5dbbe)',
+                      color: active ? '#713008' : '#7a5028',
+                      transition: 'all 0.1s',
+                    }}
+                  >
+                    {style === 'harmonium' ? '🎹 Harmonium' : '🪕 Tambura'}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {/* Drone string LED toggles */}
           <div style={{

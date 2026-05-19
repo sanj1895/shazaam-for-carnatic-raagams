@@ -41,16 +41,17 @@ const playSingleTone = (freq, duration = 0.7) => {
     }
 };
 
-const playSequenceAsync = async (swaras, sa, onIdx, signal) => {
+const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750) => {
     const octaves = getOctaveSequence(swaras);
+    const toneDur = Math.min((delayMs / 1000) * 0.85, 1.1);
     for (let i = 0; i < swaras.length; i++) {
         if (signal?.aborted) return;
         const swara = swaras[i];
         if (swara === '|' || swara === '||') continue;
         onIdx(i);
         const freq = swaraFreq(swara, sa) * Math.pow(2, octaves[i]);
-        playSingleTone(freq, 0.7);
-        await new Promise(r => setTimeout(r, 750));
+        playSingleTone(freq, toneDur);
+        await new Promise(r => setTimeout(r, delayMs));
     }
     onIdx(-1);
 };
@@ -157,22 +158,32 @@ function ExerciseListen({ swara, sa, instruction, displayLabel, onDone }) {
 
 // ─── Shared: Listen sequence ──────────────────────────────────────────────────
 
+const TEMPO_OPTIONS = [
+    { label: 'Slow', mult: 0.5 },
+    { label: 'Normal', mult: 1 },
+    { label: 'Fast', mult: 1.5 },
+];
+
 function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
     const [activeIdx, setActiveIdx] = useState(-1);
     const [finished, setFinished] = useState(false);
+    const [tempoMult, setTempoMult] = useState(1);
     const abortRef = useRef(null);
 
-    const run = useCallback(() => {
+    const runAtTempo = useCallback((mult) => {
         abortRef.current?.abort();
         const ctrl = new AbortController();
         abortRef.current = ctrl;
         setFinished(false);
-        playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal).then(() => {
+        const delayMs = Math.round(750 / mult);
+        playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal, delayMs).then(() => {
             if (!ctrl.signal.aborted) setFinished(true);
         });
     }, [swaras, sa]);
 
-    useEffect(() => { run(); return () => abortRef.current?.abort(); }, [run]);
+    const run = useCallback(() => runAtTempo(tempoMult), [runAtTempo, tempoMult]);
+
+    useEffect(() => { runAtTempo(1); return () => abortRef.current?.abort(); }, []);
 
     const renderSwaras = () => {
         const lines = [];
@@ -214,16 +225,30 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
         <div className="flex flex-col items-center gap-7 w-full">
             <p className="text-c-cream-dark text-sm font-playfair italic text-center max-w-sm leading-relaxed">{instruction}</p>
             {renderSwaras()}
-            <div className="flex items-center gap-4">
-                <button onClick={run} className="text-xs text-c-cream-dark hover:text-c-gold transition-colors font-playfair italic flex items-center gap-1.5">
-                    <span>▶</span> Play again
-                </button>
-                {finished && (
-                    <button onClick={onDone}
-                            className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity animate-fade-in">
-                        Continue
+            <div className="flex flex-col items-center gap-3">
+                <div className="flex items-center gap-1">
+                    {TEMPO_OPTIONS.map(({ label, mult }) => (
+                        <button key={mult} onClick={() => { setTempoMult(mult); runAtTempo(mult); }}
+                                className={`px-3 py-1 rounded-full text-[10px] font-mono border transition-colors ${
+                                    tempoMult === mult
+                                        ? 'bg-c-gold/20 text-c-gold border-c-gold/40'
+                                        : 'text-c-cream-dark border-c-border hover:border-c-gold/30'
+                                }`}>
+                            {label}
+                        </button>
+                    ))}
+                </div>
+                <div className="flex items-center gap-4">
+                    <button onClick={run} className="text-xs text-c-cream-dark hover:text-c-gold transition-colors font-playfair italic flex items-center gap-1.5">
+                        <span>▶</span> Play again
                     </button>
-                )}
+                    {finished && (
+                        <button onClick={onDone}
+                                className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity animate-fade-in">
+                            Continue
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );
@@ -1447,7 +1472,8 @@ function playTick(ctx, time) {
 }
 
 function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swaras', onDone }) {
-    const BEAT_MS = 800;
+    const [tempoMult, setTempoMult] = useState(1);
+    const BEAT_MS = Math.round(800 / tempoMult);
     const NOTE_MS = BEAT_MS / speed;
 
     const [phase, setPhase] = useState('idle'); // idle | guide | countdown | singing | success | fail
@@ -1657,16 +1683,30 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             })()}
 
             {phase === 'idle' && (
-                <div className="flex gap-4 items-center">
-                    <button onClick={playGuide}
-                            disabled={isPlayingGuide}
-                            className={`px-6 py-2.5 border border-c-border bg-c-surface text-c-cream-dim text-sm rounded-full font-playfair hover:border-c-gold/40 hover:text-c-gold transition-all flex items-center gap-1.5 ${isPlayingGuide ? 'opacity-60 cursor-not-allowed animate-pulse' : ''}`}>
-                        <span>{isPlayingGuide ? '🔊 Playing...' : '🔈 Hear Sequence'}</span>
-                    </button>
-                    <button onClick={startRecording}
-                            className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors flex items-center gap-1.5">
-                        <span>🎙️ Start Singing</span>
-                    </button>
+                <div className="flex flex-col items-center gap-3">
+                    <div className="flex items-center gap-1">
+                        {TEMPO_OPTIONS.map(({ label, mult }) => (
+                            <button key={mult} onClick={() => setTempoMult(mult)}
+                                    className={`px-3 py-1 rounded-full text-[10px] font-mono border transition-colors ${
+                                        tempoMult === mult
+                                            ? 'bg-c-gold/20 text-c-gold border-c-gold/40'
+                                            : 'text-c-cream-dark border-c-border hover:border-c-gold/30'
+                                    }`}>
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="flex gap-4 items-center">
+                        <button onClick={playGuide}
+                                disabled={isPlayingGuide}
+                                className={`px-6 py-2.5 border border-c-border bg-c-surface text-c-cream-dim text-sm rounded-full font-playfair hover:border-c-gold/40 hover:text-c-gold transition-all flex items-center gap-1.5 ${isPlayingGuide ? 'opacity-60 cursor-not-allowed animate-pulse' : ''}`}>
+                            <span>{isPlayingGuide ? '🔊 Playing...' : '🔈 Hear Sequence'}</span>
+                        </button>
+                        <button onClick={startRecording}
+                                className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors flex items-center gap-1.5">
+                            <span>🎙️ Start Singing</span>
+                        </button>
+                    </div>
                 </div>
             )}
 

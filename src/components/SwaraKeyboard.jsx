@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { RAGAS, toSargam } from '../utils/ragaLogic';
 import { playNote, startDrone, getAudioCtx, playSequence, getOctaveSequence } from '../utils/audioUtils';
 import RagaPracticePanel from './RagaPracticePanel';
+import { CuratedIcon, PlayIcon, StopIcon } from './IconLibrary';
 
 const SA_PRESETS = [
   { label: 'C',  hz: 261.63 }, { label: 'C#', hz: 277.18 },
@@ -156,7 +157,7 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false, onSad
               onClick={() => setShowGuide(true)}
               className="px-3 py-1 rounded-full border border-c-gold/40 hover:bg-c-gold/5 text-c-gold text-xs font-playfair italic transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer swara-guide-button"
             >
-              <span>📖</span> Swara Guide
+              <CuratedIcon icon="library" className="w-3 h-3" /> Swara Guide
             </button>
           </div>
           <div className="relative">
@@ -200,13 +201,13 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false, onSad
             <button
               onClick={handleToggleDrone}
               className={[
-                'w-full sm:w-auto ml-auto sm:ml-0 px-5 py-1.5 rounded-full border font-playfair font-bold text-[11px] tracking-widest uppercase transition-all duration-300 shadow-sm cursor-pointer active:scale-95 flex items-center justify-center',
+                'w-full sm:w-auto ml-auto sm:ml-0 px-5 py-1.5 rounded-full border font-playfair font-bold text-[11px] tracking-widest uppercase transition-all duration-300 shadow-sm cursor-pointer active:scale-95 flex items-center justify-center gap-1.5',
                 droneActive
                   ? 'bg-c-maroon border-c-maroon text-white shadow-[0_0_10px_rgba(122,30,20,0.3)]'
                   : 'bg-c-card border-c-gold/30 text-c-gold hover:border-c-gold hover:bg-c-gold/10',
               ].join(' ')}
             >
-              {droneActive ? '◼ Drone On' : '♬ Drone Off'}
+              {droneActive ? <><StopIcon className="w-3.5 h-3.5" /> Drone On</> : <><PlayIcon className="w-3.5 h-3.5" /> Drone Off</>}
             </button>
           </div>
 
@@ -263,15 +264,15 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false, onSad
           onClick={handlePlayScale}
           disabled={playingScale}
           className={[
-            'w-full py-3 rounded-xl border font-playfair text-base tracking-wide transition-colors',
+            'w-full py-3 rounded-xl border font-playfair text-base tracking-wide transition-colors flex items-center justify-center gap-2',
             playingScale
               ? 'bg-c-gold-faint border-c-gold-dim text-c-gold-dim cursor-not-allowed'
               : 'border-c-gold text-c-gold hover:bg-c-gold hover:text-c-bg',
           ].join(' ')}
         >
           {playingScale
-            ? '♫ Playing scale…'
-            : gamakamEnabled ? '▶ Play Scale (with Gamakam)' : '▶ Play Scale'}
+            ? <><PlayIcon className="w-4 h-4 animate-pulse" /> Playing scale…</>
+            : gamakamEnabled ? <><PlayIcon className="w-4 h-4" /> Play Scale (with Gamakam)</> : <><PlayIcon className="w-4 h-4" /> Play Scale</>}
         </button>
       </div>
       </div>

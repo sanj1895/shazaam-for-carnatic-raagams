@@ -210,6 +210,40 @@ export const UnitIcons = {
     )
 };
 
+export const PatIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2v20M12 22l-4-4M12 22l4-4" strokeWidth="2" stroke="currentColor" />
+        <circle cx="12" cy="6" r="3" fill="currentColor" fillOpacity="0.2" />
+    </svg>
+);
+
+export const TapIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" strokeWidth="1" opacity="0.3" />
+        <path d="M12 18v-8M12 10l-3 3M12 10l3 3" strokeWidth="2" stroke="currentColor" />
+        <circle cx="12" cy="18" r="1.5" fill="currentColor" />
+    </svg>
+);
+
+export const PlayIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" fillOpacity="0.2" />
+    </svg>
+);
+
+export const StopIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="6" width="12" height="12" rx="2" ry="2" fill="currentColor" fillOpacity="0.2" />
+    </svg>
+);
+
+export const WaveIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 12c3-3 6-3 9 0s6 3 9 0" strokeWidth="2" stroke="currentColor" />
+        <path d="M5 9c2.5-2.5 5-2.5 7.5 0s5 2.5 7.5 0" strokeWidth="1" opacity="0.5" />
+    </svg>
+);
+
 export const GurukulIcon = ({ className = "w-5 h-5" }) => (
     <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
         {/* Temple Arch / Aureole (Prabhavali) */}
@@ -358,6 +392,19 @@ export const CuratedIcon = ({ icon, className = "w-5 h-5" }) => {
     }
     if (icon === '👑') {
         const Comp = CourseIcons.manodharma_advanced;
+        return <Comp className={className} />;
+    }
+    if (icon === 'pat') {
+        return <PatIcon className={className} />;
+    }
+    if (icon === 'tap') {
+        return <TapIcon className={className} />;
+    }
+    if (icon === 'wave') {
+        return <WaveIcon className={className} />;
+    }
+    if (icon === '🌸') {
+        const Comp = CourseIcons.geetams;
         return <Comp className={className} />;
     }
 

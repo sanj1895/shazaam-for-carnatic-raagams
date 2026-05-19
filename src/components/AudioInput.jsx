@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { PlayIcon, StopIcon } from './IconLibrary';
 
 // ml5 is loaded as a global via <script> tag in index.html
 /* global ml5 */
@@ -218,7 +219,9 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
                                                         : 'bg-c-surface text-c-cream-dim hover:bg-c-gold-faint border border-c-border/40'
                                                 }`}
                                             >
-                                                {isPlaying ? '■ Stop' : '🔈 Hear'}
+                                                <div className="flex items-center justify-center gap-1">
+                                                    {isPlaying ? <><StopIcon className="w-2.5 h-2.5" /> Stop</> : <><PlayIcon className="w-2.5 h-2.5" /> Hear</>}
+                                                </div>
                                             </button>
                                             <button
                                                 onClick={() => {
@@ -304,7 +307,10 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
                                                                 : 'bg-c-surface text-c-cream-dim hover:bg-c-gold-faint border border-c-border/40'
                                                         }`}
                                                     >
-                                                        {isPlaying ? '■' : '🔈'} {preset.label.split(' ')[0]}
+                                                        <div className="flex items-center justify-center gap-1.5">
+                                                            {isPlaying ? <StopIcon className="w-2.5 h-2.5" /> : <PlayIcon className="w-2.5 h-2.5" />}
+                                                            {preset.label.split(' ')[0]}
+                                                        </div>
                                                     </button>
                                                     <button
                                                         onClick={() => {

@@ -1,17 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { CuratedIcon } from './IconLibrary';
 
 const STEPS = [
   {
     view: 'home',
-    icon: '🪔',
     title: 'Welcome to Ālāpana',
     body: "Your complete Carnatic music practice tool. Let me take you on a quick tour of each feature.",
     isWelcome: true,
   },
   {
     view: 'sadhana',
-    symbol: '🧘‍♀️',
     feature: 'Daily Sadhana',
     title: 'Your daily practice path',
     body: "Every day, Ālāpana gives you a 4-step practice routine — drone warm-up, scales, keyboard exploration, and ear training. Complete all 4 to build your streak.",
@@ -19,7 +18,6 @@ const STEPS = [
   },
   {
     view: 'tutor',
-    symbol: '📿',
     feature: 'Svara Gurukul',
     title: 'Traditional Vocal Academy',
     body: "Master structured Carnatic exercises (Varisais) through a graded curriculum — from basic notes to complex note patterns, listening and correcting your voice in real-time.",
@@ -27,7 +25,6 @@ const STEPS = [
   },
   {
     view: 'tutor',
-    symbol: '🌊',
     feature: 'Scale Flow Sadhana',
     title: 'Master Arohanam & Avarohanam',
     body: "Practice the ascending (Arohanam) and descending (Avarohanam) scales of any raga in our library with the AI Guru guiding your voice continuously.",
@@ -35,7 +32,6 @@ const STEPS = [
   },
   {
     view: 'shruthi',
-    symbol: '〜',
     feature: 'Shruthi',
     title: 'Your practice drone',
     body: "The Shruthi Box plays a continuous drone tone while you practice. Choose between a bellows Harmonium or plucked Tambura sound to stay in tune.",
@@ -43,7 +39,6 @@ const STEPS = [
   },
   {
     view: 'talam',
-    symbol: '॥',
     feature: 'Talam',
     title: 'Keep the rhythm',
     body: "Carnatic music is organized into rhythmic cycles called Talam. Practice feeling and keeping the 8-beat Adi Tala — the most common cycle in Carnatic music.",
@@ -51,7 +46,6 @@ const STEPS = [
   },
   {
     view: 'listen',
-    symbol: '♬',
     feature: 'Dhwani',
     title: 'Real-time Vocal Resonance',
     body: "Sing any Carnatic melody and Dhwani listens in real time, detecting your notes and matching them to a raga. There's also an optional Ālaap AI mode to capture subtle fluid ornamentations.",
@@ -59,7 +53,6 @@ const STEPS = [
   },
   {
     view: 'library',
-    symbol: '◈',
     feature: 'Raga Kosha',
     title: 'The Treasury of Ragas',
     body: "Browse and search a vast encyclopedia of Carnatic ragas — scale structures, moods, time of day, and signature phrases. Click any raga to practice singing its scale with real-time feedback.",
@@ -67,7 +60,6 @@ const STEPS = [
   },
   {
     view: 'melakarta',
-    symbol: '🗂️',
     feature: 'Melakarta Chart',
     title: 'The parent scale tree',
     body: "Explore the comprehensive 72 Melakarta scale system — the mathematical blueprint for all parent ragas in Carnatic music, laid out in an elegant, interactive grid.",
@@ -75,7 +67,6 @@ const STEPS = [
   },
   {
     view: 'bhedam',
-    symbol: '🔄',
     feature: 'Graha Bhedam',
     title: 'Discover modal shifts',
     body: "Experience modal shift exploration. Graha Bhedam lets you shift the tonic note (Sa) to other notes in the scale to dynamically unlock entirely new ragas.",
@@ -83,7 +74,6 @@ const STEPS = [
   },
   {
     view: null,
-    icon: '✦',
     title: "You're all set",
     body: "Tap Start Learning to go through the full curriculum from the beginning, or jump straight to any feature from the navigation bar above.",
     isLast: true,
@@ -189,13 +179,9 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
 
           {/* Icon / Symbol + title */}
           <div className="flex items-center gap-3 relative z-10">
-            {current.icon ? (
-              <span className="text-3xl flex-shrink-0">{current.icon}</span>
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-white/10 border border-[#f7d686]/30 flex items-center justify-center text-[#f7d686] text-lg font-playfair font-bold flex-shrink-0">
-                {current.symbol}
-              </div>
-            )}
+            <div className="w-10 h-10 rounded-full bg-white/10 border border-[#f7d686]/30 flex items-center justify-center text-[#f7d686] flex-shrink-0">
+              <CuratedIcon icon={current.view || 'tutor'} className="w-5 h-5" />
+            </div>
             <div className="min-w-0">
               {current.feature && (
                 <span className="text-[8px] font-mono text-[#f7d686]/70 uppercase tracking-wider block">{current.feature}</span>

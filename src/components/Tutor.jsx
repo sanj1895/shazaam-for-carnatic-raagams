@@ -469,14 +469,14 @@ function ExerciseCompare({ note1, note2, question, choices, correct, sa, onDone 
 
 function ExerciseTaalam({ instruction, onDone }) {
     const gestures = [
-        { label: 'Pat', icon: '🦵', desc: 'Pat your right thigh with your right hand. This is the downbeat — the strongest beat in the cycle.' },
-        { label: 'Pinky', icon: '🖐', desc: 'Keep your hand on your thigh. Tap your pinky finger down.' },
-        { label: 'Ring', icon: '🖐', desc: 'Tap your ring finger down, one after the other.' },
-        { label: 'Middle', icon: '🖐', desc: 'Tap your middle finger down. That completes the first group of 4.' },
-        { label: 'Pat', icon: '🦵', desc: 'Pat your thigh again — this is beat 5, the start of the second group.' },
-        { label: 'Wave', icon: '👋', desc: 'Flip your hand over so the back of your hand faces up. This is the Wave (Visarjitam).' },
-        { label: 'Pat', icon: '🦵', desc: 'Pat your thigh again — beat 7.' },
-        { label: 'Wave', icon: '👋', desc: 'Flip your hand over again. Beat 8 — and the cycle is complete. It loops back to beat 1.' },
+        { label: 'Pat', icon: 'pat', desc: 'Pat your right thigh with your right hand. This is the downbeat — the strongest beat in the cycle.' },
+        { label: 'Pinky', icon: 'tap', desc: 'Keep your hand on your thigh. Tap your pinky finger down.' },
+        { label: 'Ring', icon: 'tap', desc: 'Tap your ring finger down, one after the other.' },
+        { label: 'Middle', icon: 'tap', desc: 'Tap your middle finger down. That completes the first group of 4.' },
+        { label: 'Pat', icon: 'pat', desc: 'Pat your thigh again — this is beat 5, the start of the second group.' },
+        { label: 'Wave', icon: 'wave', desc: 'Flip your hand over so the back of your hand faces up. This is the Wave (Visarjitam).' },
+        { label: 'Pat', icon: 'pat', desc: 'Pat your thigh again — beat 7.' },
+        { label: 'Wave', icon: 'wave', desc: 'Flip your hand over again. Beat 8 — and the cycle is complete. It loops back to beat 1.' },
     ];
 
     const [phase, setPhase] = useState('idle'); // idle, stepthrough, watching, ready, practicing, success
@@ -594,7 +594,7 @@ function ExerciseTaalam({ instruction, onDone }) {
                 <p className="text-[11px] text-c-cream-dark font-mono uppercase tracking-widest self-start">Beat {stepIdx + 1} of 8</p>
 
                 <div className="w-full bg-c-surface border border-c-gold/30 rounded-2xl p-8 flex flex-col items-center gap-4">
-                    <span className="text-7xl">{g.icon}</span>
+                    <div className="text-c-gold animate-pulse"><CuratedIcon icon={g.icon} className="w-16 h-16" /></div>
                     <span className="text-xl font-mono font-bold text-c-gold">{g.label}</span>
                     <p className="text-sm text-c-cream font-playfair text-center leading-relaxed">{g.desc}</p>
                 </div>
@@ -638,13 +638,15 @@ function ExerciseTaalam({ instruction, onDone }) {
                     <div key={i} className={`relative flex flex-col items-center justify-center p-2 h-24 rounded-xl border transition-all duration-200 overflow-hidden ${
                         beat === i ? 'border-c-gold shadow-[0_0_12px_rgba(234,179,8,0.4)] scale-105 z-10' : 'border-c-border opacity-60'
                     }`}>
-                        <div className="z-20 flex flex-col items-center">
-                            <span className={`text-3xl mb-1 transition-all duration-150 ${
+                        <div className="z-20 flex flex-col items-center gap-1.5">
+                            <span className={`transition-all duration-150 ${
                                 beat === i ? (
-                                    g.label === 'Wave' ? 'scale-110 rotate-12 origin-bottom' :
-                                    '-translate-y-2 scale-110'
-                                ) : 'scale-100 rotate-0'
-                            }`}>{g.icon}</span>
+                                    g.label === 'Wave' ? 'scale-115 rotate-12 text-c-gold' :
+                                    '-translate-y-1 scale-115 text-c-gold'
+                                ) : 'scale-100 text-c-cream-dark/80'
+                            }`}>
+                                <CuratedIcon icon={g.icon} className="w-8 h-8" />
+                            </span>
                             <span className={`text-[10px] font-mono font-bold ${beat === i ? 'text-c-gold' : 'text-c-cream-dark'}`}>{g.label}</span>
                         </div>
 
@@ -2398,7 +2400,7 @@ CRITICAL INSTRUCTIONS FOR GURU:
                 const sangNotes = sequenceRef.current;
                 
                 if (styleToUse === 'classic') {
-                    feedbackText = `### 🌟 Guru Sing-Along Feedback (Classical)
+                    feedbackText = `### Guru Sing-Along Feedback (Classical)
 
 Namaste, my dear student. I appreciate your dedication to our classical foundations.
 
@@ -2406,7 +2408,7 @@ In this practice of ${practiceType}, you were expected to sing: **${expectedStri
 
 Your basic breath support is stable. To refine your sargam further, focus on keeping your Shruti alignment anchored to the base drone, minimizing minor pitch wavers.`;
                 } else {
-                    feedbackText = `### 🌸 Guru Sing-Along Feedback (Simple & Warm)
+                    feedbackText = `### Guru Sing-Along Feedback (Simple & Warm)
 
 Namaste, my dear child! I am so happy to hear your beautiful voice today!
 
@@ -2480,7 +2482,7 @@ You did a wonderful job bringing a bright and sweet energy to your singing. To m
 
                 {phase === 'idle' && (
                     <div className="flex flex-col items-center gap-5 text-center py-4 relative z-10 w-full">
-                        <div className="w-14 h-14 rounded-full bg-c-gold-faint flex items-center justify-center text-2xl shadow-inner border border-c-border/20">🧘🏽‍♂️</div>
+                        <div className="w-14 h-14 rounded-full bg-c-gold-faint flex items-center justify-center shadow-inner border border-c-border/20 text-c-gold"><CuratedIcon icon="🧘🏽‍♂️" className="w-6 h-6" /></div>
                         <div className="flex flex-col gap-2">
                             <p className="text-sm font-playfair font-bold text-c-cream">Sing to the AI — get real feedback.</p>
                             <p className="text-xs text-c-cream-dim leading-relaxed px-2">
@@ -2564,29 +2566,29 @@ You did a wonderful job bringing a bright and sweet energy to your singing. To m
                         <div className="flex justify-center gap-2 bg-c-gold-faint p-1 rounded-xl border border-c-border/30 max-w-xs mx-auto w-full">
                             <button
                                 onClick={() => generateFeedback('classic')}
-                                className={`flex-1 py-1.5 px-3 rounded-lg text-[10px] font-playfair uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1 ${
+                                className={`flex-1 py-1.5 px-3 rounded-lg text-[10px] font-playfair uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1.5 ${
                                     guruStyle === 'classic' 
                                         ? 'bg-c-gold text-c-bg shadow-md shadow-c-gold/15' 
                                         : 'text-c-cream-dim hover:text-c-cream'
                                 }`}
                             >
-                                🧘🏽‍♂️ Wise Guru (Classic)
+                                <CuratedIcon icon="🧘🏽‍♂️" className="w-3.5 h-3.5" /> Wise Guru
                             </button>
                             <button
                                 onClick={() => generateFeedback('young')}
-                                className={`flex-1 py-1.5 px-3 rounded-lg text-[10px] font-playfair uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1 ${
+                                className={`flex-1 py-1.5 px-3 rounded-lg text-[10px] font-playfair uppercase tracking-wider font-bold transition-all flex items-center justify-center gap-1.5 ${
                                     guruStyle === 'young' 
                                         ? 'bg-c-gold text-c-bg shadow-md shadow-c-gold/15' 
                                         : 'text-c-cream-dim hover:text-c-cream'
                                 }`}
                             >
-                                🌸 Young Student (Simple)
+                                <CuratedIcon icon="🌸" className="w-3.5 h-3.5" /> Young Student
                             </button>
                         </div>
 
                         <div className="bg-c-gold-faint border border-c-border/20 rounded-xl p-3.5 flex flex-col gap-1.5">
                             <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-c-gold/80 font-bold">
-                                <span>📊</span> Transcript Summary
+                                <CuratedIcon icon="swarajathis" className="w-3.5 h-3.5 text-c-gold" /> Transcript Summary
                             </div>
                             <div className="text-xs text-c-cream leading-relaxed font-playfair">
                                 <span className="font-semibold text-c-cream-dim">Detected Swaras:</span>{' '}

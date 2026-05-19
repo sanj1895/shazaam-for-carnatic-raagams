@@ -594,7 +594,7 @@ function App() {
                                     }}
                                     className="text-c-gold/80 hover:text-c-gold font-playfair px-6 py-2 text-xs tracking-[0.15em] uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer mt-1 hover:scale-105 active:scale-95"
                                 >
-                                    <span>🪔</span> Take a Guided Tour
+                                    <span className="text-c-gold opacity-80">{renderTabIcon('tutor', "w-3.5 h-3.5")}</span> Take a Guided Tour
                                 </button>
                             </div>
                         </div>
@@ -657,15 +657,7 @@ function App() {
                                     <div className={`relative z-10 text-xl sm:text-2xl mb-1.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-all duration-500 flex items-center justify-center ${
                                         highlight ? 'text-[#f7d686]' : 'text-c-gold group-hover:text-[#f7d686]'
                                     }`}>
-                                        {symbol === '📿' ? (
-                                            <GurukulIcon className="w-8 h-8 sm:w-10 sm:h-10" />
-                                        ) : symbol === '♬' ? (
-                                            <DhwaniIcon className="w-8 h-8 sm:w-10 sm:h-10" />
-                                        ) : symbol === '◈' ? (
-                                            <KoshaIcon className="w-8 h-8 sm:w-10 sm:h-10" />
-                                        ) : (
-                                            symbol
-                                        )}
+                                        {renderTabIcon(id, "w-8 h-8 sm:w-10 sm:h-10")}
                                     </div>
 
                                     {/* Text with vintage spacing */}
@@ -716,7 +708,7 @@ function App() {
                                     onClick={() => setShowGuide(!showGuide)}
                                     className="px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider bg-c-gold/15 text-c-gold border border-c-gold/30 hover:bg-c-gold/25 transition-all flex items-center gap-1.5 cursor-pointer"
                                 >
-                                    <span>🛈 {showGuide ? "Hide Guide" : "How to Sing"}</span>
+                                    <span>{showGuide ? "Hide Guide" : "How to Sing"}</span>
                                     <span className="opacity-80">{showGuide ? "▲" : "▼"}</span>
                                 </button>
                             </div>
@@ -882,10 +874,10 @@ function App() {
                 )}
                 {view === 'sadhana' && (() => {
                     const steps = [
-                        { n: 1, name: 'Tune & Warm Up',  tab: 'shruthi',  icon: '🎶', desc: 'Drone Baseline Alignment',    longDesc: 'Open the Shruthi Box and sustain a warm "ah" sound along with the drone for 30 seconds to lock in your pitch center.', btnText: 'Launch Shruthi Box' },
-                        { n: 2, name: 'Svara Gurukul',  tab: 'tutor',    icon: '📿', desc: 'Vocal Academy & Scale Flow',  longDesc: 'Master structured vocal exercises (Varisais) or practice ascending and descending scales under real-time guidance from the AI Guru.', btnText: 'Enter Svara Gurukul' },
-                        { n: 3, name: 'Explore Scales',  tab: 'keyboard', icon: '🎹', desc: 'Swarasthana Visualization',   longDesc: 'Play individual swaras on the virtual keyboard to hear and internalize the exact intervals of a scale.', btnText: 'Open Swara Keyboard' },
-                        { n: 4, name: 'Ear Training',    tab: 'singback', icon: '🎯', desc: 'Phrase Reproduction',         longDesc: 'Listen to a phrase and reproduce it by ear. Aim for 80 %+ to sharpen pitch memory and muscle memory together.', btnText: 'Launch Sing-Back' },
+                        { n: 1, name: 'Tune & Warm Up',  tab: 'shruthi',  desc: 'Drone Baseline Alignment',    longDesc: 'Open the Shruthi Box and sustain a warm "ah" sound along with the drone for 30 seconds to lock in your pitch center.', btnText: 'Launch Shruthi Box' },
+                        { n: 2, name: 'Svara Gurukul',  tab: 'tutor',    desc: 'Vocal Academy & Scale Flow',  longDesc: 'Master structured vocal exercises (Varisais) or practice ascending and descending scales under real-time guidance from the AI Guru.', btnText: 'Enter Svara Gurukul' },
+                        { n: 3, name: 'Explore Scales',  tab: 'keyboard', desc: 'Swarasthana Visualization',   longDesc: 'Play individual swaras on the virtual keyboard to hear and internalize the exact intervals of a scale.', btnText: 'Open Swara Keyboard' },
+                        { n: 4, name: 'Ear Training',    tab: 'singback', desc: 'Phrase Reproduction',         longDesc: 'Listen to a phrase and reproduce it by ear. Aim for 80 %+ to sharpen pitch memory and muscle memory together.', btnText: 'Launch Sing-Back' },
                     ];
                     const doneCount = sadhana.completed.length;
                     const pct = Math.round((doneCount / steps.length) * 100);

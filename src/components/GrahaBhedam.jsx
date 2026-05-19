@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { RAGAS, toSargam } from '../utils/ragaLogic';
 import { SWARA_SEMITONE, SEMITONE_TO_SWARA, playSequence } from '../utils/audioUtils';
+import { PlayIcon, StopIcon } from './IconLibrary';
 
 const ragaNames = Object.keys(RAGAS).sort();
 
@@ -274,11 +275,11 @@ export default function GrahaBhedam() {
                                 <label className="text-[10px] text-c-gold font-bold uppercase tracking-[0.2em] opacity-70">Original scale</label>
                                 <button
                                     onClick={handlePlayOriginal}
-                                    className={`text-[10px] uppercase tracking-widest font-bold transition-colors ${
+                                    className={`text-[10px] uppercase tracking-widest font-bold transition-colors flex items-center gap-1.5 ${
                                         playingShift === 'original' ? 'text-emerald-400' : 'text-c-gold/60 hover:text-c-gold'
                                     }`}
                                 >
-                                    {playingShift === 'original' ? '● Playing' : '▶ Listen'}
+                                    {playingShift === 'original' ? <><PlayIcon className="w-3 h-3 animate-pulse" /> Playing</> : <><PlayIcon className="w-3 h-3" /> Listen</>}
                                 </button>
                             </div>
                             <div className="flex flex-wrap gap-2">
@@ -356,13 +357,13 @@ export default function GrahaBhedam() {
                                             if (playbackMode === 'theoretical') {
                                                 return (
                                                     <span className="text-[8px] font-mono font-bold text-[#b8831a] bg-c-gold/15 border border-c-gold/20 px-1.5 py-0.5 rounded block text-center max-w-[110px] truncate shadow-sm">
-                                                        🎯 {pInfo.name} ({pInfo.freq})
+                                                        [Tonic] {pInfo.name} ({pInfo.freq})
                                                     </span>
                                                 );
                                             } else {
                                                 return (
                                                     <span className="text-[8px] font-mono text-c-cream-dark/60 bg-c-bg border border-c-border/40 px-1.5 py-0.5 rounded block text-center max-w-[110px] truncate">
-                                                        🏠 C4 (261.6 Hz)
+                                                        [Tonic] C4 (261.6 Hz)
                                                     </span>
                                                 );
                                             }
@@ -409,12 +410,12 @@ export default function GrahaBhedam() {
                                 >
                                     {playingShift === entry.shiftNote ? (
                                         <>
-                                            <span className="animate-pulse">●</span>
+                                            <PlayIcon className="w-4 h-4 animate-pulse" />
                                             <span>Playing…</span>
                                         </>
                                     ) : (
                                         <>
-                                            <span>▶</span>
+                                            <PlayIcon className="w-4 h-4" />
                                             <span>Listen</span>
                                         </>
                                     )}

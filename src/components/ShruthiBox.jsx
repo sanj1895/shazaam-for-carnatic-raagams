@@ -670,7 +670,7 @@ export default function ShruthiBox({ onSadhanaComplete }) {
                       transition: 'all 0.1s',
                     }}
                   >
-                    {style === 'harmonium' ? '🎹 Harmonium' : '🪕 Tambura'}
+                    {style === 'harmonium' ? 'Harmonium' : 'Tambura'}
                   </button>
                 );
               })}
@@ -724,7 +724,7 @@ export default function ShruthiBox({ onSadhanaComplete }) {
             fontFamily: '"Courier New", monospace',
             transition: 'all 0.1s',
           }}>
-            {playing ? '◼  STOP' : '▶  START'}
+            {playing ? 'STOP' : 'START'}
           </button>
 
           {/* Brand footer */}

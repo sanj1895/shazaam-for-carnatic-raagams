@@ -2600,7 +2600,12 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete
         const key = `${lesson.id}-${idx}`;
         if (ex.type === 'info')            return <ExerciseInfo           key={key} {...ex} onDone={next} />;
         if (ex.type === 'quiz')            return <ExerciseQuiz           key={key} {...ex} onDone={next} />;
-        if (ex.type === 'listen')          return <ExerciseListen         key={key} {...ex} sa={sa} onDone={next} />;
+        if (ex.type === 'listen') {
+            if (ex.swaras) {
+                return <ExerciseListenSequence key={key} {...ex} sa={sa} onDone={next} />;
+            }
+            return <ExerciseListen key={key} {...ex} sa={sa} onDone={next} />;
+        }
         if (ex.type === 'listen_sequence') return <ExerciseListenSequence key={key} {...ex} sa={sa} onDone={next} />;
         if (ex.type === 'identify')        return <ExerciseIdentify       key={key} {...ex} sa={sa} onDone={next} />;
         if (ex.type === 'compare')         return <ExerciseCompare        key={key} {...ex} sa={sa} onDone={next} />;

@@ -14,7 +14,7 @@ import Tutor from './components/Tutor';
 import { getSwaram, identifyRaga, RAGAS } from './utils/ragaLogic';
 import RagaDetail from './components/RagaDetail';
 import OnboardingTour from './components/OnboardingTour';
-import { CuratedIcon, FireIcon, DhwaniIcon } from './components/IconLibrary';
+import { CuratedIcon, FireIcon, DhwaniIcon, SadhanaIcon } from './components/IconLibrary';
 
 const VeenaIcon = () => (
     <svg width="22" height="68" viewBox="0 0 22 68" fill="none" className="text-c-gold-dim">
@@ -803,13 +803,19 @@ function App() {
                     const pct = Math.round((doneCount / steps.length) * 100);
                     return (
                     <div className="w-full max-w-3xl p-4 md:p-8 flex flex-col items-center animate-fade-in mx-auto">
-                        <div className="text-center mb-6">
-                            <span className="text-[10px] uppercase tracking-widest text-c-gold font-mono">Daily Vocal Routine</span>
-                            <h2 className="font-playfair text-3xl font-bold text-c-cream mt-1">Daily Sadhana</h2>
-                            <div className="w-16 h-px bg-c-gold/30 mx-auto mt-2" />
-                            <p className="text-c-cream-dim text-xs font-playfair italic max-w-md mx-auto mt-3">
-                                A daily sequence to build pitch, scale accuracy, and raga memory step by step. Resets each morning.
-                            </p>
+                        <div className="w-full flex items-center gap-4 border-b border-c-border pb-4 mb-2">
+                            <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
+                                <SadhanaIcon className="w-7 h-7" />
+                            </div>
+                            <div className="flex flex-col">
+                                <div className="flex items-center gap-2">
+                                    <h2 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Daily Sadhana</h2>
+                                    <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Daily Practice</span>
+                                </div>
+                                <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
+                                    A daily sequence to build pitch, scale accuracy, and raga memory. Resets each morning.
+                                </p>
+                            </div>
                         </div>
 
                         {/* Progress card — light theme */}

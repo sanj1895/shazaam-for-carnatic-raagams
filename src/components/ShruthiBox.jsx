@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { getAudioCtx } from '../utils/audioUtils';
+import { DroneIcon } from './IconLibrary';
 
 const PITCHES = [
   { label: 'C',  hz: 261.63 },
@@ -468,6 +469,24 @@ export default function ShruthiBox({ onSadhanaComplete }) {
   };
 
   return (
+    <div className="w-full max-w-5xl flex flex-col gap-5">
+
+      {/* Branded header */}
+      <div className="w-full flex items-center gap-4 border-b border-c-border pb-4">
+        <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
+          <DroneIcon className="w-7 h-7" />
+        </div>
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2">
+            <h2 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Shruti Box</h2>
+            <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Drone</span>
+          </div>
+          <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
+            Singing against a continuous drone trains your ear to hold pitch — the foundation of every Carnatic session.
+          </p>
+        </div>
+      </div>
+
     <div id="tour-shruthi-box" style={s.body} className="max-w-[640px] lg:max-w-5xl mx-auto">
       {/* Heritage Corners */}
       <div className="absolute inset-0 pointer-events-none">
@@ -741,6 +760,8 @@ export default function ShruthiBox({ onSadhanaComplete }) {
       </div>
 
       </div>{/* end lg:flex wrapper */}
+    </div>{/* end hardware box */}
+
     </div>
   );
 }

@@ -123,6 +123,67 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
   const [step, setStep]       = useState(0);
   const [exiting, setExiting] = useState(false);
   const [highlightRect, setHighlightRect] = useState(null);
+  const [cardStyle, setCardStyle] = useState({
+    position: 'fixed',
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 'calc(100% - 32px)',
+    maxWidth: '380px',
+  });
+
+  // Calculate dynamic tour card positioning relative to the highlighted element to avoid overlap!
+  useEffect(() => {
+    if (!active) return;
+    
+    const current = STEPS[step];
+    if (!highlightRect || current.isWelcome || current.isLast) {
+      setCardStyle({
+        position: 'fixed',
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 'calc(100% - 32px)',
+        maxWidth: '380px',
+      });
+      return;
+    }
+
+    const cardWidth = 380;
+    const cardHeight = 280; // Estimated height for tour dialog
+    const gap = 20;
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Centered horizontally with clamped values
+    let targetLeft = highlightRect.left + highlightRect.width / 2 - cardWidth / 2;
+    targetLeft = Math.max(16, Math.min(targetLeft, viewportWidth - cardWidth - 16));
+
+    const spaceBelow = viewportHeight - highlightRect.bottom;
+    const spaceAbove = highlightRect.top;
+
+    let targetTop;
+
+    // Decide if below or above
+    if (spaceBelow >= cardHeight + gap || spaceBelow >= spaceAbove) {
+      targetTop = highlightRect.bottom + gap;
+    } else {
+      targetTop = highlightRect.top - cardHeight - gap;
+    }
+
+    // Keep it on the screen
+    targetTop = Math.max(16, Math.min(targetTop, viewportHeight - cardHeight - 16));
+
+    setCardStyle({
+      position: 'fixed',
+      left: `${targetLeft}px`,
+      top: `${targetTop}px`,
+      width: 'calc(100% - 32px)',
+      maxWidth: `${cardWidth}px`,
+      transform: 'none',
+    });
+  }, [highlightRect, step, active]);
 
   // Sync active state
   useEffect(() => {
@@ -202,7 +263,7 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
           key={i}
           onClick={() => goToStep(i)}
           className={`rounded-full transition-all duration-200 ${
-            i === step ? 'w-5 h-1.5 bg-c-gold' : 'w-1.5 h-1.5 bg-c-border/60 hover:bg-c-border'
+            i === step ? 'w-5 h-1.5 bg-[#f7d686]' : 'w-1.5 h-1.5 bg-white/25 hover:bg-white/50'
           }`}
           aria-label={`Go to step ${i + 1}`}
         />
@@ -264,9 +325,10 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
 
       {/* 3. Tour Control Card Container */}
       <div
-        className={`fixed inset-x-0 bottom-0 md:top-1/2 md:-translate-y-1/2 md:left-auto md:right-8 z-[9995] flex justify-center px-4 pb-[76px] md:pb-0 pointer-events-none transition-all duration-300 ${exiting ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
+        className={`z-[9995] flex justify-center px-4 pointer-events-none transition-all duration-300 ${exiting ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
+        style={cardStyle}
       >
-        <div className="pointer-events-auto relative bg-[#1e0c04] border border-c-gold/40 rounded-2xl shadow-[0_16px_50px_rgba(0,0,0,0.6)] max-w-[380px] w-full overflow-hidden animate-slide-up p-5 flex flex-col gap-4">
+        <div className="pointer-events-auto w-full relative bg-[#1e0c04] border border-c-gold/40 rounded-2xl shadow-[0_16px_50px_rgba(0,0,0,0.6)] overflow-hidden animate-slide-up p-5 flex flex-col gap-4">
           
           {/* Heritage Corners */}
           <div className="absolute inset-0 pointer-events-none z-0">
@@ -277,13 +339,13 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
           </div>
 
           {/* Header info */}
-          <div className="flex items-center justify-between border-b border-c-gold/20 pb-2.5 z-10 relative">
-            <span className="text-[9px] font-mono text-c-gold uppercase tracking-[0.2em]">
+          <div className="flex items-center justify-between border-b border-white/10 pb-2.5 z-10 relative">
+            <span className="text-[9px] font-mono text-[#f7d686]/70 uppercase tracking-[0.2em]">
               Guided Tour · Step {step + 1} of {STEPS.length}
             </span>
             <button
               onClick={handleDismiss}
-              className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-c-card text-c-cream-dark hover:text-c-gold transition-all text-xs"
+              className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 text-white/50 hover:text-white transition-all text-xs"
               aria-label="Close tour"
             >
               ✕
@@ -295,31 +357,31 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
             {current.icon ? (
               <span className="text-3xl">{current.icon}</span>
             ) : (
-              <div className="w-10 h-10 rounded-full bg-c-gold/15 border border-c-gold/40 flex items-center justify-center text-c-gold text-lg font-playfair font-bold">
+              <div className="w-10 h-10 rounded-full bg-white/10 border border-[#f7d686]/30 flex items-center justify-center text-[#f7d686] text-lg font-playfair font-bold">
                 {current.symbol}
               </div>
             )}
             <div>
               {current.feature && (
-                <span className="text-[8px] font-mono text-c-gold uppercase tracking-wider block">{current.feature}</span>
+                <span className="text-[8px] font-mono text-[#f7d686]/70 uppercase tracking-wider block">{current.feature}</span>
               )}
-              <h3 className="font-playfair font-bold text-c-cream text-base leading-tight mt-0.5">{current.title}</h3>
+              <h3 className="font-playfair font-bold text-white text-base leading-tight mt-0.5">{current.title}</h3>
             </div>
           </div>
 
           {/* Body Content */}
           <div className="z-10 relative space-y-2.5">
-            <p className="text-[13px] text-c-cream-dim font-playfair leading-relaxed">{current.body}</p>
+            <p className="text-[13px] text-white/75 font-playfair leading-relaxed">{current.body}</p>
             {current.hint && (
-              <p className="text-[11px] text-c-gold font-playfair italic">✦ {current.hint}</p>
+              <p className="text-[11px] text-[#f7d686] font-playfair italic">✦ {current.hint}</p>
             )}
           </div>
 
           {/* Footer Actions */}
-          <div className="flex flex-col gap-3 pt-3 border-t border-c-gold/15 z-10 relative">
+          <div className="flex flex-col gap-3 pt-3 border-t border-white/10 z-10 relative">
             <div className="flex justify-between items-center">
               {progressDots}
-              <span className="text-[10px] font-mono text-c-cream-dark/50">{step + 1}/{STEPS.length}</span>
+              <span className="text-[10px] font-mono text-white/30">{step + 1}/{STEPS.length}</span>
             </div>
 
             {isLast ? (
@@ -331,7 +393,7 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
                     onStartLearning?.();
                   }, 250);
                 }}
-                className="w-full py-2.5 bg-c-gold hover:bg-c-gold-light text-c-bg font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all shadow-md transform hover:scale-[1.02] cursor-pointer"
+                className="w-full py-2.5 bg-[#f7d686] hover:bg-white text-[#1e0c04] font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all shadow-md cursor-pointer"
               >
                 Start Learning →
               </button>
@@ -340,13 +402,13 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
                 <button
                   onClick={() => goToStep(step - 1)}
                   disabled={isFirst}
-                  className="text-xs text-c-cream-dark hover:text-c-cream disabled:opacity-0 transition-all font-playfair py-1 px-2"
+                  className="text-xs text-white/50 hover:text-white disabled:opacity-0 transition-all font-playfair py-1 px-2"
                 >
                   ← Back
                 </button>
                 <button
                   onClick={() => goToStep(step + 1)}
-                  className="text-xs font-playfair font-bold text-c-bg bg-c-gold hover:bg-c-gold-light transition-all py-1.5 px-4 rounded-lg tracking-wider uppercase cursor-pointer"
+                  className="text-xs font-playfair font-bold text-[#1e0c04] bg-[#f7d686] hover:bg-white transition-all py-1.5 px-4 rounded-lg tracking-wider uppercase cursor-pointer"
                 >
                   Next →
                 </button>

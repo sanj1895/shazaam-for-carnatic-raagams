@@ -588,7 +588,7 @@ function App() {
 
                 {/* ══ LISTEN ══ */}
                 {view === 'listen' && (
-                    <main className="w-full max-w-2xl mx-auto flex flex-col items-center gap-7 px-4 md:px-8 py-10 animate-fade-in">
+                    <main className="w-full max-w-3xl mx-auto flex flex-col items-center gap-7 px-4 md:px-8 py-10 animate-fade-in">
                         <div className="w-full flex flex-col items-center gap-7">
 
                             {/* Branded Header Section - Compact */}

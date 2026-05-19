@@ -3103,7 +3103,7 @@ function RagaPractice({ sa }) {
     const colorMap = { maroon: '#5c1a0a', navy: '#0e2a4a', teal: '#0e3a36' };
 
     return (
-        <div className="w-full max-w-2xl flex flex-col gap-4">
+        <div className="w-full max-w-4xl flex flex-col gap-4">
             <div className="bg-c-gold-faint border border-c-gold/30 p-3 rounded-lg flex gap-3 items-start mb-2">
                 <svg className="w-4 h-4 text-c-gold mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <p className="text-xs text-c-cream-dim leading-relaxed">
@@ -3172,8 +3172,8 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
     };
 
     return (
-        <div className="w-full max-w-2xl flex flex-col gap-6 animate-fade-in relative z-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="w-full max-w-4xl flex flex-col gap-6 animate-fade-in relative z-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 {COURSES.map(course => {
                     const isUpcoming = course.upcoming;
                     
@@ -3271,7 +3271,7 @@ function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset, onBackToC
     });
 
     return (
-        <div className="w-full max-w-2xl flex flex-col gap-3">
+        <div className="w-full max-w-4xl flex flex-col gap-3">
             {/* Breadcrumb Navigation */}
             <div className="flex items-center mb-2">
                 <button 
@@ -3450,7 +3450,7 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
 
             {/* Header: Svara Gurukul Rebrand */}
             {screen === 'home' && (
-                <div className="w-full max-w-2xl text-left border-b border-c-gold/20 pb-4 mb-2 animate-fade-in">
+                <div className="w-full max-w-4xl text-left border-b border-c-gold/20 pb-4 mb-2 animate-fade-in">
                     <div className="flex items-center gap-3 md:gap-4 mb-1">
                         <div className="flex-shrink-0 text-c-gold opacity-90 mt-1">
                             <GurukulIcon className="w-12 h-12 md:w-14 md:h-14" />
@@ -3470,7 +3470,7 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
 
             {/* Base Sa (Shruti) quick setup bar */}
             {screen === 'home' && (
-                <div className="w-full max-w-2xl bg-c-surface border border-c-border/60 rounded-xl p-3.5 flex flex-col gap-3 transition-all duration-300 shadow-sm relative overflow-hidden heritage-card">
+                <div className="w-full max-w-4xl bg-c-surface border border-c-border/60 rounded-xl p-3.5 flex flex-col gap-3 transition-all duration-300 shadow-sm relative overflow-hidden heritage-card">
                     <div className="heritage-border-corner heritage-corner-tl" style={{ top: 2, left: 2 }} />
                     <div className="heritage-border-corner heritage-corner-tr" style={{ top: 2, right: 2 }} />
                     <div className="heritage-border-corner heritage-corner-bl" style={{ bottom: 2, left: 2 }} />
@@ -3522,7 +3522,7 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
 
             {/* Tab switcher — only show on home screens */}
             {screen === 'home' && (
-                <div className="w-full max-w-2xl">
+                <div className="w-full max-w-4xl">
                     <div className="flex gap-1 border-b border-c-border mb-6">
                         {[
                             { id: 'curriculum', label: 'Curriculum', icon: (

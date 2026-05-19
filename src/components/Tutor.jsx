@@ -168,22 +168,45 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
     const [activeIdx, setActiveIdx] = useState(-1);
     const [finished, setFinished] = useState(false);
     const [tempoMult, setTempoMult] = useState(1);
+    const [isPlaying, setIsPlaying] = useState(false);
     const abortRef = useRef(null);
+
+    const octaves = React.useMemo(() => getOctaveSequence(swaras), [swaras]);
+
+    const stopPlayback = useCallback(() => {
+        abortRef.current?.abort();
+        setActiveIdx(-1);
+        setIsPlaying(false);
+    }, []);
 
     const runAtTempo = useCallback((mult) => {
         abortRef.current?.abort();
         const ctrl = new AbortController();
         abortRef.current = ctrl;
         setFinished(false);
+        setIsPlaying(true);
         const delayMs = Math.round(750 / mult);
         playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal, delayMs).then(() => {
-            if (!ctrl.signal.aborted) setFinished(true);
+            if (!ctrl.signal.aborted) {
+                setFinished(true);
+                setIsPlaying(false);
+            }
         });
     }, [swaras, sa]);
 
     const run = useCallback(() => runAtTempo(tempoMult), [runAtTempo, tempoMult]);
 
     useEffect(() => { runAtTempo(1); return () => abortRef.current?.abort(); }, []);
+
+    const handleNoteClick = (s, i) => {
+        stopPlayback();
+        const freq = swaraFreq(s, sa) * Math.pow(2, octaves[i]);
+        playSingleTone(freq, 0.7);
+        setActiveIdx(i);
+        setTimeout(() => {
+            setActiveIdx(prev => prev === i ? -1 : prev);
+        }, 700);
+    };
 
     const renderSwaras = () => {
         const lines = [];
@@ -210,9 +233,15 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
                                 );
                             }
                             return (
-                                <div key={i} className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2.5 rounded-lg border font-mono text-xs sm:text-sm font-bold transition-all duration-100 ${
-                                    i === activeIdx ? 'border-c-gold bg-c-gold text-c-bg scale-115 font-extrabold shadow-lg shadow-c-gold/20' : 'border-c-border text-c-cream-dark bg-c-surface'
-                                }`}>{s}</div>
+                                <button 
+                                    key={i} 
+                                    onClick={() => handleNoteClick(s, i)}
+                                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2.5 rounded-lg border font-mono text-xs sm:text-sm font-bold transition-all duration-100 cursor-pointer hover:border-c-gold/75 hover:bg-c-gold/5 active:scale-95 ${
+                                        i === activeIdx ? 'border-c-gold bg-c-gold text-c-bg scale-115 font-extrabold shadow-lg shadow-c-gold/20' : 'border-c-border text-c-cream-dark bg-c-surface'
+                                    }`}
+                                >
+                                    {s}
+                                </button>
                             );
                         })}
                     </div>
@@ -225,26 +254,43 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
         <div className="flex flex-col items-center gap-7 w-full">
             <p className="text-c-cream-dark text-sm font-playfair italic text-center max-w-sm leading-relaxed">{instruction}</p>
             {renderSwaras()}
-            <div className="flex flex-col items-center gap-3">
-                <div className="flex items-center gap-1">
-                    {TEMPO_OPTIONS.map(({ label, mult }) => (
-                        <button key={mult} onClick={() => { setTempoMult(mult); runAtTempo(mult); }}
-                                className={`px-3 py-1 rounded-full text-[10px] font-mono border transition-colors ${
-                                    tempoMult === mult
-                                        ? 'bg-c-gold/20 text-c-gold border-c-gold/40'
-                                        : 'text-c-cream-dark border-c-border hover:border-c-gold/30'
-                                }`}>
-                            {label}
-                        </button>
-                    ))}
+            <div className="flex flex-col items-center gap-5 w-full">
+                {/* Tempo Slider */}
+                <div className="flex flex-col items-center gap-1.5 w-full max-w-xs px-4">
+                    <div className="flex justify-between w-full text-[9px] font-mono text-c-cream-dark/60">
+                        <span>Slow (0.4x)</span>
+                        <span className="text-c-gold font-bold">{tempoMult.toFixed(1)}x Tempo</span>
+                        <span>Fast (2.0x)</span>
+                    </div>
+                    <input 
+                        type="range" 
+                        min="0.4" 
+                        max="2.0" 
+                        step="0.1" 
+                        value={tempoMult} 
+                        onChange={(e) => {
+                            const val = parseFloat(e.target.value);
+                            setTempoMult(val);
+                            runAtTempo(val);
+                        }}
+                        className="w-full h-1.5 bg-c-border/30 rounded-lg appearance-none cursor-pointer"
+                        style={{ accentColor: '#8B5C10' }}
+                    />
                 </div>
+                
                 <div className="flex items-center gap-4">
-                    <button onClick={run} className="text-xs text-c-cream-dark hover:text-c-gold transition-colors font-playfair italic flex items-center gap-1.5">
-                        <span>▶</span> Play again
-                    </button>
-                    {finished && (
+                    {isPlaying ? (
+                        <button onClick={stopPlayback} className="px-6 py-2 border border-red-500/40 bg-red-950/10 text-red-400 hover:bg-red-500 hover:text-c-bg rounded-full text-xs font-playfair transition-colors flex items-center gap-1.5 shadow-sm">
+                            <span>■ Stop Listening</span>
+                        </button>
+                    ) : (
+                        <button onClick={run} className="px-6 py-2 border border-c-border bg-c-surface text-c-cream-dim hover:border-c-gold/40 hover:text-c-gold rounded-full text-xs font-playfair transition-colors flex items-center gap-1.5 shadow-sm">
+                            <span>▶ Play Sequence</span>
+                        </button>
+                    )}
+                    {(finished || !isPlaying) && (
                         <button onClick={onDone}
-                                className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity animate-fade-in">
+                                className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity">
                             Continue
                         </button>
                     )}
@@ -1484,6 +1530,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
     const [isPlayingGuide, setIsPlayingGuide] = useState(false);
     
     const beatToSwaraIdx = React.useMemo(() => swaras.map((s, i) => (s !== '|' && s !== '||') ? i : -1).filter(i => i !== -1), [swaras]);
+    const octaves = React.useMemo(() => getOctaveSequence(swaras), [swaras]);
 
     const streamRef = useRef(null);
     const intervalRef = useRef(null);
@@ -1497,6 +1544,22 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
         streamRef.current?.getTracks().forEach(t => t.stop());
     };
     useEffect(() => () => cleanup(), []);
+
+    const stopPlayback = useCallback(() => {
+        cleanup();
+        setIsPlayingGuide(false);
+        setPhase('idle');
+    }, []);
+
+    const handleNoteClick = (s, i) => {
+        stopPlayback();
+        const freq = swaraFreq(s, sa) * Math.pow(2, octaves[i]);
+        playSingleTone(freq, 0.7);
+        setActiveIdx(i);
+        setTimeout(() => {
+            setActiveIdx(prev => prev === i ? -1 : prev);
+        }, 700);
+    };
 
     const playGuide = async () => {
         cleanup();
@@ -1598,45 +1661,45 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                 }
             }
 
-                // Check pitch
-                const swara = swaras[currentIdx];
-                if (swara && swara !== ',') {
-                    const targetSt = SEMITONES[swara] ?? 0;
-                    const buf = new Float32Array(analyser.fftSize);
-                    analyser.getFloatTimeDomainData(buf);
-                    const rms = Math.sqrt(buf.reduce((s, v) => s + v * v, 0) / buf.length);
-                    const freq = detectPitchAudio(analyser, ctx.sampleRate);
-                    
-                    scoresRef.current[currentIdx].total++;
-                    if (freq && rms > 0.003) {
-                        const diff = Math.abs(centsToNearest(freq, targetSt, sa));
-                        if (diff <= 50) {
-                            scoresRef.current[currentIdx].hits++;
-                        }
-                    }
-                    
-                    // Live update status for current note
-                    if (scoresRef.current[currentIdx].total > 2) {
-                        const ratio = scoresRef.current[currentIdx].hits / scoresRef.current[currentIdx].total;
-                        setStatuses(prev => {
-                            const copy = [...prev];
-                            copy[currentIdx] = ratio > 0.3 ? 'hit' : 'miss';
-                            return copy;
-                        });
-                    }
-                } else if (swara === ',') {
-                    scoresRef.current[currentIdx].total++;
-                    scoresRef.current[currentIdx].hits++;
-                    if (scoresRef.current[currentIdx].total > 2) {
-                        setStatuses(prev => {
-                            const copy = [...prev];
-                            copy[currentIdx] = 'hit';
-                            return copy;
-                        });
+            // Check pitch
+            const swara = swaras[currentIdx];
+            if (swara && swara !== ',') {
+                const targetSt = SEMITONES[swara] ?? 0;
+                const buf = new Float32Array(analyser.fftSize);
+                analyser.getFloatTimeDomainData(buf);
+                const rms = Math.sqrt(buf.reduce((s, v) => s + v * v, 0) / buf.length);
+                const freq = detectPitchAudio(analyser, ctx.sampleRate);
+                
+                scoresRef.current[currentIdx].total++;
+                if (freq && rms > 0.003) {
+                    const diff = Math.abs(centsToNearest(freq, targetSt, sa));
+                    if (diff <= 50) {
+                        scoresRef.current[currentIdx].hits++;
                     }
                 }
+                
+                // Live update status for current note
+                if (scoresRef.current[currentIdx].total > 2) {
+                    const ratio = scoresRef.current[currentIdx].hits / scoresRef.current[currentIdx].total;
+                    setStatuses(prev => {
+                        const copy = [...prev];
+                        copy[currentIdx] = ratio > 0.3 ? 'hit' : 'miss';
+                        return copy;
+                    });
+                }
+            } else if (swara === ',') {
+                scoresRef.current[currentIdx].total++;
+                scoresRef.current[currentIdx].hits++;
+                if (scoresRef.current[currentIdx].total > 2) {
+                    setStatuses(prev => {
+                        const copy = [...prev];
+                        copy[currentIdx] = 'hit';
+                        return copy;
+                    });
+                }
+            }
 
-            }, 50);
+        }, 50);
     };
 
     return (
@@ -1668,14 +1731,18 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                                         );
                                     }
                                     return (
-                                        <div key={i} className={`w-8 sm:w-9 h-10 sm:h-11 flex items-center justify-center font-mono text-xs sm:text-sm font-bold border rounded-md transition-all duration-75 ${
-                                            i === activeIdx ? 'scale-115 shadow-lg border-c-gold bg-c-gold/25 text-c-gold font-extrabold' :
-                                            statuses[i] === 'hit' ? 'border-emerald-800/30 bg-emerald-800/15 text-emerald-800 font-bold' :
-                                            statuses[i] === 'miss' ? 'border-red-700/30 bg-red-950/15 text-red-800 font-bold' :
-                                            'border-c-border/50 bg-c-card text-c-cream-dim'
-                                        }`}>
+                                        <button 
+                                            key={i} 
+                                            onClick={() => handleNoteClick(s, i)}
+                                            className={`w-8 sm:w-9 h-10 sm:h-11 flex items-center justify-center font-mono text-xs sm:text-sm font-bold border rounded-md transition-all duration-75 cursor-pointer hover:border-c-gold/75 hover:bg-c-gold/5 active:scale-95 ${
+                                                i === activeIdx ? 'scale-115 shadow-lg border-c-gold bg-c-gold/25 text-c-gold font-extrabold' :
+                                                statuses[i] === 'hit' ? 'border-emerald-800/30 bg-emerald-800/15 text-emerald-800 font-bold' :
+                                                statuses[i] === 'miss' ? 'border-red-700/30 bg-red-950/15 text-red-800 font-bold' :
+                                                'border-c-border/50 bg-c-card text-c-cream-dim'
+                                            }`}
+                                        >
                                             {mode === 'akaram' && s !== ',' ? 'A' : (s === ',' ? '-' : s.replace(/[0-9]/g, ''))}
-                                        </div>
+                                        </button>
                                     );
                                 })}
                             </div>
@@ -1685,25 +1752,45 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             })()}
 
             {phase === 'idle' && (
-                <div className="flex flex-col items-center gap-3">
-                    <div className="flex items-center gap-1">
-                        {TEMPO_OPTIONS.map(({ label, mult }) => (
-                            <button key={mult} onClick={() => { tempoMultRef.current = mult; setTempoMult(mult); }}
-                                    className={`px-3 py-1 rounded-full text-[10px] font-mono border transition-colors ${
-                                        tempoMult === mult
-                                            ? 'bg-c-gold/20 text-c-gold border-c-gold/40'
-                                            : 'text-c-cream-dark border-c-border hover:border-c-gold/30'
-                                    }`}>
-                                {label}
-                            </button>
-                        ))}
+                <div className="flex flex-col items-center gap-5 w-full">
+                    {/* Tempo Slider */}
+                    <div className="flex flex-col items-center gap-1.5 w-full max-w-xs px-4">
+                        <div className="flex justify-between w-full text-[9px] font-mono text-c-cream-dark/60">
+                            <span>Slow (0.4x)</span>
+                            <span className="text-c-gold font-bold">{tempoMult.toFixed(1)}x Tempo</span>
+                            <span>Fast (2.0x)</span>
+                        </div>
+                        <input 
+                            type="range" 
+                            min="0.4" 
+                            max="2.0" 
+                            step="0.1" 
+                            value={tempoMult} 
+                            onChange={(e) => {
+                                const val = parseFloat(e.target.value);
+                                tempoMultRef.current = val;
+                                setTempoMult(val);
+                                if (isPlayingGuide) {
+                                    playGuide();
+                                }
+                            }}
+                            className="w-full h-1.5 bg-c-border/30 rounded-lg appearance-none cursor-pointer"
+                            style={{ accentColor: '#8B5C10' }}
+                        />
                     </div>
+                    
                     <div className="flex gap-4 items-center">
-                        <button onClick={playGuide}
-                                disabled={isPlayingGuide}
-                                className={`px-6 py-2.5 border border-c-border bg-c-surface text-c-cream-dim text-sm rounded-full font-playfair hover:border-c-gold/40 hover:text-c-gold transition-all flex items-center gap-1.5 ${isPlayingGuide ? 'opacity-60 cursor-not-allowed animate-pulse' : ''}`}>
-                            <span>{isPlayingGuide ? '🔊 Playing...' : '🔈 Hear Sequence'}</span>
-                        </button>
+                        {isPlayingGuide ? (
+                            <button onClick={stopPlayback}
+                                    className="px-6 py-2.5 border border-red-500/40 bg-red-950/10 text-red-400 hover:bg-red-500 hover:text-c-bg rounded-full text-xs font-playfair transition-colors flex items-center gap-1.5 shadow-sm">
+                                <span>■ Stop Guide</span>
+                            </button>
+                        ) : (
+                            <button onClick={playGuide}
+                                    className="px-6 py-2.5 border border-c-border bg-c-surface text-c-cream-dim text-sm rounded-full font-playfair hover:border-c-gold/40 hover:text-c-gold transition-all flex items-center gap-1.5">
+                                <span>🔈 Hear Sequence</span>
+                            </button>
+                        )}
                         <button onClick={startRecording}
                                 className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors flex items-center gap-1.5">
                             <span>🎙️ Start Singing</span>
@@ -1720,16 +1807,26 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             )}
             
             {phase === 'countdown' && (
-                <div className="flex flex-col items-center gap-2 animate-fade-in">
-                    <p className="text-c-gold text-4xl font-mono animate-bounce">{countdown}</p>
-                    <p className="text-[10px] text-c-cream-dim uppercase tracking-widest">Get Ready</p>
+                <div className="flex flex-col items-center gap-4 animate-fade-in">
+                    <div className="flex flex-col items-center gap-2">
+                        <p className="text-c-gold text-4xl font-mono animate-bounce">{countdown}</p>
+                        <p className="text-[10px] text-c-cream-dim uppercase tracking-widest">Get Ready</p>
+                    </div>
+                    <button onClick={stopPlayback} className="px-6 py-2 border border-red-500/40 bg-red-950/10 text-red-400 hover:bg-red-500 hover:text-c-bg rounded-full text-xs font-playfair transition-colors flex items-center gap-1.5 shadow-sm">
+                        <span>■ Cancel</span>
+                    </button>
                 </div>
             )}
             
             {phase === 'singing' && (
-                <div className="flex flex-col items-center gap-2">
-                    <p className="text-c-gold text-xs font-mono animate-pulse">Listening...</p>
-                    <p className="text-[10px] text-c-cream-dim">Follow the metronome tick</p>
+                <div className="flex flex-col items-center gap-4 animate-fade-in">
+                    <div className="flex flex-col items-center gap-2">
+                        <p className="text-c-gold text-xs font-mono animate-pulse">Listening...</p>
+                        <p className="text-[10px] text-c-cream-dim">Follow the metronome tick</p>
+                    </div>
+                    <button onClick={stopPlayback} className="px-6 py-2 border border-red-500/40 bg-red-950/10 text-red-400 hover:bg-red-500 hover:text-c-bg rounded-full text-xs font-playfair transition-colors flex items-center gap-1.5 shadow-sm">
+                        <span>■ Stop Singing</span>
+                    </button>
                 </div>
             )}
 

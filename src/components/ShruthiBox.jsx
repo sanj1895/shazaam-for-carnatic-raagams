@@ -502,7 +502,7 @@ export default function ShruthiBox({ onSadhanaComplete }) {
 
           {/* Brand */}
           <div style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontWeight: '900', fontSize: 16, color: '#7a1212', letterSpacing: '0.05em' }}>
-            Alapana
+            Ālāpana
           </div>
         </div>
 
@@ -730,7 +730,7 @@ export default function ShruthiBox({ onSadhanaComplete }) {
           {/* Brand footer */}
           <div style={{ textAlign: 'right', marginTop: -2 }}>
             <div style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontWeight: '900', fontSize: 13, color: '#7a1212' }}>
-              Alapana
+              Ālāpana
             </div>
             <div style={{ fontSize: 5.5, color: '#6a4a2a', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 1, fontFamily: 'monospace', fontWeight: 'bold' }}>
               VINTAGE HERITAGE EDITION

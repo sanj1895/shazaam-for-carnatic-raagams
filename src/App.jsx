@@ -49,7 +49,7 @@ const GurukulIcon = ({ className = "w-5 h-5" }) => (
     </svg>
 );
 
-const DhwaniIcon = ({ className = "w-5 h-5" }) => (
+const AlaapIcon = ({ className = "w-5 h-5" }) => (
     <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
         {/* The Flute (Pullanguzhal) slanting across */}
         <line x1="12" y1="52" x2="52" y2="12" stroke="currentColor" strokeWidth="3.5" />
@@ -94,7 +94,7 @@ const KoshaIcon = ({ className = "w-5 h-5" }) => (
 
 const FEATURES = [
     { id: 'tutor',     label: 'Gurukul',      desc: 'Classical vocal academy & scale flow', symbol: '📿',  mobileSymbol: '📿', level: 'beginner', highlight: true },
-    { id: 'listen',    label: 'Dhwani',       desc: 'Sing a melody & identify the raga',       symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
+    { id: 'listen',    label: 'Ālaap',        desc: 'Sing a melody & identify the raga',       symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
     { id: 'library',   label: 'Raga Kosha',   desc: 'Explore & practice every raga scale',    symbol: '◈',  mobileSymbol: '◈', level: 'all', highlight: true },
     { id: 'sadhana',   label: 'Sadhana',      desc: 'Your recommended daily practice path',    symbol: '🧘‍♀️', mobileSymbol: '🧘‍♀️', level: 'start' },
     { id: 'shruthi',   label: 'Shruthi',      desc: 'Continuous drone for practice',          symbol: '〜', mobileSymbol: '🎵', level: 'beginner' },
@@ -388,7 +388,7 @@ function App() {
                 >
                     <VeenaIcon />
                     <div>
-                        <div className="font-playfair text-c-gold text-base md:text-lg leading-none">Alapana</div>
+                        <div className="font-playfair text-c-gold text-base md:text-lg leading-none">Ālāpana</div>
                         <div className="text-c-cream-dark text-[8px] md:text-[9px] tracking-widest uppercase">Carnatic Music</div>
                     </div>
                 </button>
@@ -508,7 +508,7 @@ function App() {
                                 className="font-playfair text-5xl sm:text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-br from-c-gold-light via-[#f7d686] to-[#b88014] tracking-wider uppercase leading-none mb-3 drop-shadow-xl"
                                 style={{ textShadow: '0 4px 30px rgba(227,168,33,0.4)' }}
                             >
-                                Alapana
+                                Ālāpana
                             </h1>
                             <p className="text-[#f7d686] text-[10px] sm:text-xs md:text-sm font-semibold tracking-[0.3em] sm:tracking-[0.4em] uppercase mb-3 drop-shadow-md">
                                 Carnatic Music
@@ -658,13 +658,13 @@ function App() {
                                     <DhwaniIcon className="w-5 h-5" />
                                 </div>
                                 <div className="flex flex-col gap-2.5">
-                                    <p className="font-playfair text-c-cream text-sm font-bold">Dhwani: Real-time Raga Recognition</p>
+                                    <p className="font-playfair text-c-cream text-sm font-bold">Dhwani: Ālaap AI Raga Identifier</p>
                                     <p className="text-c-cream-dim text-xs leading-relaxed">
-                                        Sing any Carnatic melody and Alapana listens in real time, detecting each note and matching them to a raga.
+                                        Sing or hum an Ālaap, and Ālāpana listens in real time, detecting each note to identify the raga.
                                     </p>
                                     <ol className="flex flex-col gap-1.5 text-xs text-c-cream-dim leading-relaxed list-none">
                                         <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">1.</span><span>Allow microphone access and turn on pitch detection.</span></li>
-                                        <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">2.</span><span>Sing your <span className="text-c-gold font-semibold">Sa</span> — the first note of the Carnatic scale, like "Do" in Do-Re-Mi. It's the note your melody always comes back to and feels settled on. Pick a comfortable pitch and sing it steadily so Alapana can lock on to it.</span></li>
+                                        <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">2.</span><span>Sing your <span className="text-c-gold font-semibold">Sa</span> — the first note of the Carnatic scale, like "Do" in Do-Re-Mi. It's the note your melody always comes back to and feels settled on. Pick a comfortable pitch and sing it steadily so Ālāpana can lock on to it.</span></li>
                                         <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">3.</span><span>Sing your melody. Hold each note for a moment so it's detected, then watch the raga suggestions appear.</span></li>
                                     </ol>
                                     <p className="text-[10px] text-c-cream-dark italic border-t border-c-gold/15 pt-2">
@@ -921,7 +921,7 @@ function App() {
             </div>
 
             <footer className="py-6 text-center text-c-cream-dark text-xs font-playfair italic border-t border-c-border">
-                Alapana · Carnatic Music
+                Ālāpana · Carnatic Music
             </footer>
         </div>
 

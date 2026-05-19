@@ -5,7 +5,7 @@ const STEPS = [
   {
     view: 'home',
     icon: '🪔',
-    title: 'Welcome to Alapana',
+    title: 'Welcome to Ālāpana',
     body: "Your complete Carnatic music practice tool. Let me take you on a quick tour of each feature.",
     isWelcome: true,
   },
@@ -14,7 +14,7 @@ const STEPS = [
     symbol: '🧘‍♀️',
     feature: 'Daily Sadhana',
     title: 'Your daily practice path',
-    body: "Every day, Alapana gives you a 4-step practice routine — drone warm-up, scales, keyboard exploration, and ear training. Complete all 4 to build your streak.",
+    body: "Every day, Ālāpana gives you a 4-step practice routine — drone warm-up, scales, keyboard exploration, and ear training. Complete all 4 to build your streak.",
     hint: 'Steps reset each morning',
   },
   {

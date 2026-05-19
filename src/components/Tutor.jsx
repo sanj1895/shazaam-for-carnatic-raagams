@@ -1544,7 +1544,7 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
                         Start singing
                     </button>
                     {gamakamEnabled && (
-                        <p className="text-[10px] text-[#f7d686]/70 font-playfair italic text-center animate-fade-in">
+                        <p className="text-[11px] text-[#b8831a] font-playfair italic text-center animate-fade-in font-semibold">
                             ✦ Trace the glowing golden curve with your voice.
                         </p>
                     )}

@@ -167,8 +167,8 @@ const RagaLibrary = ({ onSelectRaga }) => {
         <div className="w-full max-w-5xl raga-library-container">
             <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                    <h2 className="font-playfair text-2xl text-c-gold">Raagam Library</h2>
-                    <p className="text-c-cream-dark text-xs mt-1">All 72 Melakartas and their derived janyas  ·  explore, listen, feel.</p>
+                    <h2 className="font-playfair text-2xl text-c-gold">Raga Kosha</h2>
+                    <p className="text-c-cream-dark text-xs mt-1">The Treasury of Carnatic Music — all 72 Melakartas and derived janyas.</p>
                 </div>
                 
                 {/* Search Bar */}

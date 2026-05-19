@@ -52,17 +52,17 @@ const STEPS = [
   {
     view: 'listen',
     symbol: '♬',
-    feature: 'Sing',
-    title: 'Find your raga',
-    body: "Sing any Carnatic melody and Alapana listens in real time, detecting your notes and matching them to a raga. There's also a Groq AI mode for a deeper 30-second analysis.",
+    feature: 'Alaap',
+    title: 'Real-time AI Identification',
+    body: "Sing any Carnatic melody and Alaap listens in real time, detecting your notes and matching them to a raga. There's also an advanced Groq AI mode to capture subtle ornamentations.",
     hint: 'Set your Sa first — it calibrates to your voice',
   },
   {
     view: 'library',
     symbol: '◈',
-    feature: 'Library',
-    title: 'Explore every raga',
-    body: "Browse all Carnatic ragas — scales, mood, famous compositions, and a curated performance for each. Open any raga and hit the Practice tab for AI vocal feedback.",
+    feature: 'Raga Kosha',
+    title: 'The Treasury of Ragas',
+    body: "Browse and search a vast encyclopedia of Carnatic ragas — scale structures, moods, time of day, and signature phrases. Click any raga to practice singing its scale with real-time feedback.",
     hint: 'The Practice tab has AI vocal coaching built in',
   },
   {

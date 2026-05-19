@@ -49,10 +49,53 @@ const GurukulIcon = ({ className = "w-5 h-5" }) => (
     </svg>
 );
 
+const AlaapIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        {/* The Flute (Pullanguzhal) slanting across */}
+        <line x1="12" y1="52" x2="52" y2="12" stroke="currentColor" strokeWidth="3.5" />
+        {/* Flute holes */}
+        <circle cx="24" cy="40" r="1.5" fill="currentColor" />
+        <circle cx="30" cy="34" r="1.5" fill="currentColor" />
+        <circle cx="36" cy="28" r="1.5" fill="currentColor" />
+        <circle cx="42" cy="22" r="1.5" fill="currentColor" />
+        
+        {/* Beautiful radiating soundwaves soaring from the flute's blowhole */}
+        <path d="M10 42 C 16 36, 20 44, 26 38" stroke="currentColor" strokeWidth="1.2" opacity="0.6" className="animate-pulse" />
+        <path d="M6 34 C 14 26, 20 38, 28 30" stroke="currentColor" strokeWidth="1.5" opacity="0.8" />
+        <path d="M2 26 C 12 14, 18 30, 30 18" stroke="currentColor" strokeWidth="1.2" opacity="0.5" />
+        
+        {/* Soaring musical note */}
+        <path d="M46 10 C 46 7, 50 5, 53 7 C 55 9, 53 14, 49 14" stroke="currentColor" strokeWidth="1.5" fill="currentColor" />
+        <circle cx="46" cy="14" r="2.5" fill="currentColor" />
+    </svg>
+);
+
+const KoshaIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        {/* The open ancient scroll/book */}
+        <path d="M12 18 C 12 12, 28 12, 32 18 C 36 12, 52 12, 52 18 V 48 C 52 42, 36 42, 32 48 C 28 42, 12 42, 12 48 Z" fill="currentColor" fillOpacity="0.1" strokeWidth="1.8" />
+        {/* Spine lines */}
+        <line x1="32" y1="18" x2="32" y2="48" stroke="currentColor" strokeWidth="1.8" />
+        
+        {/* Left page text lines representing sargam scripts */}
+        <line x1="18" y1="24" x2="26" y2="24" stroke="currentColor" opacity="0.6" />
+        <line x1="16" y1="30" x2="28" y2="30" stroke="currentColor" opacity="0.6" />
+        <line x1="18" y1="36" x2="24" y2="36" stroke="currentColor" opacity="0.6" />
+        
+        {/* Right page rising soundwave/note representing melody escaping the page */}
+        <path d="M38 32 Q42 22, 46 32 T50 32" stroke="currentColor" strokeWidth="1.5" className="text-c-gold" />
+        <circle cx="46" cy="22" r="2.5" fill="currentColor" className="text-c-gold animate-bounce" />
+        
+        {/* Ornate corner flourishes */}
+        <path d="M8 12 Q32 4, 56 12" stroke="currentColor" opacity="0.3" strokeDasharray="2 2" />
+        <path d="M8 52 Q32 60, 56 52" stroke="currentColor" opacity="0.3" strokeDasharray="2 2" />
+    </svg>
+);
+
 const FEATURES = [
     { id: 'tutor',     label: 'Gurukul',      desc: 'Classical vocal academy & scale flow', symbol: '📿',  mobileSymbol: '📿', level: 'beginner', highlight: true },
-    { id: 'listen',    label: 'Sing',         desc: 'Sing a melody & identify the raga',       symbol: '♬',  mobileSymbol: '🎤', level: 'intermediate', highlight: true },
-    { id: 'library',   label: 'Discover',     desc: 'Explore & practice every raga scale',    symbol: '◈',  mobileSymbol: '📚', level: 'all', highlight: true },
+    { id: 'listen',    label: 'Alaap',        desc: 'Sing a melody & identify the raga',       symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
+    { id: 'library',   label: 'Raga Kosha',   desc: 'Explore & practice every raga scale',    symbol: '◈',  mobileSymbol: '◈', level: 'all', highlight: true },
     { id: 'sadhana',   label: 'Sadhana',      desc: 'Your recommended daily practice path',    symbol: '🧘‍♀️', mobileSymbol: '🧘‍♀️', level: 'start' },
     { id: 'shruthi',   label: 'Shruthi',      desc: 'Continuous drone for practice',          symbol: '〜', mobileSymbol: '🎵', level: 'beginner' },
     { id: 'talam',     label: 'Talam',        desc: 'Keep the rhythmic cycle',                symbol: '॥',  mobileSymbol: '🥁', level: 'beginner' },
@@ -396,6 +439,10 @@ function App() {
                         >
                             {mobileSymbol === '📿' ? (
                                 <GurukulIcon className="w-4 h-4" />
+                            ) : mobileSymbol === '♬' ? (
+                                <AlaapIcon className="w-4 h-4" />
+                            ) : mobileSymbol === '◈' ? (
+                                <KoshaIcon className="w-4 h-4" />
                             ) : (
                                 <span className="text-base">{mobileSymbol}</span>
                             )}
@@ -570,6 +617,10 @@ function App() {
                                     }`}>
                                         {symbol === '📿' ? (
                                             <GurukulIcon className="w-8 h-8 sm:w-10 sm:h-10" />
+                                        ) : symbol === '♬' ? (
+                                            <AlaapIcon className="w-8 h-8 sm:w-10 sm:h-10" />
+                                        ) : symbol === '◈' ? (
+                                            <KoshaIcon className="w-8 h-8 sm:w-10 sm:h-10" />
                                         ) : (
                                             symbol
                                         )}
@@ -602,10 +653,12 @@ function App() {
                         <div className="w-full flex flex-col items-center gap-7">
 
                             {/* How-to card */}
-                            <div className="w-full bg-c-gold-faint border border-c-gold/25 rounded-xl p-4 flex gap-3 items-start">
-                                <span className="text-c-gold text-base flex-shrink-0 mt-0.5">♬</span>
+                            <div className="w-full bg-c-gold-faint border border-c-gold/25 rounded-xl p-4 flex gap-3.5 items-start">
+                                <div className="text-c-gold flex-shrink-0 mt-0.5">
+                                    <AlaapIcon className="w-5 h-5" />
+                                </div>
                                 <div className="flex flex-col gap-2.5">
-                                    <p className="font-playfair text-c-cream text-sm font-bold">Sing freely — find your raga</p>
+                                    <p className="font-playfair text-c-cream text-sm font-bold">Alaap: Real-time Raga Recognition</p>
                                     <p className="text-c-cream-dim text-xs leading-relaxed">
                                         Sing any Carnatic melody and Alapana listens in real time, detecting each note and matching them to a raga.
                                     </p>

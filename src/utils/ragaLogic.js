@@ -451,8 +451,8 @@ export const RAGAS = {
         video:        "https://www.youtube.com/shorts/dLn0cEOsirU",
     },
     'Raghupriya': {
-        arohanam:     ['Sa', 'Ri1', 'Ga1', 'Ma2', 'Pa', 'Ni2', 'Ni3', 'Sa'],
-        avarohanam:   ['Sa', 'Ni3', 'Ni2', 'Pa', 'Ma2', 'Ga1', 'Ri1', 'Sa'],
+        arohanam:     ['Sa', 'Ri1', 'Ga1', 'Ma2', 'Pa', 'Da3', 'Ni3', 'Sa'],
+        avarohanam:   ['Sa', 'Ni3', 'Da3', 'Pa', 'Ma2', 'Ga1', 'Ri1', 'Sa'],
         type:         'Melakarta 42',
         mood:         'Majesty · Unusual',
         description:  'Named "dear to Raghu" (an epithet of Rama). Consecutive semitone pairs in both tetrachords with sharp Ma  ·  structurally unique and surprisingly stately.',

@@ -58,9 +58,15 @@ function loadSadhanaState() {
 }
 
 function App() {
-    const [view, setView] = useState('home');
+    const [view, setView] = useState(() => {
+        const hash = window.location.hash.replace(/^#\/?/, '');
+        return hash || 'home';
+    });
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [showFeatures, setShowFeatures] = useState(false);
+    const [showFeatures, setShowFeatures] = useState(() => {
+        const hash = window.location.hash.replace(/^#\/?/, '');
+        return hash && hash !== 'home' ? true : false;
+    });
     const [saFrequency, setSaFrequency] = useState(null);
     const [detectedNotes, setDetectedNotes] = useState([]);
     const [possibleRagas, setPossibleRagas] = useState([]);
@@ -141,6 +147,28 @@ function App() {
         });
     };
 
+    // Listen for hashchange events (back / forward navigation)
+    useEffect(() => {
+        const handleHashChange = () => {
+            const hash = window.location.hash.replace(/^#\/?/, '');
+            const targetView = hash || 'home';
+            if (targetView !== view) {
+                if (targetView !== 'listen') handleReset();
+                setView(targetView);
+                if (targetView === 'home') {
+                    setShowFeatures(false);
+                } else {
+                    setShowFeatures(true);
+                }
+            }
+        };
+
+        window.addEventListener('hashchange', handleHashChange);
+        return () => {
+            window.removeEventListener('hashchange', handleHashChange);
+        };
+    }, [view]);
+
     const goTo = (id) => {
         if (id !== 'listen') handleReset();
         setView(id);
@@ -149,6 +177,7 @@ function App() {
         } else {
             setShowFeatures(true);
         }
+        window.location.hash = `#/${id}`;
     };
 
     return (

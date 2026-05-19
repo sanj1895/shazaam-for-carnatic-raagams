@@ -4,239 +4,84 @@ import { createPortal } from 'react-dom';
 const STEPS = [
   {
     view: 'home',
-    selector: '#tour-logo',
     icon: '🪔',
     title: 'Welcome to Alapana',
-    body: "Your premium, comprehensive digital Carnatic music companion. Let's take a deep-dive guided tour to explore all interactive features step-by-step!",
+    body: "Your complete Carnatic music practice tool. Let me take you on a quick tour — I'll navigate to each feature so you can see it for yourself.",
     isWelcome: true,
   },
   {
     view: 'sadhana',
-    selector: '.tour-sadhana-console',
     symbol: '🧘‍♀️',
     feature: 'Daily Sadhana',
-    title: 'Daily Practice Path',
-    body: "Every day, Alapana builds a custom vocal sequence for you — from warmups to ear training. Complete this routine to build your daily streak!",
-    hint: "Click practices below to mark them complete",
-  },
-  {
-    view: 'shruthi',
-    selector: '.shruthi-keypad-panel',
-    symbol: '🎹',
-    feature: 'Shruthi Tuning',
-    title: 'Tonic Pitch (Sa) Keys',
-    body: "Select your fundamental root key on the mini-keyboard or adjust tuning frequency. The continuous reference drones calibrate instantly to your vocal range!",
-    hint: "Calibrate men's preset to C4 and ladies' to G4 or G#4",
-  },
-  {
-    view: 'shruthi',
-    selector: '#tour-shruthi-box',
-    symbol: '〜',
-    feature: 'Reference Drone',
-    title: 'High-Fidelity Tambura Drones',
-    body: "Tambura reference drones play 4 classical strings (Low Sa, Pa, Sa, High Sa). Adjust individual volume sliders to blend strings into your dream backing baseline.",
-    hint: 'Lock in your comfort pitch baseline first',
+    title: 'Your daily practice path',
+    body: "Every day, Alapana gives you a 4-step practice routine — drone warm-up, scales, keyboard exploration, and ear training. Complete all 4 to build your streak.",
+    hint: 'Steps reset each morning',
   },
   {
     view: 'tutor',
-    selector: '#tour-tutor-container',
-    symbol: '🎓',
-    feature: 'Vocal Tutor',
-    title: 'AI Vocal Tutor Curriculum',
-    body: "Learn classical lessons like Sarali Varisais. The AI Guru tracks your vocal pitch line in real time to evaluate stability, timing, and gamakam.",
-    hint: 'Look for the golden real-time scrolling pitch wave!',
+    symbol: '◈',
+    feature: 'Tutor',
+    title: 'Learn from scratch',
+    body: "New to Carnatic music? The Tutor walks you through a full curriculum — from your very first note all the way to singing complete raga scales. Every step listens to your voice.",
+    hint: "Best place to start if you're a beginner",
+  },
+  {
+    view: 'shruthi',
+    symbol: '〜',
+    feature: 'Shruthi',
+    title: 'Your practice drone',
+    body: "The Shruthi Box plays a continuous drone tone while you practice. Singing against a drone trains your ear to stay in tune — an essential part of every Carnatic session.",
+    hint: 'Keep this running in the background while you sing',
   },
   {
     view: 'talam',
-    selector: '.talam-container',
-    symbol: '🥁',
+    symbol: '॥',
     feature: 'Talam',
-    title: 'Rhythmic Beat Visualizer',
-    body: "Carnatic music is governed by rhythmic cycles called Talam. Practice feeling the 8-beat Adi Tala and view dynamic visual hand taps!",
-    hint: 'Calibrate tempo with the BPM slider',
+    title: 'Keep the rhythm',
+    body: "Carnatic music is organized into rhythmic cycles called Talam. Practice feeling and keeping the 8-beat Adi Tala — the most common cycle in Carnatic music.",
+    hint: 'Try tapping along as you sing',
   },
   {
     view: 'listen',
-    selector: '.pitch-detector-container',
-    symbol: '🎙️',
-    feature: 'Real-time Detector',
-    title: 'Sing to Identify Ragas',
-    body: "Sing any classical melody and Alapana will analyze your vocal frequency in real time, map it to relative swaras, and suggest matching Carnatic ragas!",
-    hint: "Hold notes steadily to see matching suggestions",
-  },
-  {
-    view: 'listen',
-    selector: '.groq-ai-container',
-    symbol: '🤖',
-    feature: 'Groq AI Analysis',
-    title: 'AI Guru Deep Analysis',
-    body: "Switch to Groq AI mode, record 30 seconds of your singing, and get deep qualitative feedback on voice quality, posture, and swara precision from your AI Guru.",
-    hint: 'Uses state-of-the-art models for feedback',
-  },
-  {
-    view: 'keyboard',
-    selector: '#tour-swara-keyboard',
-    symbol: '🎹',
-    feature: 'Swara Keyboard',
-    title: 'Interactive Relative Swaras',
-    body: "Play individual swara steps on a virtual keyboard and toggle Gamakam ornamentation to understand scale dynamics and play along.",
-    hint: 'Play specific notes by clicking the keyboard pads',
-  },
-  {
-    view: 'keyboard',
-    selector: '.swara-guide-button',
-    symbol: '📖',
-    feature: 'Swara Guide',
-    title: 'Sanskrit & Western Translation',
-    body: "Tap the Swara Guide button to view detailed translations. It displays western frequencies alongside Sanskrit swarasthana definitions!",
-    hint: 'Perfect for beginners translating western scales',
+    symbol: '♬',
+    feature: 'Sing',
+    title: 'Find your raga',
+    body: "Sing any Carnatic melody and Alapana listens in real time, detecting your notes and matching them to a raga. There's also a Groq AI mode for a deeper 30-second analysis.",
+    hint: 'Set your Sa first — it calibrates to your voice',
   },
   {
     view: 'library',
-    selector: '.raga-library-container',
-    symbol: '📚',
-    feature: 'Raga Library',
-    title: 'Raga Scale Library',
-    body: "Browse all major Carnatic ragas — including scale structures, famous compositions, moods, and standard practice templates with professional audio feedback!",
-    hint: 'Search by typing any raga name',
+    symbol: '◈',
+    feature: 'Library',
+    title: 'Explore every raga',
+    body: "Browse all Carnatic ragas — scales, mood, famous compositions, and a curated performance for each. Open any raga and hit the Practice tab for AI vocal feedback.",
+    hint: 'The Practice tab has AI vocal coaching built in',
   },
   {
-    view: 'melakarta',
-    selector: '.raga-melakarta-chart',
-    symbol: '🗂️',
-    feature: '72 Melakarta',
-    title: 'Parent Melakarta Chart',
-    body: "Explore the foundational parent raga system. Learn the mathematical division of Carnatic scales and practice Graha Bhedam modal shifts!",
-    hint: 'Tap any melakarta card to view its scale',
-  },
-  {
-    view: 'home',
-    selector: '#tour-logo',
+    view: null,
     icon: '✦',
-    title: "You're all set!",
-    body: "You are ready to begin your vocal journey. Tap Start Learning to begin, or click any tab to explore Alapana at your own pace.",
+    title: "You're all set",
+    body: "Tap Start Learning to go through the full curriculum from the beginning, or jump straight to any feature from the navigation bar above.",
     isLast: true,
   },
 ];
 
-export default function OnboardingTour({ active, onDismiss, onStartLearning, onGoTo, onStepChange }) {
+export default function OnboardingTour({ active, onDismiss, onStartLearning, onGoTo }) {
   const [step, setStep]       = useState(0);
   const [exiting, setExiting] = useState(false);
-  const [highlightRect, setHighlightRect] = useState(null);
-  const [cardStyle, setCardStyle] = useState({
-    position: 'fixed',
-    left: '50%',
-    top: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 'calc(100% - 32px)',
-    maxWidth: '380px',
-  });
 
-  // Calculate dynamic tour card positioning relative to the highlighted element to avoid overlap!
-  useEffect(() => {
-    if (!active) return;
-    
-    const current = STEPS[step];
-    if (!highlightRect || current.isWelcome || current.isLast) {
-      setCardStyle({
-        position: 'fixed',
-        left: '50%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 'calc(100% - 32px)',
-        maxWidth: '380px',
-      });
-      return;
-    }
-
-    const cardWidth = 380;
-    const cardHeight = 280; // Estimated height for tour dialog
-    const gap = 20;
-
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    // Centered horizontally with clamped values
-    let targetLeft = highlightRect.left + highlightRect.width / 2 - cardWidth / 2;
-    targetLeft = Math.max(16, Math.min(targetLeft, viewportWidth - cardWidth - 16));
-
-    const spaceBelow = viewportHeight - highlightRect.bottom;
-    const spaceAbove = highlightRect.top;
-
-    let targetTop;
-
-    // Decide if below or above
-    if (spaceBelow >= cardHeight + gap || spaceBelow >= spaceAbove) {
-      targetTop = highlightRect.bottom + gap;
-    } else {
-      targetTop = highlightRect.top - cardHeight - gap;
-    }
-
-    // Keep it on the screen
-    targetTop = Math.max(16, Math.min(targetTop, viewportHeight - cardHeight - 16));
-
-    setCardStyle({
-      position: 'fixed',
-      left: `${targetLeft}px`,
-      top: `${targetTop}px`,
-      width: 'calc(100% - 32px)',
-      maxWidth: `${cardWidth}px`,
-      transform: 'none',
-    });
-  }, [highlightRect, step, active]);
-
-  // Sync active state
   useEffect(() => {
     if (active) {
       setStep(0);
       setExiting(false);
-      onGoTo?.('home');
-      onStepChange?.(0);
     }
   }, [active]);
-
-  // Handle dynamic spotlight positioning
-  useEffect(() => {
-    if (!active) {
-      setHighlightRect(null);
-      return;
-    }
-
-    const current = STEPS[step];
-    const updateRect = () => {
-      if (!current?.selector) {
-        setHighlightRect(null);
-        return;
-      }
-      const el = document.querySelector(current.selector);
-      if (el) {
-        setHighlightRect(el.getBoundingClientRect());
-      } else {
-        setHighlightRect(null);
-      }
-    };
-
-    updateRect();
-    const t1 = setTimeout(updateRect, 100);
-    const t2 = setTimeout(updateRect, 400);
-
-    window.addEventListener('resize', updateRect);
-    window.addEventListener('scroll', updateRect, true);
-
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      window.removeEventListener('resize', updateRect);
-      window.removeEventListener('scroll', updateRect, true);
-    };
-  }, [step, active]);
 
   if (!active) return null;
 
   const current = STEPS[step];
   const isFirst = step === 0;
   const isLast  = step === STEPS.length - 1;
-  const isFeatureStep = !current.isWelcome && !current.isLast;
 
   const handleDismiss = () => {
     setExiting(true);
@@ -249,15 +94,12 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
   const goToStep = (nextIdx) => {
     if (nextIdx < 0 || nextIdx >= STEPS.length) return;
     const next = STEPS[nextIdx];
-    if (next?.view) {
-      onGoTo?.(next.view);
-    }
+    if (next?.view) onGoTo?.(next.view);
     setStep(nextIdx);
-    onStepChange?.(nextIdx);
   };
 
   const progressDots = (
-    <div className="flex gap-1.5 items-center">
+    <div className="flex gap-1.5 items-center flex-wrap">
       {STEPS.map((_, i) => (
         <button
           key={i}
@@ -273,64 +115,20 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
 
   return createPortal(
     <>
-      {/* 1. Dynamic Spotlit Backdrop Layer */}
-      <div 
-        className={`fixed inset-0 z-[9990] pointer-events-none transition-opacity duration-300 ${exiting ? 'opacity-0' : 'opacity-100'}`}
-      >
-        <svg className="absolute inset-0 w-full h-full">
-          <defs>
-            <mask id="tour-spotlight-mask">
-              {/* White overlay dims everything */}
-              <rect x="0" y="0" width="100%" height="100%" fill="white" />
-              {/* Black rounded cutout reveals target cleanly */}
-              {highlightRect && (
-                <rect
-                  x={highlightRect.x - 12}
-                  y={highlightRect.y - 12}
-                  width={highlightRect.width + 24}
-                  height={highlightRect.height + 24}
-                  rx="16"
-                  fill="black"
-                />
-              )}
-            </mask>
-          </defs>
-          {/* Dimmer backdrop overlay utilizing target mask */}
-          <rect
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            fill="rgba(24, 10, 3, 0.78)"
-            mask="url(#tour-spotlight-mask)"
-            className="transition-all duration-300 pointer-events-auto"
-            onClick={handleDismiss}
-          />
-        </svg>
-      </div>
-
-      {/* 2. Highlight border stroke */}
-      {highlightRect && (
-        <div
-          className={`fixed pointer-events-none z-[9991] rounded-2xl border-2 border-c-gold/80 transition-all duration-300 shadow-[0_0_24px_rgba(200,148,31,0.45)] ${exiting ? 'opacity-0' : 'opacity-100'}`}
-          style={{
-            left: highlightRect.x - 12,
-            top: highlightRect.y - 12,
-            width: highlightRect.width + 24,
-            height: highlightRect.height + 24,
-            position: 'fixed',
-          }}
-        />
-      )}
-
-      {/* 3. Tour Control Card Container */}
+      {/* Backdrop — simple dark overlay, no SVG */}
       <div
-        className={`z-[9995] flex justify-center px-4 pointer-events-none transition-all duration-300 ${exiting ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
-        style={cardStyle}
+        className={`fixed inset-0 z-[9990] bg-black/60 transition-opacity duration-250 ${exiting ? 'opacity-0' : 'opacity-100'}`}
+        onClick={handleDismiss}
+        style={{ backdropFilter: 'blur(2px)' }}
+      />
+
+      {/* Tour card — bottom of screen on mobile, centered on desktop */}
+      <div
+        className={`fixed inset-x-0 bottom-0 z-[9995] flex justify-center px-4 pb-[76px] md:pb-0 md:top-1/2 md:left-1/2 md:right-auto md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 pointer-events-none transition-all duration-250 ${exiting ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}
       >
-        <div className="pointer-events-auto w-full relative bg-[#1e0c04] border border-c-gold/40 rounded-2xl shadow-[0_16px_50px_rgba(0,0,0,0.6)] overflow-hidden animate-slide-up p-5 flex flex-col gap-4">
-          
-          {/* Heritage Corners */}
+        <div className="pointer-events-auto w-full max-w-[400px] relative bg-[#1e0c04] border border-[#f7d686]/30 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden p-5 flex flex-col gap-4">
+
+          {/* Heritage corners */}
           <div className="absolute inset-0 pointer-events-none z-0">
             <div className="heritage-border-corner heritage-corner-tl opacity-50" />
             <div className="heritage-border-corner heritage-corner-tr opacity-50" />
@@ -338,10 +136,10 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
             <div className="heritage-border-corner heritage-corner-br opacity-50" />
           </div>
 
-          {/* Header info */}
-          <div className="flex items-center justify-between border-b border-white/10 pb-2.5 z-10 relative">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-white/10 pb-2.5 relative z-10">
             <span className="text-[9px] font-mono text-[#f7d686]/70 uppercase tracking-[0.2em]">
-              Guided Tour · Step {step + 1} of {STEPS.length}
+              Tour · {step + 1} of {STEPS.length}
             </span>
             <button
               onClick={handleDismiss}
@@ -352,68 +150,71 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
             </button>
           </div>
 
-          {/* Icon or Symbol */}
-          <div className="flex items-center gap-3 z-10 relative">
+          {/* Icon / Symbol + title */}
+          <div className="flex items-center gap-3 relative z-10">
             {current.icon ? (
-              <span className="text-3xl">{current.icon}</span>
+              <span className="text-3xl flex-shrink-0">{current.icon}</span>
             ) : (
-              <div className="w-10 h-10 rounded-full bg-white/10 border border-[#f7d686]/30 flex items-center justify-center text-[#f7d686] text-lg font-playfair font-bold">
+              <div className="w-10 h-10 rounded-full bg-white/10 border border-[#f7d686]/30 flex items-center justify-center text-[#f7d686] text-lg font-playfair font-bold flex-shrink-0">
                 {current.symbol}
               </div>
             )}
-            <div>
+            <div className="min-w-0">
               {current.feature && (
                 <span className="text-[8px] font-mono text-[#f7d686]/70 uppercase tracking-wider block">{current.feature}</span>
               )}
-              <h3 className="font-playfair font-bold text-white text-base leading-tight mt-0.5">{current.title}</h3>
+              <h3 className="font-playfair font-bold text-white text-[15px] leading-tight mt-0.5">{current.title}</h3>
             </div>
           </div>
 
-          {/* Body Content */}
-          <div className="z-10 relative space-y-2.5">
+          {/* Body */}
+          <div className="relative z-10 space-y-2">
             <p className="text-[13px] text-white/75 font-playfair leading-relaxed">{current.body}</p>
             {current.hint && (
               <p className="text-[11px] text-[#f7d686] font-playfair italic">✦ {current.hint}</p>
             )}
           </div>
 
-          {/* Footer Actions */}
-          <div className="flex flex-col gap-3 pt-3 border-t border-white/10 z-10 relative">
-            <div className="flex justify-between items-center">
+          {/* Footer */}
+          <div className="flex flex-col gap-3 pt-3 border-t border-white/10 relative z-10">
+            <div className="flex items-center justify-between">
               {progressDots}
-              <span className="text-[10px] font-mono text-white/30">{step + 1}/{STEPS.length}</span>
+              <span className="text-[9px] font-mono text-white/30 ml-2 flex-shrink-0">{step + 1}/{STEPS.length}</span>
             </div>
 
             {isLast ? (
               <button
-                onClick={() => {
-                  setExiting(true);
-                  setTimeout(() => {
-                    setExiting(false);
-                    onStartLearning?.();
-                  }, 250);
-                }}
-                className="w-full py-2.5 bg-[#f7d686] hover:bg-white text-[#1e0c04] font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all shadow-md cursor-pointer"
+                onClick={() => { handleDismiss(); onStartLearning?.(); }}
+                className="w-full py-2.5 bg-[#f7d686] hover:bg-white text-[#1e0c04] font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all"
               >
                 Start Learning →
               </button>
-            ) : (
-              <div className="flex items-center justify-between mt-1">
+            ) : null}
+
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => goToStep(step - 1)}
+                disabled={isFirst}
+                className="text-xs text-white/50 hover:text-white disabled:opacity-0 transition-all font-playfair py-1 px-2"
+              >
+                ← Back
+              </button>
+              {isLast ? (
                 <button
-                  onClick={() => goToStep(step - 1)}
-                  disabled={isFirst}
-                  className="text-xs text-white/50 hover:text-white disabled:opacity-0 transition-all font-playfair py-1 px-2"
+                  onClick={handleDismiss}
+                  className="text-xs text-white/50 hover:text-white transition-all font-playfair italic py-1 px-2"
                 >
-                  ← Back
+                  Just explore
                 </button>
+              ) : (
                 <button
                   onClick={() => goToStep(step + 1)}
-                  className="text-xs font-playfair font-bold text-[#1e0c04] bg-[#f7d686] hover:bg-white transition-all py-1.5 px-4 rounded-lg tracking-wider uppercase cursor-pointer"
+                  className="text-xs font-playfair font-bold text-[#1e0c04] bg-[#f7d686] hover:bg-white transition-all py-1.5 px-4 rounded-lg tracking-wider uppercase"
                 >
                   Next →
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { RAGAS, getSwaram } from '../utils/ragaLogic';
 import { CURRICULUM, COURSES } from '../utils/tutorCurriculum';
 import {
-    getAudioCtx, playNote, playSequence, detectPitch as detectPitchAudio,
+    getAudioCtx, detectPitch as detectPitchAudio,
     SWARA_SEMITONE, noteFreq, getOctaveSequence, startDrone,
 } from '../utils/audioUtils';
 
@@ -861,7 +861,7 @@ function ExerciseTuning({ instruction, sa, onDone }) {
 
 // ─── Shared: Base Shruti (Sa) Calibrator ──────────────────────────────────────
 
-function ExerciseShrutiSetup({ instruction, sa, setSa, onDone }) {
+function ExerciseShrutiSetup({ sa, setSa, onDone }) {
     const [phase, setPhase] = useState('idle'); // idle | calibrating | success
     const [tempSa, setTempSa] = useState(sa);
     const [stableSamples, setStableSamples] = useState([]);
@@ -1908,7 +1908,6 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose }) {
             // Track consecutive candidate swaras to filter out transient background clicks/room noises
             let currentCandidate = null;
             let candidateCount = 0;
-            let lastCommittedSwara = null;
             let silenceCount = 0;
 
             // Pitch & Volume tracking loop (every 50ms)
@@ -2212,7 +2211,7 @@ You did a wonderful job bringing a bright and sweet energy to your singing. To m
                 <div className="flex justify-between items-center border-b border-c-border/20 pb-3 relative z-10">
                     <div>
                         <h3 className="font-playfair text-base font-bold text-c-gold italic">AI Vocal Coach</h3>
-                        <p className="text-[10px] text-c-cream-dark/80 mt-0.5">Vocal Feedback Guru · Lesson Sing-Along</p>
+                        <p className="text-[10px] text-c-cream-dark/80 mt-0.5">Sing · Get Feedback · Improve</p>
                     </div>
                     <button onClick={onClose} className="text-c-cream-dark hover:text-c-cream text-lg transition-colors">✕</button>
                 </div>
@@ -2221,9 +2220,9 @@ You did a wonderful job bringing a bright and sweet energy to your singing. To m
                     <div className="flex flex-col items-center gap-5 text-center py-4 relative z-10 w-full">
                         <div className="w-14 h-14 rounded-full bg-c-gold-faint flex items-center justify-center text-2xl shadow-inner border border-c-border/20">🧘🏽‍♂️</div>
                         <div className="flex flex-col gap-2">
-                            <p className="text-sm font-playfair font-bold text-c-cream">Sing along with the lesson!</p>
+                            <p className="text-sm font-playfair font-bold text-c-cream">Sing to the AI — get real feedback.</p>
                             <p className="text-xs text-c-cream-dim leading-relaxed px-2">
-                                Press start, sing along with the active exercise content, and get warm, customized, and mathematically precise feedback from the Carnatic AI Guru.
+                                Sing the exercise on your own, then the AI Guru listens to your recording and tells you what you did well and what to work on.
                             </p>
                         </div>
 
@@ -2239,7 +2238,7 @@ You did a wonderful job bringing a bright and sweet energy to your singing. To m
                             onClick={startRecording}
                             className="w-full py-3 bg-c-gold hover:bg-c-gold-light active:scale-[0.98] text-c-bg rounded-xl text-sm font-playfair font-bold italic shadow-lg shadow-c-gold/25 transition-all mt-1"
                         >
-                            🎙️ Start Sing-Along (8 seconds)
+                            🎙️ Start Recording (8 seconds)
                         </button>
                     </div>
                 )}
@@ -2438,7 +2437,7 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack }) {
                         onClick={() => setShowAIFeedback(true)} 
                         className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-c-gold-faint via-c-surface to-c-gold-faint hover:from-c-gold/10 hover:to-c-gold/15 border border-c-border/40 hover:border-c-gold/40 rounded-xl text-c-gold text-xs tracking-wide transition-all font-playfair italic shadow-sm active:scale-[0.98]"
                     >
-                        <span className="text-c-gold animate-pulse">✨</span> Sing Along & Get AI Coaching
+                        <span className="text-c-gold animate-pulse">✨</span> Sing for AI Feedback
                     </button>
                 </div>
             )}
@@ -2568,7 +2567,7 @@ function RagaSession({ ragaName, raga, sa, onBack }) {
 
             {/* Pipeline progress bar tracker (Clickable Tabs) */}
             <div className="w-full flex justify-between items-center px-2 py-3 border-b border-c-border/40 mb-2 overflow-x-auto gap-2">
-                {steps.map((s, idx) => {
+                {steps.map((s) => {
                     const activeIdx = steps.findIndex(st => st.key === phase);
                     const isActive = s.key === phase;
                     const isPast = steps.findIndex(st => st.key === s.key) < activeIdx;
@@ -2787,7 +2786,7 @@ function RagaSession({ ragaName, raga, sa, onBack }) {
             {/* Sing progress dots */}
             {(phase === 'sing_aro_notes' || phase === 'sing_ava_notes') && (
                 <div className="flex justify-center gap-1.5">
-                    {(phase === 'sing_aro_notes' ? arohanam : avarohanam).map((n, i) => (
+                    {(phase === 'sing_aro_notes' ? arohanam : avarohanam).map((_n, i) => (
                         <div key={i} className={`w-2 h-2 rounded-full transition-colors ${
                             i < singIdx ? 'bg-emerald-500' : i === singIdx ? 'bg-c-gold' : 'bg-c-border'
                         }`} />

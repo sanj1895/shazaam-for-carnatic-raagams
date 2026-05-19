@@ -353,7 +353,7 @@ function App() {
                             {/* CTAs  ·  fade out once features are shown */}
                             <div
                                 className="transition-all duration-500 flex flex-col items-center gap-4"
-                                style={{ opacity: showFeatures ? 0 : 1, pointerEvents: showFeatures ? 'none' : 'auto', height: showFeatures ? 0 : 'auto', overflow: 'hidden' }}
+                                style={{ opacity: showFeatures ? 0 : 1, pointerEvents: showFeatures ? 'none' : 'auto', height: showFeatures ? 0 : 'auto', overflow: showFeatures ? 'hidden' : 'visible' }}
                             >
                                 {/* Primary: Start Learning */}
                                 <button

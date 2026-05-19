@@ -61,6 +61,22 @@ const RagaDetail = ({ raga, hasClearMatch }) => {
     const videoId = parseYouTubeId(raga.video);
     const bg = headerBg[raga.color] || 'bg-c-maroon';
 
+    const injectAngas = (scale) => {
+        if (scale.length === 8 && !scale.includes('|')) {
+            return [
+                ...scale.slice(0, 4),
+                '|',
+                ...scale.slice(4, 6),
+                '|',
+                ...scale.slice(6, 8)
+            ];
+        }
+        return [...scale];
+    };
+
+    const displayArohanam = injectAngas(raga.arohanam);
+    const displayAvarohanam = injectAngas(raga.avarohanam);
+
     return (
         <div className="w-full heritage-card rounded-lg overflow-hidden animate-slide-up shadow-2xl max-w-2xl mx-auto">
             {/* Heritage Corners */}
@@ -124,7 +140,7 @@ const RagaDetail = ({ raga, hasClearMatch }) => {
                         <div className="absolute inset-0 bg-c-gold/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                         <h3 className="font-playfair font-bold text-c-gold text-sm mb-4 uppercase tracking-[0.2em] border-b border-c-gold/10 pb-2">Arohanam ↑</h3>
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-2 relative z-10">
-                            {raga.arohanam.map((note, i) => {
+                            {displayArohanam.map((note, i) => {
                                 if (note === '|' || note === '||') {
                                     return (
                                         <div key={i} className="flex flex-col items-center mx-1">
@@ -142,7 +158,7 @@ const RagaDetail = ({ raga, hasClearMatch }) => {
                                     </React.Fragment>
                                 );
                             })}
-                            {raga.arohanam[raga.arohanam.length - 1] !== '||' && (
+                            {displayArohanam[displayArohanam.length - 1] !== '||' && (
                                 <div className="flex flex-col items-center ml-1">
                                     <span className="font-mono text-base font-light text-c-gold/40 tracking-widest leading-none">||</span>
                                     <div className="w-1 h-1 rounded-full bg-transparent mt-1" />
@@ -154,7 +170,7 @@ const RagaDetail = ({ raga, hasClearMatch }) => {
                         <div className="absolute inset-0 bg-c-gold/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                         <h3 className="font-playfair font-bold text-c-gold text-sm mb-4 uppercase tracking-[0.2em] border-b border-c-gold/10 pb-2">Avarohanam ↓</h3>
                         <div className="flex flex-wrap items-center gap-x-2 gap-y-2 relative z-10">
-                            {raga.avarohanam.map((note, i) => {
+                            {displayAvarohanam.map((note, i) => {
                                 if (note === '|' || note === '||') {
                                     return (
                                         <div key={i} className="flex flex-col items-center mx-1">
@@ -172,7 +188,7 @@ const RagaDetail = ({ raga, hasClearMatch }) => {
                                     </React.Fragment>
                                 );
                             })}
-                            {raga.avarohanam[raga.avarohanam.length - 1] !== '||' && (
+                            {displayAvarohanam[displayAvarohanam.length - 1] !== '||' && (
                                 <div className="flex flex-col items-center ml-1">
                                     <span className="font-mono text-base font-light text-c-gold/40 tracking-widest leading-none">||</span>
                                     <div className="w-1 h-1 rounded-full bg-transparent mt-1" />

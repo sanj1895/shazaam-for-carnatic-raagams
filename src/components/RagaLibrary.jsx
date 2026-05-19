@@ -49,6 +49,14 @@ const headerBg = {
     teal:   'bg-c-teal',
 };
 
+const formatScale = (scale) => {
+    const sargam = scale.map(toSargam);
+    if (sargam.length === 8) {
+        return `${sargam.slice(0,4).join(' ')} | ${sargam.slice(4,6).join(' ')} | ${sargam.slice(6,8).join(' ')}`;
+    }
+    return sargam.join(' ');
+};
+
 const RagaCard = ({ name, data, onClick }) => (
     <button
         onClick={() => onClick({ name, ...data })}
@@ -87,18 +95,17 @@ const RagaCard = ({ name, data, onClick }) => (
                 </p>
             )}
 
-            {/* Arohanam */}
             <div className="mb-1.5">
                 <span className="text-[9px] text-c-cream-dark uppercase tracking-wider mr-2">↑</span>
                 <span className="font-mono text-xs text-c-cream-dim tracking-wider">
-                    {data.arohanam.map(toSargam).join(' ')} <span className="text-c-gold/40 font-light ml-0.5 tracking-widest">||</span>
+                    {formatScale(data.arohanam)} <span className="text-c-gold/40 font-light ml-0.5 tracking-widest">||</span>
                 </span>
             </div>
             {/* Avarohanam */}
             <div>
                 <span className="text-[9px] text-c-cream-dark uppercase tracking-wider mr-2">↓</span>
                 <span className="font-mono text-xs text-c-cream-dim tracking-wider">
-                    {data.avarohanam.map(toSargam).join(' ')} <span className="text-c-gold/40 font-light ml-0.5 tracking-widest">||</span>
+                    {formatScale(data.avarohanam)} <span className="text-c-gold/40 font-light ml-0.5 tracking-widest">||</span>
                 </span>
             </div>
         </div>

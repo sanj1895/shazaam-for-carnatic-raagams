@@ -193,17 +193,7 @@ function App() {
                     setTourActive(false);
                     goTo('tutor');
                 }} 
-                onGoTo={goTo} 
-                onStepChange={(stepIndex) => {
-                    if (stepIndex === 6) {
-                        if (!saFrequency) setSaFrequency(240);
-                        setActiveMode('standard');
-                    }
-                    if (stepIndex === 7) {
-                        if (!saFrequency) setSaFrequency(240);
-                        setActiveMode('groq');
-                    }
-                }}
+                onGoTo={goTo}
             />
 
             {/* ══ UNIFIED MODAL (PORTAL) ══ */}

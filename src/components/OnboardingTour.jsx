@@ -122,9 +122,9 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
         style={{ backdropFilter: 'blur(2px)' }}
       />
 
-      {/* Tour card — bottom of screen on mobile, centered on desktop */}
+      {/* Tour card — bottom of screen on mobile, bottom-right corner on desktop */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-[9995] flex justify-center px-4 pb-[76px] md:pb-0 md:top-1/2 md:left-1/2 md:right-auto md:bottom-auto md:-translate-x-1/2 md:-translate-y-1/2 pointer-events-none transition-all duration-250 ${exiting ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}
+        className={`fixed inset-x-0 bottom-0 z-[9995] flex justify-center px-4 pb-[76px] md:inset-x-auto md:bottom-6 md:right-6 md:left-auto md:pb-0 md:block pointer-events-none transition-all duration-250 ${exiting ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}
       >
         <div className="pointer-events-auto w-full max-w-[400px] relative bg-[#1e0c04] border border-[#f7d686]/30 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden p-5 flex flex-col gap-4">
 

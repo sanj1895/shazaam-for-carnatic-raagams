@@ -14,6 +14,7 @@ import Tutor from './components/Tutor';
 import { getSwaram, identifyRaga, RAGAS } from './utils/ragaLogic';
 import RagaDetail from './components/RagaDetail';
 import OnboardingTour from './components/OnboardingTour';
+import { CuratedIcon, FireIcon } from './components/IconLibrary';
 
 const VeenaIcon = () => (
     <svg width="22" height="68" viewBox="0 0 22 68" fill="none" className="text-c-gold-dim">
@@ -106,6 +107,12 @@ const KoshaIcon = ({ className = "w-5 h-5" }) => (
         <path d="M14 53 C 24 57, 40 57, 50 53" stroke="currentColor" opacity="0.25" strokeDasharray="3 3" />
     </svg>
 );
+
+const renderTabIcon = (id, className = "w-5 h-5") => {
+    if (id === 'listen') return <DhwaniIcon className={className} />;
+    if (id === 'library') return <KoshaIcon className={className} />;
+    return <CuratedIcon icon={id} className={className} />;
+};
 
 const FEATURES = [
     { id: 'tutor',     label: 'Gurukul',      desc: 'Classical vocal academy & scale flow', symbol: '📿',  mobileSymbol: '📿', level: 'beginner', highlight: true },
@@ -387,7 +394,7 @@ function App() {
                                             : 'border-c-border bg-c-surface text-c-cream-dim active:bg-c-gold/10'
                                     }`}
                                 >
-                                    <span className="text-xl">{mobileSymbol}</span>
+                                    <span className="text-c-gold">{renderTabIcon(id, "w-5 h-5")}</span>
                                     <span className="text-[10px] font-playfair font-bold uppercase tracking-wide">{label}</span>
                                 </button>
                             ))}
@@ -453,15 +460,7 @@ function App() {
                                     : 'text-c-cream-dark border-t-2 border-transparent -mt-0.5'
                             }`}
                         >
-                            {mobileSymbol === '📿' ? (
-                                <GurukulIcon className="w-4 h-4" />
-                            ) : mobileSymbol === '♬' ? (
-                                <DhwaniIcon className="w-4 h-4" />
-                            ) : mobileSymbol === '◈' ? (
-                                <KoshaIcon className="w-4 h-4" />
-                            ) : (
-                                <span className="text-base">{mobileSymbol}</span>
-                            )}
+                            {renderTabIcon(id, "w-4 h-4")}
                             <span className="text-[8px] font-bold uppercase tracking-tight leading-none">{label}</span>
                         </button>
                     ))}
@@ -888,7 +887,7 @@ function App() {
                                     <h3 className="font-playfair text-lg font-bold text-c-cream mt-0.5">{doneCount} of {steps.length} steps done</h3>
                                 </div>
                                 <div className="flex items-center gap-2 px-4 py-1.5 border border-c-border rounded-full bg-c-surface">
-                                    <span className="text-xs text-c-cream font-mono">Streak: <strong>🔥 {sadhana.streak} {sadhana.streak === 1 ? 'day' : 'days'}</strong></span>
+                                    <span className="text-xs text-c-cream font-mono flex items-center gap-1">Streak: <strong className="flex items-center gap-0.5"><FireIcon className="w-3.5 h-3.5 text-orange-500" /> {sadhana.streak} {sadhana.streak === 1 ? 'day' : 'days'}</strong></span>
                                 </div>
                             </div>
                             <div className="space-y-1.5 relative z-10">
@@ -938,7 +937,7 @@ function App() {
                                         </div>
                                         <div>
                                             <h4 className="font-playfair text-sm font-bold text-c-cream flex items-center gap-1.5">
-                                                <span>{item.icon}</span> {item.name}
+                                                <span className="text-c-gold"><CuratedIcon icon={item.tab} className="w-5 h-5" /></span> {item.name}
                                             </h4>
                                             <span className="text-[10px] text-c-gold font-mono uppercase tracking-wider block mt-0.5">{item.desc}</span>
                                         </div>

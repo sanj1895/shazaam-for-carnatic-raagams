@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { RAGAS, getSwaram } from '../utils/ragaLogic';
 import { CURRICULUM, COURSES } from '../utils/tutorCurriculum';
+import { CuratedIcon, LockIcon, CheckIcon } from './IconLibrary';
 import {
     getAudioCtx, detectPitch as detectPitchAudio,
     SWARA_SEMITONE, noteFreq, getOctaveSequence, startDrone,
@@ -3177,15 +3178,13 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
             {/* Compact Space-Efficient Dashboard Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-c-border pb-4 mb-1">
                 <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md backdrop-blur-md relative flex-shrink-0">
-                        <GurukulIcon className="w-7 h-7 relative z-10" />
-                    </div>
                     <div className="flex flex-col text-left">
-                        <div className="flex items-center gap-2">
-                            <h1 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Gurukul</h1>
+                        <div className="flex items-center gap-2.5">
+                            <GurukulIcon className="w-8 h-8 text-c-gold animate-pulse flex-shrink-0" />
+                            <h1 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Svara Gurukul</h1>
                             <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Academy</span>
                         </div>
-                        <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
+                        <p className="text-c-cream-dim text-[11px] mt-1.5 font-light leading-relaxed pl-1.5">
                             Structured, progressive vocal training curriculum from foundations to advanced improvisation.
                         </p>
                     </div>
@@ -3210,8 +3209,8 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
                                 <div className="heritage-border-corner heritage-corner-br" style={{ bottom: 2, right: 2 }} />
 
                                 <div className="px-5 py-5 flex items-start gap-4 flex-1">
-                                    <div className="text-3xl p-3 bg-c-gold-faint rounded-xl border border-c-border/40 text-c-gold flex-shrink-0 group-hover:scale-105 transition-transform animate-pulse" style={{ animationDuration: '3s' }}>
-                                        {course.symbol}
+                                    <div className="p-3 bg-c-gold-faint rounded-xl border border-c-border/40 text-c-gold flex-shrink-0 group-hover:scale-105 transition-transform animate-pulse" style={{ animationDuration: '3s' }}>
+                                        <CuratedIcon icon={course.id} className="w-8 h-8" />
                                     </div>
                                     <div className="flex-1 flex flex-col gap-1">
                                         <div className="flex items-center gap-2">
@@ -3227,7 +3226,7 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
                                 
                                 <div className="border-t border-c-border/30 bg-c-card px-5 py-3.5 flex flex-col gap-2">
                                     <div className="flex justify-between items-center text-[10px] font-mono text-c-cream-dark uppercase tracking-wider font-bold">
-                                        <span>🏁 active Path</span>
+                                        <span className="flex items-center gap-1"><CuratedIcon icon="🏆" className="w-3.5 h-3.5 text-c-gold" /> active Path</span>
                                         <span className="text-c-gold">{completed} / {total} Lessons</span>
                                     </div>
                                     <div className="w-full h-1.5 bg-c-bg rounded-full overflow-hidden border border-c-border/10">
@@ -3248,8 +3247,8 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
                             className="rounded-xl border border-c-border/30 bg-c-surface/40 flex flex-col overflow-hidden relative opacity-70 group"
                         >
                             <div className="px-5 py-5 flex items-start gap-4 flex-1">
-                                <div className="text-3xl p-3 bg-c-border/30 rounded-xl border border-c-border/10 text-c-cream-dim flex-shrink-0">
-                                    {course.symbol}
+                                <div className="p-3 bg-c-border/30 rounded-xl border border-c-border/10 text-c-cream-dim flex-shrink-0">
+                                    <CuratedIcon icon={course.id} className="w-8 h-8 opacity-60" />
                                 </div>
                                 <div className="flex-1 flex flex-col gap-1">
                                     <div className="flex items-center justify-between gap-2">
@@ -3266,8 +3265,8 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
                                 </div>
                             </div>
                             
-                            <div className="border-t border-c-border/20 bg-c-card/20 px-5 py-3 text-[10px] font-mono text-c-cream-dark/60 uppercase tracking-wider italic">
-                                🌸 Future Program — Unlock Foundations First!
+                            <div className="border-t border-c-border/20 bg-c-card/20 px-5 py-3 text-[10px] font-mono text-c-cream-dark/60 uppercase tracking-wider flex items-center gap-1.5">
+                                <CuratedIcon icon="geetams" className="w-3.5 h-3.5 opacity-60" /> Future Program — Unlock Foundations First!
                             </div>
                         </div>
                     );
@@ -3322,7 +3321,7 @@ function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset, onBackToC
                                 unlocked ? 'border-c-border hover:border-c-gold/40' : 'border-c-border/30 opacity-40 cursor-not-allowed'
                             }`}>
                         <div className="px-5 py-4 flex items-center gap-4" style={{ background: unit.color }}>
-                            <span className="text-xl text-white/70">{unit.symbol}</span>
+                            <span className="text-white/80"><CuratedIcon icon={unit.symbol} className="w-6 h-6 text-white" /></span>
                             <div className="flex-1">
                                 <div className="font-playfair text-white font-bold">{unit.title}</div>
                                 <div className="text-white/55 text-[11px] mt-0.5">{unit.subtitle}</div>
@@ -3334,8 +3333,8 @@ function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset, onBackToC
                                     </div>
                                 )}
                             </div>
-                            {!unlocked && <span className="text-white/30">🔒</span>}
-                            {complete && <span className="text-emerald-400 text-lg">✓</span>}
+                            {!unlocked && <LockIcon className="w-5 h-5 text-white/40" />}
+                            {complete && <CheckIcon className="w-5 h-5 text-emerald-400 stroke-[3]" />}
                         </div>
                         {unlocked && (
                             <div className="bg-c-surface px-5 py-2.5 flex items-center gap-3">
@@ -3388,7 +3387,7 @@ function UnitView({ unit, progress, onSelectLesson, onBack }) {
                                 unlocked ? 'border-c-gold/40 bg-c-gold-faint text-c-gold' :
                                 'border-c-border text-c-cream-dark'
                             }`}>
-                                {done ? '✓' : unlocked ? idx + 1 : '🔒'}
+                                {done ? <CheckIcon className="w-4 h-4 text-emerald-400 stroke-[3]" /> : unlocked ? idx + 1 : <LockIcon className="w-3.5 h-3.5 text-c-cream-dark/50" />}
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="font-playfair text-sm text-c-cream">{lesson.title}</div>

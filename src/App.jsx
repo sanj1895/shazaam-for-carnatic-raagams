@@ -30,14 +30,14 @@ const VeenaIcon = () => (
 );
 
 const FEATURES = [
+    { id: 'tutor',     label: 'Tutor',        desc: 'Learn Carnatic singing from scratch',    symbol: '◈',  mobileSymbol: '🎓', level: 'beginner', highlight: true },
+    { id: 'listen',    label: 'Sing',         desc: 'Sing a melody & identify the raga',       symbol: '♬',  mobileSymbol: '🎤', level: 'intermediate', highlight: true },
+    { id: 'library',   label: 'Discover',     desc: 'Explore & practice every raga scale',    symbol: '◈',  mobileSymbol: '📚', level: 'all', highlight: true },
     { id: 'sadhana',   label: 'Sadhana',      desc: 'Your recommended daily practice path',    symbol: '🧘‍♀️', mobileSymbol: '🧘‍♀️', level: 'start' },
-    { id: 'tutor',     label: 'Tutor',        desc: 'Learn Carnatic singing from scratch',    symbol: '◈',  mobileSymbol: '🎓', level: 'beginner' },
     { id: 'shruthi',   label: 'Shruthi',      desc: 'Continuous drone for practice',          symbol: '〜', mobileSymbol: '🎵', level: 'beginner' },
     { id: 'talam',     label: 'Talam',        desc: 'Keep the rhythmic cycle',                symbol: '॥',  mobileSymbol: '🥁', level: 'beginner' },
-    { id: 'listen',    label: 'Sing',         desc: 'Sing a melody  ·  find the raga',       symbol: '♬',  mobileSymbol: '🎤', level: 'intermediate' },
     { id: 'keyboard',  label: 'Keyboard',     desc: 'Play swaras on virtual keys',            symbol: '♩',  mobileSymbol: '🎹', level: 'intermediate' },
     { id: 'singback',  label: 'Sing-Back',    desc: 'Challenge your raga memory',             symbol: '◎',  mobileSymbol: '🎯', level: 'intermediate' },
-    { id: 'library',   label: 'Library',      desc: 'Browse every Carnatic raga',             symbol: '◈',  mobileSymbol: '📚', level: 'all' },
     { id: 'melakarta', label: 'Melakarta',    desc: 'The complete 72-raga parent chart',      symbol: '⊹',  mobileSymbol: '🗂️', level: 'advanced' },
     { id: 'bhedam',    label: 'Graha Bhedam', desc: 'Discover modal shifts between ragas',    symbol: '↻',  mobileSymbol: '🔄', level: 'advanced' },
 ];
@@ -506,7 +506,7 @@ function App() {
                             </div>
 
                             <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4 w-full max-w-5xl mx-auto">
-                                {FEATURES.map(({ id, label, desc, symbol, level }, idx) => (
+                                {FEATURES.map(({ id, label, desc, symbol, level, highlight }, idx) => (
                                     <button
                                         key={id}
                                         onClick={() => goTo(id)}
@@ -517,10 +517,10 @@ function App() {
                                             transform: showFeatures ? 'translateY(0)' : 'translateY(20px)',
                                         }}
                                     >
-                                    {/* The Plaque Base — extra glow for Tutor */}
+                                    {/* The Plaque Base — extra premium gradient glow for highlighted features */}
                                     <div className={`absolute inset-0 rounded-lg shadow-xl transition-all duration-300 ${
-                                        level === 'start'
-                                            ? 'bg-[#1e0c04] border border-c-gold/60 shadow-[0_0_20px_rgba(200,148,31,0.15)] group-hover:border-c-gold'
+                                        highlight
+                                            ? 'bg-gradient-to-b from-[#2b1206] to-[#140602] border-2 border-c-gold shadow-[0_0_20px_rgba(200,148,31,0.22)] group-hover:shadow-[0_0_30px_rgba(200,148,31,0.35)] group-hover:border-[#f7d686]'
                                             : 'bg-[#1e0c04] border border-c-gold/30 group-hover:border-c-gold/70'
                                     }`} />
 
@@ -533,8 +533,17 @@ function App() {
                                     <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-c-gold/40 rounded-bl-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
                                     <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-c-gold/40 rounded-br-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
 
+                                    {/* Core Indicator Star */}
+                                    {highlight && (
+                                        <div className="absolute top-1.5 right-1.5 text-[8px] text-c-gold/80 animate-pulse pointer-events-none font-mono">
+                                            ✦
+                                        </div>
+                                    )}
+
                                     {/* Symbol with shadow */}
-                                    <div className="relative z-10 text-c-gold text-xl sm:text-2xl mb-1.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 group-hover:text-[#f7d686] transition-all duration-500">
+                                    <div className={`relative z-10 text-xl sm:text-2xl mb-1.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-all duration-500 ${
+                                        highlight ? 'text-[#f7d686]' : 'text-c-gold group-hover:text-[#f7d686]'
+                                    }`}>
                                         {symbol}
                                     </div>
 

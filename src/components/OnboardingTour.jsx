@@ -26,6 +26,14 @@ const STEPS = [
     hint: "Best place to start if you're a beginner",
   },
   {
+    view: 'tutor',
+    symbol: '🌊',
+    feature: 'Raga Practice',
+    title: 'Visual voice guidelines',
+    body: "In the Tutor's Raga Practice tab, learn to trace curved, delicate oscillations (Gamakams) using a glowing, semi-transparent golden path scrolling in real-time.",
+    hint: 'Gamakams define the soul and distinct style of each raga',
+  },
+  {
     view: 'shruthi',
     symbol: '〜',
     feature: 'Shruthi',
@@ -56,6 +64,22 @@ const STEPS = [
     title: 'Explore every raga',
     body: "Browse all Carnatic ragas — scales, mood, famous compositions, and a curated performance for each. Open any raga and hit the Practice tab for AI vocal feedback.",
     hint: 'The Practice tab has AI vocal coaching built in',
+  },
+  {
+    view: 'melakarta',
+    symbol: '🗂️',
+    feature: 'Melakarta Chart',
+    title: 'The parent scale tree',
+    body: "Explore the comprehensive 72 Melakarta scale system — the mathematical blueprint for all parent ragas in Carnatic music, laid out in an elegant, interactive grid.",
+    hint: 'Tap any melakarta to immediately view and play its scale',
+  },
+  {
+    view: 'bhedam',
+    symbol: '🔄',
+    feature: 'Graha Bhedam',
+    title: 'Discover modal shifts',
+    body: "Experience modal shift exploration. Graha Bhedam lets you shift the tonic note (Sa) to other notes in the scale to dynamically unlock entirely new ragas.",
+    hint: 'Hear the original scale versus shifted scales in real-time',
   },
   {
     view: null,

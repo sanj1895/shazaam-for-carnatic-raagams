@@ -3470,15 +3470,20 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
 
             {/* Header: Svara Gurukul Rebrand */}
             {screen === 'home' && (
-                <div className="text-center space-y-3 mb-2 animate-fade-in">
-                    <h2 className="font-playfair text-3xl sm:text-4xl md:text-5xl text-c-gold tracking-tight">Svara Gurukul</h2>
-                    <div className="flex items-center justify-center gap-3">
-                        <div className="h-px w-10 bg-c-gold/30" />
-                        <p className="text-c-cream-dim text-[10px] sm:text-xs italic font-playfair tracking-[0.2em] uppercase">Vocal Academy & Scale Mastery</p>
-                        <div className="h-px w-10 bg-c-gold/30" />
+                <div className="w-full max-w-2xl text-left border-b border-c-gold/20 pb-4 mb-2 animate-fade-in">
+                    <div className="flex items-center gap-3 md:gap-4 mb-1">
+                        <div className="flex-shrink-0 text-c-gold opacity-90 mt-1">
+                            <GurukulIcon className="w-12 h-12 md:w-14 md:h-14" />
+                        </div>
+                        <h2 className="font-playfair text-3xl sm:text-4xl md:text-5xl font-bold text-c-gold tracking-tight uppercase">
+                            Svara Gurukul
+                        </h2>
+                        <span className="px-2.5 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase bg-c-gold/15 border border-c-gold/30 text-c-gold self-center shadow-sm">
+                            Academy
+                        </span>
                     </div>
-                    <p className="text-c-cream-dark text-xs sm:text-sm max-w-xl mx-auto leading-relaxed font-playfair opacity-80">
-                        Embark on a traditional Carnatic vocal journey. Learn structured warm-up exercises (Varisais) or practice ascending and descending scales under real-time guidance from the AI Guru.
+                    <p className="text-c-cream-dark text-xs sm:text-sm leading-relaxed font-playfair opacity-80 pl-1 md:pl-[68px]">
+                        Structured, progressive vocal training curriculum from foundations to advanced improvisation.
                     </p>
                 </div>
             )}

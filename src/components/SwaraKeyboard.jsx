@@ -322,48 +322,48 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false, onSad
                 <div className="w-16 h-px bg-c-gold/30 mx-auto mt-2" />
               </div>
 
-              <div className="space-y-3 sm:space-y-4 text-xs sm:text-sm text-c-cream leading-relaxed">
-                <p>
+              <div className="space-y-3 sm:space-y-4 text-[11px] sm:text-sm text-c-cream leading-relaxed">
+                <p className="hidden sm:block">
                   Welcome to the <strong>Swara Keyboard</strong>! Unlike Western music where notes are absolute (like C, D, or E), Carnatic music is built on <strong>relative tuning</strong>.
                 </p>
                 
-                <div className="bg-c-surface border border-c-border/30 rounded-lg p-3 sm:p-4 space-y-2">
+                <div className="bg-c-surface border border-c-border/30 rounded-lg p-2.5 sm:p-4 space-y-1.5 sm:space-y-2">
                   <h4 className="font-playfair font-bold text-c-gold text-xs sm:text-sm">What are the 7 Notes (Swaras)?</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1 text-[11px] font-mono">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-0.5 sm:gap-y-1 text-[10px] sm:text-[11px] font-mono">
                     <div><strong>Sa (Shadjama):</strong> The tonic / home key.</div>
                     <div><strong>Ri (Rishabha):</strong> The 2nd note.</div>
                     <div><strong>Ga (Gandhara):</strong> The 3rd note.</div>
                     <div><strong>Ma (Madhyama):</strong> The 4th note.</div>
-                    <div><strong>Pa (Panchama):</strong> The perfect 5th note.</div>
+                    <div><strong>Pa (Panchama):</strong> The perfect 5th.</div>
                     <div><strong>Da (Dhaivata):</strong> The 6th note.</div>
                     <div><strong>Ni (Nishada):</strong> The 7th note.</div>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <h4 className="font-playfair font-bold text-c-gold text-xs sm:text-sm">What do the numbers (Ri1, Ga2, etc.) mean?</h4>
-                  <p className="text-[11px] sm:text-xs">
-                    In Carnatic music, the space between <strong>Sa</strong> and <strong>Pa</strong> is divided into 16 microtonal subdivisions called <strong>Swarasthanas</strong>. The numbers (1, 2, 3) represent microtonal pitch positions of that note:
+                <div className="space-y-1.5 sm:space-y-2">
+                  <h4 className="font-playfair font-bold text-c-gold text-xs sm:text-sm">What do the numbers (Ri1, Ga2...) mean?</h4>
+                  <p className="text-[10px] sm:text-xs leading-normal">
+                    The numbers (1, 2, 3) represent microtonal pitch positions of that note:
                   </p>
-                  <ul className="list-disc pl-5 space-y-1 text-[11px] sm:text-xs">
+                  <ul className="list-disc pl-4 space-y-0.5 text-[10px] sm:text-xs">
                     <li><strong>Ri1 / Ga1:</strong> Lower, flatter microtones.</li>
                     <li><strong>Ri2 / Ga2:</strong> Normal or middle pitch positions.</li>
                     <li><strong>Ri3 / Ga3:</strong> Higher, sharper pitch positions.</li>
                   </ul>
-                  <p className="text-[10px] sm:text-[11px] italic text-c-cream-dim">
-                    Depending on the raga you select, the keyboard automatically configures the active pitches to match that raga's exact scale structure!
+                  <p className="text-[9px] sm:text-[11px] italic text-c-cream-dim leading-normal">
+                    Pitches dynamically adapt to match your selected raga's exact scale structure!
                   </p>
                 </div>
 
-                <div className="bg-c-gold/5 border border-c-gold/20 rounded-lg p-3 text-[11px] sm:text-xs text-c-gold italic">
+                <div className="hidden sm:block bg-c-gold/5 border border-c-gold/20 rounded-lg p-3 text-[11px] sm:text-xs text-c-gold italic">
                   <strong>Pro Tip:</strong> Turn on the <strong>Drone</strong> to establish a stable reference key, then play individual notes to hear how they blend beautifully with the tonic home!
                 </div>
               </div>
 
-              <div className="flex justify-center pt-2">
+              <div className="flex justify-center pt-1.5">
                 <button 
                   onClick={() => setShowGuide(false)}
-                  className="px-6 py-2 bg-c-gold text-c-bg hover:bg-c-gold-light rounded font-playfair font-bold text-sm transition-all cursor-pointer active:scale-95"
+                  className="px-6 py-1.5 bg-c-gold text-c-bg hover:bg-c-gold-light rounded font-playfair font-bold text-xs sm:text-sm transition-all cursor-pointer active:scale-95"
                 >
                   Got it! Let's Explore
                 </button>

@@ -104,9 +104,11 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
 
   const goToStep = (nextIdx) => {
     if (nextIdx < 0 || nextIdx >= STEPS.length) return;
-    // Don't navigate to views during the tour — it mounts heavy components
-    // (Tutor, ShruthiBox with audio contexts) behind the overlay on mobile, causing lag.
-    // The user can navigate after the tour ends.
+    const next = STEPS[nextIdx];
+    // Navigate to views on desktop only — mobile skips to avoid heavy component mounts
+    if (next?.view && window.innerWidth >= 768) {
+      onGoTo?.(next.view);
+    }
     setStep(nextIdx);
   };
 

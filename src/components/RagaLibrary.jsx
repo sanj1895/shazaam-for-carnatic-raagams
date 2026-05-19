@@ -20,6 +20,32 @@ const MiniVeena = ({ color }) => {
     );
 };
 
+const KoshaIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        {/* The open ancient scroll/book with double borders */}
+        <path d="M12 18 C 12 12, 28 12, 32 18 C 36 12, 52 12, 52 18 V 48 C 52 42, 36 42, 32 48 C 28 42, 12 42, 12 48 Z" fill="currentColor" fillOpacity="0.08" strokeWidth="1.8" />
+        <path d="M10 16 C 10 10, 28 10, 32 16 C 36 10, 54 10, 54 16 V 46 C 54 40, 36 40, 32 46 C 28 40, 10 40, 10 46 Z" stroke="currentColor" strokeWidth="0.7" opacity="0.3" />
+        
+        {/* Spine lines */}
+        <line x1="32" y1="16" x2="32" y2="48" stroke="currentColor" strokeWidth="2" />
+        
+        {/* Left page text lines representing sargam scripts */}
+        <line x1="18" y1="24" x2="26" y2="24" stroke="currentColor" opacity="0.6" strokeWidth="1.2" />
+        <line x1="16" y1="30" x2="28" y2="30" stroke="currentColor" opacity="0.6" strokeWidth="1.2" />
+        <line x1="18" y1="36" x2="24" y2="36" stroke="currentColor" opacity="0.6" strokeWidth="1.2" />
+        
+        {/* Right page rising soundwave/note representing melody escaping the page */}
+        <path d="M36 34 Q 40 24, 44 32 T 50 30" stroke="currentColor" strokeWidth="1.5" className="text-c-gold" />
+        
+        {/* Softly glowing golden star representing divine knowledge - breathing, NOT bouncing out! */}
+        <path d="M44 21 L45 23 L47 23 L45 24 L46 26 L44 25 L42 26 L43 24 L41 23 L43 23 Z" fill="#C8941F" className="animate-pulse" />
+        
+        {/* Ornate halo arches */}
+        <path d="M14 9 C 24 5, 40 5, 50 9" stroke="currentColor" opacity="0.25" strokeDasharray="3 3" />
+        <path d="M14 53 C 24 57, 40 57, 50 53" stroke="currentColor" opacity="0.25" strokeDasharray="3 3" />
+    </svg>
+);
+
 // Decorative kolam-style mandala for card background
 const KolamPattern = () => (
     <svg width="80" height="80" viewBox="0 0 80 80" fill="none" opacity="0.07" className="absolute top-0 right-0">
@@ -165,11 +191,20 @@ const RagaLibrary = ({ onSelectRaga }) => {
 
     return (
         <div className="w-full max-w-5xl raga-library-container">
-            <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                    <h2 className="font-playfair text-2xl text-c-gold">Raga Kosha</h2>
-                    <p className="text-c-cream-dark text-xs mt-1">The Treasury of Carnatic Music — all 72 Melakartas and derived janyas.</p>
+            {/* Branded Header Section */}
+            <div className="flex flex-col items-center text-center gap-2 mb-8 border-b border-c-border/40 pb-6">
+                <div className="w-16 h-16 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-lg backdrop-blur-md relative group overflow-hidden">
+                    <div className="absolute inset-0 bg-c-gold/5 rounded-full animate-ping opacity-20 pointer-events-none" />
+                    <KoshaIcon className="w-10 h-10 relative z-10 transition-transform duration-500 group-hover:scale-110" />
                 </div>
+                <h1 className="font-playfair text-3xl font-bold tracking-widest text-[#f7d686] uppercase mt-2">Raga Kosha</h1>
+                <p className="text-c-cream-dark text-xs uppercase tracking-[0.2em] font-medium opacity-80">The Treasury of Carnatic Music</p>
+                <p className="text-c-cream-dim text-[11px] max-w-md mt-1 leading-relaxed">
+                    Explore, search, and practice scales for all 72 Melakarta parent ragas and their hundreds of derived Janya ragams.
+                </p>
+            </div>
+
+            <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 
                 {/* Search Bar */}
                 <div className="relative w-full md:w-64">

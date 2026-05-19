@@ -51,44 +51,59 @@ const GurukulIcon = ({ className = "w-5 h-5" }) => (
 
 const DhwaniIcon = ({ className = "w-5 h-5" }) => (
     <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-        {/* The Flute (Pullanguzhal) slanting across */}
-        <line x1="12" y1="52" x2="52" y2="12" stroke="currentColor" strokeWidth="3.5" />
-        {/* Flute holes */}
-        <circle cx="24" cy="40" r="1.5" fill="currentColor" />
-        <circle cx="30" cy="34" r="1.5" fill="currentColor" />
-        <circle cx="36" cy="28" r="1.5" fill="currentColor" />
-        <circle cx="42" cy="22" r="1.5" fill="currentColor" />
+        {/* The Flute Body (double-lined with proper organic thickness) */}
+        <line x1="12" y1="52" x2="52" y2="12" stroke="currentColor" strokeWidth="3" />
+        <line x1="13" y1="53" x2="53" y2="13" stroke="currentColor" strokeWidth="1" opacity="0.3" />
         
-        {/* Beautiful radiating soundwaves soaring from the flute's blowhole */}
-        <path d="M10 42 C 16 36, 20 44, 26 38" stroke="currentColor" strokeWidth="1.2" opacity="0.6" className="animate-pulse" />
-        <path d="M6 34 C 14 26, 20 38, 28 30" stroke="currentColor" strokeWidth="1.5" opacity="0.8" />
-        <path d="M2 26 C 12 14, 18 30, 30 18" stroke="currentColor" strokeWidth="1.2" opacity="0.5" />
+        {/* Ornate silk threads binding the ends */}
+        <line x1="15" y1="49" x2="17" y2="47" stroke="#C8941F" strokeWidth="3.5" />
+        <line x1="47" y1="17" x2="49" y2="15" stroke="#C8941F" strokeWidth="3.5" />
         
-        {/* Soaring musical note */}
-        <path d="M46 10 C 46 7, 50 5, 53 7 C 55 9, 53 14, 49 14" stroke="currentColor" strokeWidth="1.5" fill="currentColor" />
-        <circle cx="46" cy="14" r="2.5" fill="currentColor" />
+        {/* Flute holes aligned exactly along center axis */}
+        <circle cx="23" cy="41" r="1" fill="currentColor" />
+        <circle cx="27" cy="37" r="1" fill="currentColor" />
+        <circle cx="31" cy="33" r="1" fill="currentColor" />
+        <circle cx="35" cy="29" r="1" fill="currentColor" />
+        <circle cx="39" cy="25" r="1" fill="currentColor" />
+        <circle cx="43" cy="21" r="1" fill="currentColor" />
+        
+        {/* Beautiful dangling Carnatic silk tassel/beads hanging from bottom-left tail */}
+        <path d="M12 52 C 10 54, 8 55, 7 57" stroke="currentColor" strokeWidth="1.2" />
+        <circle cx="7" cy="57" r="1.5" fill="#C8941F" />
+        <path d="M7 57 C 6 59, 5 62, 5 63" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+        <path d="M7 57 C 8 59, 9 62, 9 63" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+        <path d="M7 57 C 7 59, 7 62, 7 63" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+        
+        {/* Beautiful radiating soundwaves soaring from the blowhole (top-right) */}
+        <path d="M49 9 C 52 7, 53 10, 56 8" stroke="currentColor" strokeWidth="1.2" opacity="0.7" className="animate-pulse" />
+        <path d="M46 5 C 50 3, 52 6, 56 4" stroke="currentColor" strokeWidth="1" opacity="0.4" />
+        <path d="M52 13 C 55 11, 56 14, 59 12" stroke="currentColor" strokeWidth="1" opacity="0.4" />
     </svg>
 );
 
 const KoshaIcon = ({ className = "w-5 h-5" }) => (
     <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-        {/* The open ancient scroll/book */}
-        <path d="M12 18 C 12 12, 28 12, 32 18 C 36 12, 52 12, 52 18 V 48 C 52 42, 36 42, 32 48 C 28 42, 12 42, 12 48 Z" fill="currentColor" fillOpacity="0.1" strokeWidth="1.8" />
+        {/* The open ancient scroll/book with double borders */}
+        <path d="M12 18 C 12 12, 28 12, 32 18 C 36 12, 52 12, 52 18 V 48 C 52 42, 36 42, 32 48 C 28 42, 12 42, 12 48 Z" fill="currentColor" fillOpacity="0.08" strokeWidth="1.8" />
+        <path d="M10 16 C 10 10, 28 10, 32 16 C 36 10, 54 10, 54 16 V 46 C 54 40, 36 40, 32 46 C 28 40, 10 40, 10 46 Z" stroke="currentColor" strokeWidth="0.7" opacity="0.3" />
+        
         {/* Spine lines */}
-        <line x1="32" y1="18" x2="32" y2="48" stroke="currentColor" strokeWidth="1.8" />
+        <line x1="32" y1="16" x2="32" y2="48" stroke="currentColor" strokeWidth="2" />
         
         {/* Left page text lines representing sargam scripts */}
-        <line x1="18" y1="24" x2="26" y2="24" stroke="currentColor" opacity="0.6" />
-        <line x1="16" y1="30" x2="28" y2="30" stroke="currentColor" opacity="0.6" />
-        <line x1="18" y1="36" x2="24" y2="36" stroke="currentColor" opacity="0.6" />
+        <line x1="18" y1="24" x2="26" y2="24" stroke="currentColor" opacity="0.6" strokeWidth="1.2" />
+        <line x1="16" y1="30" x2="28" y2="30" stroke="currentColor" opacity="0.6" strokeWidth="1.2" />
+        <line x1="18" y1="36" x2="24" y2="36" stroke="currentColor" opacity="0.6" strokeWidth="1.2" />
         
         {/* Right page rising soundwave/note representing melody escaping the page */}
-        <path d="M38 32 Q42 22, 46 32 T50 32" stroke="currentColor" strokeWidth="1.5" className="text-c-gold" />
-        <circle cx="46" cy="22" r="2.5" fill="currentColor" className="text-c-gold animate-bounce" />
+        <path d="M36 34 Q 40 24, 44 32 T 50 30" stroke="currentColor" strokeWidth="1.5" className="text-c-gold" />
         
-        {/* Ornate corner flourishes */}
-        <path d="M8 12 Q32 4, 56 12" stroke="currentColor" opacity="0.3" strokeDasharray="2 2" />
-        <path d="M8 52 Q32 60, 56 52" stroke="currentColor" opacity="0.3" strokeDasharray="2 2" />
+        {/* Softly glowing golden star representing divine knowledge - breathing, NOT bouncing out! */}
+        <path d="M44 21 L45 23 L47 23 L45 24 L46 26 L44 25 L42 26 L43 24 L41 23 L43 23 Z" fill="#C8941F" className="animate-pulse" />
+        
+        {/* Ornate halo arches */}
+        <path d="M14 9 C 24 5, 40 5, 50 9" stroke="currentColor" opacity="0.25" strokeDasharray="3 3" />
+        <path d="M14 53 C 24 57, 40 57, 50 53" stroke="currentColor" opacity="0.25" strokeDasharray="3 3" />
     </svg>
 );
 
@@ -651,6 +666,17 @@ function App() {
                 {view === 'listen' && (
                     <main className="w-full max-w-2xl mx-auto flex flex-col items-center gap-7 px-4 md:px-8 py-10 animate-fade-in">
                         <div className="w-full flex flex-col items-center gap-7">
+
+                            {/* Branded Header Section */}
+                            <div className="flex flex-col items-center text-center gap-2 mb-2">
+                                <div className="w-16 h-16 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-lg backdrop-blur-md relative group overflow-hidden">
+                                    <div className="absolute inset-0 bg-c-gold/5 rounded-full animate-ping opacity-30 pointer-events-none" />
+                                    <DhwaniIcon className="w-10 h-10 relative z-10 transition-transform duration-500 group-hover:scale-110" />
+                                </div>
+                                <h1 className="font-playfair text-3xl font-bold tracking-widest text-[#f7d686] uppercase mt-2">Dhwani</h1>
+                                <p className="text-c-cream-dark text-xs uppercase tracking-[0.2em] font-medium opacity-80">Ālaap AI Raga Identifier</p>
+                                <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-c-gold/40 to-transparent mt-1" />
+                            </div>
 
                             {/* How-to card */}
                             <div className="w-full bg-c-gold-faint border border-c-gold/25 rounded-xl p-4 flex gap-3.5 items-start">

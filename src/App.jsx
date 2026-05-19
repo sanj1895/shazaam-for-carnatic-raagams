@@ -129,17 +129,44 @@ const FEATURES = [
 
 const SADHANA_TABS = ['shruthi', 'tutor', 'keyboard', 'singback'];
 
+function getLocalDateString() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function getYesterdayDateString() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 function loadSadhanaState() {
-    const today = new Date().toISOString().slice(0, 10);
-    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const today = getLocalDateString();
+    const yesterday = getYesterdayDateString();
     try {
         const s = JSON.parse(localStorage.getItem('alapana_sadhana_v1') || 'null');
-        if (!s) return { date: today, completed: [], streak: 0 };
+        if (!s) {
+            const newState = { date: today, completed: [], streak: 0 };
+            localStorage.setItem('alapana_sadhana_v1', JSON.stringify(newState));
+            return newState;
+        }
         if (s.date === today) return s;
         const streak = (s.date === yesterday && s.completed.length >= SADHANA_TABS.length)
             ? (s.streak || 0) + 1 : 0;
-        return { date: today, completed: [], streak };
-    } catch { return { date: today, completed: [], streak: 0 }; }
+        const newState = { date: today, completed: [], streak };
+        localStorage.setItem('alapana_sadhana_v1', JSON.stringify(newState));
+        return newState;
+    } catch {
+        const newState = { date: today, completed: [], streak: 0 };
+        localStorage.setItem('alapana_sadhana_v1', JSON.stringify(newState));
+        return newState;
+    }
 }
 
 function App() {

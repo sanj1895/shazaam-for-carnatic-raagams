@@ -116,6 +116,10 @@ export default function SwaraKeyboard({ forceRaga = null, compact = false, onSad
     await promise;
     setPlayingNote(null);
     setPlayingScale(false);
+    if (!keyboardSadhanaDoneRef.current) {
+      onSadhanaComplete?.('keyboard');
+      keyboardSadhanaDoneRef.current = true;
+    }
   };
 
   const NoteKey = ({ note, octaveShift = 0 }) => {

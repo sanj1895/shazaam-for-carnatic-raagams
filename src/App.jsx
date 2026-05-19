@@ -174,9 +174,10 @@ function App() {
                                     </p>
                                 </div>
                             ) : (
-                                <RagaDetail 
-                                    raga={selectedRaga.type === 'melakarta' ? { name: selectedRaga.raga.name, ...RAGAS[selectedRaga.raga.ragaKey] } : selectedRaga.raga} 
-                                    hasClearMatch={selectedRaga.hasClearMatch} 
+                                <RagaDetail
+                                    raga={selectedRaga.type === 'melakarta' ? { name: selectedRaga.raga.name, ...RAGAS[selectedRaga.raga.ragaKey] } : selectedRaga.raga}
+                                    hasClearMatch={selectedRaga.hasClearMatch}
+                                    initialSaHz={saFrequency}
                                 />
                             )}
                         </div>
@@ -357,9 +358,9 @@ function App() {
                                 {/* Primary: Start Learning */}
                                 <button
                                     onClick={() => goTo('tutor')}
-                                    className="relative overflow-hidden group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-14 py-4 rounded-full text-sm md:text-base tracking-[0.2em] uppercase transition-all duration-500 transform hover:scale-105 shadow-[0_0_40px_rgba(200,148,31,0.35)]"
+                                    className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-14 py-4 rounded-full text-sm md:text-base tracking-[0.2em] uppercase transition-all duration-500 transform hover:scale-105 shadow-[0_0_40px_rgba(200,148,31,0.35)]"
                                 >
-                                    <span className="relative z-10">Start Learning</span>
+                                    Start Learning
                                 </button>
                                 <p className="text-white/40 text-[11px] font-playfair italic">New to Carnatic music? Start here.</p>
 

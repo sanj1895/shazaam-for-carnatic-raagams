@@ -452,6 +452,27 @@ function App() {
                 {view === 'listen' && (
                     <main className="w-full max-w-2xl mx-auto flex flex-col items-center gap-7 px-4 md:px-8 py-10 animate-fade-in">
                         <div className="w-full flex flex-col items-center gap-7">
+
+                            {/* How-to card */}
+                            <div className="w-full bg-c-gold-faint border border-c-gold/25 rounded-xl p-4 flex gap-3 items-start">
+                                <span className="text-c-gold text-base flex-shrink-0 mt-0.5">♬</span>
+                                <div className="flex flex-col gap-2.5">
+                                    <p className="font-playfair text-c-cream text-sm font-bold">Sing freely — find your raga</p>
+                                    <p className="text-c-cream-dim text-xs leading-relaxed">
+                                        Sing any Carnatic melody and Alapana listens in real time, detecting each note and matching them to a raga.
+                                    </p>
+                                    <ol className="flex flex-col gap-1.5 text-xs text-c-cream-dim leading-relaxed list-none">
+                                        <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">1.</span><span>Allow microphone access and turn on pitch detection.</span></li>
+                                        <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">2.</span><span>Sing your <span className="text-c-gold font-semibold">Sa</span> — the first note of the Carnatic scale, like "Do" in Do-Re-Mi. It's the note your melody always comes back to and feels settled on. Pick a comfortable pitch and sing it steadily so Alapana can lock on to it.</span></li>
+                                        <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">3.</span><span>Sing your melody. Hold each note for a moment so it's detected, then watch the raga suggestions appear.</span></li>
+                                    </ol>
+                                    <p className="text-[10px] text-c-cream-dark italic border-t border-c-gold/15 pt-2">
+                                        <span className="text-c-gold/80">Standard</span> mode works best for clear, straight notes.&ensp;
+                                        <span className="text-c-gold/80">Groq AI</span> mode records 30 seconds and uses AI to catch subtle ornaments — use it once you're comfortable.
+                                    </p>
+                                </div>
+                            </div>
+
                             {/* Step guide */}
                             <div className="w-full flex items-center gap-2">
                                 {[
@@ -528,7 +549,7 @@ function App() {
                                         {activeMode === 'standard' ? (
                                             <div className="flex flex-col items-center w-full">
                                                 <p className="text-[11px] text-c-cream-dark text-center font-playfair italic mb-5 opacity-80 max-w-sm">
-                                                    Best for straightforward singing. Matches exact notes instantly but won't pick up fluid gamakams.
+                                                    Detects notes in real time as you sing. Great for beginners — just hold each note clearly and the raga builds up live.
                                                 </p>
                                                 <RagaDisplay 
                                                     ragas={possibleRagas} 
@@ -540,7 +561,7 @@ function App() {
                                         ) : (
                                             <div className="flex flex-col w-full">
                                                 <p className="text-[11px] text-c-cream-dark text-center font-playfair italic mb-5 opacity-80 max-w-sm mx-auto">
-                                                    Best for nuanced singing. Records a 30s phrase and uses AI to identify characteristic gamakams and prayogams.
+                                                    Records a 30-second phrase, then sends the note sequence to Groq AI for deeper analysis — better at catching fluid ornaments and complex phrases.
                                                 </p>
                                                 <GroqPanel saFrequency={saFrequency} />
                                             </div>

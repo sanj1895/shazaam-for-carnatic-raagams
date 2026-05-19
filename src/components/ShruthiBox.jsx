@@ -256,8 +256,7 @@ export default function ShruthiBox() {
       borderRadius: 12,
       boxShadow: '0 20px 60px rgba(55,28,0,0.5), 0 2px 10px rgba(0,0,0,0.3)',
       border: '3px solid #c8b870',
-      maxWidth: 640,
-      margin: '0 auto',
+      width: '100%',
       fontFamily: '"Courier New", Courier, monospace',
       userSelect: 'none',
       overflow: 'hidden',
@@ -265,7 +264,6 @@ export default function ShruthiBox() {
     },
     panel: {
       background: 'linear-gradient(172deg, #eee3c4, #d8cfa4)',
-      borderBottom: '3px solid #b4a464',
       padding: '16px 14px 15px',
       boxShadow: 'inset 0 2px 9px rgba(0,0,0,0.14)',
     },
@@ -293,7 +291,7 @@ export default function ShruthiBox() {
   };
 
   return (
-    <div style={s.body}>
+    <div style={s.body} className="max-w-[640px] lg:max-w-5xl mx-auto">
       {/* Heritage Corners */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="heritage-border-corner heritage-corner-tl" />
@@ -302,8 +300,11 @@ export default function ShruthiBox() {
         <div className="heritage-border-corner heritage-corner-br" />
       </div>
 
-      {/* ══════════════ TOP CONTROL PANEL ══════════════ */}
-      <div style={s.panel}>
+      {/* Responsive 2-col wrapper: stacked on mobile, side-by-side on desktop */}
+      <div className="lg:flex lg:items-stretch">
+
+      {/* ══════════════ TOP CONTROL PANEL (left col on desktop) ══════════════ */}
+      <div style={s.panel} className="lg:flex-1 [border-bottom:3px_solid_#b4a464] lg:[border-bottom:0] lg:[border-right:3px_solid_#b4a464]">
 
         {/* Header strip */}
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -440,8 +441,8 @@ export default function ShruthiBox() {
         </div>
       </div>
 
-      {/* ══════════════ FRONT FACE ══════════════ */}
-      <div className="p-4 sm:p-5 flex flex-col sm:flex-row gap-5 sm:gap-6 items-center">
+      {/* ══════════════ FRONT FACE (right sidebar on desktop) ══════════════ */}
+      <div className="p-4 sm:p-5 flex flex-col sm:flex-row lg:flex-col gap-5 sm:gap-6 items-center lg:w-64 lg:justify-center">
 
         {/* Circular speaker grille */}
         <div className="w-32 h-32 sm:w-38 sm:h-38 flex-shrink-0 rounded-full flex items-center justify-center overflow-hidden"
@@ -518,6 +519,8 @@ export default function ShruthiBox() {
 
         </div>
       </div>
+
+      </div>{/* end lg:flex wrapper */}
     </div>
   );
 }

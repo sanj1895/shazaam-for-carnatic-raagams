@@ -122,7 +122,7 @@ Respond ONLY with valid JSON:
     // Add custom fields so it renders beautifully in our RagaDetail component
     return {
         ...result,
-        type: `Groq AI Search · ${result.parent}`,
+        type: `AI Search · ${result.parent}`,
         color: 'teal',
         video: null
     };

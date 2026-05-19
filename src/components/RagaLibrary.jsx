@@ -276,10 +276,10 @@ const RagaLibrary = ({ onSelectRaga }) => {
                         {aiLoading ? (
                             <>
                                 <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
-                                Consulting Groq AI...
+                                Consulting AI...
                             </>
                         ) : (
-                            <>Ask Groq AI about "{searchQuery}"</>
+                            <>Ask AI about "{searchQuery}"</>
                         )}
                     </button>
                     {aiError && (

@@ -167,7 +167,7 @@ export default function GroqPanel({ saFrequency }) {
             <div className="border-b border-c-border px-5 py-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 flex-shrink-0">
                     <span className="text-c-gold/40 text-xs">✦</span>
-                    <h2 className="font-playfair text-sm text-c-cream-dim italic">Free AI Analysis (Groq)</h2>
+                    <h2 className="font-playfair text-sm text-c-cream-dim italic">Ālaap AI Analysis</h2>
                 </div>
                 <select
                     value={model}
@@ -189,7 +189,7 @@ export default function GroqPanel({ saFrequency }) {
                 {panelState === STATES.IDLE && (
                     <div className="flex flex-col items-center gap-4 w-full">
                         <p className="text-c-cream-dark text-xs text-center max-w-xs font-playfair italic leading-relaxed">
-                            Set your Sa, then sing or play for 30s. We'll transcribe it to swaras directly in your browser, then send the sequence to Groq for analysis!
+                            Set your Sa, then sing or play for 30s. We'll transcribe it to swaras directly in your browser, then send the sequence to AI for analysis!
                         </p>
                         <button
                             onClick={startRecording}
@@ -227,13 +227,13 @@ export default function GroqPanel({ saFrequency }) {
                 {panelState === STATES.PROCESSING && (
                     <div className="flex flex-col items-center gap-3">
                         <div className="w-5 h-5 border-2 border-c-gold/30 border-t-c-gold rounded-full animate-spin" />
-                        <p className="text-c-cream-dark text-xs font-playfair italic">Groq AI is analyzing the notes…</p>
+                        <p className="text-c-cream-dark text-xs font-playfair italic">Ālaap AI is analyzing the notes…</p>
                     </div>
                 )}
 
                 {panelState === STATES.RESULT && result?.top_matches && (
                     <div className="w-full flex flex-col gap-6 animate-fade-in">
-                        <h3 className="text-center font-playfair text-xl text-c-cream-dim border-b border-c-border pb-2 mb-2">Groq's Top 3 Guesses</h3>
+                        <h3 className="text-center font-playfair text-xl text-c-cream-dim border-b border-c-border pb-2 mb-2">Top 3 Guesses</h3>
 
                         {result.top_matches.map((match, idx) => {
                             const localData = RAGAS[match.raagam];

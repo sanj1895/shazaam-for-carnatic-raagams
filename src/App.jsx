@@ -383,7 +383,7 @@ function App() {
             {/* ── Top Nav ── */}
             <nav className="bg-c-card border-b border-c-border px-4 md:px-6 py-3 md:py-4 flex items-center justify-between sticky top-0 z-40 shadow-md backdrop-blur-md">
                 <button
-                    onClick={() => { setView('home'); setShowFeatures(false); }}
+                    onClick={() => goTo('home')}
                     className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity"
                 >
                     <VeenaIcon />

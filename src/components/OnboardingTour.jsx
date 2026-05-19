@@ -27,11 +27,11 @@ const STEPS = [
   },
   {
     view: 'tutor',
-    symbol: '🌊',
+    symbol: '🎓',
     feature: 'Raga Practice',
-    title: 'Visual voice guidelines',
-    body: "In the Tutor's Raga Practice tab, learn to trace curved, delicate oscillations (Gamakams) using a glowing, semi-transparent golden path scrolling in real-time.",
-    hint: 'Gamakams define the soul and distinct style of each raga',
+    title: 'Advanced raga training',
+    body: "For singers who want to explore beyond the basic curriculum. Pick any raga from Alapana's extensive library, listen to its ascending/descending scales, and practice singing each note with real-time tuner feedback.",
+    hint: 'Intermediate and advanced singers can master scales here',
   },
   {
     view: 'shruthi',

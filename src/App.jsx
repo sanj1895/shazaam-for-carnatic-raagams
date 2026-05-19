@@ -154,6 +154,7 @@ function App() {
     const [sadhana, setSadhana] = useState(loadSadhanaState);
     const [sadhanaToast, setSadhanaToast] = useState(null); // { title, stepName }
     const [selectedRaga, setSelectedRaga] = useState(null); // { raga, hasClearMatch, type: 'library' | 'identify' | 'melakarta' }
+    const [showGuide, setShowGuide] = useState(false);
 
     const noteHistory = useRef([]);
     const sessionFreq = useRef({});
@@ -683,29 +684,40 @@ function App() {
                                         </p>
                                     </div>
                                 </div>
+
+                                {/* Collapsible guide toggler button */}
+                                <button
+                                    onClick={() => setShowGuide(!showGuide)}
+                                    className="px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider bg-c-gold/15 text-[#f7d686] border border-c-gold/20 hover:bg-c-gold/25 transition-all flex items-center gap-1.5"
+                                >
+                                    <span>🛈 {showGuide ? "Hide Guide" : "How to Sing"}</span>
+                                    <span className="opacity-70">{showGuide ? "▲" : "▼"}</span>
+                                </button>
                             </div>
 
-                            {/* How-to card */}
-                            <div className="w-full bg-c-gold-faint border border-c-gold/25 rounded-xl p-4 flex gap-3.5 items-start">
-                                <div className="text-c-gold flex-shrink-0 mt-0.5">
-                                    <DhwaniIcon className="w-5 h-5" />
+                            {/* Collapsible How-to card */}
+                            {showGuide && (
+                                <div className="w-full bg-c-gold-faint border border-c-gold/25 rounded-xl p-4 flex gap-3.5 items-start animate-fade-in">
+                                    <div className="text-c-gold flex-shrink-0 mt-0.5">
+                                        <DhwaniIcon className="w-5 h-5" />
+                                    </div>
+                                    <div className="flex flex-col gap-2.5">
+                                        <p className="font-playfair text-c-cream text-sm font-bold">Dhwani: Real-time Raga Recognition</p>
+                                        <p className="text-c-cream-dim text-xs leading-relaxed text-left">
+                                            Sing any Carnatic melody and Ālāpana listens in real time, detecting each note and matching them to a raga. Switch to the optional <span className="text-c-gold font-semibold">Ālaap AI</span> mode to analyze longer, ornamented phrases.
+                                        </p>
+                                        <ol className="flex flex-col gap-1.5 text-xs text-c-cream-dim leading-relaxed list-none text-left">
+                                            <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">1.</span><span>Allow microphone access and turn on pitch detection.</span></li>
+                                            <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">2.</span><span>Sing your <span className="text-c-gold font-semibold">Sa</span> — the first note of the Carnatic scale, like "Do" in Do-Re-Mi. It's the note your melody always comes back to and feels settled on. Pick a comfortable pitch and sing it steadily so Ālāpana can lock on to it.</span></li>
+                                            <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">3.</span><span>Sing your melody. Hold each note for a moment so it's detected, then watch the raga suggestions appear.</span></li>
+                                        </ol>
+                                        <p className="text-[10px] text-c-cream-dark italic border-t border-c-gold/15 pt-2 text-left">
+                                            <span className="text-c-gold/80">Standard</span> mode works best for clear, straight notes.&ensp;
+                                            <span className="text-c-gold/80">Ālaap AI</span> mode records 30 seconds and uses deep AI to catch subtle, fluid ornaments and gamakams.
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="flex flex-col gap-2.5">
-                                    <p className="font-playfair text-c-cream text-sm font-bold">Dhwani: Real-time Raga Recognition</p>
-                                    <p className="text-c-cream-dim text-xs leading-relaxed">
-                                        Sing any Carnatic melody and Ālāpana listens in real time, detecting each note and matching them to a raga. Switch to the optional <span className="text-c-gold font-semibold">Ālaap AI</span> mode to analyze longer, ornamented phrases.
-                                    </p>
-                                    <ol className="flex flex-col gap-1.5 text-xs text-c-cream-dim leading-relaxed list-none">
-                                        <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">1.</span><span>Allow microphone access and turn on pitch detection.</span></li>
-                                        <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">2.</span><span>Sing your <span className="text-c-gold font-semibold">Sa</span> — the first note of the Carnatic scale, like "Do" in Do-Re-Mi. It's the note your melody always comes back to and feels settled on. Pick a comfortable pitch and sing it steadily so Ālāpana can lock on to it.</span></li>
-                                        <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">3.</span><span>Sing your melody. Hold each note for a moment so it's detected, then watch the raga suggestions appear.</span></li>
-                                    </ol>
-                                    <p className="text-[10px] text-c-cream-dark italic border-t border-c-gold/15 pt-2">
-                                        <span className="text-c-gold/80">Standard</span> mode works best for clear, straight notes.&ensp;
-                                        <span className="text-c-gold/80">Ālaap AI</span> mode records 30 seconds and uses deep AI to catch subtle, fluid ornaments and gamakams.
-                                    </p>
-                                </div>
-                            </div>
+                            )}
 
                             {/* Step guide */}
                             <div className="w-full flex items-center gap-2">

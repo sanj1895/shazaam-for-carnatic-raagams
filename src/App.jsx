@@ -49,7 +49,7 @@ const GurukulIcon = ({ className = "w-5 h-5" }) => (
     </svg>
 );
 
-const AlaapIcon = ({ className = "w-5 h-5" }) => (
+const DhwaniIcon = ({ className = "w-5 h-5" }) => (
     <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
         {/* The Flute (Pullanguzhal) slanting across */}
         <line x1="12" y1="52" x2="52" y2="12" stroke="currentColor" strokeWidth="3.5" />

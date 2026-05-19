@@ -215,14 +215,16 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
     };
 
     const renderSwaras = () => {
+        // Split into lines on '||' — use || purely as a line break, don't render it
         const lines = [];
         let currentLine = [];
         for (let idx = 0; idx < swaras.length; idx++) {
-            currentLine.push({ s: swaras[idx], i: idx });
             if (swaras[idx] === '||') {
-                lines.push(currentLine);
+                if (currentLine.length > 0) lines.push(currentLine);
                 currentLine = [];
+                continue;
             }
+            currentLine.push({ s: swaras[idx], i: idx });
         }
         if (currentLine.length > 0) lines.push(currentLine);
 
@@ -231,10 +233,17 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
                 {lines.map((line, lIdx) => (
                     <div key={lIdx} className="flex flex-wrap justify-center gap-1 sm:gap-2">
                         {line.map(({ s, i }) => {
-                            if (s === '|' || s === '||') {
+                            if (s === '|') {
                                 return (
-                                    <div key={i} className={`flex items-center text-c-gold/40 font-light mx-0.5 sm:mx-1 ${s === '||' ? 'tracking-widest' : ''}`}>
+                                    <div key={i} className="flex items-center text-c-gold/40 font-light mx-0.5 sm:mx-1">
                                         {s}
+                                    </div>
+                                );
+                            }
+                            if (s === ',') {
+                                return (
+                                    <div key={i} className="w-8 sm:w-10 h-8 sm:h-10 flex items-center justify-center text-c-cream-dark/30 font-mono text-xs">
+                                        –
                                     </div>
                                 );
                             }

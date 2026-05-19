@@ -1291,6 +1291,8 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
     const holdMs = duration * 1000;
     const [phase, setPhase] = useState('idle');
     const [micError, setMicError] = useState('');
+    const [gamakamEnabled, setGamakamEnabled] = useState(false);
+    const [tracingAccuracy, setTracingAccuracy] = useState(100);
 
     const streamRef  = useRef(null);
     const rafRef     = useRef(null);
@@ -1309,6 +1311,7 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
         setMicError('');
         heldRef.current = 0;
         historyRef.current = [];
+        setTracingAccuracy(100);
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             streamRef.current = stream;
@@ -1328,17 +1331,70 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
                 const H = canvas.height;
                 c.clearRect(0, 0, W, H);
                 
-                // Center line
-                c.beginPath();
-                c.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-                c.moveTo(0, H/2);
-                c.lineTo(W, H/2);
-                c.stroke();
+                // Draw normal center line if Gamakam Guide is OFF
+                if (!gamakamEnabled) {
+                    c.beginPath();
+                    c.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                    c.moveTo(0, H/2);
+                    c.lineTo(W, H/2);
+                    c.stroke();
 
-                // Tolerance band (+/- 50 cents) in a 300 cents total view (+/- 150)
-                const pTol = (TOLERANCE / 150); 
-                c.fillStyle = 'rgba(16, 185, 129, 0.1)';
-                c.fillRect(0, H/2 - (H*pTol/2), W, H*pTol);
+                    // Tolerance band (+/- 50 cents)
+                    const pTol = (TOLERANCE / 150); 
+                    c.fillStyle = 'rgba(16, 185, 129, 0.1)';
+                    c.fillRect(0, H/2 - (H*pTol/2), W, H*pTol);
+                } else {
+                    // Draw glowing, oscillating golden Gamakam guideline path!
+                    c.beginPath();
+                    c.lineWidth = 3.5;
+                    c.strokeStyle = 'rgba(247, 214, 134, 0.3)'; // Golden transparent
+                    c.shadowColor = '#f7d686';
+                    c.shadowBlur = 10;
+                    c.lineJoin = 'round';
+                    
+                    let firstGuide = true;
+                    const MAX_PTS = 150;
+                    
+                    for (let i = 0; i < MAX_PTS; i++) {
+                        const x = (i / MAX_PTS) * W;
+                        // Map expected wave position based on historical timestamp of each point in grid
+                        const ageMs = (MAX_PTS - i) * 40;
+                        const pointTime = Date.now() - ageMs;
+                        // Perfect 4.5Hz Carnatic oscillation wave between -35 and +35 cents
+                        const targetCents = 35 * Math.sin(pointTime / 220);
+                        const y = H/2 - (targetCents / 150) * (H/2);
+                        
+                        if (firstGuide) {
+                            c.moveTo(x, y);
+                            firstGuide = false;
+                        } else {
+                            c.lineTo(x, y);
+                        }
+                    }
+                    c.stroke();
+                    c.shadowBlur = 0; // reset glow
+
+                    // Dynamic tolerance shadow envelope around the wave
+                    c.beginPath();
+                    c.strokeStyle = 'rgba(16, 185, 129, 0.04)';
+                    c.lineWidth = H * (TOLERANCE / 150);
+                    let firstEnv = true;
+                    const MAX_PTS_ENV = 150;
+                    for (let i = 0; i < MAX_PTS_ENV; i++) {
+                        const x = (i / MAX_PTS_ENV) * W;
+                        const ageMs = (MAX_PTS_ENV - i) * 40;
+                        const pointTime = Date.now() - ageMs;
+                        const targetCents = 35 * Math.sin(pointTime / 220);
+                        const y = H/2 - (targetCents / 150) * (H/2);
+                        if (firstEnv) {
+                            c.moveTo(x, y);
+                            firstEnv = false;
+                        } else {
+                            c.lineTo(x, y);
+                        }
+                    }
+                    c.stroke();
+                }
 
                 // History line
                 c.beginPath();
@@ -1357,7 +1413,12 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
                     const clamped = Math.max(-150, Math.min(150, pts[i]));
                     const y = H/2 - (clamped / 150) * (H/2);
                     
-                    if (Math.abs(pts[i]) <= TOLERANCE) {
+                    // Highlight green if they match the active target curve within tolerance!
+                    const ageMs = (pts.length - i) * 40;
+                    const pointTime = Date.now() - ageMs;
+                    const targetCents = gamakamEnabled ? 35 * Math.sin(pointTime / 220) : 0;
+                    
+                    if (Math.abs(pts[i] - targetCents) <= TOLERANCE) {
                         c.strokeStyle = '#10b981';
                     } else {
                         c.strokeStyle = '#ef4444';
@@ -1382,7 +1443,19 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
                     let diff = 999;
                     if (freq && freq > 50 && freq < 2200) {
                         diff = centsToNearest(freq, targetSt, sa);
-                        if (Math.abs(diff) <= TOLERANCE) {
+                        
+                        // Compare voice pitch against the golden target wave
+                        const targetCents = gamakamEnabled ? 35 * Math.sin(Date.now() / 220) : 0;
+                        const matchError = Math.abs(diff - targetCents);
+                        
+                        // Real-time tracking accuracy
+                        const currentAcc = Math.max(0, 100 - (matchError / 1.5));
+                        setTracingAccuracy(prev => {
+                            if (prev === 100) return Math.round(currentAcc);
+                            return Math.round(prev * 0.9 + currentAcc * 0.1); // Smooth EMA
+                        });
+
+                        if (matchError <= TOLERANCE) {
                             heldRef.current += 40;
                         } else {
                             heldRef.current = Math.max(0, heldRef.current - 15);
@@ -1447,24 +1520,50 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
             </div>
 
             {phase === 'idle' && (
-                <button onClick={startMic}
-                        className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors">
-                    Start singing
-                </button>
+                <div className="flex flex-col items-center gap-4 w-full">
+                    {/* Symmetrical Gamakam Guide Toggle Switch */}
+                    <button 
+                        onClick={() => setGamakamEnabled(prev => !prev)}
+                        className={`px-5 py-1.5 rounded-full border text-[10px] font-mono tracking-wider uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                            gamakamEnabled 
+                                ? 'bg-c-gold/20 border-c-gold text-c-gold shadow-[0_0_12px_rgba(200,148,31,0.2)] hover:bg-c-gold/30' 
+                                : 'bg-c-card border-c-border/40 text-c-cream-dim hover:border-c-gold/50 hover:text-c-gold'
+                        }`}
+                    >
+                        <span className="animate-pulse">🌊</span> {gamakamEnabled ? 'Gamakam Mode: ACTIVE' : 'Gamakam Mode: OFF'}
+                    </button>
+
+                    <button onClick={startMic}
+                            className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors">
+                        Start singing
+                    </button>
+                    {gamakamEnabled && (
+                        <p className="text-[10px] text-[#f7d686]/70 font-playfair italic text-center animate-fade-in">
+                            ✦ Trace the glowing golden curve with your voice.
+                        </p>
+                    )}
+                </div>
             )}
 
             {phase === 'listening' && (
                 <div className="flex flex-col gap-3 w-full animate-fade-in">
-                    <p className="text-[10px] text-c-cream-dim text-center font-mono text-red-400">↑ Too High (Sharp) - Lower Your Voice</p>
-                    <canvas ref={canvasRef} width={320} height={100} className="w-full bg-[#111] rounded-xl border border-c-border shadow-inner" />
-                    <p className="text-[10px] text-c-cream-dim text-center font-mono text-blue-400">↓ Too Low (Flat) - Raise Your Voice</p>
+                    <div className="flex justify-between items-center w-full px-1 text-[10px] font-mono text-c-cream-dark/60">
+                        <span>{gamakamEnabled ? '🌊 Gamakam Wave Guide' : '🎯 Steady Intonation'}</span>
+                        {gamakamEnabled && (
+                            <span className="text-c-gold font-bold">Accuracy: {tracingAccuracy}%</span>
+                        )}
+                    </div>
+
+                    <p className="text-[9px] text-c-cream-dim text-center font-mono text-red-500/80">↑ Sharp (Lower Voice)</p>
+                    <canvas ref={canvasRef} width={320} height={100} className="w-full bg-[#0d0705] rounded-xl border border-c-gold/20 shadow-inner" />
+                    <p className="text-[9px] text-c-cream-dim text-center font-mono text-blue-500/80">↓ Flat (Raise Voice)</p>
                 </div>
             )}
 
             {phase === 'success' && (
                 <div className="flex flex-col items-center gap-3 animate-fade-in">
-                    <div className="w-12 h-12 rounded-full border border-emerald-700/50 bg-emerald-800/15 flex items-center justify-center text-emerald-800 text-xl">✓</div>
-                    <p className="text-emerald-800 text-sm font-playfair italic font-bold">Held it</p>
+                    <div className="w-12 h-12 rounded-full border border-emerald-700/50 bg-emerald-800/15 flex items-center justify-center text-emerald-800 text-xl shadow-[0_0_15px_rgba(16,185,129,0.2)]">✓</div>
+                    <p className="text-emerald-800 text-sm font-playfair italic font-bold">Excellent tracing completed!</p>
                     <button onClick={onDone} className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity">
                         Continue
                     </button>

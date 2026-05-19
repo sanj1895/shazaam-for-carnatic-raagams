@@ -109,7 +109,7 @@ const KoshaIcon = ({ className = "w-5 h-5" }) => (
 
 const FEATURES = [
     { id: 'tutor',     label: 'Gurukul',      desc: 'Classical vocal academy & scale flow', symbol: '📿',  mobileSymbol: '📿', level: 'beginner', highlight: true },
-    { id: 'listen',    label: 'Ālaap',        desc: 'Sing a melody & identify the raga',       symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
+    { id: 'listen',    label: 'Dhwani',       desc: 'Sing a melody & identify the raga',       symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
     { id: 'library',   label: 'Raga Kosha',   desc: 'Explore & practice every raga scale',    symbol: '◈',  mobileSymbol: '◈', level: 'all', highlight: true },
     { id: 'sadhana',   label: 'Sadhana',      desc: 'Your recommended daily practice path',    symbol: '🧘‍♀️', mobileSymbol: '🧘‍♀️', level: 'start' },
     { id: 'shruthi',   label: 'Shruthi',      desc: 'Continuous drone for practice',          symbol: '〜', mobileSymbol: '🎵', level: 'beginner' },
@@ -674,7 +674,7 @@ function App() {
                                     <DhwaniIcon className="w-10 h-10 relative z-10 transition-transform duration-500 group-hover:scale-110" />
                                 </div>
                                 <h1 className="font-playfair text-3xl font-bold tracking-widest text-[#f7d686] uppercase mt-2">Dhwani</h1>
-                                <p className="text-c-cream-dark text-xs uppercase tracking-[0.2em] font-medium opacity-80">Ālaap AI Raga Identifier</p>
+                                <p className="text-c-cream-dark text-xs uppercase tracking-[0.2em] font-medium opacity-80">Real-time Vocal Resonance</p>
                                 <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-c-gold/40 to-transparent mt-1" />
                             </div>
 
@@ -684,9 +684,9 @@ function App() {
                                     <DhwaniIcon className="w-5 h-5" />
                                 </div>
                                 <div className="flex flex-col gap-2.5">
-                                    <p className="font-playfair text-c-cream text-sm font-bold">Dhwani: Ālaap AI Raga Identifier</p>
+                                    <p className="font-playfair text-c-cream text-sm font-bold">Dhwani: Real-time Raga Recognition</p>
                                     <p className="text-c-cream-dim text-xs leading-relaxed">
-                                        Sing or hum an Ālaap, and Ālāpana listens in real time, detecting each note to identify the raga.
+                                        Sing any Carnatic melody and Ālāpana listens in real time, detecting each note and matching them to a raga. Switch to the optional <span className="text-c-gold font-semibold">Ālaap AI</span> mode to analyze longer, ornamented phrases.
                                     </p>
                                     <ol className="flex flex-col gap-1.5 text-xs text-c-cream-dim leading-relaxed list-none">
                                         <li className="flex gap-2"><span className="text-c-gold font-bold flex-shrink-0">1.</span><span>Allow microphone access and turn on pitch detection.</span></li>
@@ -695,7 +695,7 @@ function App() {
                                     </ol>
                                     <p className="text-[10px] text-c-cream-dark italic border-t border-c-gold/15 pt-2">
                                         <span className="text-c-gold/80">Standard</span> mode works best for clear, straight notes.&ensp;
-                                        <span className="text-c-gold/80">Groq AI</span> mode records 30 seconds and uses AI to catch subtle ornaments — use it once you're comfortable.
+                                        <span className="text-c-gold/80">Ālaap AI</span> mode records 30 seconds and uses deep AI to catch subtle, fluid ornaments and gamakams.
                                     </p>
                                 </div>
                             </div>
@@ -767,7 +767,7 @@ function App() {
                                                         : 'text-c-cream-dim hover:text-c-cream'
                                                 }`}
                                             >
-                                                Groq AI
+                                                Ālaap AI
                                             </button>
                                         </div>
                                     </div>
@@ -788,7 +788,7 @@ function App() {
                                         ) : (
                                             <div className="flex flex-col w-full groq-ai-container">
                                                 <p className="text-[11px] text-c-cream-dark text-center font-playfair italic mb-5 opacity-80 max-w-sm mx-auto">
-                                                    Records a 30-second phrase, then sends the note sequence to Groq AI for deeper analysis — better at catching fluid ornaments and complex phrases.
+                                                    Records a 30-second phrase, then sends the note sequence to the Ālaap AI model for deeper analysis — better at catching fluid ornaments and complex phrases.
                                                 </p>
                                                 <GroqPanel saFrequency={saFrequency} />
                                             </div>

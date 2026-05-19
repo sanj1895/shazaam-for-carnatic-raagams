@@ -53,8 +53,8 @@ const STEPS = [
     view: 'listen',
     symbol: '♬',
     feature: 'Dhwani',
-    title: 'Real-time AI Identification',
-    body: "Sing any Carnatic melody and Dhwani listens in real time, detecting your notes and matching them to a raga. There's also an advanced Groq AI mode to capture subtle ornamentations.",
+    title: 'Real-time Vocal Resonance',
+    body: "Sing any Carnatic melody and Dhwani listens in real time, detecting your notes and matching them to a raga. There's also an optional Ālaap AI mode to capture subtle fluid ornamentations.",
     hint: 'Set your Sa first — it calibrates to your voice',
   },
   {

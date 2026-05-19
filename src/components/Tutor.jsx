@@ -6,6 +6,26 @@ import {
     SWARA_SEMITONE, noteFreq, getOctaveSequence, startDrone,
 } from '../utils/audioUtils';
 
+const GurukulIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        {/* Temple Arch / Aureole (Prabhavali) */}
+        <path d="M12 52C12 28 20 12 32 12C44 12 52 28 52 52" strokeWidth="2" stroke="currentColor" opacity="0.8" />
+        <path d="M8 56C8 24 18 8 32 8C46 8 56 24 56 56" strokeWidth="1" stroke="currentColor" opacity="0.4" strokeDasharray="3 3" />
+        
+        {/* Traditional Lighted Diya (Oil Lamp) symbolizing classical knowledge */}
+        <path d="M18 46C18 51.5 24.3 56 32 56C39.7 56 46 51.5 46 46C46 46 41 46 32 46C23 46 18 46 18 46Z" fill="currentColor" fillOpacity="0.15" strokeWidth="1.8" />
+        <path d="M32 46C32 46 36 43 36 39C36 35 32 30 32 30C32 30 28 35 28 39C28 43 32 46 32 46Z" fill="currentColor" className="text-c-gold animate-pulse" />
+        
+        {/* Radiating sound rays of wisdom */}
+        <line x1="32" y1="25" x2="32" y2="20" stroke="currentColor" strokeWidth="1.5" />
+        <line x1="22" y1="29" x2="18" y2="26" stroke="currentColor" strokeWidth="1.5" />
+        <line x1="42" y1="29" x2="46" y2="26" stroke="currentColor" strokeWidth="1.5" />
+        
+        {/* Base steps */}
+        <rect x="6" y="56" width="52" height="4" rx="2" fill="currentColor" strokeWidth="1" />
+    </svg>
+);
+
 // ─── Audio helpers (thin wrappers over audioUtils) ────────────────────────────
 
 // Extended semitone map including upper-octave Sa for sing exercises
@@ -3154,14 +3174,22 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
 
     return (
         <div className="w-full max-w-2xl flex flex-col gap-6 animate-fade-in relative z-10">
-            {/* Catalog Hero Banner */}
-            <div className="text-center flex flex-col gap-1.5 mb-2 py-4">
-                <h1 className="font-playfair text-2xl md:text-3xl font-extrabold text-c-gold tracking-wide">
-                    Carnatic Vocal Curriculum
-                </h1>
-                <p className="text-xs md:text-sm text-c-cream-dim font-playfair max-w-md mx-auto leading-relaxed">
-                    A comprehensive, step-by-step masterclass path from basic breath to advanced classical improvisation.
-                </p>
+            {/* Compact Space-Efficient Dashboard Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-c-border pb-4 mb-1">
+                <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md backdrop-blur-md relative flex-shrink-0">
+                        <GurukulIcon className="w-7 h-7 relative z-10" />
+                    </div>
+                    <div className="flex flex-col text-left">
+                        <div className="flex items-center gap-2">
+                            <h1 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Gurukul</h1>
+                            <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Academy</span>
+                        </div>
+                        <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
+                            Structured, progressive vocal training curriculum from foundations to advanced improvisation.
+                        </p>
+                    </div>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

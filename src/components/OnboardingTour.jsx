@@ -69,6 +69,11 @@ const STEPS = [
 export default function OnboardingTour({ active, onDismiss, onStartLearning, onGoTo }) {
   const [step, setStep]       = useState(0);
   const [exiting, setExiting] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (active) {
@@ -77,7 +82,7 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
     }
   }, [active]);
 
-  if (!active) return null;
+  if (!active || !mounted) return null;
 
   const current = STEPS[step];
   const isFirst = step === 0;

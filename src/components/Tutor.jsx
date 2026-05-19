@@ -3173,7 +3173,7 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
 
     return (
         <div className="w-full max-w-4xl flex flex-col gap-6 animate-fade-in relative z-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {COURSES.map(course => {
                     const isUpcoming = course.upcoming;
                     
@@ -3448,68 +3448,61 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
     return (
         <div id="tour-tutor-container" className="w-full px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 flex flex-col items-center gap-4 sm:gap-6 animate-fade-in">
 
-            {/* Header: Svara Gurukul Rebrand */}
+            {/* Header + Sa tuner row — merged like Swara Keyboard pattern */}
             {screen === 'home' && (
-                <div className="w-full max-w-4xl text-left border-b border-c-gold/20 pb-4 mb-2 animate-fade-in">
-                    <div className="flex items-center gap-3 md:gap-4 mb-1">
-                        <div className="flex-shrink-0 text-c-gold opacity-90 mt-1">
-                            <GurukulIcon className="w-12 h-12 md:w-14 md:h-14" />
-                        </div>
-                        <h2 className="font-playfair text-3xl sm:text-4xl md:text-5xl font-bold text-c-gold tracking-tight uppercase">
-                            Svara Gurukul
-                        </h2>
-                        <span className="px-2.5 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase bg-c-gold/15 border border-c-gold/30 text-c-gold self-center shadow-sm">
-                            Academy
-                        </span>
-                    </div>
-                    <p className="text-c-cream-dark text-xs sm:text-sm leading-relaxed font-playfair opacity-80 pl-1 md:pl-[68px]">
-                        Structured, progressive vocal training curriculum from foundations to advanced improvisation.
-                    </p>
-                </div>
-            )}
-
-            {/* Base Sa (Shruti) quick setup bar */}
-            {screen === 'home' && (
-                <div className="w-full max-w-4xl bg-c-surface border border-c-border/60 rounded-xl p-3.5 flex flex-col gap-3 transition-all duration-300 shadow-sm relative overflow-hidden heritage-card">
-                    <div className="heritage-border-corner heritage-corner-tl" style={{ top: 2, left: 2 }} />
-                    <div className="heritage-border-corner heritage-corner-tr" style={{ top: 2, right: 2 }} />
-                    <div className="heritage-border-corner heritage-corner-bl" style={{ bottom: 2, left: 2 }} />
-                    <div className="heritage-border-corner heritage-corner-br" style={{ bottom: 2, right: 2 }} />
-                    
-                    <div className="flex items-center justify-between gap-2 z-10">
-                        <div className="flex items-center gap-2">
-                            <svg className="w-5 h-5 text-c-gold flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M9 18V5l12-2v13" />
-                                <circle cx="6" cy="18" r="3" />
-                                <circle cx="18" cy="16" r="3" />
-                            </svg>
+                <>
+                    <div className="w-full max-w-4xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-c-gold/20 animate-fade-in">
+                        {/* Left: identity */}
+                        <div className="flex items-center gap-3 md:gap-4">
+                            <div className="flex-shrink-0 text-c-gold opacity-90">
+                                <GurukulIcon className="w-12 h-12 md:w-14 md:h-14" />
+                            </div>
                             <div>
-                                <div className="text-[8px] sm:text-[9px] text-c-cream-dark uppercase tracking-widest font-mono font-extrabold">Base Sa (Shruti)</div>
-                                <div className="text-sm font-playfair font-black text-c-gold">
-                                    {getWesternNoteName(sa)} <span className="font-sans text-[10px] sm:text-[11px] font-normal text-c-cream-dim">({sa} Hz)</span>
+                                <div className="flex items-center gap-2 mb-0.5">
+                                    <h2 className="font-playfair text-3xl sm:text-4xl font-bold text-c-gold tracking-tight uppercase">Svara Gurukul</h2>
+                                    <span className="px-2.5 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase bg-c-gold/15 border border-c-gold/30 text-c-gold self-center shadow-sm">Academy</span>
                                 </div>
+                                <p className="text-c-cream-dark text-xs leading-relaxed font-playfair opacity-80">
+                                    Structured, progressive vocal training curriculum from foundations to advanced improvisation.
+                                </p>
                             </div>
                         </div>
-                        <button 
-                            type="button"
-                            onClick={() => setTunerOpen(!tunerOpen)}
-                            className="px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs border border-c-gold/40 text-c-gold rounded-full hover:bg-c-gold hover:text-c-bg font-playfair font-bold transition-all z-20 flex-shrink-0"
-                        >
-                            {tunerOpen ? 'Close' : (
-                                <span className="flex items-center gap-1.5">
-                                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="14" y2="12" /><line x1="4" y1="18" x2="20" y2="18" />
-                                        <circle cx="17" cy="6" r="3" /><circle cx="17" cy="18" r="3" />
-                                    </svg>
-                                    Tune
-                                </span>
-                            )}
-                        </button>
+                        {/* Right: compact Sa tuner */}
+                        <div className="flex-shrink-0 flex items-center gap-2.5 bg-c-surface border border-c-border/60 rounded-xl px-3.5 py-2.5 relative overflow-hidden heritage-card self-start sm:self-auto">
+                            <div className="heritage-border-corner heritage-corner-tl" style={{ top: 2, left: 2 }} />
+                            <div className="heritage-border-corner heritage-corner-tr" style={{ top: 2, right: 2 }} />
+                            <div className="heritage-border-corner heritage-corner-bl" style={{ bottom: 2, left: 2 }} />
+                            <div className="heritage-border-corner heritage-corner-br" style={{ bottom: 2, right: 2 }} />
+                            <svg className="w-4 h-4 text-c-gold flex-shrink-0 z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
+                            </svg>
+                            <div className="z-10">
+                                <div className="text-[8px] text-c-cream-dark uppercase tracking-widest font-mono font-extrabold">Base Sa</div>
+                                <div className="text-sm font-playfair font-black text-c-gold leading-none">
+                                    {getWesternNoteName(sa)} <span className="font-sans text-[10px] font-normal text-c-cream-dim">({sa} Hz)</span>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setTunerOpen(!tunerOpen)}
+                                className="z-10 px-3 py-1.5 text-[10px] border border-c-gold/40 text-c-gold rounded-full hover:bg-c-gold hover:text-c-bg font-playfair font-bold transition-all flex items-center gap-1.5 flex-shrink-0"
+                            >
+                                {tunerOpen ? 'Close' : (
+                                    <>
+                                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="14" y2="12" /><line x1="4" y1="18" x2="20" y2="18" />
+                                            <circle cx="17" cy="6" r="3" /><circle cx="17" cy="18" r="3" />
+                                        </svg>
+                                        Tune
+                                    </>
+                                )}
+                            </button>
+                        </div>
                     </div>
-                    
+                    {/* Tuner expansion — full-width below header */}
                     {tunerOpen && (
-                        <div className="border-t border-c-border/20 pt-4 pb-2 animate-fade-in flex justify-center z-10">
-                            <ExerciseShrutiSetup 
+                        <div className="w-full max-w-4xl border border-c-border/40 rounded-xl p-4 bg-c-surface animate-fade-in flex justify-center">
+                            <ExerciseShrutiSetup
                                 sa={sa}
                                 setSa={updateSa}
                                 onDone={() => setTunerOpen(false)}
@@ -3517,7 +3510,7 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
                             />
                         </div>
                     )}
-                </div>
+                </>
             )}
 
             {/* Tab switcher — only show on home screens */}

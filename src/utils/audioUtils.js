@@ -64,8 +64,8 @@ export function playNote(note, saHz, ctx, options = {}) {
   const masterGain = audioCtx.createGain();
   
   // Sustained Bansuri Envelope: Gentle swell, long sustain, soft legato-ready release
-  masterGain.gain.setValueAtTime(0, now);
-  masterGain.gain.exponentialRampToValueAtTime(volume, now + 0.08); // Softer "breath" attack
+  masterGain.gain.setValueAtTime(0.0001, now);
+  masterGain.gain.linearRampToValueAtTime(volume, now + 0.08); // Softer "breath" attack
   masterGain.gain.linearRampToValueAtTime(volume * 0.9, now + duration * 0.9); 
   // Overlapping release: lasts slightly longer than the gap to create legato feel
   masterGain.gain.exponentialRampToValueAtTime(0.001, now + duration + 0.15); 
@@ -110,8 +110,8 @@ export function playNote(note, saHz, ctx, options = {}) {
 
       const depth = targetFreq * (0.01 + Math.random() * 0.005);
       const individualGain = audioCtx.createGain();
-      individualGain.gain.setValueAtTime(0, now);
-      individualGain.gain.linearRampToValueAtTime(0, now + slideDuration * 0.5);
+      individualGain.gain.setValueAtTime(0.0001, now);
+      individualGain.gain.linearRampToValueAtTime(0.0001, now + slideDuration * 0.5);
       individualGain.gain.exponentialRampToValueAtTime(depth, now + slideDuration + 0.2);
       
       vibratoLfo.connect(individualGain);
@@ -202,7 +202,10 @@ export function playSequence(notes, saHz, { gapMs = 550, duration = 0.55, onNote
   const effectiveGap = gamakam ? Math.max(gapMs, 680) : gapMs;
   const effectiveDuration = (effectiveGap / 1000) + overlap;
 
-  const promise = new Promise((resolve) => {
+  const promise = new Promise(async (resolve) => {
+    if (ctx.state === 'suspended') {
+      try { await ctx.resume(); } catch (_) {}
+    }
     notes.forEach((note, idx) => {
       // Detect melodic direction so the slide goes the right way
       let slideDir = 1;

@@ -9,15 +9,14 @@ export const DroneIcon = ({ className = "w-5 h-5" }) => (
 
 export const KeyboardIcon = ({ className = "w-5 h-5" }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="4" width="20" height="16" rx="2" />
-        <line x1="6" y1="4" x2="6" y2="20" />
-        <line x1="10" y1="4" x2="10" y2="20" />
-        <line x1="14" y1="4" x2="14" y2="20" />
-        <line x1="18" y1="4" x2="18" y2="20" />
-        <rect x="4" y="4" width="3" height="10" fill="currentColor" />
-        <rect x="8" y="4" width="3" height="10" fill="currentColor" />
-        <rect x="12" y="4" width="3" height="10" fill="currentColor" />
-        <rect x="16" y="4" width="3" height="10" fill="currentColor" />
+        <rect x="2" y="5" width="20" height="14" rx="2" />
+        <line x1="6" y1="5" x2="6" y2="19" />
+        <line x1="10" y1="5" x2="10" y2="19" />
+        <line x1="14" y1="5" x2="14" y2="19" />
+        <line x1="18" y1="5" x2="18" y2="19" />
+        <path d="M5 5h2v8a1 1 0 0 1-2 0V5Z" fill="currentColor" stroke="none" />
+        <path d="M9 5h2v8a1 1 0 0 1-2 0V5Z" fill="currentColor" stroke="none" />
+        <path d="M17 5h2v8a1 1 0 0 1-2 0V5Z" fill="currentColor" stroke="none" />
     </svg>
 );
 
@@ -264,21 +263,88 @@ export const GurukulIcon = ({ className = "w-5 h-5" }) => (
     </svg>
 );
 
+export const DhwaniIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <line x1="12" y1="52" x2="52" y2="12" stroke="currentColor" strokeWidth="3" />
+        <line x1="13" y1="53" x2="53" y2="13" stroke="currentColor" strokeWidth="1" opacity="0.3" />
+        <line x1="15" y1="49" x2="17" y2="47" stroke="#C8941F" strokeWidth="3.5" />
+        <line x1="47" y1="17" x2="49" y2="15" stroke="#C8941F" strokeWidth="3.5" />
+        <circle cx="23" cy="41" r="1" fill="currentColor" />
+        <circle cx="27" cy="37" r="1" fill="currentColor" />
+        <circle cx="31" cy="33" r="1" fill="currentColor" />
+        <circle cx="35" cy="29" r="1" fill="currentColor" />
+        <circle cx="39" cy="25" r="1" fill="currentColor" />
+        <circle cx="43" cy="21" r="1" fill="currentColor" />
+        <path d="M12 52 C 10 54, 8 55, 7 57" stroke="currentColor" strokeWidth="1.2" />
+        <circle cx="7" cy="57" r="1.5" fill="#C8941F" />
+        <path d="M7 57 C 6 59, 5 62, 5 63" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+        <path d="M7 57 C 8 59, 9 62, 9 63" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+        <path d="M7 57 C 7 59, 7 62, 7 63" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
+        <path d="M49 9 C 52 7, 53 10, 56 8" stroke="currentColor" strokeWidth="1.2" opacity="0.7" className="animate-pulse" />
+        <path d="M46 5 C 50 3, 52 6, 56 4" stroke="currentColor" strokeWidth="1" opacity="0.4" />
+        <path d="M52 13 C 55 11, 56 14, 59 12" stroke="currentColor" strokeWidth="1" opacity="0.4" />
+    </svg>
+);
+
+export const KoshaIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 18 C 12 12, 28 12, 32 18 C 36 12, 52 12, 52 18 V 48 C 52 42, 36 42, 32 48 C 28 42, 12 42, 12 48 Z" fill="currentColor" fillOpacity="0.08" strokeWidth="1.8" />
+        <path d="M10 16 C 10 10, 28 10, 32 16 C 36 10, 54 10, 54 16 V 46 C 54 40, 36 40, 32 46 C 28 40, 10 40, 10 46 Z" stroke="currentColor" strokeWidth="0.7" opacity="0.3" />
+        <line x1="32" y1="16" x2="32" y2="48" stroke="currentColor" strokeWidth="2" />
+        <line x1="18" y1="24" x2="26" y2="24" stroke="currentColor" opacity="0.6" strokeWidth="1.2" />
+        <line x1="16" y1="30" x2="28" y2="30" stroke="currentColor" opacity="0.6" strokeWidth="1.2" />
+        <line x1="18" y1="36" x2="24" y2="36" stroke="currentColor" opacity="0.6" strokeWidth="1.2" />
+        <path d="M36 34 Q 40 24, 44 32 T 50 30" stroke="currentColor" strokeWidth="1.5" className="text-c-gold" />
+        <path d="M44 21 L45 23 L47 23 L45 24 L46 26 L44 25 L42 26 L43 24 L41 23 L43 23 Z" fill="#C8941F" className="animate-pulse" />
+        <path d="M14 9 C 24 5, 40 5, 50 9" stroke="currentColor" opacity="0.25" strokeDasharray="3 3" />
+        <path d="M14 53 C 24 57, 40 57, 50 53" stroke="currentColor" opacity="0.25" strokeDasharray="3 3" />
+    </svg>
+);
+
+export const MelakartaIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="3" width="7" height="7" rx="1" />
+        <rect x="3" y="14" width="7" height="7" rx="1" />
+        <rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor" fillOpacity="0.2" />
+    </svg>
+);
+
+export const BhedamIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+        <path d="M3 3v5h5" />
+    </svg>
+);
+
+export const HomeIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+);
+
+export const SadhanaIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <path d="M12 8v4" />
+        <circle cx="12" cy="16" r="1" fill="currentColor" />
+    </svg>
+);
+
 // Generic Curated Icon component mapping symbols/IDs to beautiful SVGs
 export const CuratedIcon = ({ icon, className = "w-5 h-5" }) => {
-    // Sadhana tab keys
-    if (icon === 'shruthi') {
-        return <DroneIcon className={className} />;
-    }
-    if (icon === 'tutor') {
-        return <GurukulIcon className={className} />;
-    }
-    if (icon === 'keyboard') {
-        return <KeyboardIcon className={className} />;
-    }
-    if (icon === 'singback') {
-        return <TargetIcon className={className} />;
-    }
+    // Nav / Feature Tab keys
+    if (icon === 'home') return <HomeIcon className={className} />;
+    if (icon === 'sadhana') return <SadhanaIcon className={className} />;
+    if (icon === 'shruthi') return <DroneIcon className={className} />;
+    if (icon === 'tutor') return <GurukulIcon className={className} />;
+    if (icon === 'keyboard') return <KeyboardIcon className={className} />;
+    if (icon === 'singback') return <TargetIcon className={className} />;
+    if (icon === 'listen') return <DhwaniIcon className={className} />;
+    if (icon === 'library') return <KoshaIcon className={className} />;
+    if (icon === 'melakarta') return <MelakartaIcon className={className} />;
+    if (icon === 'bhedam') return <BhedamIcon className={className} />;
 
     // Intercept standard Course IDs
     if (icon === 'foundations' || icon === '🧘🏽‍♂️') {

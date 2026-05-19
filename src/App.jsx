@@ -14,7 +14,7 @@ import Tutor from './components/Tutor';
 import { getSwaram, identifyRaga, RAGAS } from './utils/ragaLogic';
 import RagaDetail from './components/RagaDetail';
 import OnboardingTour from './components/OnboardingTour';
-import { CuratedIcon, FireIcon } from './components/IconLibrary';
+import { CuratedIcon, FireIcon, DhwaniIcon } from './components/IconLibrary';
 
 const VeenaIcon = () => (
     <svg width="22" height="68" viewBox="0 0 22 68" fill="none" className="text-c-gold-dim">
@@ -30,87 +30,7 @@ const VeenaIcon = () => (
     </svg>
 );
 
-const GurukulIcon = ({ className = "w-5 h-5" }) => (
-    <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-        {/* Temple Arch / Aureole (Prabhavali) */}
-        <path d="M12 52C12 28 20 12 32 12C44 12 52 28 52 52" strokeWidth="2" stroke="currentColor" opacity="0.8" />
-        <path d="M8 56C8 24 18 8 32 8C46 8 56 24 56 56" strokeWidth="1" stroke="currentColor" opacity="0.4" strokeDasharray="3 3" />
-        
-        {/* Traditional Lighted Diya (Oil Lamp) symbolizing classical knowledge */}
-        <path d="M18 46C18 51.5 24.3 56 32 56C39.7 56 46 51.5 46 46C46 46 41 46 32 46C23 46 18 46 18 46Z" fill="currentColor" fillOpacity="0.15" strokeWidth="1.8" />
-        <path d="M32 46C32 46 36 43 36 39C36 35 32 30 32 30C32 30 28 35 28 39C28 43 32 46 32 46Z" fill="currentColor" className="text-c-gold animate-pulse" />
-        
-        {/* Radiating sound rays of wisdom */}
-        <line x1="32" y1="25" x2="32" y2="20" stroke="currentColor" strokeWidth="1.5" />
-        <line x1="22" y1="29" x2="18" y2="26" stroke="currentColor" strokeWidth="1.5" />
-        <line x1="42" y1="29" x2="46" y2="26" stroke="currentColor" strokeWidth="1.5" />
-        
-        {/* Base steps */}
-        <rect x="6" y="56" width="52" height="4" rx="2" fill="currentColor" strokeWidth="1" />
-    </svg>
-);
-
-const DhwaniIcon = ({ className = "w-5 h-5" }) => (
-    <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-        {/* The Flute Body (double-lined with proper organic thickness) */}
-        <line x1="12" y1="52" x2="52" y2="12" stroke="currentColor" strokeWidth="3" />
-        <line x1="13" y1="53" x2="53" y2="13" stroke="currentColor" strokeWidth="1" opacity="0.3" />
-        
-        {/* Ornate silk threads binding the ends */}
-        <line x1="15" y1="49" x2="17" y2="47" stroke="#C8941F" strokeWidth="3.5" />
-        <line x1="47" y1="17" x2="49" y2="15" stroke="#C8941F" strokeWidth="3.5" />
-        
-        {/* Flute holes aligned exactly along center axis */}
-        <circle cx="23" cy="41" r="1" fill="currentColor" />
-        <circle cx="27" cy="37" r="1" fill="currentColor" />
-        <circle cx="31" cy="33" r="1" fill="currentColor" />
-        <circle cx="35" cy="29" r="1" fill="currentColor" />
-        <circle cx="39" cy="25" r="1" fill="currentColor" />
-        <circle cx="43" cy="21" r="1" fill="currentColor" />
-        
-        {/* Beautiful dangling Carnatic silk tassel/beads hanging from bottom-left tail */}
-        <path d="M12 52 C 10 54, 8 55, 7 57" stroke="currentColor" strokeWidth="1.2" />
-        <circle cx="7" cy="57" r="1.5" fill="#C8941F" />
-        <path d="M7 57 C 6 59, 5 62, 5 63" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
-        <path d="M7 57 C 8 59, 9 62, 9 63" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
-        <path d="M7 57 C 7 59, 7 62, 7 63" stroke="currentColor" strokeWidth="0.8" opacity="0.7" />
-        
-        {/* Beautiful radiating soundwaves soaring from the blowhole (top-right) */}
-        <path d="M49 9 C 52 7, 53 10, 56 8" stroke="currentColor" strokeWidth="1.2" opacity="0.7" className="animate-pulse" />
-        <path d="M46 5 C 50 3, 52 6, 56 4" stroke="currentColor" strokeWidth="1" opacity="0.4" />
-        <path d="M52 13 C 55 11, 56 14, 59 12" stroke="currentColor" strokeWidth="1" opacity="0.4" />
-    </svg>
-);
-
-const KoshaIcon = ({ className = "w-5 h-5" }) => (
-    <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-        {/* The open ancient scroll/book with double borders */}
-        <path d="M12 18 C 12 12, 28 12, 32 18 C 36 12, 52 12, 52 18 V 48 C 52 42, 36 42, 32 48 C 28 42, 12 42, 12 48 Z" fill="currentColor" fillOpacity="0.08" strokeWidth="1.8" />
-        <path d="M10 16 C 10 10, 28 10, 32 16 C 36 10, 54 10, 54 16 V 46 C 54 40, 36 40, 32 46 C 28 40, 10 40, 10 46 Z" stroke="currentColor" strokeWidth="0.7" opacity="0.3" />
-        
-        {/* Spine lines */}
-        <line x1="32" y1="16" x2="32" y2="48" stroke="currentColor" strokeWidth="2" />
-        
-        {/* Left page text lines representing sargam scripts */}
-        <line x1="18" y1="24" x2="26" y2="24" stroke="currentColor" opacity="0.6" strokeWidth="1.2" />
-        <line x1="16" y1="30" x2="28" y2="30" stroke="currentColor" opacity="0.6" strokeWidth="1.2" />
-        <line x1="18" y1="36" x2="24" y2="36" stroke="currentColor" opacity="0.6" strokeWidth="1.2" />
-        
-        {/* Right page rising soundwave/note representing melody escaping the page */}
-        <path d="M36 34 Q 40 24, 44 32 T 50 30" stroke="currentColor" strokeWidth="1.5" className="text-c-gold" />
-        
-        {/* Softly glowing golden star representing divine knowledge - breathing, NOT bouncing out! */}
-        <path d="M44 21 L45 23 L47 23 L45 24 L46 26 L44 25 L42 26 L43 24 L41 23 L43 23 Z" fill="#C8941F" className="animate-pulse" />
-        
-        {/* Ornate halo arches */}
-        <path d="M14 9 C 24 5, 40 5, 50 9" stroke="currentColor" opacity="0.25" strokeDasharray="3 3" />
-        <path d="M14 53 C 24 57, 40 57, 50 53" stroke="currentColor" opacity="0.25" strokeDasharray="3 3" />
-    </svg>
-);
-
 const renderTabIcon = (id, className = "w-5 h-5") => {
-    if (id === 'listen') return <DhwaniIcon className={className} />;
-    if (id === 'library') return <KoshaIcon className={className} />;
     return <CuratedIcon icon={id} className={className} />;
 };
 

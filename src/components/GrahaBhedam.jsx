@@ -174,7 +174,7 @@ export default function GrahaBhedam() {
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-6 relative z-10">
+        <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 relative z-10">
             {/* Header with controls merged into one row */}
             <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 {/* Left: identity */}
@@ -264,21 +264,22 @@ export default function GrahaBhedam() {
                 )}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-6 lg:gap-8">
-                {/* Left: Source Selection */}
-                <div className="space-y-6">
-                    <div className="heritage-card rounded-xl p-8 space-y-6 shadow-2xl border border-c-gold/20">
-                        <div className="absolute inset-0 pointer-events-none">
-                            <div className="heritage-border-corner heritage-corner-tl" />
-                            <div className="heritage-border-corner heritage-corner-br" />
-                        </div>
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-4 lg:gap-6">
+                {/* Left: Source Selection + Hall of Fame (merged, compact) */}
+                <div className="heritage-card rounded-xl shadow-2xl border border-c-gold/20 flex flex-col divide-y divide-c-gold/10">
+                    <div className="absolute inset-0 pointer-events-none">
+                        <div className="heritage-border-corner heritage-corner-tl" />
+                        <div className="heritage-border-corner heritage-corner-br" />
+                    </div>
 
+                    {/* Source picker */}
+                    <div className="p-5 space-y-4 relative z-10">
                         <div className="space-y-2">
                             <label className="text-[10px] text-c-gold font-bold uppercase tracking-[0.2em] opacity-70">Step 1 · Pick a Source</label>
                             <select
                                 value={selectedRaga}
                                 onChange={(e) => setSelectedRaga(e.target.value)}
-                                className="w-full bg-c-bg border border-c-gold/40 text-c-gold font-playfair font-bold rounded-lg px-4 py-3 text-lg focus:outline-none focus:ring-1 focus:ring-c-gold transition-all"
+                                className="w-full bg-c-bg border border-c-gold/40 text-c-gold font-playfair font-bold rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-1 focus:ring-c-gold transition-all"
                             >
                                 {ragaNames.map((name) => (
                                     <option key={name} value={name}>{name}</option>
@@ -286,7 +287,7 @@ export default function GrahaBhedam() {
                             </select>
                         </div>
 
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <label className="text-[10px] text-c-gold font-bold uppercase tracking-[0.2em] opacity-70">Original scale</label>
                                 <button
@@ -298,47 +299,42 @@ export default function GrahaBhedam() {
                                     {playingShift === 'original' ? <><PlayIcon className="w-3 h-3 animate-pulse" /> Playing</> : <><PlayIcon className="w-3 h-3" /> Listen</>}
                                 </button>
                             </div>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-1.5">
                                 {arohanam.map((note, i) => (
                                     <div key={i} className="flex flex-col items-center gap-1 group">
-                                        <span className="w-10 h-10 flex items-center justify-center rounded-full border border-c-gold/30 bg-c-gold/5 text-c-gold font-mono text-xs font-bold group-hover:bg-c-gold/10 transition-colors">
+                                        <span className="w-9 h-9 flex items-center justify-center rounded-full border border-c-gold/30 bg-c-gold/5 text-c-gold font-mono text-xs font-bold group-hover:bg-c-gold/10 transition-colors">
                                             {toSargam(note)}
                                         </span>
-                                        <span className="text-[9px] text-c-cream-dark opacity-50 uppercase">{note}</span>
+                                        <span className="text-[8px] text-c-cream-dark opacity-50 uppercase">{note}</span>
                                     </div>
                                 ))}
                             </div>
                         </div>
                     </div>
 
-                    {/* Hall of Fame - Educational */}
-                    <div className="bg-c-card/50 border border-c-border p-6 rounded-xl space-y-4">
-                        <div className="space-y-1">
-                            <h4 className="text-c-gold text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                                <span>✦</span> Hall of Fame
-                            </h4>
-                            <p className="text-[10px] text-c-cream-dark italic leading-tight">These famous pairs share the exact same notes, just starting on a different home note.</p>
+                    {/* Hall of Fame — compact inline section */}
+                    <div className="p-5 space-y-3 relative z-10">
+                        <div className="flex items-center gap-2">
+                            <span className="text-c-gold/60 text-[10px]">✦</span>
+                            <h4 className="text-c-gold text-[10px] font-bold uppercase tracking-widest">Hall of Fame</h4>
+                            <span className="text-[9px] text-c-cream-dark italic">— try a famous pair</span>
                         </div>
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                             {[
-                                { from: 'Dheerasankarabharanam', label: 'Shankarabharanam', to: 'Mechakalyani', labelTo: 'Kalyani', via: 'Ma1', desc: 'The most famous shift' },
-                                { from: 'Mayamalavagowla', label: 'Mayamalavagowla', to: 'Rasikapriya', labelTo: 'Rasikapriya', via: 'Ri1', desc: 'A complex heritage shift' }
+                                { from: 'Dheerasankarabharanam', label: 'Shankarabharanam', labelTo: 'Kalyani', via: 'Ma1' },
+                                { from: 'Mayamalavagowla', label: 'Mayamalavagowla', labelTo: 'Rasikapriya', via: 'Ri1' }
                             ].map((ex, i) => (
                                 <button
                                     key={i}
                                     onClick={() => setSelectedRaga(ex.from)}
-                                    className={`w-full text-left p-3 rounded-lg border transition-all group ${
-                                        selectedRaga === ex.from 
-                                            ? 'bg-c-gold/10 border-c-gold/50 shadow-md scale-[1.02]' 
+                                    className={`w-full text-left px-3 py-2 rounded-lg border transition-all group flex items-center justify-between gap-2 ${
+                                        selectedRaga === ex.from
+                                            ? 'bg-c-gold/10 border-c-gold/50'
                                             : 'bg-c-bg border-c-border hover:border-c-gold/40'
                                     }`}
                                 >
-                                    <div className="flex justify-between items-center mb-1">
-                                        <span className={`text-xs font-medium transition-colors ${selectedRaga === ex.from ? 'text-c-gold' : 'text-c-cream group-hover:text-c-gold'}`}>{ex.label}</span>
-                                        <span className="text-[10px] text-c-gold/60">Start on {toSargam(ex.via)}</span>
-                                    </div>
-                                    <p className="text-[10px] text-c-cream-dark italic">Transforms into <span className="text-c-gold font-bold">{ex.labelTo}</span></p>
-                                    <p className="text-[8px] text-c-cream-dark opacity-40 uppercase tracking-tighter mt-1">{ex.desc}</p>
+                                    <span className={`text-xs font-medium transition-colors truncate ${selectedRaga === ex.from ? 'text-c-gold' : 'text-c-cream group-hover:text-c-gold'}`}>{ex.label}</span>
+                                    <span className="text-[9px] text-c-gold/60 flex-shrink-0">→ {ex.labelTo} via {toSargam(ex.via)}</span>
                                 </button>
                             ))}
                         </div>

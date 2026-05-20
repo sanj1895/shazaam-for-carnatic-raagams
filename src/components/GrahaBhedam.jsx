@@ -68,6 +68,7 @@ export default function GrahaBhedam() {
     const [playingShift, setPlayingShift] = useState(null);
     const [gamakamEnabled, setGamakamEnabled] = useState(false);
     const [playbackMode, setPlaybackMode] = useState('theoretical'); // 'theoretical' | 'vocal'
+    const [explainerOpen, setExplainerOpen] = useState(false);
     const abortRef = useRef(null);
 
     useEffect(() => {
@@ -224,6 +225,44 @@ export default function GrahaBhedam() {
                 </div>
             </div>
             <SketchyRule className="opacity-60" />
+
+            {/* Collapsible explainer */}
+            <div className="border border-c-border/50 rounded-xl overflow-hidden bg-c-card/30">
+                <button
+                    onClick={() => setExplainerOpen(o => !o)}
+                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-c-gold/5 transition-colors group"
+                >
+                    <div className="flex items-center gap-2.5">
+                        <span className="text-c-gold/70 text-sm">✦</span>
+                        <span className="text-xs font-playfair font-bold text-c-cream-dim group-hover:text-c-cream transition-colors tracking-wide">What is Graha Bhedam?</span>
+                    </div>
+                    <svg
+                        className={`w-3.5 h-3.5 text-c-gold/50 transition-transform duration-200 flex-shrink-0 ${explainerOpen ? 'rotate-180' : ''}`}
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
+                    >
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </button>
+                {explainerOpen && (
+                    <div className="px-5 pb-5 pt-1 space-y-3 animate-fade-in border-t border-c-border/30">
+                        <p className="text-xs text-c-cream-dim font-playfair leading-relaxed">
+                            In Carnatic music, every raga is defined by which notes it uses relative to the home note — called <span className="text-c-cream font-semibold">Sa</span>. Graha Bhedam asks: what if we kept the exact same set of notes but called a <em>different</em> note Sa?
+                        </p>
+                        <p className="text-xs text-c-cream-dim font-playfair leading-relaxed">
+                            The intervals between notes shift, and what was one raga becomes a completely different one — same keyboard keys, different tonal center. It's the Carnatic equivalent of modal transposition in Western music.
+                        </p>
+                        <div className="bg-c-surface border border-c-gold/20 rounded-lg px-4 py-3 space-y-1.5">
+                            <p className="text-[10px] text-c-gold font-mono font-bold uppercase tracking-widest">Classic example</p>
+                            <p className="text-xs text-c-cream-dim font-playfair leading-relaxed">
+                                <span className="text-c-cream font-semibold">Shankarabharanam</span> and <span className="text-c-cream font-semibold">Kalyani</span> share the exact same notes. Treat Ma (the 4th note of Shankarabharanam) as Sa, and Kalyani emerges — a completely different mood and feeling, yet not a single new pitch was introduced.
+                            </p>
+                        </div>
+                        <p className="text-[10px] text-c-cream-dark font-playfair italic">
+                            Select a raga below, then listen to each shift — you'll often recognise the resulting raga even if you didn't know the theory.
+                        </p>
+                    </div>
+                )}
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-6 lg:gap-8">
                 {/* Left: Source Selection */}

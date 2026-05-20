@@ -89,8 +89,8 @@ export const RAGAS = {
         video:        "https://www.youtube.com/shorts/XFTf-O-yvJw",
     },
     'Tanarupi': {
-        arohanam:     ['Sa', 'Ri1', 'Ga1', 'Ma1', 'Pa', 'Ni2', 'Ni3', 'Sa'],
-        avarohanam:   ['Sa', 'Ni3', 'Ni2', 'Pa', 'Ma1', 'Ga1', 'Ri1', 'Sa'],
+        arohanam:     ['Sa', 'Ri1', 'Ga1', 'Ma1', 'Pa', 'Da3', 'Ni3', 'Sa'],
+        avarohanam:   ['Sa', 'Ni3', 'Da3', 'Pa', 'Ma1', 'Ga1', 'Ri1', 'Sa'],
         type:         'Melakarta 6',
         mood:         'Unusual · Contemplative',
         description:  'One of the most structurally unusual Melakartas  ·  it skips Da entirely, leaping from Pa straight to Ni2. The consecutive Ni2-Ni3 in the upper register creates a tense, contemplative quality.',

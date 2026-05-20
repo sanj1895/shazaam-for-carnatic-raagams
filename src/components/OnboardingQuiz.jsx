@@ -3,51 +3,13 @@ import { createPortal } from 'react-dom';
 
 const QUESTIONS = [
     {
-        id: 'studied',
-        q: 'Have you studied Carnatic music before?',
-        options: [
-            { label: 'Never', sub: "I'm starting completely fresh", score: 0 },
-            { label: 'A little', sub: 'Some exposure, no formal training', score: 1 },
-            { label: 'Yes, formally', sub: "I've had a guru or classes", score: 2 },
-        ],
-    },
-    {
-        id: 'swaras',
-        q: 'Can you sing the 7 swaras?',
-        sub: 'Sa  ·  Ri  ·  Ga  ·  Ma  ·  Pa  ·  Da  ·  Ni',
-        options: [
-            { label: 'Not yet', score: 0 },
-            { label: "I've heard them", score: 1 },
-            { label: 'Yes, I can sing them', score: 2 },
-        ],
-    },
-    {
-        id: 'shruti',
-        q: 'Can you identify your Shruti?',
-        sub: 'Your personal home note — Sa',
-        options: [
-            { label: "What's Shruti?", score: 0 },
-            { label: 'I know what it is', score: 1 },
-            { label: 'Yes, I know my Sa', score: 2 },
-        ],
-    },
-    {
-        id: 'tala',
-        q: 'Do you know how to keep Tala?',
-        sub: 'Clapping the rhythmic cycle while singing',
-        options: [
-            { label: "What's Tala?", score: 0 },
-            { label: "I've heard of it", score: 1 },
-            { label: 'Yes, Adi Tala', score: 2 },
-        ],
-    },
-    {
         id: 'learner',
-        q: 'Who is learning?',
+        q: 'Who will be learning?',
         options: [
             {
-                label: 'Me — adult learner',
-                value: 'adult',
+                label: 'Me',
+                sub: "I'm learning for myself",
+                value: 'self',
                 icon: (
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="12" cy="7" r="4"/>
@@ -56,19 +18,9 @@ const QUESTIONS = [
                 ),
             },
             {
-                label: 'My child',
-                value: 'child',
-                icon: (
-                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="8" r="3"/>
-                        <path d="M6 21v-1a6 6 0 0112 0v1"/>
-                        <path d="M9 14l-1.5 4M15 14l1.5 4"/>
-                    </svg>
-                ),
-            },
-            {
-                label: 'Both of us',
-                value: 'both',
+                label: 'Someone else',
+                sub: 'My child, student, or family member',
+                value: 'other',
                 icon: (
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="8" cy="7" r="3"/>
@@ -80,19 +32,85 @@ const QUESTIONS = [
             },
         ],
     },
+    {
+        id: 'age',
+        qFn: (answers) => answers.learner === 'other' ? 'How old are they?' : 'How old are you?',
+        options: [
+            { label: 'Under 8', value: 'very_young' },
+            { label: '8 – 12', value: 'child' },
+            { label: '13 – 17', value: 'teen' },
+            { label: '18+', value: 'adult' },
+        ],
+    },
+    {
+        id: 'studied',
+        qFn: (answers) => answers.learner === 'other' ? 'Have they studied Carnatic music before?' : 'Have you studied Carnatic music before?',
+        options: [
+            { label: 'Never', sub: 'Starting completely fresh', score: 0 },
+            { label: 'A little', sub: 'Some exposure, no formal training', score: 1 },
+            { label: 'Yes, formally', sub: 'Had a guru or classes', score: 2 },
+        ],
+    },
+    {
+        id: 'swaras',
+        qFn: (answers) => answers.learner === 'other' ? 'Can they sing the 7 swaras?' : 'Can you sing the 7 swaras?',
+        sub: 'Sa  ·  Ri  ·  Ga  ·  Ma  ·  Pa  ·  Da  ·  Ni',
+        options: [
+            { label: 'Not yet', score: 0 },
+            { label: "Heard them, not confidently", score: 1 },
+            { label: 'Yes, can sing them', score: 2 },
+        ],
+    },
+    {
+        id: 'shruti',
+        qFn: (answers) => answers.learner === 'other' ? 'Can they identify their Shruti?' : 'Can you identify your Shruti?',
+        sub: 'Your personal home note — Sa',
+        options: [
+            { label: "What's Shruti?", score: 0 },
+            { label: 'I know what it is', score: 1 },
+            { label: 'Yes, I know my Sa', score: 2 },
+        ],
+    },
+    {
+        id: 'tala',
+        qFn: (answers) => answers.learner === 'other' ? 'Do they know how to keep Tala?' : 'Do you know how to keep Tala?',
+        sub: 'Clapping the rhythmic cycle while singing',
+        options: [
+            { label: "What's Tala?", score: 0 },
+            { label: "I've heard of it", score: 1 },
+            { label: 'Yes, Adi Tala', score: 2 },
+        ],
+    },
 ];
 
 const SCORE_KEYS = ['studied', 'swaras', 'shruti', 'tala'];
 
-function getPath(totalScore, learner) {
-    const isChild = learner === 'child' || learner === 'both';
+function getPath(totalScore, learner, age) {
+    const isOther = learner === 'other';
+    const pronoun = isOther ? 'They' : 'You';
+    const possessive = isOther ? 'Their' : 'Your';
+    const isVeryYoung = age === 'very_young';
+    const isChild = age === 'child';
+
+    if (isVeryYoung) {
+        return {
+            level: 'Beginner',
+            headline: 'Carnatic Singing Foundations',
+            body: `${pronoun}'ll start with the very basics — finding Sa, gentle breathing, and first sounds. Designed to be playful and encouraging.`,
+            detail: '5 structured stages · First notes in under 15 minutes',
+            note: isOther ? 'Activities are designed to be accessible and joyful for very young learners.' : null,
+            action: 'tutor',
+            cta: 'Start Foundations',
+        };
+    }
+
     if (totalScore <= 2) {
         return {
             level: 'Beginner',
             headline: 'Carnatic Singing Foundations',
-            body: "You'll build everything from the ground up — posture, breath, shruti, and your first swaras. No prior knowledge needed.",
+            body: `${pronoun}'ll build everything from the ground up — posture, breath, shruti, and first swaras. No prior knowledge needed.`,
             detail: '5 structured stages · First notes in under 15 minutes',
-            note: isChild ? 'The exercises are designed to be accessible and engaging for young learners.' : null,
+            note: isChild && isOther ? 'The exercises are designed to be accessible and engaging for young learners.' : null,
             action: 'tutor',
             cta: 'Start Foundations',
         };
@@ -100,9 +118,9 @@ function getPath(totalScore, learner) {
         return {
             level: 'Developing',
             headline: 'Sarali Varisai',
-            body: "You have the basics. We'll refine your pitch, timing, and control through the foundational scale exercises — the backbone of all Carnatic training.",
+            body: `${pronoun} have the basics. We'll refine pitch, timing, and control through the foundational scale exercises — the backbone of all Carnatic training.`,
             detail: '14 progressive exercises · Multiple speeds',
-            note: isChild ? 'Sarali Varisai is ideal for building a young learner\'s musical ear and muscle memory.' : null,
+            note: isChild && isOther ? "Sarali Varisai is ideal for building a young learner's musical ear and muscle memory." : null,
             action: 'tutor',
             cta: 'Start Sarali Varisai',
         };
@@ -110,7 +128,7 @@ function getPath(totalScore, learner) {
         return {
             level: 'Intermediate',
             headline: 'Daily Sadhana',
-            body: "You're past the basics. Your structured daily practice — drone warm-up, scale exercises, keyboard, and ear training — is ready.",
+            body: `${pronoun}'re past the basics. ${possessive} structured daily practice — drone warm-up, scale exercises, keyboard, and ear training — is ready.`,
             detail: '4 daily steps · Build your streak',
             note: null,
             action: 'sadhana',
@@ -131,9 +149,10 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate }) {
     if (typeof document === 'undefined' || !document.body) return null;
 
     const q = QUESTIONS[qIdx];
+    const questionText = q.qFn ? q.qFn(answers) : q.q;
     const isLast = qIdx === QUESTIONS.length - 1;
     const totalScore = SCORE_KEYS.reduce((sum, k) => sum + (answers[k] ?? 0), 0);
-    const path = done ? getPath(totalScore, answers.learner ?? 'adult') : null;
+    const path = done ? getPath(totalScore, answers.learner ?? 'self', answers.age ?? 'adult') : null;
 
     const dismiss = () => {
         setExiting(true);
@@ -152,7 +171,7 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate }) {
         if (advancing) return;
         setSelected(opt);
         setAdvancing(true);
-        const newAnswers = { ...answers, [q.id]: opt.score ?? opt.value };
+        const newAnswers = { ...answers, [q.id]: opt.score !== undefined ? opt.score : opt.value };
         setAnswers(newAnswers);
         setTimeout(() => {
             if (isLast) {
@@ -224,7 +243,7 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate }) {
                         /* ── Question screen ── */
                         <>
                             <div className="mb-6">
-                                <h2 className="font-playfair text-[22px] text-white font-bold leading-snug mb-2">{q.q}</h2>
+                                <h2 className="font-playfair text-[22px] text-white font-bold leading-snug mb-2">{questionText}</h2>
                                 {q.sub && (
                                     <p className="text-[#f7d686]/50 text-[11px] font-mono tracking-widest">{q.sub}</p>
                                 )}

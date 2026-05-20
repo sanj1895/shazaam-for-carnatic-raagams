@@ -84,6 +84,30 @@ const TALAS = [
 ];
 
 
+const TALA_FAMILIES = [
+  { id: 'eka',     label: 'Ekam',    jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
+  { id: 'rupaka',  label: 'Rupaka',  jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
+  { id: 'triputa', label: 'Triputa', jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
+  { id: 'jhampa',  label: 'Jhampa',  jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
+  { id: 'matya',   label: 'Matya',   jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
+  { id: 'ata',     label: 'Ata',     jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
+  { id: 'druva',   label: 'Druva',   jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
+  { id: 'chapu',   label: 'Chapu',   jatis: ['khanda', 'misra'] },
+];
+
+const JATI_LABELS = {
+  tisra:     'Tisra · 3',
+  chatusra:  'Chatusra · 4',
+  khanda:    'Khanda · 5',
+  misra:     'Misra · 7',
+  sankeerna: 'Sankeerna · 9',
+};
+
+function getTalaId(family, jati) {
+  if (family === 'triputa' && jati === 'chatusra') return 'adi';
+  return `${jati}_${family}`;
+}
+
 function playClick(ctx, time, type) {
   const cfg = {
     sam:    { freq: 940, vol: 0.60, body: 220, decay: 0.15, resonance: 0.12 },
@@ -140,7 +164,8 @@ function playClick(ctx, time, type) {
 }
 
 export default function Talam() {
-  const [selectedTala, setSelectedTala] = useState('adi');
+  const [selectedFamily, setSelectedFamily] = useState('triputa');
+  const [selectedJati, setSelectedJati] = useState('chatusra');
   const [bpm, setBpm] = useState(72);
   const [playing, setPlaying] = useState(false);
   const [currentBeat, setCurrentBeat] = useState(-1);
@@ -166,7 +191,8 @@ export default function Talam() {
     if (!playing) { stopScheduler(); return; }
 
     const ctx = getAudioCtx();
-    const tala = TALAS.find(t => t.id === selectedTala);
+    const talaId = getTalaId(selectedFamily, selectedJati);
+    const tala = TALAS.find(t => t.id === talaId);
 
     nextTimeRef.current  = ctx.currentTime + 0.05;
     beatCountRef.current = 0;
@@ -195,16 +221,23 @@ export default function Talam() {
     schedule();
     animFrameRef.current = requestAnimationFrame(syncVisual);
     return stopScheduler;
-  }, [playing, selectedTala, stopScheduler]);
+  }, [playing, selectedFamily, selectedJati, stopScheduler]);
 
-  const handleTalaChange = (id) => {
+  const handleFamilyChange = (family) => {
     if (playing) setPlaying(false);
-    setSelectedTala(id);
+    const validJatis = TALA_FAMILIES.find(f => f.id === family).jatis;
+    if (!validJatis.includes(selectedJati)) setSelectedJati(validJatis[0]);
+    setSelectedFamily(family);
+  };
+
+  const handleJatiChange = (jati) => {
+    if (playing) setPlaying(false);
+    setSelectedJati(jati);
   };
 
   const adjustBpm = (delta) => setBpm(v => Math.max(40, Math.min(240, v + delta)));
 
-  const tala       = TALAS.find(t => t.id === selectedTala);
+  const tala = TALAS.find(t => t.id === getTalaId(selectedFamily, selectedJati));
   const tempoLabel = bpm < 60 ? 'Vilambit' : bpm <= 120 ? 'Madhyama' : 'Drut';
 
   // Pre-compute group offsets
@@ -235,22 +268,46 @@ export default function Talam() {
       </div>
       <SketchyRule className="opacity-60" />
 
-      {/* Tala selector */}
-      <div className="flex flex-wrap gap-2">
-        {TALAS.map(t => (
-          <button
-            key={t.id}
-            onClick={() => handleTalaChange(t.id)}
-            className={[
-              'px-4 py-2 rounded-full border font-playfair text-xs tracking-wide transition-all',
-              selectedTala === t.id
-                ? 'bg-c-gold border-c-gold text-c-bg font-bold'
-                : 'border-c-gold/30 text-c-cream-dim hover:border-c-gold hover:text-c-gold',
-            ].join(' ')}
-          >
-            {t.name}
-          </button>
-        ))}
+      {/* Tala selector — family then jati */}
+      <div className="space-y-3">
+        <div>
+          <p className="text-[9px] font-mono text-c-cream-dark/40 uppercase tracking-widest mb-2">Tala</p>
+          <div className="flex flex-wrap gap-1.5">
+            {TALA_FAMILIES.map(f => (
+              <button
+                key={f.id}
+                onClick={() => handleFamilyChange(f.id)}
+                className={[
+                  'px-3 py-1.5 rounded-full border font-playfair text-[11px] tracking-wide transition-all',
+                  selectedFamily === f.id
+                    ? 'bg-c-gold border-c-gold text-c-bg font-bold'
+                    : 'border-c-gold/30 text-c-cream-dim hover:border-c-gold hover:text-c-gold',
+                ].join(' ')}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-[9px] font-mono text-c-cream-dark/40 uppercase tracking-widest mb-2">Jati</p>
+          <div className="flex flex-wrap gap-1.5">
+            {TALA_FAMILIES.find(f => f.id === selectedFamily).jatis.map(j => (
+              <button
+                key={j}
+                onClick={() => handleJatiChange(j)}
+                className={[
+                  'px-3 py-1.5 rounded-full border font-playfair text-[11px] tracking-wide transition-all',
+                  selectedJati === j
+                    ? 'bg-c-gold/20 border-c-gold text-c-gold font-bold'
+                    : 'border-c-gold/20 text-c-cream-dark hover:border-c-gold/50 hover:text-c-gold',
+                ].join(' ')}
+              >
+                {JATI_LABELS[j]}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Two-column on laptop: beat display left, tempo + start right */}

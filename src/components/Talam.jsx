@@ -5,39 +5,53 @@ import SketchyRule from './SketchyRule';
 
 const TALAS = [
   {
-    id: 'adi',
-    name: 'Adi',
-    description: 'Chatusra Jati Triputa',
-    pattern: ['sam', 'finger', 'finger', 'finger', 'clap', 'wave', 'clap', 'wave'],
-    groups: [4, 2, 2],
+    id: 'druva',
+    name: 'Druva',
+    description: 'Chatusra Jati · |O||',
+    pattern: ['sam', 'finger', 'finger', 'finger', 'clap', 'wave', 'clap', 'finger', 'finger', 'finger', 'clap', 'finger', 'finger', 'finger'],
+    groups: [4, 2, 4, 4],
+  },
+  {
+    id: 'matya',
+    name: 'Matya',
+    description: 'Chatusra Jati · |O|',
+    pattern: ['sam', 'finger', 'finger', 'finger', 'clap', 'wave', 'clap', 'finger', 'finger', 'finger'],
+    groups: [4, 2, 4],
   },
   {
     id: 'rupaka',
     name: 'Rupaka',
-    description: 'Drutam + Chatusra Laghu',
+    description: 'Chatusra Jati · O|',
     pattern: ['sam', 'wave', 'clap', 'finger', 'finger', 'finger'],
     groups: [2, 4],
   },
   {
-    id: 'misra_chapu',
-    name: 'Misra Chapu',
-    description: '3 + 2 + 2',
+    id: 'jhampa',
+    name: 'Jhampa',
+    description: 'Misra Jati · |UO',
+    pattern: ['sam', 'finger', 'finger', 'finger', 'finger', 'finger', 'finger', 'clap', 'clap', 'wave'],
+    groups: [7, 1, 2],
+  },
+  {
+    id: 'triputa',
+    name: 'Triputa',
+    description: 'Tisra Jati · |OO',
     pattern: ['sam', 'finger', 'finger', 'clap', 'wave', 'clap', 'wave'],
     groups: [3, 2, 2],
   },
   {
-    id: 'khanda_chapu',
-    name: 'Khanda Chapu',
-    description: '2 + 3',
-    pattern: ['sam', 'wave', 'clap', 'finger', 'finger'],
-    groups: [2, 3],
+    id: 'ata',
+    name: 'Ata',
+    description: 'Khanda Jati · ||OO',
+    pattern: ['sam', 'finger', 'finger', 'finger', 'finger', 'clap', 'finger', 'finger', 'finger', 'finger', 'clap', 'wave', 'clap', 'wave'],
+    groups: [5, 5, 2, 2],
   },
   {
-    id: 'tisra_ekam',
-    name: 'Tisra Ekam',
-    description: 'Tisra Laghu',
-    pattern: ['sam', 'finger', 'finger'],
-    groups: [3],
+    id: 'eka',
+    name: 'Eka',
+    description: 'Chatusra Jati · |',
+    pattern: ['sam', 'finger', 'finger', 'finger'],
+    groups: [4],
   },
 ];
 
@@ -97,7 +111,7 @@ function playClick(ctx, time, type) {
 }
 
 export default function Talam() {
-  const [selectedTala, setSelectedTala] = useState('adi');
+  const [selectedTala, setSelectedTala] = useState('eka');
   const [bpm, setBpm] = useState(72);
   const [playing, setPlaying] = useState(false);
   const [currentBeat, setCurrentBeat] = useState(-1);

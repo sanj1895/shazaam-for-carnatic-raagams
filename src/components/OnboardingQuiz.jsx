@@ -1,0 +1,318 @@
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
+
+const QUESTIONS = [
+    {
+        id: 'studied',
+        q: 'Have you studied Carnatic music before?',
+        options: [
+            { label: 'Never', sub: "I'm starting completely fresh", score: 0 },
+            { label: 'A little', sub: 'Some exposure, no formal training', score: 1 },
+            { label: 'Yes, formally', sub: "I've had a guru or classes", score: 2 },
+        ],
+    },
+    {
+        id: 'swaras',
+        q: 'Can you sing the 7 swaras?',
+        sub: 'Sa  ·  Ri  ·  Ga  ·  Ma  ·  Pa  ·  Da  ·  Ni',
+        options: [
+            { label: 'Not yet', score: 0 },
+            { label: "I've heard them", score: 1 },
+            { label: 'Yes, I can sing them', score: 2 },
+        ],
+    },
+    {
+        id: 'shruti',
+        q: 'Can you identify your Shruti?',
+        sub: 'Your personal home note — Sa',
+        options: [
+            { label: "What's Shruti?", score: 0 },
+            { label: 'I know what it is', score: 1 },
+            { label: 'Yes, I know my Sa', score: 2 },
+        ],
+    },
+    {
+        id: 'tala',
+        q: 'Do you know how to keep Tala?',
+        sub: 'Clapping the rhythmic cycle while singing',
+        options: [
+            { label: "What's Tala?", score: 0 },
+            { label: "I've heard of it", score: 1 },
+            { label: 'Yes, Adi Tala', score: 2 },
+        ],
+    },
+    {
+        id: 'learner',
+        q: 'Who is learning?',
+        options: [
+            {
+                label: 'Me — adult learner',
+                value: 'adult',
+                icon: (
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="7" r="4"/>
+                        <path d="M4 21v-1a8 8 0 0116 0v1"/>
+                    </svg>
+                ),
+            },
+            {
+                label: 'My child',
+                value: 'child',
+                icon: (
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="8" r="3"/>
+                        <path d="M6 21v-1a6 6 0 0112 0v1"/>
+                        <path d="M9 14l-1.5 4M15 14l1.5 4"/>
+                    </svg>
+                ),
+            },
+            {
+                label: 'Both of us',
+                value: 'both',
+                icon: (
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="8" cy="7" r="3"/>
+                        <path d="M2 20v-1a6 6 0 0112 0v1"/>
+                        <circle cx="17" cy="9" r="2.5"/>
+                        <path d="M13 20v-0.5a4.5 4.5 0 019 0V20"/>
+                    </svg>
+                ),
+            },
+        ],
+    },
+];
+
+const SCORE_KEYS = ['studied', 'swaras', 'shruti', 'tala'];
+
+function getPath(totalScore, learner) {
+    const isChild = learner === 'child' || learner === 'both';
+    if (totalScore <= 2) {
+        return {
+            level: 'Beginner',
+            headline: 'Carnatic Singing Foundations',
+            body: "You'll build everything from the ground up — posture, breath, shruti, and your first swaras. No prior knowledge needed.",
+            detail: '5 structured stages · First notes in under 15 minutes',
+            note: isChild ? 'The exercises are designed to be accessible and engaging for young learners.' : null,
+            action: 'tutor',
+            cta: 'Start Foundations',
+        };
+    } else if (totalScore <= 5) {
+        return {
+            level: 'Developing',
+            headline: 'Sarali Varisai',
+            body: "You have the basics. We'll refine your pitch, timing, and control through the foundational scale exercises — the backbone of all Carnatic training.",
+            detail: '14 progressive exercises · Multiple speeds',
+            note: isChild ? 'Sarali Varisai is ideal for building a young learner\'s musical ear and muscle memory.' : null,
+            action: 'tutor',
+            cta: 'Start Sarali Varisai',
+        };
+    } else {
+        return {
+            level: 'Intermediate',
+            headline: 'Daily Sadhana',
+            body: "You're past the basics. Your structured daily practice — drone warm-up, scale exercises, keyboard, and ear training — is ready.",
+            detail: '4 daily steps · Build your streak',
+            note: null,
+            action: 'sadhana',
+            cta: 'Open Daily Sadhana',
+        };
+    }
+}
+
+export default function OnboardingQuiz({ active, onDismiss, onNavigate }) {
+    const [qIdx, setQIdx] = useState(0);
+    const [answers, setAnswers] = useState({});
+    const [selected, setSelected] = useState(null);
+    const [advancing, setAdvancing] = useState(false);
+    const [done, setDone] = useState(false);
+    const [exiting, setExiting] = useState(false);
+
+    if (!active) return null;
+    if (typeof document === 'undefined' || !document.body) return null;
+
+    const q = QUESTIONS[qIdx];
+    const isLast = qIdx === QUESTIONS.length - 1;
+    const totalScore = SCORE_KEYS.reduce((sum, k) => sum + (answers[k] ?? 0), 0);
+    const path = done ? getPath(totalScore, answers.learner ?? 'adult') : null;
+
+    const dismiss = () => {
+        setExiting(true);
+        setTimeout(() => {
+            setExiting(false);
+            setQIdx(0);
+            setAnswers({});
+            setSelected(null);
+            setAdvancing(false);
+            setDone(false);
+            onDismiss?.();
+        }, 200);
+    };
+
+    const handleSelect = (opt) => {
+        if (advancing) return;
+        setSelected(opt);
+        setAdvancing(true);
+        const newAnswers = { ...answers, [q.id]: opt.score ?? opt.value };
+        setAnswers(newAnswers);
+        setTimeout(() => {
+            if (isLast) {
+                setDone(true);
+            } else {
+                setQIdx((i) => i + 1);
+            }
+            setSelected(null);
+            setAdvancing(false);
+        }, 360);
+    };
+
+    const handleBack = () => {
+        if (done) { setDone(false); return; }
+        if (qIdx > 0) { setQIdx((i) => i - 1); setSelected(null); }
+    };
+
+    const handleBegin = () => {
+        const dest = path.action;
+        dismiss();
+        onNavigate?.(dest);
+    };
+
+    const progress = done ? 1 : qIdx / QUESTIONS.length;
+
+    return createPortal(
+        <div
+            className={`fixed inset-0 z-[9990] flex items-center justify-center p-4 transition-opacity duration-200 ${exiting ? 'opacity-0' : 'opacity-100'}`}
+            style={{ background: 'rgba(10,4,2,0.82)', backdropFilter: 'blur(4px)' }}
+        >
+            <div
+                className={`relative w-full max-w-md rounded-2xl overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.9)] transition-all duration-200 ${exiting ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}
+                style={{ background: '#150801', border: '1px solid rgba(247,214,134,0.18)' }}
+            >
+                {/* Gold progress bar */}
+                <div className="h-[2px] bg-white/8">
+                    <div
+                        className="h-full bg-[#f7d686] transition-all duration-500 ease-out"
+                        style={{ width: `${progress * 100}%` }}
+                    />
+                </div>
+
+                <div className="p-6 sm:p-8">
+                    {/* Header row */}
+                    <div className="flex items-center justify-between mb-7">
+                        <button
+                            onClick={handleBack}
+                            className={`text-[11px] font-mono text-white/30 hover:text-white/60 transition-colors flex items-center gap-1 ${(qIdx === 0 && !done) ? 'invisible' : ''}`}
+                        >
+                            <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M8 2L4 6l4 4"/></svg>
+                            Back
+                        </button>
+
+                        {!done && (
+                            <span className="text-[9px] font-mono text-[#f7d686]/40 uppercase tracking-widest">
+                                {qIdx + 1} of {QUESTIONS.length}
+                            </span>
+                        )}
+
+                        <button
+                            onClick={dismiss}
+                            className="w-6 h-6 flex items-center justify-center rounded-full text-white/25 hover:text-white/60 hover:bg-white/8 transition-all text-xs"
+                        >
+                            ✕
+                        </button>
+                    </div>
+
+                    {!done ? (
+                        /* ── Question screen ── */
+                        <>
+                            <div className="mb-6">
+                                <h2 className="font-playfair text-[22px] text-white font-bold leading-snug mb-2">{q.q}</h2>
+                                {q.sub && (
+                                    <p className="text-[#f7d686]/50 text-[11px] font-mono tracking-widest">{q.sub}</p>
+                                )}
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                {q.options.map((opt) => {
+                                    const isChosen = selected === opt;
+                                    return (
+                                        <button
+                                            key={opt.label}
+                                            onClick={() => handleSelect(opt)}
+                                            disabled={advancing}
+                                            className={`w-full text-left px-4 py-3.5 rounded-xl border transition-all duration-200 flex items-center gap-3 ${
+                                                isChosen
+                                                    ? 'bg-[#f7d686] border-[#f7d686]'
+                                                    : 'bg-white/[0.04] border-white/10 hover:border-[#f7d686]/35 hover:bg-white/[0.07]'
+                                            }`}
+                                        >
+                                            {opt.icon && (
+                                                <span className={isChosen ? 'text-[#1a0804]' : 'text-[#f7d686]/60'}>
+                                                    {opt.icon}
+                                                </span>
+                                            )}
+                                            <span className="flex flex-col min-w-0">
+                                                <span className={`font-playfair font-bold text-[13px] leading-tight ${isChosen ? 'text-[#1a0804]' : 'text-white'}`}>
+                                                    {opt.label}
+                                                </span>
+                                                {opt.sub && (
+                                                    <span className={`text-[11px] mt-0.5 ${isChosen ? 'text-[#1a0804]/65' : 'text-white/35'}`}>
+                                                        {opt.sub}
+                                                    </span>
+                                                )}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </>
+                    ) : (
+                        /* ── Result screen ── */
+                        <>
+                            <div className="text-center mb-6">
+                                <span className="text-[9px] font-mono text-[#f7d686]/50 uppercase tracking-[0.25em] block mb-5">Your Learning Path</span>
+
+                                {/* Ornamental ring */}
+                                <div className="w-14 h-14 rounded-full border border-[#f7d686]/25 bg-[#f7d686]/8 flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-6 h-6 text-[#f7d686]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M9 18V5l12-2v13"/>
+                                        <circle cx="6" cy="18" r="3"/>
+                                        <circle cx="18" cy="16" r="3"/>
+                                    </svg>
+                                </div>
+
+                                <span className="text-[9px] font-mono text-[#f7d686]/50 uppercase tracking-widest block mb-1">{path.level}</span>
+                                <h2 className="font-playfair text-2xl text-[#f7d686] font-bold leading-tight">{path.headline}</h2>
+                                <p className="text-white/35 text-[10px] font-mono mt-1.5 tracking-wider">{path.detail}</p>
+                            </div>
+
+                            <p className="text-white/60 text-[13px] font-playfair leading-relaxed text-center mb-3">
+                                {path.body}
+                            </p>
+
+                            {path.note && (
+                                <p className="text-[#f7d686]/50 text-[11px] italic text-center mb-4 px-2">
+                                    ✦ {path.note}
+                                </p>
+                            )}
+
+                            <div className="flex flex-col gap-2 mt-6">
+                                <button
+                                    onClick={handleBegin}
+                                    className="w-full py-3 bg-[#f7d686] hover:bg-white text-[#150801] font-playfair font-bold text-sm tracking-wider uppercase rounded-xl transition-all shadow-[0_0_30px_rgba(247,214,134,0.2)]"
+                                >
+                                    {path.cta} →
+                                </button>
+                                <button
+                                    onClick={dismiss}
+                                    className="w-full py-2 text-[11px] text-white/25 hover:text-white/50 transition-colors font-playfair italic"
+                                >
+                                    Just explore on my own
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+        </div>,
+        document.body
+    );
+}

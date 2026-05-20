@@ -14,6 +14,7 @@ import Tutor from './components/Tutor';
 import { getSwaram, identifyRaga, RAGAS } from './utils/ragaLogic';
 import RagaDetail from './components/RagaDetail';
 import OnboardingTour from './components/OnboardingTour';
+import OnboardingQuiz from './components/OnboardingQuiz';
 import { CuratedIcon, FireIcon, DhwaniIcon, SadhanaIcon } from './components/IconLibrary';
 import SketchyRule from './components/SketchyRule';
 
@@ -106,6 +107,7 @@ function App() {
     const [isListening, setIsListening] = useState(false);
     const [activeMode, setActiveMode] = useState('standard');
     const [tourActive, setTourActive] = useState(false);
+    const [quizActive, setQuizActive] = useState(false);
     const [sadhana, setSadhana] = useState(loadSadhanaState);
     const [sadhanaToast, setSadhanaToast] = useState(null); // { title, stepName }
     const [selectedRaga, setSelectedRaga] = useState(null); // { raga, hasClearMatch, type: 'library' | 'identify' | 'melakarta' }
@@ -232,7 +234,12 @@ function App() {
 
     return (
         <>
-            <OnboardingTour 
+            <OnboardingQuiz
+                active={quizActive}
+                onDismiss={() => setQuizActive(false)}
+                onNavigate={(view) => { setQuizActive(false); goTo(view); }}
+            />
+            <OnboardingTour
                 active={tourActive} 
                 onDismiss={() => {
                     setTourActive(false);
@@ -510,7 +517,7 @@ function App() {
                             >
                                 {/* Primary: Start Learning */}
                                 <button
-                                    onClick={() => goTo('tutor')}
+                                    onClick={() => setQuizActive(true)}
                                     className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-14 py-4 rounded-full text-sm md:text-base tracking-[0.2em] uppercase transition-all duration-500 transform hover:scale-105 shadow-[0_0_40px_rgba(200,148,31,0.35)] cursor-pointer"
                                 >
                                     Start Learning

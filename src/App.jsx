@@ -419,7 +419,7 @@ function App() {
                 {/* ══ HOME ══ */}
                 {view === 'home' && (
                         <div
-                            className="w-full flex flex-col items-center relative overflow-hidden transition-all duration-1000 animate-fade-in"
+                            className="w-full flex flex-col items-center relative overflow-y-auto scrollbar-hide transition-all duration-1000 animate-fade-in"
                             style={{
                                 minHeight: 'calc(100vh - 73px)',
                                 background: 'radial-gradient(circle at center, #7a2a10 0%, #3a1208 50%, #1a0804 100%)',
@@ -541,6 +541,47 @@ function App() {
                                 >
                                     <span className="text-c-gold opacity-80">{renderTabIcon('tutor', "w-3.5 h-3.5")}</span> Take a Guided Tour
                                 </button>
+                            </div>
+                        </div>
+
+                        {/* About / Mission section */}
+                        <div
+                            className="relative z-10 w-full max-w-2xl mx-auto px-6 py-16 text-center transition-all duration-700"
+                            style={{
+                                opacity: showFeatures ? 0 : 1,
+                                pointerEvents: showFeatures ? 'none' : 'auto',
+                                height: showFeatures ? 0 : 'auto',
+                                overflow: showFeatures ? 'hidden' : 'visible',
+                            }}
+                        >
+                            <div className="flex items-center gap-4 mb-10">
+                                <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-c-gold/30" />
+                                <span className="text-c-gold/60 text-[10px] tracking-[0.4em] uppercase font-semibold">What We Believe</span>
+                                <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-c-gold/30" />
+                            </div>
+
+                            <p className="font-playfair text-2xl sm:text-3xl text-[#f7d686] leading-snug mb-6">
+                                Carnatic music belongs<br />to everyone.
+                            </p>
+                            <p className="text-white/55 text-sm sm:text-base leading-relaxed mb-4 max-w-xl mx-auto">
+                                One of humanity's oldest living classical traditions — over 2,000 years of raga, tala, and devotion — has long required the right birthplace, the right language, or the right guru to access.
+                            </p>
+                            <p className="text-white/55 text-sm sm:text-base leading-relaxed mb-14 max-w-xl mx-auto">
+                                Ālāpana exists to change that. Whether you grew up in Chennai or Chicago, speak Tamil or not, have trained for decades or are hearing a raga for the very first time — the music meets you where you are.
+                            </p>
+
+                            <div className="grid grid-cols-3 gap-6 text-center">
+                                {[
+                                    { symbol: '🌍', title: 'Open to All', body: 'No geography, language, or lineage required to begin.' },
+                                    { symbol: '📿', title: 'Ancient Wisdom', body: '2,000 years of classical tradition — alive and unbroken.' },
+                                    { symbol: '✦', title: 'Modern Tools', body: 'Real-time pitch detection, guided lessons, and live raga recognition.' },
+                                ].map(({ symbol, title, body }) => (
+                                    <div key={title} className="flex flex-col items-center gap-2 px-1">
+                                        <span className="text-2xl mb-1">{symbol}</span>
+                                        <p className="text-c-gold text-[10px] font-semibold tracking-[0.2em] uppercase">{title}</p>
+                                        <p className="text-white/35 text-xs leading-relaxed">{body}</p>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 

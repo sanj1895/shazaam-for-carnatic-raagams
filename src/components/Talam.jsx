@@ -5,6 +5,41 @@ import SketchyRule from './SketchyRule';
 
 const TALAS = [
   {
+    id: 'adi',
+    name: 'Adi',
+    description: 'Chatusra Jati Triputa',
+    pattern: ['sam', 'finger', 'finger', 'finger', 'clap', 'wave', 'clap', 'wave'],
+    groups: [4, 2, 2],
+  },
+  {
+    id: 'rupaka',
+    name: 'Rupaka',
+    description: 'Chatusra Jati · O|',
+    pattern: ['sam', 'wave', 'clap', 'finger', 'finger', 'finger'],
+    groups: [2, 4],
+  },
+  {
+    id: 'misra_chapu',
+    name: 'Misra Chapu',
+    description: '3 + 2 + 2',
+    pattern: ['sam', 'finger', 'finger', 'clap', 'wave', 'clap', 'wave'],
+    groups: [3, 2, 2],
+  },
+  {
+    id: 'khanda_chapu',
+    name: 'Khanda Chapu',
+    description: '2 + 3',
+    pattern: ['sam', 'wave', 'clap', 'finger', 'finger'],
+    groups: [2, 3],
+  },
+  {
+    id: 'tisra_ekam',
+    name: 'Tisra Ekam',
+    description: 'Tisra Laghu',
+    pattern: ['sam', 'finger', 'finger'],
+    groups: [3],
+  },
+  {
     id: 'druva',
     name: 'Druva',
     description: 'Chatusra Jati · |O||',
@@ -17,13 +52,6 @@ const TALAS = [
     description: 'Chatusra Jati · |O|',
     pattern: ['sam', 'finger', 'finger', 'finger', 'clap', 'wave', 'clap', 'finger', 'finger', 'finger'],
     groups: [4, 2, 4],
-  },
-  {
-    id: 'rupaka',
-    name: 'Rupaka',
-    description: 'Chatusra Jati · O|',
-    pattern: ['sam', 'wave', 'clap', 'finger', 'finger', 'finger'],
-    groups: [2, 4],
   },
   {
     id: 'jhampa',
@@ -111,7 +139,7 @@ function playClick(ctx, time, type) {
 }
 
 export default function Talam() {
-  const [selectedTala, setSelectedTala] = useState('eka');
+  const [selectedTala, setSelectedTala] = useState('adi');
   const [bpm, setBpm] = useState(72);
   const [playing, setPlaying] = useState(false);
   const [currentBeat, setCurrentBeat] = useState(-1);

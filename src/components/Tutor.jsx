@@ -1124,20 +1124,48 @@ function ExerciseShrutiSetup({ sa, setSa, onDone }) {
                 <span className="text-[10px] text-c-cream-dark uppercase tracking-wider font-semibold">Voice Register Presets</span>
                 <div className="grid grid-cols-3 gap-2">
                     {[
-                        { label: '👨🏽 Male (Low)', hz: 130.81 },
-                        { label: '👩🏽 Female (Mid)', hz: 220.00 },
-                        { label: '👧🏽 Kids (High)', hz: 261.63 }
+                        {
+                            label: 'Male (Low)', hz: 130.81,
+                            icon: (
+                                <svg className="w-5 h-5" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="11" cy="6" r="3.5"/>
+                                    <path d="M4 20c0-3.87 3.13-7 7-7s7 3.13 7 7"/>
+                                    <path d="M2 20.5 Q5.5 18.5 9 20.5" strokeWidth="1.2"/>
+                                </svg>
+                            )
+                        },
+                        {
+                            label: 'Female (Mid)', hz: 220.00,
+                            icon: (
+                                <svg className="w-5 h-5" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="11" cy="6" r="3"/>
+                                    <path d="M5 20c0-3.31 2.69-6 6-6s6 2.69 6 6"/>
+                                    <path d="M2 20.5 Q4 19 6 20.5 Q8 22 10 20.5" strokeWidth="1.2"/>
+                                </svg>
+                            )
+                        },
+                        {
+                            label: 'Kids (High)', hz: 261.63,
+                            icon: (
+                                <svg className="w-5 h-5" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="11" cy="7" r="2.5"/>
+                                    <path d="M6 20c0-2.76 2.24-5 5-5s5 2.24 5 5"/>
+                                    <path d="M2 20.5 Q3.5 19 5 20.5 Q6.5 22 8 20.5 Q9.5 19 11 20.5" strokeWidth="1.2"/>
+                                </svg>
+                            )
+                        }
                     ].map(preset => (
-                        <button 
+                        <button
                             type="button"
                             key={preset.label}
                             onClick={() => selectRegister(preset.hz)}
-                            className={`py-2 px-1 text-[11px] rounded-lg border font-semibold transition-all ${
+                            className={`py-2.5 px-1 text-[11px] rounded-lg border font-semibold transition-all flex flex-col items-center gap-1.5 ${
                                 Math.abs(tempSa - preset.hz) < 5
                                 ? 'bg-c-gold text-c-bg border-c-gold'
                                 : 'bg-c-bg text-c-cream border-c-border/40 hover:border-c-gold/50'
                             }`}
                         >
+                            {preset.icon}
                             {preset.label}
                         </button>
                     ))}
@@ -1173,7 +1201,23 @@ function ExerciseShrutiSetup({ sa, setSa, onDone }) {
                         : 'bg-c-gold-faint text-c-gold border-c-gold/30 hover:bg-c-gold hover:text-c-bg'
                     }`}
                 >
-                    <span>{dronePlaying ? '⏹️ Stop Drone' : '🔈 Play Drone'}</span>
+                    {dronePlaying ? (
+                        <>
+                            <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                <rect x="4" y="4" width="12" height="12" rx="2"/>
+                            </svg>
+                            Stop Drone
+                        </>
+                    ) : (
+                        <>
+                            <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M5 7.5H3a1 1 0 00-1 1v3a1 1 0 001 1h2l4 3V4.5L5 7.5z" fill="currentColor" stroke="none"/>
+                                <path d="M14 5.5a5.5 5.5 0 010 9"/>
+                                <path d="M11.5 8a2.5 2.5 0 010 4"/>
+                            </svg>
+                            Play Drone
+                        </>
+                    )}
                 </button>
             </div>
 
@@ -1186,7 +1230,13 @@ function ExerciseShrutiSetup({ sa, setSa, onDone }) {
                             onClick={startCalibration}
                             className="w-full py-2.5 bg-c-gold text-c-bg rounded-full font-bold text-sm tracking-wide shadow-md hover:bg-c-gold-light transition-all flex items-center justify-center gap-2"
                         >
-                            <span>🎙️ Sing comfortable note to Calibrate</span>
+                            <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                                <rect x="7" y="1" width="6" height="11" rx="3" fill="currentColor" stroke="none"/>
+                                <path d="M3 10a7 7 0 0014 0"/>
+                                <line x1="10" y1="17" x2="10" y2="20"/>
+                                <line x1="7" y1="20" x2="13" y2="20"/>
+                            </svg>
+                            <span>Sing a note to Calibrate</span>
                         </button>
                         {micError && <p className="text-red-500 text-[11px] font-semibold text-center mt-1">{micError}</p>}
                     </div>

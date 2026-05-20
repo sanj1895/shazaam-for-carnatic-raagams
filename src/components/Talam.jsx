@@ -3,85 +3,86 @@ import { getAudioCtx } from '../utils/audioUtils';
 import { CuratedIcon } from './IconLibrary';
 import SketchyRule from './SketchyRule';
 
+function makeTala(id, name, description, angas) {
+  const pattern = [];
+  const groups = [];
+  angas.forEach((anga, i) => {
+    const first = i === 0 ? 'sam' : 'clap';
+    if (anga === 'D') {
+      pattern.push(first, 'wave');
+      groups.push(2);
+    } else if (anga === 'U') {
+      pattern.push(first);
+      groups.push(1);
+    } else {
+      const n = parseInt(anga, 10);
+      pattern.push(first);
+      for (let j = 1; j < n; j++) pattern.push('finger');
+      groups.push(n);
+    }
+  });
+  return { id, name, description, pattern, groups };
+}
+
 const TALAS = [
-  {
-    id: 'adi',
-    name: 'Adi',
-    description: 'Chatusra Jati Triputa',
-    pattern: ['sam', 'finger', 'finger', 'finger', 'clap', 'wave', 'clap', 'wave'],
-    groups: [4, 2, 2],
-  },
-  {
-    id: 'rupaka',
-    name: 'Rupaka',
-    description: 'Chatusra Jati · O|',
-    pattern: ['sam', 'wave', 'clap', 'finger', 'finger', 'finger'],
-    groups: [2, 4],
-  },
-  {
-    id: 'misra_chapu',
-    name: 'Misra Chapu',
-    description: '3 + 2 + 2',
-    pattern: ['sam', 'finger', 'finger', 'clap', 'wave', 'clap', 'wave'],
-    groups: [3, 2, 2],
-  },
-  {
-    id: 'khanda_chapu',
-    name: 'Khanda Chapu',
-    description: '2 + 3',
-    pattern: ['sam', 'wave', 'clap', 'finger', 'finger'],
-    groups: [2, 3],
-  },
-  {
-    id: 'tisra_ekam',
-    name: 'Tisra Ekam',
-    description: 'Tisra Laghu',
-    pattern: ['sam', 'finger', 'finger'],
-    groups: [3],
-  },
-  {
-    id: 'druva',
-    name: 'Druva',
-    description: 'Chatusra Jati · |O||',
-    pattern: ['sam', 'finger', 'finger', 'finger', 'clap', 'wave', 'clap', 'finger', 'finger', 'finger', 'clap', 'finger', 'finger', 'finger'],
-    groups: [4, 2, 4, 4],
-  },
-  {
-    id: 'matya',
-    name: 'Matya',
-    description: 'Chatusra Jati · |O|',
-    pattern: ['sam', 'finger', 'finger', 'finger', 'clap', 'wave', 'clap', 'finger', 'finger', 'finger'],
-    groups: [4, 2, 4],
-  },
-  {
-    id: 'jhampa',
-    name: 'Jhampa',
-    description: 'Misra Jati · |UO',
-    pattern: ['sam', 'finger', 'finger', 'finger', 'finger', 'finger', 'finger', 'clap', 'clap', 'wave'],
-    groups: [7, 1, 2],
-  },
-  {
-    id: 'triputa',
-    name: 'Triputa',
-    description: 'Tisra Jati · |OO',
-    pattern: ['sam', 'finger', 'finger', 'clap', 'wave', 'clap', 'wave'],
-    groups: [3, 2, 2],
-  },
-  {
-    id: 'ata',
-    name: 'Ata',
-    description: 'Khanda Jati · ||OO',
-    pattern: ['sam', 'finger', 'finger', 'finger', 'finger', 'clap', 'finger', 'finger', 'finger', 'finger', 'clap', 'wave', 'clap', 'wave'],
-    groups: [5, 5, 2, 2],
-  },
-  {
-    id: 'eka',
-    name: 'Eka',
-    description: 'Chatusra Jati · |',
-    pattern: ['sam', 'finger', 'finger', 'finger'],
-    groups: [4],
-  },
+  // 3 beats
+  makeTala('tisra_eka',         'Tisra Ekam',         'Tisra Jati · |',                ['3']),
+  // 4 beats
+  makeTala('chatusra_eka',      'Chatusra Ekam',      'Chatusra Jati · |',             ['4']),
+  // 5 beats
+  makeTala('khanda_eka',        'Khanda Ekam',        'Khanda Jati · |',               ['5']),
+  makeTala('tisra_rupaka',      'Tisra Rupaka',       'Tisra Jati · O|',               ['D', '3']),
+  makeTala('khanda_chapu',      'Khanda Chapu',       '2 + 3',                         ['D', '3']),
+  // 6 beats
+  makeTala('chatusra_rupaka',   'Rupaka',             'Chatusra Jati · O|',            ['D', '4']),
+  makeTala('tisra_jhampa',      'Tisra Jhampa',       'Tisra Jati · |UO',              ['3', 'U', 'D']),
+  // 7 beats
+  makeTala('misra_eka',         'Misra Ekam',         'Misra Jati · |',                ['7']),
+  makeTala('khanda_rupaka',     'Khanda Rupaka',      'Khanda Jati · O|',              ['D', '5']),
+  makeTala('tisra_triputa',     'Tisra Triputa',      'Tisra Jati · |OO',              ['3', 'D', 'D']),
+  makeTala('chatusra_jhampa',   'Chatusra Jhampa',    'Chatusra Jati · |UO',           ['4', 'U', 'D']),
+  makeTala('misra_chapu',       'Misra Chapu',        '3 + 2 + 2',                     ['3', 'D', 'D']),
+  // 8 beats
+  makeTala('adi',               'Adi',                'Chatusra Jati Triputa · |OO',   ['4', 'D', 'D']),
+  makeTala('khanda_jhampa',     'Khanda Jhampa',      'Khanda Jati · |UO',             ['5', 'U', 'D']),
+  makeTala('tisra_matya',       'Tisra Matya',        'Tisra Jati · |O|',              ['3', 'D', '3']),
+  // 9 beats
+  makeTala('sankeerna_eka',     'Sankeerna Ekam',     'Sankeerna Jati · |',            ['9']),
+  makeTala('misra_rupaka',      'Misra Rupaka',       'Misra Jati · O|',               ['D', '7']),
+  makeTala('khanda_triputa',    'Khanda Triputa',     'Khanda Jati · |OO',             ['5', 'D', 'D']),
+  // 10 beats
+  makeTala('misra_jhampa',      'Jhampa',             'Misra Jati · |UO',              ['7', 'U', 'D']),
+  makeTala('chatusra_matya',    'Matya',              'Chatusra Jati · |O|',           ['4', 'D', '4']),
+  makeTala('tisra_ata',         'Tisra Ata',          'Tisra Jati · ||OO',             ['3', '3', 'D', 'D']),
+  // 11 beats
+  makeTala('sankeerna_rupaka',  'Sankeerna Rupaka',   'Sankeerna Jati · O|',           ['D', '9']),
+  makeTala('misra_triputa',     'Misra Triputa',      'Misra Jati · |OO',              ['7', 'D', 'D']),
+  makeTala('tisra_druva',       'Tisra Druva',        'Tisra Jati · |O||',             ['3', 'D', '3', '3']),
+  // 12 beats
+  makeTala('sankeerna_jhampa',  'Sankeerna Jhampa',   'Sankeerna Jati · |UO',          ['9', 'U', 'D']),
+  makeTala('khanda_matya',      'Khanda Matya',       'Khanda Jati · |O|',             ['5', 'D', '5']),
+  makeTala('chatusra_ata',      'Chatusra Ata',       'Chatusra Jati · ||OO',          ['4', '4', 'D', 'D']),
+  // 13 beats
+  makeTala('sankeerna_triputa', 'Sankeerna Triputa',  'Sankeerna Jati · |OO',          ['9', 'D', 'D']),
+  // 14 beats
+  makeTala('khanda_ata',        'Ata',                'Khanda Jati · ||OO',            ['5', '5', 'D', 'D']),
+  makeTala('chatusra_druva',    'Chatusra Druva',     'Chatusra Jati · |O||',          ['4', 'D', '4', '4']),
+  // 16 beats
+  makeTala('misra_matya',       'Misra Matya',        'Misra Jati · |O|',              ['7', 'D', '7']),
+  // 17 beats
+  makeTala('khanda_druva',      'Khanda Druva',       'Khanda Jati · |O||',            ['5', 'D', '5', '5']),
+  // 18 beats
+  makeTala('misra_ata',         'Misra Ata',          'Misra Jati · ||OO',             ['7', '7', 'D', 'D']),
+  // 20 beats
+  makeTala('sankeerna_matya',   'Sankeerna Matya',    'Sankeerna Jati · |O|',          ['9', 'D', '9']),
+  // 22 beats
+  makeTala('sankeerna_ata',     'Sankeerna Ata',      'Sankeerna Jati · ||OO',         ['9', '9', 'D', 'D']),
+  // 23 beats
+  makeTala('misra_druva',       'Druva',              'Misra Jati · |O||',             ['7', 'D', '7', '7']),
+  // 29 beats
+  makeTala('sankeerna_druva',   'Sankeerna Druva',    'Sankeerna Jati · |O||',         ['9', 'D', '9', '9']),
 ];
+
 
 function playClick(ctx, time, type) {
   const cfg = {

@@ -78,22 +78,36 @@ const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamak
     const octaves = getOctaveSequence(swaras);
     const toneDur = Math.min((delayMs / 1000) * 0.85, 1.1);
     let prevFreq = null;
-    
+    let prevNoteIdx = -1;
+
     for (let i = 0; i < swaras.length; i++) {
         if (signal?.aborted) return;
         const swara = swaras[i];
-        if (swara === '|' || swara === '||') continue;  // skip bar lines — no delay
+        if (swara === '|' || swara === '||') continue;
         if (swara === ',') {
-            // silence/rest beat — highlight nothing, just wait
+            // rest/silence — clear highlight and wait
             onIdx(-1);
             prevFreq = null;
             await new Promise(r => setTimeout(r, delayMs));
             continue;
         }
+        if (swara === '-') {
+            // hold — keep visual highlight on the sustained note, no new audio attack
+            onIdx(prevNoteIdx);
+            await new Promise(r => setTimeout(r, delayMs));
+            continue;
+        }
+        // Peek ahead: count consecutive hold beats to extend tone duration
+        let holdCount = 0;
+        for (let k = i + 1; k < swaras.length && swaras[k] === '-'; k++) holdCount++;
+        const extDur = holdCount > 0
+            ? Math.min(((1 + holdCount) * delayMs / 1000) * 0.90, 8.0)
+            : toneDur;
         onIdx(i);
         const freq = swaraFreq(swara, sa) * Math.pow(2, octaves[i]);
-        playSingleTone(freq, toneDur, gamakam ? prevFreq : null);
+        playSingleTone(freq, extDur, gamakam ? prevFreq : null);
         prevFreq = freq;
+        prevNoteIdx = i;
         await new Promise(r => setTimeout(r, delayMs));
     }
     onIdx(-1);
@@ -284,9 +298,18 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
                                     </div>
                                 );
                             }
+                            if (s === '-') {
+                                return (
+                                    <div key={i} className={`w-8 sm:w-10 h-8 sm:h-10 flex items-center justify-center text-lg transition-all duration-100 ${
+                                        i === activeIdx ? 'text-c-gold scale-110' : 'text-c-cream-dark/25'
+                                    }`}>
+                                        ·
+                                    </div>
+                                );
+                            }
                             return (
-                                <button 
-                                    key={i} 
+                                <button
+                                    key={i}
                                     onClick={() => handleNoteClick(s, i)}
                                     className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2.5 rounded-lg border font-mono text-xs sm:text-sm font-bold transition-all duration-100 cursor-pointer hover:border-c-gold/75 hover:bg-c-gold/5 active:scale-95 ${
                                         i === activeIdx ? 'border-c-gold bg-c-gold text-c-bg scale-115 font-extrabold shadow-lg shadow-c-gold/20' : 'border-c-border text-c-cream-dark bg-c-surface'
@@ -1648,6 +1671,16 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
     
     const beatToSwaraIdx = React.useMemo(() => swaras.map((s, i) => (s !== '|' && s !== '||') ? i : -1).filter(i => i !== -1), [swaras]);
     const octaves = React.useMemo(() => getOctaveSequence(swaras), [swaras]);
+    // For hold beats ('-'), pitch detection uses the preceding note's semitone
+    const effectiveSemitones = React.useMemo(() => {
+        let last = 0;
+        return swaras.map(s => {
+            if (s === '-') return last;
+            const st = SEMITONES[s];
+            if (st !== undefined) last = st;
+            return st ?? last;
+        });
+    }, [swaras]);
 
     const streamRef = useRef(null);
     const intervalRef = useRef(null);
@@ -1781,7 +1814,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             // Check pitch
             const swara = swaras[currentIdx];
             if (swara && swara !== ',') {
-                const targetSt = SEMITONES[swara] ?? 0;
+                const targetSt = effectiveSemitones[currentIdx];
                 const buf = new Float32Array(analyser.fftSize);
                 analyser.getFloatTimeDomainData(buf);
                 const rms = Math.sqrt(buf.reduce((s, v) => s + v * v, 0) / buf.length);
@@ -1854,9 +1887,28 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                                             </div>
                                         );
                                     }
+                                    if (s === ',') {
+                                        return (
+                                            <div key={i} className="w-8 sm:w-9 h-10 sm:h-11 flex items-center justify-center text-c-cream-dark/25 font-mono text-xs">
+                                                –
+                                            </div>
+                                        );
+                                    }
+                                    if (s === '-') {
+                                        return (
+                                            <div key={i} className={`w-8 sm:w-9 h-10 sm:h-11 flex items-center justify-center text-lg transition-all duration-75 ${
+                                                i === activeIdx ? 'text-c-gold scale-110' :
+                                                statuses[i] === 'hit' ? 'text-emerald-700' :
+                                                statuses[i] === 'miss' ? 'text-red-700' :
+                                                'text-c-cream-dark/25'
+                                            }`}>
+                                                ·
+                                            </div>
+                                        );
+                                    }
                                     return (
-                                        <button 
-                                            key={i} 
+                                        <button
+                                            key={i}
                                             onClick={() => handleNoteClick(s, i)}
                                             className={`w-8 sm:w-9 h-10 sm:h-11 flex items-center justify-center font-mono text-xs sm:text-sm font-bold border rounded-md transition-all duration-75 cursor-pointer hover:border-c-gold/75 hover:bg-c-gold/5 active:scale-95 ${
                                                 i === activeIdx ? 'scale-115 shadow-lg border-c-gold bg-c-gold/25 text-c-gold font-extrabold' :
@@ -1865,7 +1917,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                                                 'border-c-border/50 bg-c-card text-c-cream-dim'
                                             }`}
                                         >
-                                            {mode === 'akaram' && s !== ',' ? 'A' : (s === ',' ? '-' : s.replace(/[0-9]/g, ''))}
+                                            {mode === 'akaram' ? 'A' : s.replace(/[0-9]/g, '')}
                                         </button>
                                     );
                                 })}

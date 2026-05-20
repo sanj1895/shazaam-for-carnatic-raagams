@@ -336,13 +336,16 @@ export const CURRICULUM = [
 // Uppercase S → 'Ṡ' (upper Sa), plain lowercase → middle-octave names, as in parseMmg.
 export function parseMmgMandhra(str) {
     const loMap = { 's': 'Sa.', 'r': 'Ri.', 'g': 'Ga.', 'm': 'Ma.', 'p': 'Pa.', 'd': 'Da.', 'n': 'Ni.' };
-    const midMap = { 's': 'Sa', 'r': 'Ri', 'g': 'Ga', 'm': 'Ma', 'p': 'Pa', 'd': 'Da', 'n': 'Ni', 'S': 'Ṡ', ',': ',' };
+    const midMap = { 's': 'Sa', 'r': 'Ri', 'g': 'Ga', 'm': 'Ma', 'p': 'Pa', 'd': 'Da', 'n': 'Ni', 'S': 'Ṡ' };
     const tokens = [];
     for (let i = 0; i < str.length; i++) {
         const char = str[i];
         if (char === '|') {
             if (str[i + 1] === '|') { tokens.push('||'); i++; }
             else tokens.push('|');
+        } else if (char === ',') {
+            // In mandhra notation commas mean "hold the previous note", not silence
+            tokens.push('-');
         } else if (loMap[char] && str[i + 1] === '.') {
             tokens.push(loMap[char]);
             i++;

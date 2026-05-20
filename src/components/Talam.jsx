@@ -261,10 +261,10 @@ export default function Talam() {
                     : 'bg-white/[0.03] border-c-gold/25 text-c-cream hover:border-c-gold/60 hover:text-c-gold',
                 ].join(' ')}
               >
-                <span className={`font-playfair font-bold text-[13px] leading-tight ${active ? 'text-c-bg' : ''}`}>
+                <span className="font-playfair text-[13px] leading-tight">
                   {t.name}
                 </span>
-                <span className={`text-[10px] mt-0.5 font-mono ${active ? 'text-c-bg/70' : 'text-c-cream-dark/50'}`}>
+                <span className={`text-[10px] mt-0.5 font-mono ${active ? 'opacity-70' : 'text-c-cream-dark/50'}`}>
                   {t.pattern.length} beats
                 </span>
               </button>

@@ -2785,7 +2785,14 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete
         );
     }
 
-    const next = () => idx + 1 >= exercises.length ? onComplete() : setIdx(i => i + 1);
+    const next = () => {
+        if (idx + 1 >= exercises.length) {
+            onSadhanaComplete?.('tutor');
+            onComplete();
+        } else {
+            setIdx(i => i + 1);
+        }
+    };
     const prev = () => idx > 0 ? setIdx(i => i - 1) : onBack();
 
     const renderEx = () => {

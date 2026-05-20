@@ -158,7 +158,7 @@ export default function ShruthiBox({ onSadhanaComplete }) {
         sadhanaTimerRef.current = setTimeout(() => {
           onSadhanaComplete?.('shruthi');
           sadhanaCompleteCalledRef.current = true;
-        }, 30000); // 30 seconds continuous play
+        }, 15000); // 15 seconds continuous play
       }
     } else {
       if (sadhanaTimerRef.current) {

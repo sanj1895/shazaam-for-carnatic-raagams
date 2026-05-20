@@ -184,7 +184,7 @@ export function getOctaveSequence(notes) {
       if (currAbsSemi > lastAbsSemi && (currAbsSemi - lastAbsSemi) > 6 && octave > 0) octave--;
     }
     octaves.push(octave);
-    lastAbsSemi = currAbsSemi;
+    lastAbsSemi = rawSemi + octave * 12; // use updated octave so next note has the correct reference
   }
   return octaves;
 }

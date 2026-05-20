@@ -84,29 +84,11 @@ const TALAS = [
 ];
 
 
-const TALA_FAMILIES = [
-  { id: 'eka',     label: 'Ekam',    jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
-  { id: 'rupaka',  label: 'Rupaka',  jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
-  { id: 'triputa', label: 'Triputa', jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
-  { id: 'jhampa',  label: 'Jhampa',  jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
-  { id: 'matya',   label: 'Matya',   jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
-  { id: 'ata',     label: 'Ata',     jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
-  { id: 'druva',   label: 'Druva',   jatis: ['tisra', 'chatusra', 'khanda', 'misra', 'sankeerna'] },
-  { id: 'chapu',   label: 'Chapu',   jatis: ['khanda', 'misra'] },
+// The 8 talas beginners encounter first, in a natural learning order
+const COMMON_TALA_IDS = [
+  'adi', 'chatusra_rupaka', 'misra_chapu', 'khanda_chapu',
+  'misra_jhampa', 'chatusra_matya', 'khanda_ata', 'chatusra_druva',
 ];
-
-const JATI_LABELS = {
-  tisra:     'Tisra · 3',
-  chatusra:  'Chatusra · 4',
-  khanda:    'Khanda · 5',
-  misra:     'Misra · 7',
-  sankeerna: 'Sankeerna · 9',
-};
-
-function getTalaId(family, jati) {
-  if (family === 'triputa' && jati === 'chatusra') return 'adi';
-  return `${jati}_${family}`;
-}
 
 function playClick(ctx, time, type) {
   const cfg = {
@@ -164,8 +146,8 @@ function playClick(ctx, time, type) {
 }
 
 export default function Talam() {
-  const [selectedFamily, setSelectedFamily] = useState('triputa');
-  const [selectedJati, setSelectedJati] = useState('chatusra');
+  const [selectedTala, setSelectedTala] = useState('adi');
+  const [showAll, setShowAll] = useState(false);
   const [bpm, setBpm] = useState(72);
   const [playing, setPlaying] = useState(false);
   const [currentBeat, setCurrentBeat] = useState(-1);
@@ -191,8 +173,7 @@ export default function Talam() {
     if (!playing) { stopScheduler(); return; }
 
     const ctx = getAudioCtx();
-    const talaId = getTalaId(selectedFamily, selectedJati);
-    const tala = TALAS.find(t => t.id === talaId);
+    const tala = TALAS.find(t => t.id === selectedTala);
 
     nextTimeRef.current  = ctx.currentTime + 0.05;
     beatCountRef.current = 0;
@@ -221,23 +202,16 @@ export default function Talam() {
     schedule();
     animFrameRef.current = requestAnimationFrame(syncVisual);
     return stopScheduler;
-  }, [playing, selectedFamily, selectedJati, stopScheduler]);
+  }, [playing, selectedTala, stopScheduler]);
 
-  const handleFamilyChange = (family) => {
+  const handleTalaChange = (id) => {
     if (playing) setPlaying(false);
-    const validJatis = TALA_FAMILIES.find(f => f.id === family).jatis;
-    if (!validJatis.includes(selectedJati)) setSelectedJati(validJatis[0]);
-    setSelectedFamily(family);
-  };
-
-  const handleJatiChange = (jati) => {
-    if (playing) setPlaying(false);
-    setSelectedJati(jati);
+    setSelectedTala(id);
   };
 
   const adjustBpm = (delta) => setBpm(v => Math.max(40, Math.min(240, v + delta)));
 
-  const tala = TALAS.find(t => t.id === getTalaId(selectedFamily, selectedJati));
+  const tala = TALAS.find(t => t.id === selectedTala);
   const tempoLabel = bpm < 60 ? 'Vilambit' : bpm <= 120 ? 'Madhyama' : 'Drut';
 
   // Pre-compute group offsets
@@ -268,46 +242,70 @@ export default function Talam() {
       </div>
       <SketchyRule className="opacity-60" />
 
-      {/* Tala selector — family then jati */}
+      {/* Tala selector */}
       <div className="space-y-3">
-        <div>
-          <p className="text-[9px] font-mono text-c-cream-dark/40 uppercase tracking-widest mb-2">Tala</p>
-          <div className="flex flex-wrap gap-1.5">
-            {TALA_FAMILIES.map(f => (
+        {/* Common talas — named buttons with beat count */}
+        <div className="flex flex-wrap gap-2">
+          {COMMON_TALA_IDS.map(id => {
+            const t = TALAS.find(x => x.id === id);
+            if (!t) return null;
+            const active = selectedTala === id;
+            return (
               <button
-                key={f.id}
-                onClick={() => handleFamilyChange(f.id)}
+                key={id}
+                onClick={() => handleTalaChange(id)}
                 className={[
-                  'px-3 py-1.5 rounded-full border font-playfair text-[11px] tracking-wide transition-all',
-                  selectedFamily === f.id
-                    ? 'bg-c-gold border-c-gold text-c-bg font-bold'
-                    : 'border-c-gold/30 text-c-cream-dim hover:border-c-gold hover:text-c-gold',
+                  'flex flex-col items-center px-4 py-2.5 rounded-xl border transition-all',
+                  active
+                    ? 'bg-c-gold border-c-gold text-c-bg'
+                    : 'bg-white/[0.03] border-c-gold/25 text-c-cream hover:border-c-gold/60 hover:text-c-gold',
                 ].join(' ')}
               >
-                {f.label}
+                <span className={`font-playfair font-bold text-[13px] leading-tight ${active ? 'text-c-bg' : ''}`}>
+                  {t.name}
+                </span>
+                <span className={`text-[10px] mt-0.5 font-mono ${active ? 'text-c-bg/70' : 'text-c-cream-dark/50'}`}>
+                  {t.pattern.length} beats
+                </span>
               </button>
-            ))}
-          </div>
+            );
+          })}
         </div>
-        <div>
-          <p className="text-[9px] font-mono text-c-cream-dark/40 uppercase tracking-widest mb-2">Jati</p>
-          <div className="flex flex-wrap gap-1.5">
-            {TALA_FAMILIES.find(f => f.id === selectedFamily).jatis.map(j => (
-              <button
-                key={j}
-                onClick={() => handleJatiChange(j)}
-                className={[
-                  'px-3 py-1.5 rounded-full border font-playfair text-[11px] tracking-wide transition-all',
-                  selectedJati === j
-                    ? 'bg-c-gold/20 border-c-gold text-c-gold font-bold'
-                    : 'border-c-gold/20 text-c-cream-dark hover:border-c-gold/50 hover:text-c-gold',
-                ].join(' ')}
-              >
-                {JATI_LABELS[j]}
-              </button>
-            ))}
+
+        {/* Show all toggle */}
+        <button
+          onClick={() => setShowAll(s => !s)}
+          className="flex items-center gap-1.5 text-[10px] font-mono text-c-cream-dark/40 hover:text-c-gold/70 transition-colors uppercase tracking-widest"
+        >
+          <svg className={`w-3 h-3 transition-transform ${showAll ? 'rotate-180' : ''}`} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M2 4l4 4 4-4"/></svg>
+          {showAll ? 'Show fewer' : 'All 37 talas'}
+        </button>
+
+        {/* Full list — all talas sorted by beat count */}
+        {showAll && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {TALAS.map(t => {
+              const active = selectedTala === t.id;
+              const isCommon = COMMON_TALA_IDS.includes(t.id);
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => handleTalaChange(t.id)}
+                  className={[
+                    'px-3 py-1.5 rounded-full border font-playfair text-[11px] tracking-wide transition-all',
+                    active
+                      ? 'bg-c-gold border-c-gold text-c-bg font-bold'
+                      : isCommon
+                      ? 'border-c-gold/40 text-c-cream hover:border-c-gold hover:text-c-gold'
+                      : 'border-c-gold/20 text-c-cream-dark/70 hover:border-c-gold/50 hover:text-c-gold',
+                  ].join(' ')}
+                >
+                  {t.name} · {t.pattern.length}
+                </button>
+              );
+            })}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Two-column on laptop: beat display left, tempo + start right */}

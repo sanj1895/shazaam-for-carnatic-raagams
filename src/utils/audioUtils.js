@@ -21,6 +21,15 @@ export const SWARA_SEMITONE = {
   'Da': 8,
   'Ni': 11,
   'Ṡ': 12,
+
+  // Mandhra Sthayi (lower octave) notes — negative semitones encode frequency directly at octave 0
+  'Sa.': -12,
+  'Ri.': -11,
+  'Ga.': -8,
+  'Ma.': -7,
+  'Pa.': -5,
+  'Da.': -4,
+  'Ni.': -1,
 };
 
 export const SEMITONE_TO_SWARA = Object.fromEntries(
@@ -154,20 +163,28 @@ export function playNote(note, saHz, ctx, options = {}) {
 export function getOctaveSequence(notes) {
   const octaves = [];
   let octave = 0;
-  let lastNoteSemi = 0;
+  let lastAbsSemi = null;
   for (let i = 0; i < notes.length; i++) {
     const swara = notes[i];
     if (swara === '|' || swara === '||' || swara === ',') {
        octaves.push(octave);
        continue;
     }
-    const currSemi = SWARA_SEMITONE[swara] ?? 0;
-    if (i > 0 && lastNoteSemi !== undefined) {
-      if (currSemi < lastNoteSemi && (lastNoteSemi - currSemi) > 6) octave++;
-      if (currSemi > lastNoteSemi && (currSemi - lastNoteSemi) > 6 && octave > 0) octave--;
+    const rawSemi = SWARA_SEMITONE[swara] ?? 0;
+    // Mandhra (lower-octave) notes have negative semitones that already encode the correct
+    // sub-Sa frequency — they always play at octave 0; no auto-shift needed.
+    if (rawSemi < 0) {
+      octaves.push(0);
+      lastAbsSemi = rawSemi;
+      continue;
+    }
+    const currAbsSemi = rawSemi + octave * 12;
+    if (lastAbsSemi !== null) {
+      if (currAbsSemi < lastAbsSemi && (lastAbsSemi - currAbsSemi) > 6) octave++;
+      if (currAbsSemi > lastAbsSemi && (currAbsSemi - lastAbsSemi) > 6 && octave > 0) octave--;
     }
     octaves.push(octave);
-    lastNoteSemi = currSemi;
+    lastAbsSemi = currAbsSemi;
   }
   return octaves;
 }

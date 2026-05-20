@@ -331,6 +331,28 @@ export const CURRICULUM = [
     }
 ];
 
+// parseMmgMandhra: same as parseMmg but also handles the `.` suffix for lower-octave (Mandhra) notes.
+// e.g. `n.` → 'Ni.'  `d.` → 'Da.'  `p.` → 'Pa.'  `m.` → 'Ma.'
+// Uppercase S → 'Ṡ' (upper Sa), plain lowercase → middle-octave names, as in parseMmg.
+export function parseMmgMandhra(str) {
+    const loMap = { 's': 'Sa.', 'r': 'Ri.', 'g': 'Ga.', 'm': 'Ma.', 'p': 'Pa.', 'd': 'Da.', 'n': 'Ni.' };
+    const midMap = { 's': 'Sa', 'r': 'Ri', 'g': 'Ga', 'm': 'Ma', 'p': 'Pa', 'd': 'Da', 'n': 'Ni', 'S': 'Ṡ', ',': ',' };
+    const tokens = [];
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        if (char === '|') {
+            if (str[i + 1] === '|') { tokens.push('||'); i++; }
+            else tokens.push('|');
+        } else if (loMap[char] && str[i + 1] === '.') {
+            tokens.push(loMap[char]);
+            i++;
+        } else if (midMap[char]) {
+            tokens.push(midMap[char]);
+        }
+    }
+    return tokens;
+}
+
 export function parseMmg(str) {
     const map = {
         's': 'Sa', 'r': 'Ri', 'g': 'Ga', 'm': 'Ma', 'p': 'Pa', 'd': 'Da', 'n': 'Ni', 'S': 'Ṡ', ',': ','
@@ -694,6 +716,154 @@ export const DAATU_CURRICULUM = [
     }
 ];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// MANDHRA STHAYI (Lower Octave) VARISAI CURRICULUM
+// Lower-octave notes are written with a trailing dot: Ni. Da. Pa. Ma. etc.
+// ─────────────────────────────────────────────────────────────────────────────
+export const MANDHRA_CURRICULUM = [
+    {
+        id: 'mandhra_stage1', title: 'Touching the Lower Octave', symbol: '🌊',
+        subtitle: 'Introducing Ni. — the first step below Sa',
+        color: '#0d1f0d', tag: 'Stage 1',
+        lessons: [
+            {
+                id: 'mnd_1', title: 'Varisai 1: First Touch of Mandhra Ni', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'Welcome to Mandhra Sthayi',
+                        body: 'In Carnatic music the octave below your Sa is called Mandhra Sthayi (lower register). Notes here are written with a dot: Ni. Da. Pa. Ma.\n\nIn this first exercise the melody descends from upper Sa (Ṡ) through the middle octave and dips one step below Sa to touch lower Ni (Ni.). Hear how that single lower-octave note gives the phrase a grounded, deep feeling.\n\nDot notation: lower octave  ·  Capital S = Ṡ (upper Sa)  ·  Plain letters = middle octave'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmgMandhra('S n d p | m g r s || s , , , | s , , , || g r s n. | s r | g m || s r g m | p d | n S ||'),
+                        instruction: 'Listen to the descent through middle octave and the touch of lower Ni. (the dot note).'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmgMandhra('S n d p | m g r s || s , , , | s , , , || g r s n. | s r | g m || s r g m | p d | n S ||'),
+                        speed: 1,
+                        instruction: 'Sing it back. Let your voice dip naturally below Sa for Ni. — no strain, just ease.'
+                    }
+                ]
+            },
+            {
+                id: 'mnd_2', title: 'Varisai 2: Ni. as a Pivot', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'Lower Ni as a Melodic Pivot',
+                        body: 'Now Ni. becomes an active pivot — the melody bounces off it repeatedly:\n\ng r s n. | s s Ni. s\nand\ns Ni. s r | g m p m\n\nSing Sa, dip to Ni., return to Sa. Feel the magnetic pull of the lower octave note. The voice should descend softly without reaching — Ni. lives just one half-step below your Sa.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmgMandhra('S n d p | m g | r s || s , , , | s , , , || g r s n. | s s n. s || s n. s r | g m p m || g r s n. | s r g m || s r g m | p d n S ||'),
+                        instruction: 'Listen to how Ni. pivots the phrase back toward Sa each time.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmgMandhra('S n d p | m g | r s || s , , , | s , , , || g r s n. | s s n. s || s n. s r | g m p m || g r s n. | s r g m || s r g m | p d n S ||'),
+                        speed: 1,
+                        instruction: 'Sing. Focus on the s Ni. s r motif — down one step and right back up.'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'mandhra_stage2', title: 'Diving Deeper — Da. and Pa.', symbol: '🌑',
+        subtitle: 'Expanding the lower range to Da. and Pa.',
+        color: '#12101e', tag: 'Stage 2',
+        lessons: [
+            {
+                id: 'mnd_3', title: 'Varisai 3: Adding Lower Da.', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'Lower Da. — Two Steps Below Sa',
+                        body: 'We now reach a note two semitones further into the lower octave: Da. (lower Dha).\n\nThe new phrase is:  g r s n. | d. n. s n.\n\nNotice the double descent: Ni. then Da., then back to Ni., then Sa. The movement d. n. s n. has a characteristic wavy, searching quality — explore it slowly before singing at full tempo.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmgMandhra('S n d p | m g r s || s , , , | s , , , || g r s n. | d. n. s n. || s n. s r | g m p m || g r s n. | s s n. s || s n. s r | g m p m || g r s n. | s r g m || s r g m | p d n S ||'),
+                        instruction: 'Listen to the new deeper dip: Da. (d.) then Ni. (n.) before returning to Sa.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmgMandhra('S n d p | m g r s || s , , , | s , , , || g r s n. | d. n. s n. || s n. s r | g m p m || g r s n. | s s n. s || s n. s r | g m p m || g r s n. | s r g m || s r g m | p d n S ||'),
+                        speed: 1,
+                        instruction: 'Sing Varisai 3. Let the d. n. phrase feel naturally low — do not push.'
+                    }
+                ]
+            },
+            {
+                id: 'mnd_4', title: 'Varisai 4: Lower Pa. Enters', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'Lower Pa. — Four Steps Below Sa',
+                        body: 'We now reach lower Pa. — four semitones below Sa, the mirror of the perfect fifth above.\n\nThe new phrase:  g r s n. | d. p. d n.\n\nThis leaps to Pa., rises back to Da., and then resolves through Ni. — a descending triad in the lower octave. Keep your throat relaxed and your breath support steady as you navigate this lower range.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmgMandhra('S n d p | m g r s || s , , , | s , , , || g r s n. | d. p. d n. || s n. s r | g m p m || g r s n. | d. n. s n. || s n. s r | g m p m || g r s n. | s s n. s || s n. s r | g m p m || g r s n. | s r g m || s r g m | p d n S ||'),
+                        instruction: 'Listen to the new d. p. d n. phrase — the lowest point reached so far.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmgMandhra('S n d p | m g r s || s , , , | s , , , || g r s n. | d. p. d n. || s n. s r | g m p m || g r s n. | d. n. s n. || s n. s r | g m p m || g r s n. | s s n. s || s n. s r | g m p m || g r s n. | s r g m || s r g m | p d n S ||'),
+                        speed: 1,
+                        instruction: 'Sing Varisai 4. The cumulative length builds stamina — maintain your Sa anchor throughout.'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'mandhra_stage3', title: 'Full Lower Range Mastery', symbol: '🏔️',
+        subtitle: 'Descending to Ma. — the complete Mandhra tetrachord',
+        color: '#1e140a', tag: 'Stage 3',
+        lessons: [
+            {
+                id: 'mnd_5a', title: 'Varisai 5: Lower Ma. — New Depth', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'The Crown of Mandhra Sthayi: Ma.',
+                        body: 'We reach the deepest note in this series: Ma. — seven semitones below Sa, the mirror of Ma above.\n\nThe new phrase:  g r s n. | d. p. m. p.\n\nThis descends through Da., Pa., and all the way to lower Ma. — the core tetrachord of the Mandhra octave. After touching Ma. the melody rises back through Pa., establishing a full lower-octave arc.\n\nThis is the most physically demanding phrase. Sing from the chest, relax the jaw, and let the Tambura drone anchor you.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmgMandhra('S n d p | m g r s || s , , , | s , , , || g r s n. | d. p. m. p. || d n. s r | g m p m ||'),
+                        instruction: 'Listen to the new phrase: d. p. m. p. — four steps deep into Mandhra Sthayi.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmgMandhra('S n d p | m g r s || s , , , | s , , , || g r s n. | d. p. m. p. || d n. s r | g m p m ||'),
+                        speed: 1,
+                        instruction: 'Sing the new phrase section at full tempo. Use the slow setting (0.5×) if needed.'
+                    }
+                ]
+            },
+            {
+                id: 'mnd_5b', title: 'Varisai 5: Complete Mandhra Mastery', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'The Full Varisai 5 — Cumulative Mastery',
+                        body: 'Varisai 5 is the crowning cumulative exercise of Mandhra Sthayi. It includes every pattern from Varisais 1–4 in reverse order, each preceded by the full g r s n. opening, and all wrapped by the standard descent and ascent.\n\nThe complete pattern arc from top to bottom:\n  d. p. m. p. → d. p. d n. → d. n. s n. → s s n. s\n\nSing each section with care. Maintain your breath support and your connection to the Tambura drone. When complete, you will have command of the full Mandhra Sthayi tetrachord.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmgMandhra('S n d p | m g r s || s , , , | s , , , || g r s n. | d. p. m. p. || d n. s r | g m p m || g r s n. | d. p. d n. || s n. s r | g m p m || g r s n. | d. n. s n. || s n. s r | g m p m || g r s n. | s s n. s || s n. s r | g m p m || g r s n. | s r g m || s r g m | p d n S ||'),
+                        instruction: 'Listen to the complete Varisai 5 from start to finish — the full Mandhra journey.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmgMandhra('S n d p | m g r s || s , , , | s , , , || g r s n. | d. p. m. p. || d n. s r | g m p m || g r s n. | d. p. d n. || s n. s r | g m p m || g r s n. | d. n. s n. || s n. s r | g m p m || g r s n. | s s n. s || s n. s r | g m p m || g r s n. | s r g m || s r g m | p d n S ||'),
+                        speed: 1,
+                        instruction: 'Sing the complete Varisai 5. This is your Mandhra Sthayi graduation piece — sing it with pride.'
+                    }
+                ]
+            }
+        ]
+    }
+];
+
 export const COURSES = [
     {
         id: 'foundations',
@@ -730,10 +900,10 @@ export const COURSES = [
     {
         id: 'melsthayi_mandrasthayi',
         title: 'Melsthayi / Mandrasthayi Varisai',
-        description: 'Sargam in high and low octaves to expand your vocal range.',
+        description: 'Exercises in the lower octave (Mandhra Sthayi) to ground your voice and expand your range below Sa.',
         symbol: '🏔️',
-        color: '#3a2b0e',
-        upcoming: true
+        color: '#1e140a',
+        curriculum: MANDHRA_CURRICULUM
     },
     {
         id: 'alankarams',

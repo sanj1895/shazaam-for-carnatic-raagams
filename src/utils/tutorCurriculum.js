@@ -867,6 +867,227 @@ export const MANDHRA_CURRICULUM = [
     }
 ];
 
+export const ALANKARAM_CURRICULUM = [
+    {
+        id: 'alankaram_stage1', title: 'Chatushra Jaati Talas', symbol: '🥁',
+        subtitle: 'The four-beat unit: Druva, Matya, Rupaka & Eka',
+        color: '#1e3a1f', tag: 'Stage 1',
+        lessons: [
+            {
+                id: 'al_intro', title: 'Introduction to Alankarams', tag: 'Concept',
+                exercises: [
+                    {
+                        type: 'info', title: 'What Are Alankarams?',
+                        body: 'Alankarams are exercises in Mayamalavagowla (15th Melakarta Raga) set to different rhythmic cycles called Talas.\n\nThe Saptha Tala system has 35 talas in total, but 7 are traditionally taught — Druva, Matya, Rupaka, Jhampa, Triputa, Ata, and Eka — each with a unique beat structure.\n\nPractice each Alankaram in at least 3–4 speeds. Render each exercise twice: once with swaras, and again on Akaram (Aaaa).'
+                    },
+                    {
+                        type: 'info', title: 'Speeds in Carnatic Music',
+                        body: 'Speed in Carnatic music is relative to the Tala beat — not seconds or minutes.\n\n• 1st speed: 1 note per beat\n• 2nd speed: 2 notes per beat (exactly double)\n• 3rd speed: 4 notes per beat\n• 4th speed: 8 notes per beat\n\nOnly the speed of the music changes. The Tala tempo stays fixed. Each speed is always an exact multiple of the previous one — there is mathematical precision to it.'
+                    },
+                    {
+                        type: 'info', title: 'Tala Components',
+                        body: 'Every Tala is built from three components:\n\n• Laghu (I) — A finger-counted group of beats. The Jaati name tells you how many: Thrisra=3, Chatushra=4, Khanda=5, Mishra=7, Sankeerna=9.\n\n• Drutam (0) — Always 2 beats: one clap and one wave.\n\n• Anudhrutam (U) — Always 1 beat: a single downward tap.\n\nFor each Alankaram, you will practice all 10 starting notes: Sa, Ri, Ga, Ma, Pa (ascending), then Ṡa, Ni, Da, Pa, Ma (descending).'
+                    }
+                ]
+            },
+            {
+                id: 'al_1', title: 'Alankaram 1: Chatushra Jaati Druva Talam', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'Druva Talam — 14 Beats',
+                        body: 'Structure: I₄ | 0 | I₄ | I₄ = 4 + 2 + 4 + 4 = 14 beats\n\n"Druva" (fixed/steady) is the most majestic of the seven talas. Its pattern: Laghu (4) → Drutam (2) → Laghu (4) → Laghu (4).\n\nEach row starts one note higher and explores a different melodic pattern across the 14-beat cycle. Practice your hand gestures for all three Laghus and the Drutam before singing.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmg('s r g m | g r | s r g r | s r g m || r g m p | m g | r g m g | r g m p || g m p d | p m | g m p m | g m p d || m p d n | d p | m p d p | m p d n || p d n S | n d | p d n d | p d n S || S n d p | d n | S n d n | S n d p || n d p m | p d | n d p d | n d p m || d p m g | m p | d p m p | d p m g || p m g r | g m | p m g m | p m g r || m g r s | r g | m g r g | m g r s ||'),
+                        displayLabel: '♪',
+                        instruction: 'Listen to all 10 rows of Druva Talam. Notice the 4+2+4+4 beat groupings within each cycle.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmg('s r g m | g r | s r g r | s r g m || r g m p | m g | r g m g | r g m p || g m p d | p m | g m p m | g m p d || m p d n | d p | m p d p | m p d n || p d n S | n d | p d n d | p d n S || S n d p | d n | S n d n | S n d p || n d p m | p d | n d p d | n d p m || d p m g | m p | d p m p | d p m g || p m g r | g m | p m g m | p m g r || m g r s | r g | m g r g | m g r s ||'),
+                        speed: 1,
+                        instruction: 'Sing all 10 rows in sync with the beat clicks. Keep each group of 4, 2, 4, and 4 beats distinct.'
+                    }
+                ]
+            },
+            {
+                id: 'al_2', title: 'Alankaram 2: Chatushra Jaati Matya Talam', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'Matya Talam — 10 Beats',
+                        body: 'Structure: I₄ | 0 | I₄ = 4 + 2 + 4 = 10 beats\n\nMatya is a balanced tala — two equal Laghus sandwiching a Drutam. It has a symmetrical, even feel.\n\nHere the first 4-beat Laghu echoes the starting note (e.g. "Sa Ri Ga Ri"), while the last 4 beats ascend (e.g. "Sa Ri Ga Ma"). Notice how the two Laghus have different melodic characters.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmg('s r g r | s r | s r g m || r g m g | r g | r g m p || g m p m | g m | g m p d || m p d p | m p | m p d n || p d n d | p d | p d n S || S n d n | S n | S n d p || n d p d | n d | n d p m || d p m p | d p | d p m g || p m g m | p m | p m g r || m g r g | m g | m g r s ||'),
+                        displayLabel: '♪',
+                        instruction: 'Listen to all 10 rows of Matya Talam. Notice the 4+2+4 structure in each cycle.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmg('s r g r | s r | s r g m || r g m g | r g | r g m p || g m p m | g m | g m p d || m p d p | m p | m p d n || p d n d | p d | p d n S || S n d n | S n | S n d p || n d p d | n d | n d p m || d p m p | d p | d p m g || p m g m | p m | p m g r || m g r g | m g | m g r s ||'),
+                        speed: 1,
+                        instruction: 'Sing Matya Talam with a steady beat. Keep the two Laghus and the central Drutam clearly defined.'
+                    }
+                ]
+            },
+            {
+                id: 'al_3', title: 'Alankaram 3: Chatushra Jati Rupaka Talam', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'Rupaka Talam — 6 Beats',
+                        body: 'Structure: 0 | I₄ = 2 + 4 = 6 beats\n\nRupaka Talam begins with a Drutam (2 beats) and ends with a Laghu (4 beats). It is one of the most common talas in Carnatic music — many kritis and devotional songs are set in this cycle.\n\nListen for the short-long feel: 2 quick beats, then 4 steady beats.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmg('s r | s r g m || r g | r g m p || g m | g m p d || m p | m p d n || p d | p d n S || S n | S n d p || n d | n d p m || d p | d p m g || p m | p m g r || m g | m g r s ||'),
+                        displayLabel: '♪',
+                        instruction: 'Listen to all 10 rows of Rupaka Talam. Feel the 2+4 grouping in each cycle.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmg('s r | s r g m || r g | r g m p || g m | g m p d || m p | m p d n || p d | p d n S || S n | S n d p || n d | n d p m || d p | d p m g || p m | p m g r || m g | m g r s ||'),
+                        speed: 1,
+                        instruction: 'Sing Rupaka Talam. Begin with the 2-beat Drutam, then settle into the 4-beat Laghu.'
+                    }
+                ]
+            },
+            {
+                id: 'al_7', title: 'Alankaram 7: Chatushra Jati Eka Talam', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'Eka Talam — 4 Beats',
+                        body: 'Structure: I₄ = 4 beats\n\n"Eka" means one — a single Laghu of 4 beats is the entire cycle. The simplest of the seven talas, and an excellent vehicle for speed practice.\n\nMaster this first before exploring longer cycles. Once comfortable, practice in 2nd speed (2 notes per beat) and 3rd speed (4 notes per beat).'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmg('s r g m || r g m p || g m p d || m p d n || p d n S || S n d p || n d p m || d p m g || p m g r || m g r s ||'),
+                        displayLabel: '♪',
+                        instruction: 'Listen to all 10 rows of Eka Talam — pure, clean 4-beat cycles.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmg('s r g m || r g m p || g m p d || m p d n || p d n S || S n d p || n d p m || d p m g || p m g r || m g r s ||'),
+                        speed: 1,
+                        instruction: 'Sing Eka Talam clearly. Once comfortable at 1st speed, try 2nd speed (two notes per beat).'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'alankaram_stage2', title: 'Mishra, Thrisra & Khanda Talas', symbol: '🎼',
+        subtitle: 'Seven, three, and five-beat Laghu structures',
+        color: '#1a2a3a', tag: 'Stage 2',
+        lessons: [
+            {
+                id: 'al_4', title: 'Alankaram 4: Mishra Jati Jhampa Talam', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'Jhampa Talam — 10 Beats',
+                        body: 'Structure: I₇ | U | 0 = 7 + 1 + 2 = 10 beats\n\n"Mishra" means the Laghu has 7 beats. Jhampa Talam has three components: a 7-beat Laghu, a 1-beat Anudhrutam, and a 2-beat Drutam.\n\nThe melodic pattern in each row mirrors the 7-beat structure: "Sa Ri Ga Sa Ri Sa Ri" — the first three notes, then a reversal pattern. The single Anudhrutam and Drutam-with-pause complete the cycle.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmg('s r g s r s r | g | m , || r g m r g r g | m | p , || g m p g m g m | p | d , || m p d m p m p | d | n , || p d n p d p d | n | S , || S n d S n S n | d | p , || n d p n d n d | p | m , || d p m d p d p | m | g , || p m g p m p m | g | r , || m g r m g m g | r | s , ||'),
+                        displayLabel: '♪',
+                        instruction: 'Listen to Jhampa Talam. Note the 7-beat Laghu phrase, the single pivot note, then the 2-beat Drutam with a pause.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmg('s r g s r s r | g | m , || r g m r g r g | m | p , || g m p g m g m | p | d , || m p d m p m p | d | n , || p d n p d p d | n | S , || S n d S n S n | d | p , || n d p n d n d | p | m , || d p m d p d p | m | g , || p m g p m p m | g | r , || m g r m g m g | r | s , ||'),
+                        speed: 1,
+                        instruction: 'Sing Jhampa Talam. Give the 7-beat Laghu your full attention before settling into the pivot and Drutam.'
+                    }
+                ]
+            },
+            {
+                id: 'al_5', title: 'Alankaram 5: Thrisra Jati Triputa Talam', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'Triputa Talam — 7 Beats',
+                        body: 'Structure: I₃ | 0 | 0 = 3 + 2 + 2 = 7 beats\n\n"Thrisra" means the Laghu has 3 beats. Triputa has one 3-beat Laghu followed by two Drutams. Adi Talam — the most common Carnatic tala — is the Chatushra Jati version (4+2+2=8 beats). This is its Thrisra cousin.\n\nFeel the lopsided, lilting quality of 3+2+2 as you sing each row.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmg('s r g | s r | g m || r g m | r g | m p || g m p | g m | p d || m p d | m p | d n || p d n | p d | n S || S n d | S n | d p || n d p | n d | p m || d p m | d p | m g || p m g | p m | g r || m g r | m g | r s ||'),
+                        displayLabel: '♪',
+                        instruction: 'Listen to Triputa Talam. Feel the 3+2+2 grouping as the melody moves through each cycle.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmg('s r g | s r | g m || r g m | r g | m p || g m p | g m | p d || m p d | m p | d n || p d n | p d | n S || S n d | S n | d p || n d p | n d | p m || d p m | d p | m g || p m g | p m | g r || m g r | m g | r s ||'),
+                        speed: 1,
+                        instruction: 'Sing Triputa Talam. Let the beat clicks clearly mark your 3-beat Laghu before the two Drutams.'
+                    }
+                ]
+            },
+            {
+                id: 'al_6', title: 'Alankaram 6: Khanda Jati Ata Talam', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'Ata Talam — 14 Beats',
+                        body: 'Structure: I₅ | I₅ | 0 | 0 = 5 + 5 + 2 + 2 = 14 beats\n\n"Khanda" means the Laghu has 5 beats. Ata Talam has two 5-beat Laghus followed by two Drutams — a grand, expansive 14-beat cycle.\n\nThe pauses within the 5-beat Laghus are crucial to the pattern: "Sa Ri [pause] Ga [pause]" in the first Laghu, and "Sa [pause] Ri Ga [pause]" in the second. Honor each silence.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmg('s r , g , | s , r g , | m , | m , || r g , m , | r , g m , | p , | p , || g m , p , | g , m p , | d , | d , || m p , d , | m , p d , | n , | n , || p d , n , | p , d n , | S , | S , || S n , d , | S , n d , | p , | p , || n d , p , | n , d p , | m , | m , || d p , m , | d , p m , | g , | g , || p m , g , | p , m g , | r , | r , || m g , r , | m , g r , | s , | s , ||'),
+                        displayLabel: '♪',
+                        instruction: 'Listen to Ata Talam. Pay close attention to the pauses within each 5-beat Laghu.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmg('s r , g , | s , r g , | m , | m , || r g , m , | r , g m , | p , | p , || g m , p , | g , m p , | d , | d , || m p , d , | m , p d , | n , | n , || p d , n , | p , d n , | S , | S , || S n , d , | S , n d , | p , | p , || n d , p , | n , d p , | m , | m , || d p , m , | d , p m , | g , | g , || p m , g , | p , m g , | r , | r , || m g , r , | m , g r , | s , | s , ||'),
+                        speed: 1,
+                        instruction: 'Sing Ata Talam in full. Sustain silence on pause beats — do not fill them with sound.'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'alankaram_stage3', title: 'Sankeerna Jaati', symbol: '✨',
+        subtitle: 'Nine-beat Laghu patterns in Eka Talam',
+        color: '#2a1a3a', tag: 'Stage 3',
+        lessons: [
+            {
+                id: 'al_8', title: 'Alankaram 8: Sankeerna Jati Eka Talam', tag: 'Practice',
+                exercises: [
+                    {
+                        type: 'info', title: 'Sankeerna Eka Talam — 9 Beats',
+                        body: 'Structure: I₉ = 9 beats\n\n"Sankeerna" means the Laghu has 9 beats — the largest Jaati. Combined with Eka Talam (a single Laghu), this gives a continuous 9-beat cycle.\n\nTwo versions are practiced:\n• Version 1: Alternating notes and pauses — "Sa [pause] Ri [pause] Ga [pause] Ma Pa Da"\n• Version 2: Notes in pairs — "Sa Ri [pause] Ga Ma [pause] Pa Da Ni"\n\nBoth versions ascend then descend through the scale.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmg('s , r , g , m p d || r , g , m , p d n || g , m , p , d n S || S , n , d , p m g || n , d , p , m g r || d , p , m , g r s ||'),
+                        displayLabel: '♪ Version 1',
+                        instruction: 'Listen to Sankeerna Eka Talam — Version 1. Each note is followed by a pause beat.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmg('s , r , g , m p d || r , g , m , p d n || g , m , p , d n S || S , n , d , p m g || n , d , p , m g r || d , p , m , g r s ||'),
+                        speed: 1,
+                        instruction: 'Sing Version 1. Hold silence on the pause beats — let each note ring clear before the next.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: parseMmg('s r , g m , p d n || r g , m p , d n S || S n , d p , m g r || n d , p m , g r s ||'),
+                        displayLabel: '♪ Version 2',
+                        instruction: 'Listen to Version 2. Notes now come in pairs, with a pause on every third beat.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: parseMmg('s r , g m , p d n || r g , m p , d n S || S n , d p , m g r || n d , p m , g r s ||'),
+                        speed: 1,
+                        instruction: 'Sing Version 2. Keep the two-note groups crisp, then honor the silence before the next group.'
+                    }
+                ]
+            }
+        ]
+    }
+];
+
 export const COURSES = [
     {
         id: 'foundations',
@@ -911,10 +1132,10 @@ export const COURSES = [
     {
         id: 'alankarams',
         title: 'Alankarams',
-        description: 'Exercises set in different rhythmic cycles (Taalams) to master time signatures.',
+        description: 'Exercises in Mayamalavagowla across the 7 Saptha Talas — Druva, Matya, Rupaka, Jhampa, Triputa, Ata & Eka — practiced in multiple speeds.',
         symbol: '⏱️',
         color: '#1e3a1f',
-        upcoming: true
+        curriculum: ALANKARAM_CURRICULUM
     },
     {
         id: 'geetams',

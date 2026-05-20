@@ -457,7 +457,7 @@ function App() {
                         </div>
 
                         {/* New mandala — fades in when features panel opens, spins counter-clockwise */}
-                        <div className="absolute left-1/2 top-[22%] -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[160vw] h-[160vw] z-0"
+                        <div className="absolute left-1/2 top-[52%] -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[160vw] h-[160vw] z-0"
                             style={{
                                 maskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)',
                                 WebkitMaskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)',

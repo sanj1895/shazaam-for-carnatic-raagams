@@ -435,9 +435,14 @@ function App() {
                         {/* Glow */}
                         <div className="absolute left-1/2 top-[30%] -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-c-gold/10 blur-[160px] pointer-events-none rounded-full z-0" />
 
-                        {/* Rotating mandala — radial mask to remove hard rectangle edge */}
-                        <div className="absolute left-1/2 top-[22%] -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[160vw] h-[160vw] opacity-[0.12] z-0"
-                            style={{ maskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)', WebkitMaskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)' }}
+                        {/* Hero mandala — fades out when features panel opens */}
+                        <div className="absolute left-1/2 top-[22%] -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[160vw] h-[160vw] z-0"
+                            style={{
+                                maskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)',
+                                WebkitMaskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)',
+                                opacity: showFeatures ? 0 : 0.12,
+                                transition: 'opacity 1.4s ease-in-out',
+                            }}
                         >
                             <img
                                 src="/hero-mandala.jpg"
@@ -447,6 +452,27 @@ function App() {
                                     filter: 'invert(1) sepia(1) saturate(500%) hue-rotate(-20deg) brightness(0.8)',
                                     mixBlendMode: 'screen',
                                     animation: 'spin 240s linear infinite',
+                                }}
+                            />
+                        </div>
+
+                        {/* New mandala — fades in when features panel opens, spins counter-clockwise */}
+                        <div className="absolute left-1/2 top-[22%] -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[160vw] h-[160vw] z-0"
+                            style={{
+                                maskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)',
+                                WebkitMaskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)',
+                                opacity: showFeatures ? 0.15 : 0,
+                                transition: 'opacity 1.4s ease-in-out',
+                            }}
+                        >
+                            <img
+                                src="/newmandala.png"
+                                alt=""
+                                className="w-full h-full object-contain"
+                                style={{
+                                    filter: 'invert(1) sepia(1) saturate(500%) hue-rotate(-20deg) brightness(0.8)',
+                                    mixBlendMode: 'screen',
+                                    animation: 'spin 240s linear infinite reverse',
                                 }}
                             />
                         </div>

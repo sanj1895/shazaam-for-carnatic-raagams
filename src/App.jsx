@@ -423,7 +423,6 @@ function App() {
                             style={{
                                 minHeight: 'calc(100vh - 73px)',
                                 background: 'radial-gradient(circle at center, #7a2a10 0%, #3a1208 50%, #1a0804 100%)',
-                                justifyContent: 'center',
                             }}
                         >
                         {/* Vignette Overlay */}

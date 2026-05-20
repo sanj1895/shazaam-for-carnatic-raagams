@@ -173,86 +173,57 @@ export default function GrahaBhedam() {
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-8 sm:space-y-10 relative z-10">
-            {/* Header */}
-            <div className="w-full flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
-                    <CuratedIcon icon="bhedam" className="w-7 h-7" />
-                </div>
-                <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                        <h2 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Graha Bhedam</h2>
-                        <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Modal Shift</span>
+        <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-6 relative z-10">
+            {/* Header with controls merged into one row */}
+            <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                {/* Left: identity */}
+                <div className="flex items-center gap-4">
+                    <div className="w-11 h-11 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
+                        <CuratedIcon icon="bhedam" className="w-6 h-6" />
                     </div>
-                    <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
-                        Shift which note you call Sa — and watch one raga transform into another.
-                    </p>
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                            <h2 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Graha Bhedam</h2>
+                            <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Modal Shift</span>
+                        </div>
+                        <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
+                            Shift which note you call Sa — watch one raga transform into another.
+                        </p>
+                    </div>
                 </div>
-            </div>
-            <SketchyRule className="mt-2 opacity-60" />
-
-            <div className="text-center space-y-4">
-                {/* Control Panel: Gamakam and Playback Mode selectors */}
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 pt-4 pb-2 border-t border-b border-c-border/30 max-w-2xl mx-auto">
+                {/* Right: Controls */}
+                <div className="flex flex-wrap items-center gap-4 sm:gap-5 flex-shrink-0">
                     {/* Gamakam Toggle */}
-                    <div className="flex flex-col items-center gap-1.5">
-                        <span className="text-[9px] text-c-gold font-bold uppercase tracking-[0.2em] opacity-70">Aesthetic Ornamentation</span>
+                    <div className="flex flex-col items-start gap-1">
+                        <span className="text-[9px] text-c-gold font-bold uppercase tracking-[0.2em] opacity-70">Ornamentation</span>
                         <div
                             onClick={() => setGamakamEnabled(g => !g)}
-                            className="flex items-center gap-3.5 cursor-pointer select-none bg-c-card/35 border border-c-border/40 px-4 py-2 rounded-full hover:border-c-gold/40 hover:bg-c-card/60 transition-all duration-300 shadow-sm"
+                            className="flex items-center gap-2.5 cursor-pointer select-none bg-c-card/35 border border-c-border/40 px-3 py-1.5 rounded-full hover:border-c-gold/40 hover:bg-c-card/60 transition-all duration-300"
                         >
-                            <span className={`text-[9px] uppercase tracking-wider font-bold transition-all duration-300 ${
-                                !gamakamEnabled ? 'text-c-gold opacity-100' : 'text-c-cream-dark opacity-40'
-                            }`}>
-                                Simple
-                            </span>
-                            <div className={`relative w-10 h-5 rounded-full overflow-hidden transition-all duration-300 flex-shrink-0 border shadow-inner pointer-events-none ${
-                                gamakamEnabled
-                                    ? 'bg-c-gold/20 border-c-gold'
-                                    : 'bg-transparent border-c-gold/30'
-                            }`}>
-                                <span className={`absolute top-0.5 w-3.5 h-3.5 rounded-full transition-all duration-300 ${
-                                    gamakamEnabled
-                                        ? 'left-5.5 bg-c-gold'
-                                        : 'left-0.5 bg-c-cream-dark/60'
-                                }`} />
+                            <span className={`text-[9px] uppercase tracking-wider font-bold transition-all duration-300 ${!gamakamEnabled ? 'text-c-gold opacity-100' : 'text-c-cream-dark opacity-40'}`}>Simple</span>
+                            <div className={`relative w-8 h-4 rounded-full overflow-hidden transition-all duration-300 flex-shrink-0 border pointer-events-none ${gamakamEnabled ? 'bg-c-gold/20 border-c-gold' : 'bg-transparent border-c-gold/30'}`}>
+                                <span className={`absolute top-0.5 w-3 h-3 rounded-full transition-all duration-300 ${gamakamEnabled ? 'left-4 bg-c-gold' : 'left-0.5 bg-c-cream-dark/60'}`} />
                             </div>
-                            <span className={`text-[9px] uppercase tracking-wider font-bold transition-all duration-300 ${
-                                gamakamEnabled ? 'text-c-gold opacity-100' : 'text-c-cream-dark opacity-40'
-                            }`}>
-                                Gamakam
-                            </span>
+                            <span className={`text-[9px] uppercase tracking-wider font-bold transition-all duration-300 ${gamakamEnabled ? 'text-c-gold opacity-100' : 'text-c-cream-dark opacity-40'}`}>Gamakam</span>
                         </div>
                     </div>
-
-                    {/* Playback Mode Selector */}
-                    <div className="flex flex-col items-center gap-1.5">
-                        <span className="text-[9px] text-c-gold font-bold uppercase tracking-[0.2em] opacity-70">Shift Playback Mode</span>
+                    {/* Playback Mode */}
+                    <div className="flex flex-col items-start gap-1">
+                        <span className="text-[9px] text-c-gold font-bold uppercase tracking-[0.2em] opacity-70">Playback</span>
                         <div className="flex p-0.5 bg-c-card/45 border border-c-border/40 rounded-full shadow-inner">
                             <button
                                 onClick={() => setPlaybackMode('theoretical')}
-                                className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                                    playbackMode === 'theoretical'
-                                        ? 'bg-c-gold text-c-bg shadow-md'
-                                        : 'text-c-cream-dim hover:text-c-gold'
-                                }`}
-                            >
-                                Theoretical (Absolute Keys)
-                            </button>
+                                className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all cursor-pointer ${playbackMode === 'theoretical' ? 'bg-c-gold text-c-bg shadow-md' : 'text-c-cream-dim hover:text-c-gold'}`}
+                            >Absolute Keys</button>
                             <button
                                 onClick={() => setPlaybackMode('vocal')}
-                                className={`px-4 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                                    playbackMode === 'vocal'
-                                        ? 'bg-c-gold text-c-bg shadow-md'
-                                        : 'text-c-cream-dim hover:text-c-gold'
-                                }`}
-                            >
-                                Vocal (Tonic Aligned)
-                            </button>
+                                className={`px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all cursor-pointer ${playbackMode === 'vocal' ? 'bg-c-gold text-c-bg shadow-md' : 'text-c-cream-dim hover:text-c-gold'}`}
+                            >Vocal</button>
                         </div>
                     </div>
                 </div>
             </div>
+            <SketchyRule className="opacity-60" />
 
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-6 lg:gap-8">
                 {/* Left: Source Selection */}

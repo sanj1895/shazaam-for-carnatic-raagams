@@ -787,78 +787,66 @@ function App() {
                     const doneCount = sadhana.completed.length;
                     const pct = Math.round((doneCount / steps.length) * 100);
                     return (
-                    <div className="w-full max-w-3xl p-4 md:p-8 flex flex-col items-center animate-fade-in mx-auto">
-                        <div className="w-full flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
-                                <SadhanaIcon className="w-7 h-7" />
-                            </div>
-                            <div className="flex flex-col">
-                                <div className="flex items-center gap-2">
-                                    <h2 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-none">Daily Sadhana</h2>
-                                    <span className="text-[8px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 leading-none">Daily Practice</span>
+                    <div className="w-full max-w-5xl p-4 md:px-8 md:py-6 animate-fade-in mx-auto grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-0">
+                        {/* LEFT: Identity + Progress card */}
+                        <div className="flex flex-col gap-4 lg:border-r lg:border-c-gold/20 lg:pr-7 pb-6 lg:pb-0">
+                            <div className="flex items-start gap-3">
+                                <div className="w-11 h-11 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0 mt-0.5">
+                                    <SadhanaIcon className="w-6 h-6" />
                                 </div>
-                                <p className="text-c-cream-dim text-[11px] mt-1 font-light leading-relaxed">
-                                    A daily sequence to build pitch, scale accuracy, and raga memory. Resets each morning.
-                                </p>
-                            </div>
-                        </div>
-                        <SketchyRule className="mt-2 mb-2 opacity-60" />
-
-                        {/* Progress card — light theme */}
-                        <div className="w-full border border-c-border bg-c-card rounded-xl p-5 relative overflow-hidden mb-6 tour-sadhana-console">
-                            <div className="absolute inset-0 pointer-events-none">
-                                <div className="heritage-border-corner heritage-corner-tl" />
-                                <div className="heritage-border-corner heritage-corner-tr" />
-                                <div className="heritage-border-corner heritage-corner-bl" />
-                                <div className="heritage-border-corner heritage-corner-br" />
-                            </div>
-                            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-c-border/50 pb-4 mb-4 relative z-10">
                                 <div>
-                                    <span className="text-[9px] uppercase tracking-widest text-c-gold font-mono">Today's Progress</span>
-                                    <h3 className="font-playfair text-lg font-bold text-c-cream mt-0.5">{doneCount} of {steps.length} steps done</h3>
-                                </div>
-                                <div className="flex items-center gap-2 px-4 py-1.5 border border-c-border rounded-full bg-c-surface">
-                                    <span className="text-xs text-c-cream font-mono flex items-center gap-1">Streak: <strong className="flex items-center gap-0.5"><FireIcon className="w-3.5 h-3.5 text-orange-500" /> {sadhana.streak} {sadhana.streak === 1 ? 'day' : 'days'}</strong></span>
-                                </div>
-                            </div>
-                            <div className="space-y-1.5 relative z-10">
-                                <div className="flex justify-between text-xs font-mono text-c-cream-dim">
-                                    <span>Daily target</span>
-                                    <span className="text-c-gold font-bold">{pct}%</span>
-                                </div>
-                                <div className="w-full h-2.5 bg-c-surface border border-c-border/50 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-gradient-to-r from-c-gold-dim to-c-gold rounded-full transition-all duration-700"
-                                        style={{ width: `${pct}%` }}
-                                    />
-                                </div>
-                                {doneCount === steps.length && (
-                                    <p className="text-[11px] text-emerald-700 font-playfair italic text-center pt-1">
-                                        ✦ Today's sadhana complete — well done!
+                                    <h2 className="font-playfair text-2xl font-bold tracking-wider text-c-gold uppercase leading-tight mb-1">Daily Sadhana</h2>
+                                    <span className="inline-block text-[9px] uppercase tracking-widest bg-c-gold/15 text-c-gold px-2 py-0.5 rounded font-semibold border border-c-gold/20 mb-2">Daily Practice</span>
+                                    <p className="text-c-cream-dim text-xs font-light leading-relaxed">
+                                        A daily sequence to build pitch, scale accuracy, and raga memory. Resets each morning.
                                     </p>
-                                )}
+                                </div>
+                            </div>
+                            <SketchyRule className="opacity-40" />
+
+                            {/* Progress card */}
+                            <div className="border border-c-border bg-c-card rounded-xl p-4 relative overflow-hidden tour-sadhana-console">
+                                <div className="absolute inset-0 pointer-events-none">
+                                    <div className="heritage-border-corner heritage-corner-tl" />
+                                    <div className="heritage-border-corner heritage-corner-tr" />
+                                    <div className="heritage-border-corner heritage-corner-bl" />
+                                    <div className="heritage-border-corner heritage-corner-br" />
+                                </div>
+                                <div className="relative z-10 space-y-3">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <div>
+                                            <span className="text-[9px] uppercase tracking-widest text-c-gold font-mono">Today's Progress</span>
+                                            <h3 className="font-playfair text-base font-bold text-c-cream mt-0.5">{doneCount} of {steps.length} steps</h3>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 px-3 py-1.5 border border-c-border rounded-full bg-c-surface">
+                                            <FireIcon className="w-3.5 h-3.5 text-orange-500" />
+                                            <span className="text-xs text-c-cream font-mono font-bold">{sadhana.streak}d</span>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <div className="flex justify-between text-[10px] font-mono text-c-cream-dim">
+                                            <span>Daily target</span>
+                                            <span className="text-c-gold font-bold">{pct}%</span>
+                                        </div>
+                                        <div className="w-full h-2 bg-c-surface border border-c-border/50 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full bg-gradient-to-r from-c-gold-dim to-c-gold rounded-full transition-all duration-700"
+                                                style={{ width: `${pct}%` }}
+                                            />
+                                        </div>
+                                        {doneCount === steps.length && (
+                                            <p className="text-[10px] text-emerald-700 font-playfair italic text-center pt-1">
+                                                ✦ Today's sadhana complete — well done!
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* VeenaMark divider */}
-                        <div className="flex items-center gap-3 w-full mb-2">
-                            <div className="flex-1"><SketchyRule className="opacity-40" /></div>
-                            <svg viewBox="0 0 22 68" fill="none" className="text-c-gold/30 w-5 h-auto flex-shrink-0">
-                                <ellipse cx="11" cy="57" rx="10" ry="9" stroke="currentColor" strokeWidth="1.2"/>
-                                <rect x="9.5" y="10" width="3" height="47" rx="1.5" fill="currentColor" opacity="0.35"/>
-                                <line x1="10.5" y1="10" x2="10.5" y2="48" stroke="currentColor" strokeWidth="0.7" opacity="0.5"/>
-                                <line x1="12.5" y1="10" x2="12.5" y2="48" stroke="currentColor" strokeWidth="0.7" opacity="0.5"/>
-                                <line x1="8.5" y1="40" x2="13.5" y2="40" stroke="currentColor" strokeWidth="0.9"/>
-                                <line x1="8.5" y1="28" x2="13.5" y2="28" stroke="currentColor" strokeWidth="0.9"/>
-                                <line x1="8.5" y1="18" x2="13.5" y2="18" stroke="currentColor" strokeWidth="0.9"/>
-                                <path d="M11 10 Q5 6 7 2 Q9 -1 11 1.5 Q13 4 11 7" stroke="currentColor" strokeWidth="1.2" fill="none"/>
-                                <ellipse cx="11" cy="7" rx="4" ry="3" stroke="currentColor" strokeWidth="1" opacity="0.5"/>
-                            </svg>
-                            <div className="flex-1"><SketchyRule className="opacity-40" /></div>
-                        </div>
-
-                        {/* Steps grid — light theme */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                        {/* RIGHT: Steps grid */}
+                        <div className="lg:pl-7">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
                             {steps.map((item) => {
                                 const done = sadhana.completed.includes(item.tab);
                                 return (
@@ -911,6 +899,7 @@ function App() {
                                 </div>
                                 );
                             })}
+                        </div>
                         </div>
                     </div>
                     );

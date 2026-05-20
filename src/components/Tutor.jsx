@@ -3196,7 +3196,7 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
     };
 
     return (
-        <div className="w-full max-w-4xl flex flex-col gap-6 animate-fade-in relative z-10">
+        <div className="w-full flex flex-col gap-6 animate-fade-in relative z-10">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {COURSES.map(course => {
                     const isUpcoming = course.upcoming;
@@ -3295,7 +3295,7 @@ function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset, onBackToC
     });
 
     return (
-        <div className="w-full max-w-4xl flex flex-col gap-3">
+        <div className="w-full flex flex-col gap-3">
             {/* Breadcrumb Navigation */}
             <div className="flex items-center mb-2">
                 <button 
@@ -3472,27 +3472,24 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
     return (
         <div id="tour-tutor-container" className="w-full px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 flex flex-col items-center gap-4 sm:gap-6 animate-fade-in">
 
-            {/* Header + Sa tuner row — merged like Swara Keyboard pattern */}
             {screen === 'home' && (
-                <>
-                    <div className="w-full max-w-4xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-c-gold/20 animate-fade-in">
-                        {/* Left: identity */}
-                        <div className="flex items-center gap-3 md:gap-4">
-                            <div className="flex-shrink-0 text-c-gold opacity-90">
-                                <GurukulIcon className="w-12 h-12 md:w-14 md:h-14" />
+                <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-0 animate-fade-in">
+                    {/* LEFT: Gurukul identity + Sa tuner */}
+                    <div className="flex flex-col gap-4 lg:border-r lg:border-c-gold/20 lg:pr-7 pb-6 lg:pb-0">
+                        <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 text-c-gold opacity-90 pt-0.5">
+                                <GurukulIcon className="w-11 h-11" />
                             </div>
                             <div>
-                                <div className="flex items-center gap-2 mb-0.5">
-                                    <h2 className="font-playfair text-3xl sm:text-4xl font-bold text-c-gold tracking-tight uppercase">Svara Gurukul</h2>
-                                    <span className="px-2.5 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase bg-c-gold/15 border border-c-gold/30 text-c-gold self-center shadow-sm">Academy</span>
-                                </div>
+                                <h2 className="font-playfair text-2xl font-bold text-c-gold tracking-tight uppercase leading-tight mb-1">Svara Gurukul</h2>
+                                <span className="inline-block px-2 py-0.5 rounded text-[9px] font-bold tracking-widest uppercase bg-c-gold/15 border border-c-gold/30 text-c-gold mb-2">Academy</span>
                                 <p className="text-c-cream-dark text-xs leading-relaxed font-playfair opacity-80">
-                                    Structured, progressive vocal training curriculum from foundations to advanced improvisation.
+                                    Structured, progressive vocal training from foundations to advanced improvisation.
                                 </p>
                             </div>
                         </div>
-                        {/* Right: compact Sa tuner */}
-                        <div className="flex-shrink-0 flex items-center gap-2.5 bg-c-surface border border-c-border/60 rounded-xl px-3.5 py-2.5 relative overflow-hidden heritage-card self-start sm:self-auto">
+
+                        <div className="flex items-center gap-2.5 bg-c-surface border border-c-border/60 rounded-xl px-3.5 py-2.5 relative overflow-hidden heritage-card">
                             <div className="heritage-border-corner heritage-corner-tl" style={{ top: 2, left: 2 }} />
                             <div className="heritage-border-corner heritage-corner-tr" style={{ top: 2, right: 2 }} />
                             <div className="heritage-border-corner heritage-corner-bl" style={{ bottom: 2, left: 2 }} />
@@ -3500,9 +3497,9 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
                             <svg className="w-4 h-4 text-c-gold flex-shrink-0 z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
                             </svg>
-                            <div className="z-10">
+                            <div className="z-10 flex-1 min-w-0">
                                 <div className="text-[8px] text-c-cream-dark uppercase tracking-widest font-mono font-extrabold">Base Sa</div>
-                                <div className="text-sm font-playfair font-black text-c-gold leading-none">
+                                <div className="text-sm font-playfair font-black text-c-gold leading-none truncate">
                                     {getWesternNoteName(sa)} <span className="font-sans text-[10px] font-normal text-c-cream-dim">({sa} Hz)</span>
                                 </div>
                             </div>
@@ -3522,66 +3519,64 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
                                 )}
                             </button>
                         </div>
+
+                        {tunerOpen && (
+                            <div className="border border-c-border/40 rounded-xl p-4 bg-c-surface animate-fade-in">
+                                <ExerciseShrutiSetup
+                                    sa={sa}
+                                    setSa={updateSa}
+                                    onDone={() => setTunerOpen(false)}
+                                    instruction="Set your base pitch using the calibrator below."
+                                />
+                            </div>
+                        )}
                     </div>
-                    {/* Tuner expansion — full-width below header */}
-                    {tunerOpen && (
-                        <div className="w-full max-w-4xl border border-c-border/40 rounded-xl p-4 bg-c-surface animate-fade-in flex justify-center">
-                            <ExerciseShrutiSetup
-                                sa={sa}
-                                setSa={updateSa}
-                                onDone={() => setTunerOpen(false)}
-                                instruction="Set your base pitch using the calibrator below."
-                            />
+
+                    {/* RIGHT: Tab bar + course content */}
+                    <div className="lg:pl-7">
+                        <div className="flex gap-1 border-b border-c-border mb-6">
+                            {[
+                                { id: 'curriculum', label: 'Curriculum', icon: (
+                                    <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                                    </svg>
+                                )},
+                                { id: 'practice', label: 'Raga Practice', icon: (
+                                    <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M2 12 C5 6, 9 6, 12 12 S19 18, 22 12" />
+                                    </svg>
+                                )},
+                            ].map(({ id, label, icon }) => (
+                                <button key={id} onClick={() => setTab(id)}
+                                        className={`px-5 py-2 text-xs font-playfair tracking-wide transition-colors relative flex items-center gap-1.5 ${
+                                            tab === id ? 'text-c-gold' : 'text-c-cream-dim hover:text-c-cream'
+                                        }`}>
+                                    {icon}{label}
+                                    {tab === id && <span className="absolute bottom-0 left-0 right-0 h-px bg-c-gold" />}
+                                </button>
+                            ))}
                         </div>
-                    )}
-                </>
-            )}
 
-            {/* Tab switcher — only show on home screens */}
-            {screen === 'home' && (
-                <div className="w-full max-w-4xl">
-                    <div className="flex gap-1 border-b border-c-border mb-6">
-                        {[
-                            { id: 'curriculum', label: 'Curriculum', icon: (
-                                <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                                </svg>
-                            )},
-                            { id: 'practice', label: 'Raga Practice', icon: (
-                                <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M2 12 C5 6, 9 6, 12 12 S19 18, 22 12" />
-                                </svg>
-                            )},
-                        ].map(({ id, label, icon }) => (
-                            <button key={id} onClick={() => setTab(id)}
-                                    className={`px-5 py-2 text-xs font-playfair tracking-wide transition-colors relative flex items-center gap-1.5 ${
-                                        tab === id ? 'text-c-gold' : 'text-c-cream-dim hover:text-c-cream'
-                                    }`}>
-                                {icon}{label}
-                                {tab === id && <span className="absolute bottom-0 left-0 right-0 h-px bg-c-gold" />}
-                            </button>
-                        ))}
-                    </div>
-
-                    {tab === 'curriculum' ? (
-                        selectedCourseId === null ? (
-                            <ProgramsCatalog 
-                                progress={progress}
-                                onSelectCourse={(courseId) => setSelectedCourseId(courseId)}
-                            />
+                        {tab === 'curriculum' ? (
+                            selectedCourseId === null ? (
+                                <ProgramsCatalog
+                                    progress={progress}
+                                    onSelectCourse={(courseId) => setSelectedCourseId(courseId)}
+                                />
+                            ) : (
+                                <CurriculumHome
+                                    progress={progress}
+                                    isUnlocked={isUnlocked}
+                                    onSelectUnit={(unit) => { setActiveUnit(unit); setScreen('unit'); }}
+                                    onReset={resetProgress}
+                                    onBackToCatalog={() => setSelectedCourseId(null)}
+                                    activeCurriculum={activeCurriculum}
+                                />
+                            )
                         ) : (
-                            <CurriculumHome
-                                progress={progress}
-                                isUnlocked={isUnlocked}
-                                onSelectUnit={(unit) => { setActiveUnit(unit); setScreen('unit'); }}
-                                onReset={resetProgress}
-                                onBackToCatalog={() => setSelectedCourseId(null)}
-                                activeCurriculum={activeCurriculum}
-                            />
-                        )
-                    ) : (
-                        <RagaPractice sa={sa} setSa={updateSa} />
-                    )}
+                            <RagaPractice sa={sa} setSa={updateSa} />
+                        )}
+                    </div>
                 </div>
             )}
 

@@ -496,11 +496,11 @@ function App() {
                             >
                                 Ālāpana
                             </h1>
-                            <p className="text-[#f7d686] text-[10px] sm:text-xs md:text-sm font-semibold tracking-[0.3em] sm:tracking-[0.4em] uppercase mb-3 drop-shadow-md">
-                                Carnatic Music
+                            <p className="text-white/70 text-sm sm:text-base md:text-xl max-w-[300px] sm:max-w-[400px] leading-snug font-light mb-3 mt-1">
+                                The modern way to learn Carnatic singing.
                             </p>
-                            <p className="text-white/80 text-xs sm:text-sm md:text-base max-w-[280px] sm:max-w-[320px] leading-relaxed font-light italic mb-8 md:mb-10">
-                                From discovering ragas to refining every note, everything you need for Carnatic practice lives here.
+                            <p className="text-white/40 text-[11px] sm:text-xs md:text-sm max-w-[260px] sm:max-w-[360px] leading-relaxed mb-8 md:mb-10 tracking-wide">
+                                Real-time pitch feedback · guided lessons · tala & shruti tools
                             </p>
 
                             {/* CTAs  ·  fade out once features are shown */}

@@ -546,12 +546,14 @@ function App() {
 
                         {/* About / Mission section */}
                         <div
-                            className="relative z-10 w-full max-w-2xl mx-auto px-6 py-16 text-center transition-all duration-700"
+                            className="relative z-10 w-full max-w-2xl mx-auto px-6 text-center transition-all duration-700"
                             style={{
                                 opacity: showFeatures ? 0 : 1,
                                 pointerEvents: showFeatures ? 'none' : 'auto',
                                 height: showFeatures ? 0 : 'auto',
-                                overflow: showFeatures ? 'hidden' : 'visible',
+                                paddingTop: showFeatures ? 0 : '4rem',
+                                paddingBottom: showFeatures ? 0 : '4rem',
+                                overflow: 'hidden',
                             }}
                         >
                             <div className="flex items-center gap-4 mb-10">

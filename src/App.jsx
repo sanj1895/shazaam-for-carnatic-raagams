@@ -237,8 +237,7 @@ function App() {
                 onDismiss={() => {
                     setTourActive(false);
                     setShowFeatures(false);
-                    goTo('home');
-                }} 
+                }}
                 onStartLearning={() => {
                     setTourActive(false);
                     goTo('tutor');

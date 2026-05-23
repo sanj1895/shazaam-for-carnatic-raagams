@@ -1109,9 +1109,9 @@ export const GEETHAM_CURRICULUM = [
                 id: 'gm1', title: 'Geetham 1: Śrī Gaṇanātha', tag: 'Geetham',
                 exercises: [
                     { type: 'info', title: 'Śrī Gaṇanātha', body: 'Rāga: Malahari · Tāḷam: Chatusra Jāti Rūpaka (3 beats)\n\nThis geetham is a devotional invocation to Lord Ganesha, the remover of obstacles. "Śrī Gaṇanātha" means "the auspicious lord of the Ganas (celestial beings)."\n\nLook for the characteristic ascending phrase Ma–Pa–Da–Ṡ followed by the beautiful descent through the full Malahari Avarohanam.' },
-                    { type: 'listen_sequence', swaras: ['Ma1', 'Pa', 'Da1', 'Ṡ', 'Ṡ', 'Da1', 'Pa', 'Ma1', 'Pa'], displayLabel: '♪', instruction: 'Listen to the characteristic opening ascent and return.' },
+                    { type: 'listen_sequence', swaras: ['Ma1', 'Pa', 'Da1', 'Ṡ', 'Ṡ', 'Ri1', 'Ri1', 'Ṡ', 'Da1', 'Pa', 'Ma1', 'Pa'], displayLabel: '♪', instruction: 'Listen to the opening phrase: Ma Pa Da Ṡ Ṡ Ṙ Ṙ Ṡ Da Pa Ma Pa.' },
                     { type: 'listen_sequence', swaras: ['Ri1', 'Ma1', 'Pa', 'Da1', 'Ma1', 'Pa', 'Da1', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa'], displayLabel: '♪', instruction: 'Listen to the full second phrase — classic Malahari movement.' },
-                    { type: 'sing_sequence', swaras: ['Ma1', 'Pa', 'Da1', 'Ṡ'], speed: 1, instruction: 'Sing the signature opening ascent: Ma Pa Da Ṡ.' },
+                    { type: 'sing_sequence', swaras: ['Ma1', 'Pa', 'Da1', 'Ṡ', 'Ṡ', 'Ri1', 'Ri1', 'Ṡ', 'Da1', 'Pa', 'Ma1', 'Pa'], speed: 1, instruction: 'Sing the opening phrase of Śrī Gaṇanātha: Ma Pa Da Ṡ Ṡ Ṙ Ṙ Ṡ Da Pa Ma Pa.' },
                     { type: 'sing_sequence', swaras: ['Ṡ', 'Da1', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa'], speed: 1, instruction: 'Descend in Malahari from Ṡ back to Sa.' },
                 ]
             },

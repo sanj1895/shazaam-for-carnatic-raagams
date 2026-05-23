@@ -1088,6 +1088,247 @@ export const ALANKARAM_CURRICULUM = [
     }
 ];
 
+export const GEETHAM_CURRICULUM = [
+    // ─── STAGE 1: MALAHARI ────────────────────────────────────────────────
+    {
+        id: 'geetham_stage1', title: 'Malahari Rāgam', symbol: '🌿',
+        subtitle: 'Four geethams in the graceful pentatonic raga',
+        color: '#1a2d1a', tag: 'Rāga 1',
+        lessons: [
+            {
+                id: 'gm_malahari_intro', title: 'Introduction to Malahari', tag: 'Rāga',
+                exercises: [
+                    { type: 'info', title: 'Malahari Rāgam', body: 'Malahari is a janya (derived) raga of the 15th mela, Māyāmāḷavagowḷa. It has a pentatonic ascending scale and 6 notes descending.\n\nArohanam (ascending): Sa Ri₁ Ma₁ Pa Da₁ Ṡ\nAvarohanam (descending): Ṡ Da₁ Pa Ma₁ Ga₂ Ri₁ Sa\n\nNote that Ga₂ appears only in the descent — it adds a characteristic color to the downward movement. Malahari has a calm, meditative quality and is traditionally sung in the morning.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ma1', 'Pa', 'Da1', 'Ṡ'], displayLabel: '♪', instruction: 'Arohanam: listen to the Malahari scale ascend.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa'], displayLabel: '♪', instruction: 'Avarohanam: listen to the Malahari scale descend — hear Ga₂ appear on the way down.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ma1', 'Pa', 'Da1', 'Ṡ'], speed: 1, instruction: 'Sing the Malahari Arohanam.' },
+                    { type: 'sing_sequence', swaras: ['Ṡ', 'Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the Malahari Avarohanam.' },
+                ]
+            },
+            {
+                id: 'gm1', title: 'Geetham 1: Śrī Gaṇanātha', tag: 'Geetham',
+                exercises: [
+                    { type: 'info', title: 'Śrī Gaṇanātha', body: 'Rāga: Malahari · Tāḷam: Chatusra Jāti Rūpaka (3 beats)\n\nThis geetham is a devotional invocation to Lord Ganesha, the remover of obstacles. "Śrī Gaṇanātha" means "the auspicious lord of the Ganas (celestial beings)."\n\nLook for the characteristic ascending phrase Ma–Pa–Da–Ṡ followed by the beautiful descent through the full Malahari Avarohanam.' },
+                    { type: 'listen_sequence', swaras: ['Ma1', 'Pa', 'Da1', 'Ṡ', 'Ṡ', 'Da1', 'Pa', 'Ma1', 'Pa'], displayLabel: '♪', instruction: 'Listen to the characteristic opening ascent and return.' },
+                    { type: 'listen_sequence', swaras: ['Ri1', 'Ma1', 'Pa', 'Da1', 'Ma1', 'Pa', 'Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa'], displayLabel: '♪', instruction: 'Listen to the full second phrase — classic Malahari movement.' },
+                    { type: 'sing_sequence', swaras: ['Ma1', 'Pa', 'Da1', 'Ṡ'], speed: 1, instruction: 'Sing the signature opening ascent: Ma Pa Da Ṡ.' },
+                    { type: 'sing_sequence', swaras: ['Ṡ', 'Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa'], speed: 1, instruction: 'Descend in Malahari from Ṡ back to Sa.' },
+                ]
+            },
+            {
+                id: 'gm2', title: 'Geetham 2: Kuṇḍha Gowra', tag: 'Geetham',
+                exercises: [
+                    { type: 'info', title: 'Kuṇḍha Gowra', body: 'Rāga: Malahari · Tāḷam: Chatusra Jāti Rūpaka (3 beats)\n\n"Kuṇḍha Gowra" praises Shiva, who is white as the jasmine flower (kuṇḍha) and the Himalayan snow (gowra). This geetham opens with a striking descent from Da down through the full Malahari avarohanam, then rises again — a beautiful rocking motion that captures Shiva\'s serene nature.' },
+                    { type: 'listen_sequence', swaras: ['Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa', 'Ri1', 'Ma1', 'Pa', 'Da1', 'Ma1', 'Pa'], displayLabel: '♪', instruction: 'Listen to the characteristic descend-then-ascend opening of Kuṇḍha Gowra.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ma1', ',', 'Ga2', 'Ri1', 'Sa', 'Ri1', 'Ga2', 'Ri1', 'Sa', ','], displayLabel: '♪', instruction: 'Listen to the closing phrase: the gentle Malahari cadence.' },
+                    { type: 'sing_sequence', swaras: ['Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the opening descent through the avarohanam.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ga2', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the gentle closing cadence of Kuṇḍha Gowra.' },
+                ]
+            },
+            {
+                id: 'gm3', title: 'Geetham 3: Kereya Nīranu', tag: 'Geetham',
+                exercises: [
+                    { type: 'info', title: 'Kereya Nīranu', body: 'Rāga: Malahari · Tāḷam: Tisra Jāti Triputa (7 beats: 3+2+2)\n\n"Kereya Nīranu" is a Kannada devotional geetham about the eternal principle of giving back what you receive — "return the water of the tank to the tank." It is a philosophical song about gratitude and the nature of service.\n\nThe Tisra Triputa tāḷam gives this geetham a flowing, triple-grouped pulse.' },
+                    { type: 'listen_sequence', swaras: ['Da1', 'Ṡ', 'Ṡ', 'Da1', 'Pa', 'Ma1', 'Pa', 'Da1', 'Da1', 'Pa', 'Ma1', 'Ma1', 'Pa', ','], displayLabel: '♪', instruction: 'Listen to the opening phrase — notice the repeated Da–Ṡ ascent.' },
+                    { type: 'listen_sequence', swaras: ['Da1', 'Da1', 'Ṡ', 'Da1', 'Pa', 'Ma1', 'Pa', 'Da1', 'Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa'], displayLabel: '♪', instruction: 'Listen to the full characteristic phrase of Kereya Nīranu.' },
+                    { type: 'sing_sequence', swaras: ['Da1', 'Ṡ', 'Ṡ', 'Da1', 'Pa', 'Ma1', 'Pa'], speed: 1, instruction: 'Sing the Da-Ṡ ascent phrase.' },
+                    { type: 'sing_sequence', swaras: ['Da1', 'Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the full descent to finish the phrase.' },
+                ]
+            },
+            {
+                id: 'gm4', title: 'Geetham 4: Padhumanābha', tag: 'Geetham',
+                exercises: [
+                    { type: 'info', title: 'Padhumanābha', body: 'Rāga: Malahari · Tāḷam: Tisra Jāti Triputa (7 beats: 3+2+2)\n\n"Padhumanābha" is a prayer to Vishnu, "the one with a lotus navel" (paduma = lotus, nābha = navel), from whose navel the universe and Brahma were born.\n\nThis is one of the more complex Malahari geethams, featuring longer phrases that weave between the middle and upper octave regions of the raga.' },
+                    { type: 'listen_sequence', swaras: ['Ri1', 'Sa', 'Da1', 'Sa', ',', 'Sa', ',', 'Ma1', 'Ga2', 'Ri1', 'Ma1', 'Ma1', 'Pa', ','], displayLabel: '♪', instruction: 'Listen to the distinctive opening phrase of Padhumanābha.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Da1', ',', 'Da1', 'Pa', 'Ma1', 'Pa', 'Da1', 'Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa'], displayLabel: '♪', instruction: 'Listen to the second characteristic phrase.' },
+                    { type: 'sing_sequence', swaras: ['Ma1', 'Ga2', 'Ri1', 'Ma1', 'Pa', 'Da1', 'Pa'], speed: 1, instruction: 'Sing the central ascending phrase of Padhumanābha.' },
+                    { type: 'sing_sequence', swaras: ['Da1', 'Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the closing descent.' },
+                ]
+            },
+        ]
+    },
+
+    // ─── STAGE 2: SUDDHA SAVERI ───────────────────────────────────────────
+    {
+        id: 'geetham_stage2', title: 'Suddha Sāveri Rāgam', symbol: '💧',
+        subtitle: 'One geetham in the pure, open pentatonic raga',
+        color: '#0f2030', tag: 'Rāga 2',
+        lessons: [
+            {
+                id: 'gm_sudhasaveri_intro', title: 'Introduction to Suddha Sāveri', tag: 'Rāga',
+                exercises: [
+                    { type: 'info', title: 'Suddha Sāveri Rāgam', body: 'Suddha Sāveri is a janya of the 29th mela, Dhīrasankarābharaṇam. It is a pentatonic raga with no Ga or Ni — giving it a clean, open sound.\n\nArohanam: Sa Ri₂ Ma₁ Pa Da₂ Ṡ\nAvarohanam: Da₂ Pa Ma₁ Ri₂ Sa\n\nNote the vakra (curved) avarohanam — it skips Sa at the top and goes directly from Da₂ downward. This is what gives Suddha Sāveri its distinctive character.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri2', 'Ma1', 'Pa', 'Da2', 'Ṡ'], displayLabel: '♪', instruction: 'Arohanam: listen to the open, bright ascent.' },
+                    { type: 'listen_sequence', swaras: ['Da2', 'Pa', 'Ma1', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Avarohanam: listen to the characteristic descent (no Ṡ at the top).' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri2', 'Ma1', 'Pa', 'Da2', 'Ṡ'], speed: 1, instruction: 'Sing the Suddha Sāveri arohanam.' },
+                    { type: 'sing_sequence', swaras: ['Da2', 'Pa', 'Ma1', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the Suddha Sāveri avarohanam.' },
+                ]
+            },
+            {
+                id: 'gm5', title: 'Geetham 5: Aṇalēkāra', tag: 'Geetham',
+                exercises: [
+                    { type: 'info', title: 'Aṇalēkāra', body: 'Rāga: Suddha Sāveri · Tāḷam: Tisra Jāti Triputa (7 beats: 3+2+2)\n\n"Aṇalēkāra" praises Goddess Lakshmi, whose compassion has no measure or boundary (aṇalēkāra = immeasurable). The open, sunlit quality of Suddha Sāveri perfectly suits this song about the infinite grace of the goddess of wealth.\n\nNotice how the geetham hovers around Pa and Da before sweeping up to tara Sa.' },
+                    { type: 'listen_sequence', swaras: ['Da2', 'Da2', 'Ṡ', 'Da2', ',', 'Da2', 'Pa', 'Ma1', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to the characteristic Da–Ṡ phrase of Aṇalēkāra.' },
+                    { type: 'listen_sequence', swaras: ['Pa', ',', 'Pa', 'Da2', 'Da2', 'Da2', 'Pa', 'Pa', 'Ma1', 'Ri2', 'Sa', 'Ri2', 'Sa', 'Ri2'], displayLabel: '♪', instruction: 'Listen to the flowing second phrase.' },
+                    { type: 'listen_sequence', swaras: ['Pa', 'Pa', 'Da2', 'Pa', 'Pa', 'Ma1', 'Ri2', 'Ri2', 'Sa', 'Ri2', 'Ma1', ',', 'Ma1', ','], displayLabel: '♪', instruction: 'Listen to the bouncing Sa–Ri–Ma section.' },
+                    { type: 'sing_sequence', swaras: ['Da2', 'Da2', 'Ṡ', 'Da2', 'Pa', 'Ma1', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the Da–Ṡ–Da descent of Aṇalēkāra.' },
+                    { type: 'sing_sequence', swaras: ['Pa', 'Ma1', 'Ri2', 'Sa', 'Ri2', 'Ma1', 'Pa', 'Da2', 'Pa', 'Ṡ'], speed: 1, instruction: 'Sing the ascending phrase back to Ṡ.' },
+                ]
+            },
+        ]
+    },
+
+    // ─── STAGE 3: MOHANAM ─────────────────────────────────────────────────
+    {
+        id: 'geetham_stage3', title: 'Mohana Rāgam', symbol: '✨',
+        subtitle: 'One geetham in the captivating pentatonic raga',
+        color: '#2a1a30', tag: 'Rāga 3',
+        lessons: [
+            {
+                id: 'gm_mohanam_intro', title: 'Introduction to Mohanam', tag: 'Rāga',
+                exercises: [
+                    { type: 'info', title: 'Mohana Rāgam', body: 'Mohanam is a janya of the 28th mela, Harikambhoji. It is a symmetric pentatonic raga — the same 5 notes ascending and descending, with no Ma or Ni.\n\nArohanam: Sa Ri₂ Ga₂ Pa Da₂ Ṡ\nAvarohanam: Ṡ Da₂ Pa Ga₂ Ri₂ Sa\n\nMohanam means "that which captivates." It has a bright, joyful, and enlivening quality. You may recognize it from many popular Indian film melodies — it is one of the most commonly used ragas in all of Indian music.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri2', 'Ga2', 'Pa', 'Da2', 'Ṡ'], displayLabel: '♪', instruction: 'Arohanam: listen to the bright, captivating ascent.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Da2', 'Pa', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Avarohanam: listen to the symmetric descent.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri2', 'Ga2', 'Pa', 'Da2', 'Ṡ'], speed: 1, instruction: 'Sing the Mohanam arohanam.' },
+                    { type: 'sing_sequence', swaras: ['Ṡ', 'Da2', 'Pa', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the Mohanam avarohanam.' },
+                ]
+            },
+            {
+                id: 'gm6', title: 'Geetham 6: Vāra Vīṇā', tag: 'Geetham',
+                exercises: [
+                    { type: 'info', title: 'Vāra Vīṇā', body: 'Rāga: Mohanam · Tāḷam: Chatusra Jāti Rūpaka (3 beats)\n\n"Vāra Vīṇā" ("the auspicious vīṇā") is a praise of Goddess Saraswati, the goddess of learning and music, who carries the divine vīṇā instrument. The bright, captivating Mohanam raga perfectly suits a tribute to the muse of music.\n\nThe geetham features elegant leaps up to Da₂ and Ṡ, with Ga₂ creating beautiful Mohanam color.' },
+                    { type: 'listen_sequence', swaras: ['Ga2', 'Ga2', 'Pa', ',', 'Pa', ',', 'Da2', 'Pa', 'Ṡ', ',', 'Ṡ', ','], displayLabel: '♪', instruction: 'Listen to the opening phrase — Ga-Pa-Da-Ṡ: the signature Mohanam ascent.' },
+                    { type: 'listen_sequence', swaras: ['Ga2', 'Pa', 'Da2', 'Ṡ', 'Da2', ',', 'Da2', 'Pa', 'Ga2', 'Ga2', 'Ri2', ','], displayLabel: '♪', instruction: 'Listen to the characteristic ascent-then-descent phrase.' },
+                    { type: 'listen_sequence', swaras: ['Ga2', 'Ga2', 'Da2', 'Pa', 'Ga2', ',', 'Pa', 'Ga2', 'Ga2', 'Ri2', 'Sa', ','], displayLabel: '♪', instruction: 'Listen to the cadential phrase returning to Sa.' },
+                    { type: 'sing_sequence', swaras: ['Ga2', 'Pa', 'Da2', 'Ṡ'], speed: 1, instruction: 'Sing the signature Mohanam ascent: Ga Pa Da Ṡ.' },
+                    { type: 'sing_sequence', swaras: ['Ṡ', 'Da2', 'Pa', 'Ga2', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the descent back to Sa with Ga₂ color.' },
+                ]
+            },
+        ]
+    },
+
+    // ─── STAGE 4: KALYANI ─────────────────────────────────────────────────
+    {
+        id: 'geetham_stage4', title: 'Kalyāṇī Rāgam', symbol: '🌺',
+        subtitle: 'One geetham in the auspicious raga of all seven notes',
+        color: '#1a1230', tag: 'Rāga 4',
+        lessons: [
+            {
+                id: 'gm_kalyani_intro', title: 'Introduction to Kalyāṇī', tag: 'Rāga',
+                exercises: [
+                    { type: 'info', title: 'Kalyāṇī Rāgam', body: 'Kalyāṇī is the 65th mela (Mechakalyāṇī) — a complete raga with all 7 notes, and the distinctive raised 4th (Ma₂, called Pratimadhyamam or sharp Madhyamam).\n\nArohanam: Sa Ri₂ Ga₂ Ma₂ Pa Da₂ Ni₂ Ṡ\nAvarohanam: Ṡ Ni₂ Da₂ Pa Ma₂ Ga₂ Ri₂ Sa\n\nKalyāṇī means "auspicious." It is a grand, expansive raga associated with morning, celebration, and divine grace. The raised Ma₂ gives it a bright, uplifting, almost Western major-key quality — yet uniquely Carnatic.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri2', 'Ga2', 'Ma2', 'Pa', 'Da2', 'Ni2', 'Ṡ'], displayLabel: '♪', instruction: 'Arohanam: listen to all 7 notes of Kalyāṇī ascending — hear the raised Ma₂.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ni2', 'Da2', 'Pa', 'Ma2', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Avarohanam: the full descent of Kalyāṇī.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri2', 'Ga2', 'Ma2', 'Pa', 'Da2', 'Ni2', 'Ṡ'], speed: 1, instruction: 'Sing the Kalyāṇī arohanam — feel the brightness of Ma₂.' },
+                    { type: 'sing_sequence', swaras: ['Ṡ', 'Ni2', 'Da2', 'Pa', 'Ma2', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the Kalyāṇī avarohanam.' },
+                ]
+            },
+            {
+                id: 'gm7', title: 'Geetham 7: Kamala Jādhalā', tag: 'Geetham',
+                exercises: [
+                    { type: 'info', title: 'Kamala Jādhalā', body: 'Rāga: Kalyāṇī · Tāḷam: Tisra Jāti Triputa (7 beats: 3+2+2)\n\n"Kamala Jādhalā" is a praise of Goddess Lakshmi — "she who sports in the lotus." The grandeur of Kalyāṇī suits the majesty of Lakshmi, the goddess of prosperity.\n\nThis is one of the most challenging geethams in this set, spanning from tara Sa (Ṡ) all the way down through the full Kalyāṇī avarohanam, with phrases using all 7 notes.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ṡ', 'Ṡ', 'Ni2', 'Da2', 'Ni2', 'Ṡ', 'Ni2', 'Da2', 'Pa', 'Da2', 'Pa', 'Ma2', 'Pa'], displayLabel: '♪', instruction: 'Listen to the opening phrase — notice how it stays in the upper register.' },
+                    { type: 'listen_sequence', swaras: ['Da2', 'Da2', 'Da2', 'Ga2', 'Ga2', 'Ga2', ',', 'Ma2', 'Pa', ',', 'Ma2', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to the characteristic middle section.' },
+                    { type: 'listen_sequence', swaras: ['Ni2', 'Da2', 'Pa', 'Da2', 'Pa', 'Ma2', 'Pa', 'Ga2', 'Ma2', 'Pa', 'Ma2', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to the full descending phrase of Kamala Jādhalā.' },
+                    { type: 'sing_sequence', swaras: ['Ni2', 'Da2', 'Pa', 'Ma2', 'Pa', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing this characteristic descent through Kalyāṇī.' },
+                    { type: 'sing_sequence', swaras: ['Ga2', 'Ma2', 'Pa', 'Ma2', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the closing cadence of Kamala Jādhalā.' },
+                ]
+            },
+        ]
+    },
+
+    // ─── STAGE 5: SAVERI ──────────────────────────────────────────────────
+    {
+        id: 'geetham_stage5', title: 'Sāveri Rāgam', symbol: '🌸',
+        subtitle: 'One geetham in the tender, devotional raga',
+        color: '#301520', tag: 'Rāga 5',
+        lessons: [
+            {
+                id: 'gm_saveri_intro', title: 'Introduction to Sāveri', tag: 'Rāga',
+                exercises: [
+                    { type: 'info', title: 'Sāveri Rāgam', body: 'Sāveri is a janya of the 15th mela, Māyāmāḷavagowḷa (same parent as Malahari). It has an asymmetric structure — more notes descend than ascend.\n\nArohanam: Sa Ri₁ Ma₁ Pa Da₁ Ṡ (5 notes, no Ga, no Ni)\nAvarohanam: Ṡ Ni₂ Da₁ Pa Ma₁ Ga₂ Ri₁ Sa (7 notes)\n\nSāveri has a plaintive, tender, and mildly melancholic quality. Ni₂ and Ga₂ only appear in the descent, giving the avarohanam a characteristic ornamented quality. Sāveri is often sung in the morning.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ma1', 'Pa', 'Da1', 'Ṡ'], displayLabel: '♪', instruction: 'Arohanam: listen to the clean 5-note ascent.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ni2', 'Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa'], displayLabel: '♪', instruction: 'Avarohanam: listen to all 7 notes in the descent — hear Ni₂ and Ga₂ appearing.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ma1', 'Pa', 'Da1', 'Ṡ'], speed: 1, instruction: 'Sing the Sāveri arohanam.' },
+                    { type: 'sing_sequence', swaras: ['Ṡ', 'Ni2', 'Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the Sāveri avarohanam with Ni₂ and Ga₂.' },
+                ]
+            },
+            {
+                id: 'gm8', title: 'Geetham 8: Janaka Sutha', tag: 'Geetham',
+                exercises: [
+                    { type: 'info', title: 'Janaka Sutha', body: 'Rāga: Sāveri · Tāḷam: Chatusra Jāti Rūpaka (3 beats)\n\n"Janaka Sutha" means "the daughter of Janaka" — a name for Goddess Sītā, the daughter of King Janaka. This geetham is a prayer to Sītā, the consort of Rāma.\n\nThe tender, devotional quality of Sāveri suits this intimate prayer beautifully. Notice how the geetham weaves between Ri₁ and Ga₂ in the characteristic Sāveri way.' },
+                    { type: 'listen_sequence', swaras: ['Da1', 'Sa', 'Ri1', 'Ma1', 'Ma1', ',', 'Ma1', 'Ga2', ',', 'Ga2', 'Ri1', 'Sa'], displayLabel: '♪', instruction: 'Listen to the opening phrase of Janaka Sutha — hear the gentle Ga₂ ornament.' },
+                    { type: 'listen_sequence', swaras: ['Ga2', ',', 'Ri1', 'Ri1', 'Ga2', ',', 'Ri1', 'Ri1', 'Sa', 'Da1', 'Sa', ','], displayLabel: '♪', instruction: 'Listen to the Ri-Ga interplay in the second phrase.' },
+                    { type: 'listen_sequence', swaras: ['Da1', 'Da1', 'Pa', 'Ma1', 'Pa', ',', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa', 'Ri1'], displayLabel: '♪', instruction: 'Listen to the broad mid-section phrase.' },
+                    { type: 'sing_sequence', swaras: ['Da1', 'Sa', 'Ri1', 'Ma1', 'Ga2', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the opening phrase of Janaka Sutha.' },
+                    { type: 'sing_sequence', swaras: ['Da1', 'Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the characteristic Sāveri descent.' },
+                ]
+            },
+        ]
+    },
+
+    // ─── STAGE 6: KAMBHOJI ────────────────────────────────────────────────
+    {
+        id: 'geetham_stage6', title: 'Kāmbhoji Rāgam', symbol: '🌙',
+        subtitle: 'One geetham in the majestic raga of the evening',
+        color: '#1a1a2e', tag: 'Rāga 6',
+        lessons: [
+            {
+                id: 'gm_kambhoji_intro', title: 'Introduction to Kāmbhoji', tag: 'Rāga',
+                exercises: [
+                    { type: 'info', title: 'Kāmbhoji Rāgam', body: 'Kāmbhoji is a janya of the 28th mela, Harikambhoji. It is a rich raga with 6 notes ascending and 7 descending.\n\nArohanam: Sa Ri₂ Ga₂ Ma₁ Pa Da₂ Ṡ (no Ni ascending)\nAvarohanam: Ṡ Ni₁ Da₂ Pa Ma₁ Ga₂ Ri₂ Sa\n\nKāmbhoji is a majestic raga traditionally associated with the evening. The absence of Ni in the ascent followed by its appearance (as Ni₁) in the descent creates a distinctive, sweeping character. It is widely used in classical compositions, folk music, and film songs.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri2', 'Ga2', 'Ma1', 'Pa', 'Da2', 'Ṡ'], displayLabel: '♪', instruction: 'Arohanam: listen to Kāmbhoji ascending — notice no Ni.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ni1', 'Da2', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Avarohanam: listen to Ni₁ appear in the descent.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri2', 'Ga2', 'Ma1', 'Pa', 'Da2', 'Ṡ'], speed: 1, instruction: 'Sing the Kāmbhoji arohanam.' },
+                    { type: 'sing_sequence', swaras: ['Ṡ', 'Ni1', 'Da2', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the Kāmbhoji avarohanam with Ni₁.' },
+                ]
+            },
+            {
+                id: 'gm9', title: 'Geetham 9: Mandhara Dhārarē', tag: 'Geetham',
+                exercises: [
+                    { type: 'info', title: 'Mandhara Dhārarē', body: 'Rāga: Kāmbhoji · Tāḷam: Chatusra Jāti Triputa (Ādi, 8 beats) or Tisra Jāti Triputa\n\n"Mandhara Dhārarē" praises Vishnu who holds Mount Mandara — a reference to the divine churning of the cosmic ocean. The majestic Kāmbhoji raga suits this grand mythological theme perfectly.\n\nThis is the most complex geetham in this collection, set in Ādi Tāḷam with full use of the Kāmbhoji range from Sa to Ṡ.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', ',', 'Ni1', 'Pa', 'Da2', 'Da2', 'Ṡ', ','], displayLabel: '♪', instruction: 'Listen to the characteristic opening phrase: Ṡ–Ni₁–Pa sweeping up to Ṡ.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ṡ', 'Ni1', 'Ni1', 'Da2', 'Pa', 'Da2', 'Da2', 'Pa', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to the broad descending phrase of Mandhara Dhārarē.' },
+                    { type: 'listen_sequence', swaras: ['Ga2', 'Pa', 'Da2', 'Ṡ', 'Ni1', 'Ni1', 'Da2', 'Pa', 'Da2', 'Da2', 'Pa', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to the full characteristic phrase with the complete Kāmbhoji avarohanam.' },
+                    { type: 'sing_sequence', swaras: ['Ga2', 'Pa', 'Da2', 'Ṡ', 'Ni1', 'Da2', 'Pa'], speed: 1, instruction: 'Sing the ascent to Ṡ and descent through Ni₁.' },
+                    { type: 'sing_sequence', swaras: ['Da2', 'Da2', 'Pa', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the closing descent of Mandhara Dhārarē.' },
+                ]
+            },
+        ]
+    },
+
+    // ─── STAGE 7: ARABHI ──────────────────────────────────────────────────
+    {
+        id: 'geetham_stage7', title: 'Ārābhi Rāgam', symbol: '🏔️',
+        subtitle: 'One geetham in the expansive pentatonic raga',
+        color: '#2a1800', tag: 'Rāga 7',
+        lessons: [
+            {
+                id: 'gm_arabhi_intro', title: 'Introduction to Ārābhi', tag: 'Rāga',
+                exercises: [
+                    { type: 'info', title: 'Ārābhi Rāgam', body: 'Ārābhi is a janya of the 29th mela, Dhīrasankarābharaṇam (same parent as Suddha Sāveri). It has a pentatonic ascending scale and a richer 7-note descent.\n\nArohanam: Sa Ri₂ Ma₁ Pa Da₂ Ṡ (5 notes — no Ga or Ni ascending)\nAvarohanam: Ṡ Ni₂ Da₂ Pa Ma₁ Ga₂ Ri₂ Sa\n\nĀrābhi has a bold, expansive, heroic quality. The large leaps in its characteristic phrases (especially Sa–Da₂ and Pa–Ṡ) give it a grand, sweeping feel. It is associated with valor and devotion.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri2', 'Ma1', 'Pa', 'Da2', 'Ṡ'], displayLabel: '♪', instruction: 'Arohanam: listen to the bold, open ascent.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ni2', 'Da2', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Avarohanam: listen to Ni₂ and Ga₂ appear in the descent.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri2', 'Ma1', 'Pa', 'Da2', 'Ṡ'], speed: 1, instruction: 'Sing the Ārābhi arohanam.' },
+                    { type: 'sing_sequence', swaras: ['Ṡ', 'Ni2', 'Da2', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the Ārābhi avarohanam.' },
+                ]
+            },
+            {
+                id: 'gm10', title: 'Geetham 10: Rē Rē Śrī Rāma Chandra', tag: 'Geetham',
+                exercises: [
+                    { type: 'info', title: 'Rē Rē Śrī Rāma Chandra', body: 'Rāga: Ārābhi · Tāḷam: Tisra Jāti Triputa (7 beats: 3+2+2)\n\n"Rē Rē Śrī Rāma Chandra" is a fervent prayer to Lord Rāma. "Rē Rē" is a respectful exclamation calling out to the Lord. The bold Ārābhi raga perfectly captures the heroic and devotional spirit of a prayer to Rāma, the warrior king.\n\nThis geetham is the culmination of this collection — it uses all the techniques and raga awareness you have built through the previous nine geethams.' },
+                    { type: 'listen_sequence', swaras: ['Pa', ',', 'Pa', 'Ma1', 'Ma1', 'Pa', ',', 'Ma1', 'Ga2', 'Ri2', 'Sa', 'Ri2', 'Ma1', 'Ga2'], displayLabel: '♪', instruction: 'Listen to the opening phrase of Rē Rē Śrī Rāma Chandra.' },
+                    { type: 'listen_sequence', swaras: ['Ri2', 'Ri2', 'Sa', 'Sa', 'Da2', 'Ri2', 'Sa', 'Ri2', ',', ',', 'Ri2', ',', 'Sa', 'Ri2'], displayLabel: '♪', instruction: 'Listen to the bold Sa–Da₂ leap that characterizes Ārābhi.' },
+                    { type: 'listen_sequence', swaras: ['Pa', 'Ma1', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Ri2', 'Ma1', 'Ga2', 'Ri2', 'Sa', 'Ri2', 'Sa', 'Sa'], displayLabel: '♪', instruction: 'Listen to the flowing descent with Ga₂ color.' },
+                    { type: 'sing_sequence', swaras: ['Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the characteristic Ārābhi descent: Pa–Ma–Ga–Ri–Sa.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri2', 'Ma1', 'Pa', 'Da2', 'Ṡ', 'Ni2', 'Da2', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the full Ārābhi scale — the complete journey of Rē Rē Śrī Rāma Chandra.' },
+                ]
+            },
+        ]
+    },
+];
+
 export const COURSES = [
     {
         id: 'foundations',
@@ -1140,10 +1381,10 @@ export const COURSES = [
     {
         id: 'geetams',
         title: 'Geetams',
-        description: 'Simple melodic songs that weave lyrics, notes, and rhythm together.',
+        description: 'Simple melodic songs that weave lyrics, notes, and rhythm together across seven ragas.',
         symbol: '🌸',
-        color: '#1a0e3a',
-        upcoming: true
+        color: '#1a2d1a',
+        curriculum: GEETHAM_CURRICULUM
     },
     {
         id: 'swarajathis',

@@ -1108,41 +1108,41 @@ export const GEETHAM_CURRICULUM = [
             {
                 id: 'gm1', title: 'Geetham 1: Śrī Gaṇanātha', tag: 'Geetham',
                 exercises: [
-                    { type: 'info', title: 'Śrī Gaṇanātha', body: 'Rāga: Malahari · Tāḷam: Chatusra Jāti Rūpaka (3 beats)\n\nThis geetham is a devotional invocation to Lord Ganesha, the remover of obstacles. "Śrī Gaṇanātha" means "the auspicious lord of the Ganas (celestial beings)."\n\nLook for the characteristic ascending phrase Ma–Pa–Da–Ṡ followed by the beautiful descent through the full Malahari Avarohanam.' },
-                    { type: 'listen_sequence', swaras: ['Ma1', 'Pa', 'Da1', 'Ṡ', 'Ṡ', 'Ri1', 'Ri1', 'Ṡ', 'Da1', 'Pa', 'Ma1', 'Pa'], displayLabel: '♪', instruction: 'Listen to the opening phrase: Ma Pa Da Ṡ Ṡ Ṙ Ṙ Ṡ Da Pa Ma Pa.' },
-                    { type: 'listen_sequence', swaras: ['Ri1', 'Ma1', 'Pa', 'Da1', 'Ma1', 'Pa', 'Da1', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa'], displayLabel: '♪', instruction: 'Listen to the full second phrase — classic Malahari movement.' },
-                    { type: 'sing_sequence', swaras: ['Ma1', 'Pa', 'Da1', 'Ṡ', 'Ṡ', 'Ri1', 'Ri1', 'Ṡ', 'Da1', 'Pa', 'Ma1', 'Pa'], speed: 1, instruction: 'Sing the opening phrase of Śrī Gaṇanātha: Ma Pa Da Ṡ Ṡ Ṙ Ṙ Ṡ Da Pa Ma Pa.' },
-                    { type: 'sing_sequence', swaras: ['Ṡ', 'Da1', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa'], speed: 1, instruction: 'Descend in Malahari from Ṡ back to Sa.' },
+                    { type: 'info', title: 'Śrī Gaṇanātha', body: 'Rāga: Malahari · Tāḷam: Chatusra Jāti Rūpaka (2+4 per cycle)\n\nThis geetham is a devotional invocation to Lord Ganesha, the remover of obstacles. "Śrī Gaṇanātha" means "the auspicious lord of the Ganas (celestial beings)."\n\nLook for the characteristic ascending phrase Ma–Pa–Da–Ṡ, followed by the tara Ṙ (high Ri) and the beautiful descent through the full Malahari Avarohanam.' },
+                    { type: 'listen_sequence', swaras: ['Ma1','Pa','|','Da1','Ṡ','Ṡ','Ṙ','||','Ṙ','Ṡ','|','Da1','Pa','Ma1','Pa','||'], displayLabel: '♪', instruction: 'Listen to the opening phrase — two Rūpaka cycles: Ma Pa | Da Ṡ Ṡ Ṙ || Ṙ Ṡ | Da Pa Ma Pa ||' },
+                    { type: 'listen_sequence', swaras: ['Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||','Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'], displayLabel: '♪', instruction: 'Listen to lines 2–3 — the descent and closing cadence: R M | P D M P || D P | M G R S || S , | R M G R || S R | G R S , ||' },
+                    { type: 'sing_sequence', swaras: ['Ma1','Pa','|','Da1','Ṡ','Ṡ','Ṙ','||','Ṙ','Ṡ','|','Da1','Pa','Ma1','Pa','||'], speed: 1, instruction: 'Sing the opening phrase: Ma Pa | Da Ṡ Ṡ Ṙ || Ṙ Ṡ | Da Pa Ma Pa ||' },
+                    { type: 'sing_sequence', swaras: ['Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'], speed: 1, instruction: 'Sing the closing cadence of Śrī Gaṇanātha: Sa , | Ri Ma Ga Ri || Sa Ri | Ga Ri Sa , ||' },
                 ]
             },
             {
                 id: 'gm2', title: 'Geetham 2: Kuṇḍha Gowra', tag: 'Geetham',
                 exercises: [
-                    { type: 'info', title: 'Kuṇḍha Gowra', body: 'Rāga: Malahari · Tāḷam: Chatusra Jāti Rūpaka (3 beats)\n\n"Kuṇḍha Gowra" praises Shiva, who is white as the jasmine flower (kuṇḍha) and the Himalayan snow (gowra). This geetham opens with a striking descent from Da down through the full Malahari avarohanam, then rises again — a beautiful rocking motion that captures Shiva\'s serene nature.' },
-                    { type: 'listen_sequence', swaras: ['Da1', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa', 'Ri1', 'Ma1', 'Pa', 'Da1', 'Ma1', 'Pa'], displayLabel: '♪', instruction: 'Listen to the characteristic descend-then-ascend opening of Kuṇḍha Gowra.' },
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ma1', ',', 'Ga3', 'Ri1', 'Sa', 'Ri1', 'Ga3', 'Ri1', 'Sa', ','], displayLabel: '♪', instruction: 'Listen to the closing phrase: the gentle Malahari cadence.' },
-                    { type: 'sing_sequence', swaras: ['Da1', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the opening descent through the avarohanam.' },
-                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the gentle closing cadence of Kuṇḍha Gowra.' },
+                    { type: 'info', title: 'Kuṇḍha Gowra', body: 'Rāga: Malahari · Tāḷam: Chatusra Jāti Rūpaka (2+4 per cycle)\n\n"Kuṇḍha Gowra" praises Shiva, who is white as the jasmine flower (kuṇḍha) and the Himalayan snow (gowra). This geetham opens with a striking descent from Da through the full Malahari avarohanam, then ascends — a beautiful rocking motion that captures Shiva\'s serene nature.\n\nLook for the characteristic Ṙ (tara Ri) leap in the second line.' },
+                    { type: 'listen_sequence', swaras: ['Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||','Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Ṙ','|','Ṙ','Ṡ','Da1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||'], displayLabel: '♪', instruction: 'Listen to lines 1–2 — the opening descent and the Ṙ (tara Ri) leap: D P | M G R S || R M | P D M P || D Ṙ | Ṙ Ṡ D P || D P | M G R S ||' },
+                    { type: 'listen_sequence', swaras: ['Sa',',','|','Ri1',',','Ri1',',','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||','Sa','Ri1','|','Ma1',',','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'], displayLabel: '♪', instruction: 'Listen to lines 3–4 — the gentle Malahari closing cadence: S , | R , R , || D P | M G R S || S R | M , G R || S R | G R S , ||' },
+                    { type: 'sing_sequence', swaras: ['Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||'], speed: 1, instruction: 'Sing the opening descent: Da Pa | Ma Ga Ri Sa ||' },
+                    { type: 'sing_sequence', swaras: ['Sa','Ri1','|','Ma1',',','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'], speed: 1, instruction: 'Sing the closing cadence of Kuṇḍha Gowra: S R | M , G R || S R | G R S , ||' },
                 ]
             },
             {
                 id: 'gm3', title: 'Geetham 3: Kereya Nīranu', tag: 'Geetham',
                 exercises: [
-                    { type: 'info', title: 'Kereya Nīranu', body: 'Rāga: Malahari · Tāḷam: Tisra Jāti Triputa (7 beats: 3+2+2)\n\n"Kereya Nīranu" is a Kannada devotional geetham about the eternal principle of giving back what you receive — "return the water of the tank to the tank." It is a philosophical song about gratitude and the nature of service.\n\nThe Tisra Triputa tāḷam gives this geetham a flowing, triple-grouped pulse.' },
-                    { type: 'listen_sequence', swaras: ['Da1', 'Ṡ', 'Ṡ', 'Da1', 'Pa', 'Ma1', 'Pa', 'Da1', 'Da1', 'Pa', 'Ma1', 'Ma1', 'Pa', ','], displayLabel: '♪', instruction: 'Listen to the opening phrase — notice the repeated Da–Ṡ ascent.' },
-                    { type: 'listen_sequence', swaras: ['Da1', 'Da1', 'Ṡ', 'Da1', 'Pa', 'Ma1', 'Pa', 'Da1', 'Da1', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa'], displayLabel: '♪', instruction: 'Listen to the full characteristic phrase of Kereya Nīranu.' },
-                    { type: 'sing_sequence', swaras: ['Da1', 'Ṡ', 'Ṡ', 'Da1', 'Pa', 'Ma1', 'Pa'], speed: 1, instruction: 'Sing the Da-Ṡ ascent phrase.' },
-                    { type: 'sing_sequence', swaras: ['Da1', 'Da1', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the full descent to finish the phrase.' },
+                    { type: 'info', title: 'Kereya Nīranu', body: 'Rāga: Malahari · Tāḷam: Tisra Jāti Triputa (3+2+2 per cycle)\n\n"Kereya Nīranu" is a Kannada devotional geetham about giving back what you receive — "return the water of the tank to the tank." It is a philosophical song about gratitude and service.\n\nThe Tisra Triputa tāḷam gives this geetham a flowing, triple-grouped pulse.' },
+                    { type: 'listen_sequence', swaras: ['Da1','Ṡ','Ṡ','|','Da1','Pa','|','Ma1','Pa','||','Da1','Da1','Pa','|','Ma1','Ma1','|','Pa',',','||','Da1','Da1','Ṡ','|','Da1','Pa','|','Ma1','Pa','||','Da1','Da1','Pa','|','Ma1','Ga3','|','Ri1','Sa','||'], displayLabel: '♪', instruction: 'Listen to lines 1–2 — D Ṡ Ṡ | D P | M P || D D P | M M | P , || D D Ṡ | D P | M P || D D P | M G | R S ||' },
+                    { type: 'listen_sequence', swaras: ['Sa','Ri1','Ri1','|','Sa','Ri1','|','Sa','Ri1','||','Da1','Da1','Pa','|','Ma1','Ga3','|','Ri1','Sa','||','Da1','Pa','Da1','|','Ṡ',',','|','Da1','Pa','||','Da1','Da1','Pa','|','Ma1','Ga3','|','Ri1','Sa','||'], displayLabel: '♪', instruction: 'Listen to lines 3–4 — S R R | S R | S R || D D P | M G | R S || and the leaping D P D | Ṡ , | D P ||' },
+                    { type: 'sing_sequence', swaras: ['Da1','Ṡ','Ṡ','|','Da1','Pa','|','Ma1','Pa','||'], speed: 1, instruction: 'Sing the opening Da–Ṡ ascent: D Ṡ Ṡ | D P | M P ||' },
+                    { type: 'sing_sequence', swaras: ['Da1','Da1','Pa','|','Ma1','Ga3','|','Ri1','Sa','||'], speed: 1, instruction: 'Sing the signature Malahari descent of Kereya Nīranu: D D P | M G | R S ||' },
                 ]
             },
             {
                 id: 'gm4', title: 'Geetham 4: Padhumanābha', tag: 'Geetham',
                 exercises: [
-                    { type: 'info', title: 'Padhumanābha', body: 'Rāga: Malahari · Tāḷam: Tisra Jāti Triputa (7 beats: 3+2+2)\n\n"Padhumanābha" is a prayer to Vishnu, "the one with a lotus navel" (paduma = lotus, nābha = navel), from whose navel the universe and Brahma were born.\n\nThis is one of the more complex Malahari geethams, featuring longer phrases that weave between the middle and upper octave regions of the raga.' },
-                    { type: 'listen_sequence', swaras: ['Ri1', 'Sa', 'Da1', 'Sa', ',', 'Sa', ',', 'Ma1', 'Ga3', 'Ri1', 'Ma1', 'Ma1', 'Pa', ','], displayLabel: '♪', instruction: 'Listen to the distinctive opening phrase of Padhumanābha.' },
-                    { type: 'listen_sequence', swaras: ['Sa', 'Da1', ',', 'Da1', 'Pa', 'Ma1', 'Pa', 'Da1', 'Da1', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa'], displayLabel: '♪', instruction: 'Listen to the second characteristic phrase.' },
-                    { type: 'sing_sequence', swaras: ['Ma1', 'Ga3', 'Ri1', 'Ma1', 'Pa', 'Da1', 'Pa'], speed: 1, instruction: 'Sing the central ascending phrase of Padhumanābha.' },
-                    { type: 'sing_sequence', swaras: ['Da1', 'Da1', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the closing descent.' },
+                    { type: 'info', title: 'Padhumanābha', body: 'Rāga: Malahari · Tāḷam: Tisra Jāti Triputa (3+2+2 per cycle)\n\n"Padhumanābha" is a prayer to Vishnu, "the one with a lotus navel" (paduma = lotus, nābha = navel), from whose navel the universe and Brahma were born.\n\nThis is one of the more complex Malahari geethams, featuring a distinctive R S D opening and longer phrases that weave between the middle and upper octave regions, including a soaring Ṙ (tara Ri) passage.' },
+                    { type: 'listen_sequence', swaras: ['Ri1','Sa','Da1','|','Sa',',','|','Sa',',','||','Ma1','Ga3','Ri1','|','Ma1','Ma1','|','Pa',',','||','Sa','Da1',',','|','Da1','Pa','|','Ma1','Pa','||','Da1','Da1','Pa','|','Ma1','Ga3','|','Ri1','Sa','||'], displayLabel: '♪', instruction: 'Listen to lines 1–2 — the distinctive R S D | S , | S , || opening and descent.' },
+                    { type: 'listen_sequence', swaras: ['Pa','Ma1','Pa','|','Da1','Ṡ','|','Da1','Ṡ','||','Ṙ','Ṡ','Da1','|','Da1','Ṡ','|','Da1','Pa','||','Da1','Da1','Pa','|','Pa',',','|','Pa','Ma1','||','Ri1','Ma1','Ma1','|','Pa',',','|','Pa',',','||'], displayLabel: '♪', instruction: 'Listen to lines 5–6 — the soaring Ṡ phrase with tara Ṙ: P M P | D Ṡ | D Ṡ || Ṙ Ṡ D | D Ṡ | D P ||' },
+                    { type: 'sing_sequence', swaras: ['Ri1','Sa','Da1','|','Sa',',','|','Sa',',','||','Ma1','Ga3','Ri1','|','Ma1','Ma1','|','Pa',',','||'], speed: 1, instruction: 'Sing the opening phrase: R S D | S , | S , || M G R | M M | P , ||' },
+                    { type: 'sing_sequence', swaras: ['Da1','Da1','Pa','|','Pa',',','|','Pa','Ma1','||','Ri1',',','Ma1','|','Ma1','Ga3','|','Ri1','Sa','||'], speed: 1, instruction: 'Sing the closing descent of Padhumanābha: D D P | P , | P M || R , M | M G | R S ||' },
                 ]
             },
         ]
@@ -1167,12 +1167,12 @@ export const GEETHAM_CURRICULUM = [
             {
                 id: 'gm5', title: 'Geetham 5: Aṇalēkāra', tag: 'Geetham',
                 exercises: [
-                    { type: 'info', title: 'Aṇalēkāra', body: 'Rāga: Suddha Sāveri · Tāḷam: Tisra Jāti Triputa (7 beats: 3+2+2)\n\n"Aṇalēkāra" praises Goddess Lakshmi, whose compassion has no measure or boundary (aṇalēkāra = immeasurable). The open, sunlit quality of Suddha Sāveri perfectly suits this song about the infinite grace of the goddess of wealth.\n\nNotice how the geetham hovers around Pa and Da before sweeping up to tara Sa.' },
-                    { type: 'listen_sequence', swaras: ['Da2', 'Da2', 'Ṡ', 'Da2', ',', 'Da2', 'Pa', 'Ma1', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to the characteristic Da–Ṡ phrase of Aṇalēkāra.' },
-                    { type: 'listen_sequence', swaras: ['Pa', ',', 'Pa', 'Da2', 'Da2', 'Da2', 'Pa', 'Pa', 'Ma1', 'Ri2', 'Sa', 'Ri2', 'Sa', 'Ri2'], displayLabel: '♪', instruction: 'Listen to the flowing second phrase.' },
-                    { type: 'listen_sequence', swaras: ['Pa', 'Pa', 'Da2', 'Pa', 'Pa', 'Ma1', 'Ri2', 'Ri2', 'Sa', 'Ri2', 'Ma1', ',', 'Ma1', ','], displayLabel: '♪', instruction: 'Listen to the bouncing Sa–Ri–Ma section.' },
-                    { type: 'sing_sequence', swaras: ['Da2', 'Da2', 'Ṡ', 'Da2', 'Pa', 'Ma1', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the Da–Ṡ–Da descent of Aṇalēkāra.' },
-                    { type: 'sing_sequence', swaras: ['Pa', 'Ma1', 'Ri2', 'Sa', 'Ri2', 'Ma1', 'Pa', 'Da2', 'Pa', 'Ṡ'], speed: 1, instruction: 'Sing the ascending phrase back to Ṡ.' },
+                    { type: 'info', title: 'Aṇalēkāra', body: 'Rāga: Suddha Sāveri · Tāḷam: Tisra Jāti Triputa (3+2+2 per cycle)\n\n"Aṇalēkāra" praises Goddess Lakshmi, whose compassion has no measure or boundary (aṇalēkāra = immeasurable). The open, sunlit quality of Suddha Sāveri perfectly suits this song about the infinite grace of the goddess of wealth.\n\nNotice how the geetham hovers around Pa and Da before sweeping up to tara Sa (Ṡ).' },
+                    { type: 'listen_sequence', swaras: ['Da2','Da2','Ṡ','|','Da2',',','|','Da2','Pa','||','Pa','Ma1','Ri2','|','Da2','Da2','|','Da2','Pa','||'], displayLabel: '♪', instruction: 'Listen to line 2 — D D Ṡ | D , | D P || P M R | D D | D P ||' },
+                    { type: 'listen_sequence', swaras: ['Pa',',','Pa','|','Da2','Da2','|','Da2','Pa','||','Pa',',','Pa','|','Ma1','Pa','|','Da2','Pa','||','Pa','Ma1','Ri2','|','Sa','Ri2','|','Sa','Ri2','||','Pa','Ma1','Ri2','|','Sa','Ri2','|','Sa','Ri2','||'], displayLabel: '♪', instruction: 'Listen to lines 3–4 — the bouncing P , P | D D | D P || phrase and the Sa–Ri repeating cadence.' },
+                    { type: 'listen_sequence', swaras: ['Pa','Pa','Da2','|','Pa','Pa','|','Ma1','Ri2','||','Ri2','Sa','Ri2','|','Ma1',',','|','Ma1',',','||'], displayLabel: '♪', instruction: 'Listen to line 5 — P P D | P P | M R || R S R | M , | M , ||' },
+                    { type: 'sing_sequence', swaras: ['Da2','Da2','Ṡ','|','Da2',',','|','Da2','Pa','||'], speed: 1, instruction: 'Sing the Da–Ṡ phrase: D D Ṡ | D , | D P ||' },
+                    { type: 'sing_sequence', swaras: ['Pa','Ma1','Ri2','|','Sa','Ri2','|','Sa','Ri2','||','Pa','Pa','Da2','|','Pa','Pa','|','Ma1','Ri2','||'], speed: 1, instruction: 'Sing the Sa–Ri cadence and P–P–D ascent of Aṇalēkāra.' },
                 ]
             },
         ]
@@ -1197,12 +1197,12 @@ export const GEETHAM_CURRICULUM = [
             {
                 id: 'gm6', title: 'Geetham 6: Vāra Vīṇā', tag: 'Geetham',
                 exercises: [
-                    { type: 'info', title: 'Vāra Vīṇā', body: 'Rāga: Mohanam · Tāḷam: Chatusra Jāti Rūpaka (3 beats)\n\n"Vāra Vīṇā" ("the auspicious vīṇā") is a praise of Goddess Saraswati, the goddess of learning and music, who carries the divine vīṇā instrument. The bright, captivating Mohanam raga perfectly suits a tribute to the muse of music.\n\nThe geetham features elegant leaps up to Da₂ and Ṡ, with Ga₂ creating beautiful Mohanam color.' },
-                    { type: 'listen_sequence', swaras: ['Ga2', 'Ga2', 'Pa', ',', 'Pa', ',', 'Da2', 'Pa', 'Ṡ', ',', 'Ṡ', ','], displayLabel: '♪', instruction: 'Listen to the opening phrase — Ga-Pa-Da-Ṡ: the signature Mohanam ascent.' },
-                    { type: 'listen_sequence', swaras: ['Ga2', 'Pa', 'Da2', 'Ṡ', 'Da2', ',', 'Da2', 'Pa', 'Ga2', 'Ga2', 'Ri2', ','], displayLabel: '♪', instruction: 'Listen to the characteristic ascent-then-descent phrase.' },
-                    { type: 'listen_sequence', swaras: ['Ga2', 'Ga2', 'Da2', 'Pa', 'Ga2', ',', 'Pa', 'Ga2', 'Ga2', 'Ri2', 'Sa', ','], displayLabel: '♪', instruction: 'Listen to the cadential phrase returning to Sa.' },
-                    { type: 'sing_sequence', swaras: ['Ga2', 'Pa', 'Da2', 'Ṡ'], speed: 1, instruction: 'Sing the signature Mohanam ascent: Ga Pa Da Ṡ.' },
-                    { type: 'sing_sequence', swaras: ['Ṡ', 'Da2', 'Pa', 'Ga2', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the descent back to Sa with Ga₂ color.' },
+                    { type: 'info', title: 'Vāra Vīṇā', body: 'Rāga: Mohanam · Tāḷam: Chatusra Jāti Rūpaka (2+4 per cycle)\n\n"Vāra Vīṇā" ("the auspicious vīṇā") is a praise of Goddess Saraswati, the goddess of learning and music, who carries the divine vīṇā instrument. The bright, captivating Mohanam raga perfectly suits a tribute to the muse of music.\n\nThe geetham features elegant leaps up to Da₂ and Ṡ, with Ga₂ creating beautiful Mohanam color.' },
+                    { type: 'listen_sequence', swaras: ['Ga2','Ga2','|','Pa',',','Pa',',','||','Da2','Pa','|','Ṡ',',','Ṡ',',','||','Ri2','Ṡ','|','Da2','Da2','Pa',',','||','Da2','Pa','|','Ga2','Ga2','Ri2',',','||'], displayLabel: '♪', instruction: 'Listen to lines 1–2 — G G | P , P , || D P | Ṡ , Ṡ , || then Ṙ Ṡ | D D P , || D P | G G R , ||' },
+                    { type: 'listen_sequence', swaras: ['Ga2','Pa','|','Da2','Ṡ','Da2',',','||','Da2','Pa','|','Ga2','Ga2','Ri2',',','||','Ga2','Ga2','|','Ga2','Ga2','Da2','Pa','||','Ga2',',','|','Ga2','Ga2','Ri2','Sa','||'], displayLabel: '♪', instruction: 'Listen to lines 3–4 — G P | D Ṡ D , || D P | G G R , || and G G | G G D P || G , | G G R S ||' },
+                    { type: 'listen_sequence', swaras: ['Sa','Ga2','|','Ga2',',','Ga2',',','||','Ga2','Ri2','|','Pa','Ga2','Ri2','Sa','||'], displayLabel: '♪', instruction: 'Listen to the cadential phrase returning to Sa: S G | G , G , || G R | P G R S ||' },
+                    { type: 'sing_sequence', swaras: ['Ga2','Pa','|','Da2','Ṡ','Da2',',','||','Da2','Pa','|','Ga2','Ga2','Ri2',',','||'], speed: 1, instruction: 'Sing line 3: G P | D Ṡ D , || D P | G G R , ||' },
+                    { type: 'sing_sequence', swaras: ['Sa','Ga2','|','Ga2',',','Ga2',',','||','Ga2','Ri2','|','Pa','Ga2','Ri2','Sa','||'], speed: 1, instruction: 'Sing the closing cadence of Vāra Vīṇā: S G | G , G , || G R | P G R S ||' },
                 ]
             },
         ]
@@ -1227,12 +1227,12 @@ export const GEETHAM_CURRICULUM = [
             {
                 id: 'gm7', title: 'Geetham 7: Kamala Jādhalā', tag: 'Geetham',
                 exercises: [
-                    { type: 'info', title: 'Kamala Jādhalā', body: 'Rāga: Kalyāṇī · Tāḷam: Tisra Jāti Triputa (7 beats: 3+2+2)\n\n"Kamala Jādhalā" is a praise of Goddess Lakshmi — "she who sports in the lotus." The grandeur of Kalyāṇī suits the majesty of Lakshmi, the goddess of prosperity.\n\nThis is one of the most challenging geethams in this set, spanning from tara Sa (Ṡ) all the way down through the full Kalyāṇī avarohanam, with phrases using all 7 notes.' },
-                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ṡ', 'Ṡ', 'Ni2', 'Da2', 'Ni2', 'Ṡ', 'Ni2', 'Da2', 'Pa', 'Da2', 'Pa', 'Ma2', 'Pa'], displayLabel: '♪', instruction: 'Listen to the opening phrase — notice how it stays in the upper register.' },
-                    { type: 'listen_sequence', swaras: ['Da2', 'Da2', 'Da2', 'Ga2', 'Ga2', 'Ga2', ',', 'Ma2', 'Pa', ',', 'Ma2', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to the characteristic middle section.' },
-                    { type: 'listen_sequence', swaras: ['Ni2', 'Da2', 'Pa', 'Da2', 'Pa', 'Ma2', 'Pa', 'Ga2', 'Ma2', 'Pa', 'Ma2', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to the full descending phrase of Kamala Jādhalā.' },
-                    { type: 'sing_sequence', swaras: ['Ni2', 'Da2', 'Pa', 'Ma2', 'Pa', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing this characteristic descent through Kalyāṇī.' },
-                    { type: 'sing_sequence', swaras: ['Ga2', 'Ma2', 'Pa', 'Ma2', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the closing cadence of Kamala Jādhalā.' },
+                    { type: 'info', title: 'Kamala Jādhalā', body: 'Rāga: Kalyāṇī · Tāḷam: Tisra Jāti Triputa (3+2+2 per cycle)\n\n"Kamala Jādhalā" is a praise of Goddess Lakshmi — "she who sports in the lotus." The grandeur of Kalyāṇī suits the majesty of Lakshmi, the goddess of prosperity.\n\nThis is one of the most challenging geethams in this set, opening with three tara Ṡ beats and weaving all 7 Kalyāṇī notes through a long, sweeping pallavi.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ','Ṡ','Ṡ','|','Ni2','Da2','|','Ni2','Ṡ','||','Ni2','Da2','Pa','|','Da2','Pa','|','Ma2','Pa','||','Ga2','Ma2','Pa','|','Pa','Da2','|','Da2','Ni2','||','Da2','Pa','Ma2','|','Pa','Ga2','|','Ri2','Sa','||'], displayLabel: '♪', instruction: 'Listen to lines 1–2 — Ṡ Ṡ Ṡ | N D | N Ṡ || N D P | D P | M P || and the full 7-note descent.' },
+                    { type: 'listen_sequence', swaras: ['Da2','Da2','Da2','|','Ga2','Ga2','|','Ga2',',','||','Ma2','Pa',',','|','Ma2','Ga2','|','Ri2','Sa','||','Ri2',',',',','|','Sa',',','|',',',',','||','Ga2','Ma2','Pa','|','Ma2','Pa','|','Da2','Pa','||'], displayLabel: '♪', instruction: 'Listen to lines 3–4 — D D D | G G | G , || M P , | M G | R S || and the ascending return.' },
+                    { type: 'listen_sequence', swaras: ['Ni2','Da2','Pa','|','Da2','Pa','|','Ma2','Pa','||','Ga2','Ma2','Pa','|','Pa','Da2','|','Da2','Ni2','||','Da2','Pa','Ma2','|','Pa','Ga2','|','Ri2','Sa','||'], displayLabel: '♪', instruction: 'Listen to lines 5–6 — full characteristic Kalyāṇī phrases N D P | D P | M P || G M P | P D | D N || D P M | P G | R S ||' },
+                    { type: 'sing_sequence', swaras: ['Ṡ','Ṡ','Ṡ','|','Ni2','Da2','|','Ni2','Ṡ','||','Ni2','Da2','Pa','|','Da2','Pa','|','Ma2','Pa','||'], speed: 1, instruction: 'Sing the opening upper-register phrase: Ṡ Ṡ Ṡ | N D | N Ṡ || N D P | D P | M P ||' },
+                    { type: 'sing_sequence', swaras: ['Da2','Pa','Ma2','|','Pa','Ga2','|','Ri2','Sa','||'], speed: 1, instruction: 'Sing the closing descent through all 7 Kalyāṇī notes: D P M | P G | R S ||' },
                 ]
             },
         ]
@@ -1257,12 +1257,12 @@ export const GEETHAM_CURRICULUM = [
             {
                 id: 'gm8', title: 'Geetham 8: Janaka Sutha', tag: 'Geetham',
                 exercises: [
-                    { type: 'info', title: 'Janaka Sutha', body: 'Rāga: Sāveri · Tāḷam: Chatusra Jāti Rūpaka (3 beats)\n\n"Janaka Sutha" means "the daughter of Janaka" — a name for Goddess Sītā, the daughter of King Janaka. This geetham is a prayer to Sītā, the consort of Rāma.\n\nThe tender, devotional quality of Sāveri suits this intimate prayer beautifully. Notice how the geetham weaves between Ri₁ and Ga₃ in the characteristic Sāveri way.' },
-                    { type: 'listen_sequence', swaras: ['Da1', 'Sa', 'Ri1', 'Ma1', 'Ma1', ',', 'Ma1', 'Ga3', ',', 'Ga3', 'Ri1', 'Sa'], displayLabel: '♪', instruction: 'Listen to the opening phrase of Janaka Sutha — hear the gentle Ga₃ ornament.' },
-                    { type: 'listen_sequence', swaras: ['Ga3', ',', 'Ri1', 'Ri1', 'Ga3', ',', 'Ri1', 'Ri1', 'Sa', 'Da1', 'Sa', ','], displayLabel: '♪', instruction: 'Listen to the Ri-Ga interplay in the second phrase.' },
-                    { type: 'listen_sequence', swaras: ['Da1', 'Da1', 'Pa', 'Ma1', 'Pa', ',', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa', 'Ri1'], displayLabel: '♪', instruction: 'Listen to the broad mid-section phrase.' },
-                    { type: 'sing_sequence', swaras: ['Da1', 'Sa', 'Ri1', 'Ma1', 'Ga3', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the opening phrase of Janaka Sutha.' },
-                    { type: 'sing_sequence', swaras: ['Da1', 'Da1', 'Pa', 'Ma1', 'Ga3', 'Ri1', 'Sa'], speed: 1, instruction: 'Sing the characteristic Sāveri descent.' },
+                    { type: 'info', title: 'Janaka Sutha', body: 'Rāga: Sāveri · Tāḷam: Chatusra Jāti Rūpaka (2+4 per cycle)\n\n"Janaka Sutha" means "the daughter of Janaka" — a name for Goddess Sītā, the daughter of King Janaka. This geetham is a prayer to Sītā, the consort of Rāma.\n\nThe tender, devotional quality of Sāveri suits this intimate prayer beautifully. Notice how the geetham weaves between Ri₁ and Ga₃, and how Ni₂ appears as a characteristic color in the descent.' },
+                    { type: 'listen_sequence', swaras: ['Da1','Sa','|','Ri1','Ma1','Ma1',',','||','Ma1','Ga3','|',',','Ga3','Ri1','Sa','||','Ga3',',','|','Ri1','Ri1','Ga3',',','||','Ri1','Ri1','|','Sa','Da1','Sa',',','||'], displayLabel: '♪', instruction: 'Listen to lines 1–2 — D S | R M M , || M G | , G R S || G , | R R G , || R R | S D S , ||' },
+                    { type: 'listen_sequence', swaras: ['Da1','Da1','|','Pa','Ma1','Pa',',','||','Pa','Ma1','|','Ga3','Ri1','Sa','Ri1','||','Pa','Ma1','|','Ga3','Ri1','Ri1','Ma1','||','Ga3','Ri1','|','Sa',',','Sa',',','||'], displayLabel: '♪', instruction: 'Listen to lines 3–4 — the broad mid-section: D D | P M P , || P M | G R S R || P M | G R R M || G R | S , S , ||' },
+                    { type: 'listen_sequence', swaras: ['Sa','Ri1','|','Sa',',','Ni2','Da1','||','Sa','Ri1','|','Ma1',',','Ga3','Ri1','||'], displayLabel: '♪', instruction: 'Listen to line 5 — S R | S , N D || S R | M , G R || — hear Ni₂ and Ga₃ in characteristic Sāveri.' },
+                    { type: 'sing_sequence', swaras: ['Da1','Sa','|','Ri1','Ma1','Ma1',',','||','Ma1','Ga3','|',',','Ga3','Ri1','Sa','||'], speed: 1, instruction: 'Sing the opening phrase: D S | R M M , || M G | , G R S ||' },
+                    { type: 'sing_sequence', swaras: ['Sa','Ri1','|','Sa',',','Ni2','Da1','||','Sa','Ri1','|','Ma1',',','Ga3','Ri1','||'], speed: 1, instruction: 'Sing the characteristic Sāveri descent with Ni₂ and Ga₃: S R | S , N D || S R | M , G R ||' },
                 ]
             },
         ]
@@ -1287,12 +1287,12 @@ export const GEETHAM_CURRICULUM = [
             {
                 id: 'gm9', title: 'Geetham 9: Mandhara Dhārarē', tag: 'Geetham',
                 exercises: [
-                    { type: 'info', title: 'Mandhara Dhārarē', body: 'Rāga: Kāmbhoji · Tāḷam: Chatusra Jāti Triputa (Ādi, 8 beats) or Tisra Jāti Triputa\n\n"Mandhara Dhārarē" praises Vishnu who holds Mount Mandara — a reference to the divine churning of the cosmic ocean. The majestic Kāmbhoji raga suits this grand mythological theme perfectly.\n\nThis is the most complex geetham in this collection, set in Ādi Tāḷam with full use of the Kāmbhoji range from Sa to Ṡ.' },
-                    { type: 'listen_sequence', swaras: ['Ṡ', ',', 'Ni1', 'Pa', 'Da2', 'Da2', 'Ṡ', ','], displayLabel: '♪', instruction: 'Listen to the characteristic opening phrase: Ṡ–Ni₁–Pa sweeping up to Ṡ.' },
-                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ṡ', 'Ni1', 'Ni1', 'Da2', 'Pa', 'Da2', 'Da2', 'Pa', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to the broad descending phrase of Mandhara Dhārarē.' },
-                    { type: 'listen_sequence', swaras: ['Ga2', 'Pa', 'Da2', 'Ṡ', 'Ni1', 'Ni1', 'Da2', 'Pa', 'Da2', 'Da2', 'Pa', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to the full characteristic phrase with the complete Kāmbhoji avarohanam.' },
-                    { type: 'sing_sequence', swaras: ['Ga2', 'Pa', 'Da2', 'Ṡ', 'Ni1', 'Da2', 'Pa'], speed: 1, instruction: 'Sing the ascent to Ṡ and descent through Ni₁.' },
-                    { type: 'sing_sequence', swaras: ['Da2', 'Da2', 'Pa', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the closing descent of Mandhara Dhārarē.' },
+                    { type: 'info', title: 'Mandhara Dhārarē', body: 'Rāga: Kāmbhoji · Tāḷam: Chatusra Jāti Triputa (Ādi, 4+2+2 per cycle)\n\n"Mandhara Dhārarē" praises Vishnu who holds Mount Mandara — a reference to the divine churning of the cosmic ocean. The majestic Kāmbhoji raga suits this grand mythological theme perfectly.\n\nSet in Ādi Tāḷam, this geetham features sweeping phrases from Sa up through Ṡ and into the tara register, with the characteristic Kāmbhoji Ni₁ in the descent.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ',',','Ni1','Pa','|','Da2','Da2','|','Ṡ',',','||','Da2','Ṡ','Ri2','Ga2','|','Ma1','Ga2','|','Ga2','Ri2','||'], displayLabel: '♪', instruction: 'Listen to lines 1–2 — Ṡ , N P | D D | Ṡ , || and the tara ascent through Ṙ and Ġ.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ','Ri2','Ṡ','Ṡ','|','Ni1','Ni1','|','Da2','Pa','||','Da2','Da2','Pa','Ma1','|','Ga2','Ma1','|','Pa',',','||'], displayLabel: '♪', instruction: 'Listen to lines 3–4 — Ṡ Ṙ Ṡ Ṡ | N N | D P || and Pā-va-na descent D D P M | G M | P , ||' },
+                    { type: 'listen_sequence', swaras: ['Ga2','Pa','Da2','Ṡ','|','Ni1','Ni1','|','Da2','Pa','||','Da2','Da2','Pa','Pa','|','Ma1','Ga2','|','Ri2','Sa','||'], displayLabel: '♪', instruction: 'Listen to lines 5–6 — the characteristic sweep G P D Ṡ | N N | D P || and descent D D P P | M G | R S ||' },
+                    { type: 'sing_sequence', swaras: ['Ṡ',',','Ni1','Pa','|','Da2','Da2','|','Ṡ',',','||'], speed: 1, instruction: 'Sing line 1 of Mandhara Dhārarē: Ṡ , N P | D D | Ṡ , ||' },
+                    { type: 'sing_sequence', swaras: ['Ga2','Pa','Da2','Ṡ','|','Ni1','Ni1','|','Da2','Pa','||','Da2','Da2','Pa','Pa','|','Ma1','Ga2','|','Ri2','Sa','||'], speed: 1, instruction: 'Sing the characteristic sweep and descent: G P D Ṡ | N N | D P || D D P P | M G | R S ||' },
                 ]
             },
         ]
@@ -1317,12 +1317,12 @@ export const GEETHAM_CURRICULUM = [
             {
                 id: 'gm10', title: 'Geetham 10: Rē Rē Śrī Rāma Chandra', tag: 'Geetham',
                 exercises: [
-                    { type: 'info', title: 'Rē Rē Śrī Rāma Chandra', body: 'Rāga: Ārābhi · Tāḷam: Tisra Jāti Triputa (7 beats: 3+2+2)\n\n"Rē Rē Śrī Rāma Chandra" is a fervent prayer to Lord Rāma. "Rē Rē" is a respectful exclamation calling out to the Lord. The bold Ārābhi raga perfectly captures the heroic and devotional spirit of a prayer to Rāma, the warrior king.\n\nThis geetham is the culmination of this collection — it uses all the techniques and raga awareness you have built through the previous nine geethams.' },
-                    { type: 'listen_sequence', swaras: ['Pa', ',', 'Pa', 'Ma1', 'Ma1', 'Pa', ',', 'Ma1', 'Ga2', 'Ri2', 'Sa', 'Ri2', 'Ma1', 'Ga2'], displayLabel: '♪', instruction: 'Listen to the opening phrase of Rē Rē Śrī Rāma Chandra.' },
-                    { type: 'listen_sequence', swaras: ['Ri2', 'Ri2', 'Sa', 'Sa', 'Da2', 'Ri2', 'Sa', 'Ri2', ',', ',', 'Ri2', ',', 'Sa', 'Ri2'], displayLabel: '♪', instruction: 'Listen to the bold Sa–Da₂ leap that characterizes Ārābhi.' },
-                    { type: 'listen_sequence', swaras: ['Pa', 'Ma1', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Ri2', 'Ma1', 'Ga2', 'Ri2', 'Sa', 'Ri2', 'Sa', 'Sa'], displayLabel: '♪', instruction: 'Listen to the flowing descent with Ga₂ color.' },
-                    { type: 'sing_sequence', swaras: ['Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the characteristic Ārābhi descent: Pa–Ma–Ga–Ri–Sa.' },
-                    { type: 'sing_sequence', swaras: ['Sa', 'Ri2', 'Ma1', 'Pa', 'Da2', 'Ṡ', 'Ni2', 'Da2', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], speed: 1, instruction: 'Sing the full Ārābhi scale — the complete journey of Rē Rē Śrī Rāma Chandra.' },
+                    { type: 'info', title: 'Rē Rē Śrī Rāma Chandra', body: 'Rāga: Ārābhi · Tāḷam: Tisra Jāti Triputa (3+2+2 per cycle)\n\n"Rē Rē Śrī Rāma Chandra" is a fervent prayer to Lord Rāma. "Rē Rē" is a respectful exclamation calling out to the Lord. The bold Ārābhi raga perfectly captures the heroic and devotional spirit of a prayer to Rāma, the warrior king.\n\nThis geetham is the culmination of this collection — it uses all the techniques and raga awareness you have built through the previous nine geethams.' },
+                    { type: 'listen_sequence', swaras: ['Pa',',','Pa','|','Ma1','Ma1','|','Pa',',','||','Ma1','Ga2','Ri2','|','Sa','Ri2','|','Ma1','Ga2','||','Ri2','Ri2','Sa','|','Sa','Da2','|','Ri2','Sa','||','Ri2',',',',','|','Ri2',',','|','Sa','Ri2','||'], displayLabel: '♪', instruction: 'Listen to lines 1–2 — P , P | M M | P , || M G R | S R | M G || R R S | S D | R S ||' },
+                    { type: 'listen_sequence', swaras: ['Ma1','Ga2','Ri2','|','Ri2','Sa','|','Sa',',','||','Pa','Ma1','Ma1','|','Pa',',','|','Pa',',','||','Pa','Ma1','Pa','|','Ma1','Ga2','|','Ri2','Ri2','||','Ma1','Ga2','Ri2','|','Sa','Ri2','|','Sa','Sa','||'], displayLabel: '♪', instruction: 'Listen to lines 3–4 — M G R | R S | S , || P M M | P , | P , || P M P | M G | R R ||' },
+                    { type: 'listen_sequence', swaras: ['Pa','Ma1','Pa','|','Da2','Ṡ','|','Ṡ','Ri2','||','Ma1','Ga2','Ri2','|','Ṡ','Ri2','|','Ṡ','Ṡ','||'], displayLabel: '♪', instruction: 'Listen to the soaring tara section — P M P | D Ṡ | Ṡ Ṙ || M Ġ Ṙ | Ṡ Ṙ | Ṡ Ṡ ||' },
+                    { type: 'sing_sequence', swaras: ['Pa',',','Pa','|','Ma1','Ma1','|','Pa',',','||','Ma1','Ga2','Ri2','|','Sa','Ri2','|','Ma1','Ga2','||'], speed: 1, instruction: 'Sing the opening phrase: P , P | M M | P , || M G R | S R | M G ||' },
+                    { type: 'sing_sequence', swaras: ['Pa','Ma1','Pa','|','Ma1','Ga2','|','Ri2','Ri2','||','Ma1','Ga2','Ri2','|','Sa','Ri2','|','Sa','Sa','||'], speed: 1, instruction: 'Sing the bold Ārābhi descent: P M P | M G | R R || M G R | S R | S S ||' },
                 ]
             },
         ]

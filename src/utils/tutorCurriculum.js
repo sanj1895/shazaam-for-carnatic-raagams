@@ -1417,7 +1417,6 @@ const GEETHAM_CURRICULUM_RAW = [
 const parseSwarajathi = (str, swaraMap) => {
     const tokens = [];
     let lastPlayableIdx = -1;
-    const lowerOctaveMap = { s: 'Sa.', r: 'Ri.', g: 'Ga.', m: 'Ma.', p: 'Pa.', d: 'Da.', n: 'Ni.' };
     for (let i = 0; i < str.length; i++) {
         const char = str[i];
         if (char === '|') {
@@ -1438,8 +1437,8 @@ const parseSwarajathi = (str, swaraMap) => {
                 tokens.push({ swara: ',', duration: 1 });
             }
         } else if (swaraMap[char]) {
-            if (str[i + 1] === '.' && lowerOctaveMap[char]) {
-                tokens.push(lowerOctaveMap[char]);
+            if (str[i + 1] === '.') {
+                tokens.push(`${swaraMap[char]}.`);
                 i++;
             } else {
                 tokens.push(swaraMap[char]);

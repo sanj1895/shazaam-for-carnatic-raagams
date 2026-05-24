@@ -25,10 +25,22 @@ export const SWARA_SEMITONE = {
 
   // Mandhra Sthayi (lower octave) notes — negative semitones encode frequency directly at octave 0
   'Sa.': -12,
+  'Ri1.': -11,
+  'Ri2.': -10, 'Ga1.': -10,
+  'Ga2.': -9,  'Ri3.': -9,
+  'Ga3.': -8,
+  'Ma.': -7,
+  'Ma1.': -7,
+  'Ma2.': -6,
+  'Pa.': -5,
+  'Da1.': -4,
+  'Da2.': -3, 'Ni1.': -3,
+  'Ni2.': -2, 'Da3.': -2,
+  'Ni3.': -1,
+
+  // Plain lower-octave aliases for the beginner Mayamalavagowla material.
   'Ri.': -11,
   'Ga.': -8,
-  'Ma.': -7,
-  'Pa.': -5,
   'Da.': -4,
   'Ni.': -1,
 };
@@ -42,7 +54,11 @@ export const SEMITONE_TO_SWARA = Object.fromEntries(
  * Uses equal temperament spacing (2^(semitones/12)).
  */
 export function noteFreq(note, saHz) {
-  const semitone = SWARA_SEMITONE[note];
+  const semitone = SWARA_SEMITONE[note] ?? (
+    note?.endsWith('.') && SWARA_SEMITONE[note.slice(0, -1)] !== undefined
+      ? SWARA_SEMITONE[note.slice(0, -1)] - 12
+      : undefined
+  );
   if (semitone === undefined) return saHz;
   return saHz * Math.pow(2, semitone / 12);
 }

@@ -137,22 +137,19 @@ const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamak
         if (tala) {
             playTick(getAudioCtx(), getAudioCtx().currentTime);
         }
-        if (swara === ',') {
-            // rest/silence — clear highlight and wait
-            onIdx(-1);
-            prevFreq = null;
-            await waitRhythmicUnits(getTokenDuration(swaras[i]), delayMs, signal, tala);
-            continue;
-        }
-        if (swara === '-') {
+        if (swara === ',' || swara === '-') {
             // hold — keep visual highlight on the sustained note, no new audio attack
             onIdx(prevNoteIdx);
             await waitRhythmicUnits(getTokenDuration(swaras[i]), delayMs, signal, tala);
             continue;
         }
-        // Peek ahead: count consecutive hold beats to extend tone duration
+        // Peek ahead: count consecutive hold beats ('-' or ',') to extend tone duration
         let holdCount = 0;
-        for (let k = i + 1; k < swaras.length && getTokenSwara(swaras[k]) === '-'; k++) holdCount += getTokenDuration(swaras[k]);
+        for (let k = i + 1; k < swaras.length; k++) {
+            const nxt = getTokenSwara(swaras[k]);
+            if (nxt !== '-' && nxt !== ',') break;
+            holdCount += getTokenDuration(swaras[k]);
+        }
         const totalDuration = getTokenDuration(swaras[i]) + holdCount;
         const extDur = holdCount > 0
             ? Math.min((totalDuration * delayMs / 1000) * 0.90, 8.0)

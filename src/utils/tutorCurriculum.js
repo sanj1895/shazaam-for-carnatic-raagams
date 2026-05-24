@@ -453,7 +453,6 @@ const withCompositionRhythm = (curriculum) => curriculum.map(stage => ({
                 return {
                     ...exercise,
                     tala: exercise.tala || currentTala || null,
-                    swaras: sustainNotation(exercise.swaras)
                 };
             }
             return exercise;

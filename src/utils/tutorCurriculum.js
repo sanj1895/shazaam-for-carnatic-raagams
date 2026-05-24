@@ -1713,6 +1713,173 @@ const SWARAJATHI_CURRICULUM_RAW = [
 
 export const GEETHAM_CURRICULUM = withCompositionRhythm(GEETHAM_CURRICULUM_RAW);
 export const SWARAJATHI_CURRICULUM = withCompositionRhythm(SWARAJATHI_CURRICULUM_RAW);
+export const VARNAM_CURRICULUM_RAW = [
+    {
+        id: 'varnam_stage1', title: 'Devar Munivar (Pada Varnam)', symbol: '🛕',
+        subtitle: 'Shanmukhapriya · Adi · Lalgudi Jayaraman',
+        color: '#2a1220', tag: 'Varnam 1',
+        lessons: [
+            {
+                id: 'v1_intro', title: 'Raga and Sahitya Orientation', tag: 'Orientation',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Devar Munivar — Overview',
+                        body: 'Raga: Shanmukhapriya (57th Melakarta)\nTala: Adi\nComposer: Lalgudi Jayaraman\n\nArohanam: Sa Ri2 Ga2 Ma2 Pa Da1 Ni2 Ṡ\nAvarohanam: Ṡ Ni2 Da1 Pa Ma2 Ga2 Ri2 Sa\n\nThis pada varnam praises Lord Srinivasa of Tirumala. Focus first on bhava-rich sahityam delivery, then on clean handling of Ma2 and Da1 color.'
+                    },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri2', 'Ga2', 'Ma2', 'Pa', 'Da1', 'Ni2', 'Ṡ'], displayLabel: '♪', instruction: 'Listen to the Shanmukhapriya arohanam.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ni2', 'Da1', 'Pa', 'Ma2', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to the Shanmukhapriya avarohanam.' },
+                ]
+            },
+            {
+                id: 'v1_pallavi_anupallavi', title: 'Pallavi and Anupallavi', tag: 'Sahityam',
+                exercises: [
+                    {
+                        type: 'lyrics_practice',
+                        title: 'Pallavi',
+                        lyrics: ['dEvar munivar tozhum jagannAthan dIna dayALan tirumaghaLurai mArban'],
+                        meaning: 'O Lord of the world, revered by gods and sages, compassionate to the humble, with Lakshmi on your chest.'
+                    },
+                    {
+                        type: 'lyrics_practice',
+                        title: 'Anupallavi',
+                        lyrics: ['mAvali valimaiyait-tALAl aLanda tirumAl shrI vEnkaTagiri cenkamalak-kaNNa perumAn'],
+                        meaning: 'The Lord who measured the worlds (Vamana), the lotus-eyed one of Venkatagiri.'
+                    }
+                ]
+            },
+            {
+                id: 'v1_charanam', title: 'Charanam and Chittaswaram Themes', tag: 'Meaning',
+                exercises: [
+                    {
+                        type: 'lyrics_practice',
+                        title: 'Charanam',
+                        lyrics: ['shrInivAsan perumai collat-taramA'],
+                        meaning: 'Can one truly describe the full glory of Srinivasa?'
+                    },
+                    {
+                        type: 'info',
+                        title: 'Chittaswaram Bhava Anchors',
+                        body: 'Use these emotional anchors while practicing the four chittaswaram sahityas:\n1) All devas worship him.\n2) Conch and discus-bearing protector.\n3) Kali-yuga karuna murti in jewel-like splendor.\n4) Gita-upadesha giver, beloved Venkataramana, eternal auspicious one.'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'varnam_stage2', title: 'Evvari Bodhana', symbol: '🏔️',
+        subtitle: 'Abhogi · Adi · Patnam Subramania Iyer',
+        color: '#1d2338', tag: 'Varnam 2',
+        lessons: [
+            {
+                id: 'v2_intro', title: 'Raga and Theme', tag: 'Orientation',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Evvari Bodhana — Overview',
+                        body: 'Raga: Abhogi (Janya of 22nd mela)\nTala: Adi\nComposer: Patnam Subramania Iyer\n\nArohanam: Sa Ri2 Ga1 Ma1 Da2 Ṡ\nAvarohanam: Ṡ Da2 Ma1 Ga1 Ri2 Sa\n\nThis varnam voices longing and questioning: "By whose counsel do you behave this way?" Keep the delivery pleading yet dignified.'
+                    },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri2', 'Ga1', 'Ma1', 'Da2', 'Ṡ'], displayLabel: '♪', instruction: 'Listen to Abhogi arohanam.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Da2', 'Ma1', 'Ga1', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to Abhogi avarohanam.' },
+                ]
+            },
+            {
+                id: 'v2_core_lyrics', title: 'Pallavi, Anupallavi, Charanam', tag: 'Sahityam',
+                exercises: [
+                    { type: 'lyrics_practice', title: 'Pallavi', lyrics: ['Evvari bodhanavini eelagu jesevura'], meaning: 'By hearing whose words are you behaving like this?' },
+                    { type: 'lyrics_practice', title: 'Anupallavi', lyrics: ['Javamuga nannelara Seshachalendra Sree Venkatesa'], meaning: 'O Venkatesa, lord of Seshachala, come swiftly and rule/protect me.' },
+                    { type: 'lyrics_practice', title: 'Charanam', lyrics: ['Marubari korvajalanura'], meaning: 'I cannot endure the torment caused by Cupid any longer.' }
+                ]
+            },
+            {
+                id: 'v2_practice_focus', title: 'Practice Focus for Abhogi', tag: 'Technique',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Voice and Bhava Checklist',
+                        body: '1) Keep Ga1 and Ma1 transitions clean (no over-sliding).\n2) In Madhyama kala passages, keep sahitya consonants crisp.\n3) Preserve the pleading tone in pallavi/anupallavi and emotional fragility in charanam.'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'varnam_stage3', title: 'Sami Ninne', symbol: '🪷',
+        subtitle: 'Sankarabharanam · Adi · Veenai Kuppaiyer',
+        color: '#223019', tag: 'Varnam 3',
+        lessons: [
+            {
+                id: 'v3_intro', title: 'Raga and Structure', tag: 'Orientation',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Sami Ninne — Overview',
+                        body: 'Raga: Sankarabharanam (29th Melakarta)\nTala: Adi\nComposer: Veenai Kuppaiyer\n\nArohanam: Sa Ri2 Ga2 Ma1 Pa Da2 Ni2 Ṡ\nAvarohanam: Ṡ Ni2 Da2 Pa Ma1 Ga2 Ri2 Sa\n\nA classic varnam balancing rakti and clarity. Build evenness across all speeds before adding heavier gamaka weight.'
+                    },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri2', 'Ga2', 'Ma1', 'Pa', 'Da2', 'Ni2', 'Ṡ'], displayLabel: '♪', instruction: 'Listen to Sankarabharanam arohanam.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ni2', 'Da2', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to Sankarabharanam avarohanam.' },
+                ]
+            },
+            {
+                id: 'v3_core_lyrics', title: 'Sahityam Core', tag: 'Sahityam',
+                exercises: [
+                    { type: 'lyrics_practice', title: 'Pallavi', lyrics: ['Sami nine kori chala marulu konnadira'], meaning: 'O Lord, she is deeply agitated due to longing for you.' },
+                    { type: 'lyrics_practice', title: 'Anupallavi', lyrics: ['Thamasamu seyaka dayajudara kumara'], meaning: 'O divine son, do not delay further; please show compassion.' },
+                    { type: 'lyrics_practice', title: 'Charanam', lyrics: ['Neerajakshi neepai'], meaning: 'The lotus-eyed one longs for you.' }
+                ]
+            },
+            {
+                id: 'v3_practice_focus', title: 'Speed and Articulation Focus', tag: 'Technique',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'How to Practice This Varnam',
+                        body: '1) First speed: perfect sruti and sahitya clarity.\n2) Second speed: maintain vowel length balance.\n3) Chittaswaram: no swallowed notes at phrase turns.\n4) Keep Sankarabharanam bright and open, never nasal.'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'varnam_stage4', title: 'Vanajaksha', symbol: '🌺',
+        subtitle: 'Kalyani · Khanda Jathi Ata · Pallavi Gopaliyer',
+        color: '#3a1f13', tag: 'Varnam 4',
+        lessons: [
+            {
+                id: 'v4_intro', title: 'Raga and Tala Orientation', tag: 'Orientation',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Vanajaksha — Overview',
+                        body: 'Raga: Kalyani (65th Melakarta)\nTala: Khanda Jathi Ata Tala (5 + 5 + 2 + 2)\nComposer: Pallavi Gopaliyer\n\nArohanam: Sa Ri2 Ga3 Ma2 Pa Da2 Ni3 Ṡ\nAvarohanam: Ṡ Ni3 Da2 Pa Ma2 Ga3 Ri2 Sa\n\nThis is an Ata tala varnam: your laya steadiness is as important as swara precision. Count internally without rushing the long khanda laghu spans.'
+                    },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri2', 'Ga3', 'Ma2', 'Pa', 'Da2', 'Ni3', 'Ṡ'], displayLabel: '♪', instruction: 'Listen to Kalyani arohanam.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ni3', 'Da2', 'Pa', 'Ma2', 'Ga3', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to Kalyani avarohanam.' },
+                ]
+            },
+            {
+                id: 'v4_core_lyrics', title: 'Main Sahityam', tag: 'Sahityam',
+                exercises: [
+                    { type: 'lyrics_practice', title: 'Pallavi', lyrics: ['Vanajakshi Ninne Kori yunnadira'], meaning: 'O lotus-eyed one, I am longing for you.' },
+                    { type: 'lyrics_practice', title: 'Anupallavi', lyrics: ['Manasijuni kanna chakkani Sree Ma Kasturi Rangasami'], meaning: 'O beautiful one, more charming than Cupid, O Sri Kasturi Rangasami.' },
+                    { type: 'lyrics_practice', title: 'Charanam', lyrics: ['Chiru Navvu momuna'], meaning: 'The one with the gently smiling face.' }
+                ]
+            },
+            {
+                id: 'v4_tala_focus', title: 'Ata Tala Internalization', tag: 'Laya',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Khanda Jathi Ata Practice Plan',
+                        body: 'Use this progression daily:\n1) Recite tala counts (5+5+2+2) without singing.\n2) Sing only pallavi in first speed with strict eduppu alignment.\n3) Add muktayi swaram in chunks, always landing samam accurately.\n4) Only then increase speed.'
+                    }
+                ]
+            }
+        ]
+    }
+];
+
+export const VARNAM_CURRICULUM = withCompositionRhythm(VARNAM_CURRICULUM_RAW);
 
 export const COURSES = [
     {
@@ -1785,7 +1952,7 @@ export const COURSES = [
         description: 'The ultimate complex blueprints of Ragas, detailing speeds and gamakam glides.',
         symbol: '🦁',
         color: '#3a1313',
-        upcoming: true
+        curriculum: VARNAM_CURRICULUM
     },
     {
         id: 'kritis',

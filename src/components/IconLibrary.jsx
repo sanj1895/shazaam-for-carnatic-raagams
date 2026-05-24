@@ -343,6 +343,14 @@ export const SadhanaIcon = ({ className = "w-5 h-5" }) => (
     </svg>
 );
 
+export const TranscribeIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 5h10a2 2 0 0 1 2 2v12H6a2 2 0 0 1-2-2V5z" />
+        <path d="M8 9h6M8 13h6M8 17h4" />
+        <path d="M18 6l2 2-5 5-2 .5.5-2L18 6z" />
+    </svg>
+);
+
 // Generic Curated Icon component mapping symbols/IDs to beautiful SVGs
 export const CuratedIcon = ({ icon, className = "w-5 h-5" }) => {
     // Nav / Feature Tab keys
@@ -353,6 +361,7 @@ export const CuratedIcon = ({ icon, className = "w-5 h-5" }) => {
     if (icon === 'keyboard') return <KeyboardIcon className={className} />;
     if (icon === 'singback') return <TargetIcon className={className} />;
     if (icon === 'listen') return <DhwaniIcon className={className} />;
+    if (icon === 'transcribe') return <TranscribeIcon className={className} />;
     if (icon === 'library') return <KoshaIcon className={className} />;
     if (icon === 'talam') return <TalamIcon className={className} />;
     if (icon === 'melakarta') return <MelakartaIcon className={className} />;

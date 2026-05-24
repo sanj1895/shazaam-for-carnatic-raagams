@@ -3465,7 +3465,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         const grid = Array.from({ length: totalSlots }, () => []);
         const slotDurSec = slotMs / 1000;
         const onsetTolerance = slotDurSec * 0.35;
-        const minSegSec = Math.max(slotDurSec * 0.35, 0.045);
+        const minSegSec = Math.max(slotDurSec * 0.18, 0.02);
 
         // Smooth labels with local majority to suppress one-frame flips.
         const smoothed = frames.map((_, i) => {
@@ -3676,9 +3676,9 @@ function TalaSwaraTranscriber({ sa, setSa }) {
 
                 const yin = yinEstimate(buf, getAudioCtx().sampleRate);
                 const acfFreq = detectPitchAudio(analyserNode, getAudioCtx().sampleRate);
-                const chosenFreq = yin?.confidence >= 0.55 ? yin.freq : acfFreq;
-                const confidence = yin?.confidence ?? 0.45;
-                if (!chosenFreq || confidence < 0.45) {
+                const chosenFreq = yin?.confidence >= 0.48 ? yin.freq : acfFreq;
+                const confidence = yin?.confidence ?? 0.40;
+                if (!chosenFreq || confidence < 0.35) {
                     frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
                     return;
                 }
@@ -3699,9 +3699,9 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 frameHistoryRef.current.push({ time: elapsed / 1000, label: swara, glide, freqSemi: semitones });
 
                 const bucket = bucketsRef.current[slot];
-                const bucketLabel = glide && prev?.label && prev.label !== ',' ? prev.label : swara;
+                const bucketLabel = (anchorOnlyMode && glide && prev?.label && prev.label !== ',') ? prev.label : swara;
                 bucket[bucketLabel] = (bucket[bucketLabel] || 0) + 1;
-            }, 35);
+            }, 20);
         } catch {
             cleanup();
             setPhase('error');
@@ -4226,7 +4226,7 @@ function UnitView({ unit, progress, onSelectLesson, onBack, structuredMode = fal
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export default function Tutor({ saFrequency, onSadhanaComplete }) {
+export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly = false }) {
     const [sa, setSa] = useState(() => {
         try {
             return Number(localStorage.getItem('tutor_base_sa') || saFrequency || 261.63);
@@ -4293,6 +4293,23 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
         const prev = activeCurriculum[unitIdx - 1];
         return prev.lessons.every(l => progress[`${prev.id}/${l.id}`]);
     };
+
+    if (transcribeOnly) {
+        return (
+            <div className="w-full px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 flex flex-col items-center gap-4 sm:gap-6 animate-fade-in">
+                <div className="w-full max-w-4xl flex flex-col gap-3">
+                    <div className="flex items-center justify-between pb-3 border-b border-c-gold/20">
+                        <div>
+                            <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-c-gold tracking-tight uppercase">Sangati Transcribe</h2>
+                            <p className="text-c-cream-dark text-xs font-playfair opacity-85">Capture your own kriti variations against tala and convert them to notation.</p>
+                        </div>
+                        <div className="text-[10px] text-c-cream-dark font-mono">Sa: {sa.toFixed(2)} Hz</div>
+                    </div>
+                    <TalaSwaraTranscriber sa={sa} setSa={updateSa} />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div id="tour-tutor-container" className="w-full px-3 sm:px-4 md:px-8 py-4 sm:py-6 md:py-8 flex flex-col items-center gap-4 sm:gap-6 animate-fade-in">

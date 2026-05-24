@@ -40,6 +40,13 @@ const STEPS = [
     hint: 'Try it while you practice scales in Svara Gurukul',
   },
   {
+    view: 'transcribe',
+    feature: 'Transcribe',
+    title: 'Capture your own sangatis',
+    body: "Sing your own kriti variations against a selected tala, and the app transcribes your swaras with rhythm-aware notation. You can preview tempo, set Sa, and play back your transcription.",
+    hint: 'Great for writing down improvisations and comparing sangati versions',
+  },
+  {
     view: 'keyboard',
     feature: 'Swara Keyboard',
     title: 'Play swaras on virtual keys',
@@ -85,7 +92,7 @@ const STEPS = [
   {
     view: null,
     title: "You're ready to begin",
-    body: "Open Svara Gurukul to start the structured curriculum from scratch, or jump straight to any feature from the navigation.",
+    body: "Open Svara Gurukul to start structured training, or jump into Transcribe and the other tools from the navigation.",
     isLast: true,
   },
 ];

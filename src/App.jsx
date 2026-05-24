@@ -39,6 +39,7 @@ const renderTabIcon = (id, className = "w-5 h-5") => {
 const FEATURES = [
     { id: 'tutor',     label: 'Gurukul',      desc: 'Classical vocal academy & scale flow', symbol: '📿',  mobileSymbol: '📿', level: 'beginner', highlight: true },
     { id: 'listen',    label: 'Dhwani',       desc: 'Sing a melody & identify the raga',       symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
+    { id: 'transcribe',label: 'Transcribe',   desc: 'Transcribe your sangatis against tala',    symbol: '✍︎', mobileSymbol: '✍︎', level: 'intermediate', highlight: true },
     { id: 'library',   label: 'Raga Kosha',   desc: 'Explore & practice every raga scale',    symbol: '◈',  mobileSymbol: '◈', level: 'all', highlight: true },
     { id: 'sadhana',   label: 'Sadhana',      desc: 'Your recommended daily practice path',    symbol: '🧘‍♀️', mobileSymbol: '🧘‍♀️', level: 'start' },
     { id: 'shruthi',   label: 'Shruthi',      desc: 'Continuous drone for practice',          symbol: '〜', mobileSymbol: '🎵', level: 'beginner' },
@@ -550,49 +551,6 @@ function App() {
                             </div>
                         </div>
 
-                        {/* About / Mission section */}
-                        <div
-                            className="relative z-10 w-full max-w-2xl mx-auto px-6 text-center transition-all duration-700"
-                            style={{
-                                opacity: showFeatures ? 0 : 1,
-                                pointerEvents: showFeatures ? 'none' : 'auto',
-                                height: showFeatures ? 0 : 'auto',
-                                paddingTop: showFeatures ? 0 : '4rem',
-                                paddingBottom: showFeatures ? 0 : '4rem',
-                                overflow: 'hidden',
-                            }}
-                        >
-                            <div className="flex items-center gap-4 mb-10">
-                                <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-c-gold/30" />
-                                <span className="text-c-gold/60 text-[10px] tracking-[0.4em] uppercase font-semibold">What We Believe</span>
-                                <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-c-gold/30" />
-                            </div>
-
-                            <p className="font-playfair text-2xl sm:text-3xl text-[#f7d686] leading-snug mb-6">
-                                Carnatic music belongs<br />to everyone.
-                            </p>
-                            <p className="text-white/55 text-sm sm:text-base leading-relaxed mb-4 max-w-xl mx-auto">
-                                One of humanity's oldest living classical traditions — over 2,000 years of raga, tala, and devotion — has long required the right birthplace, the right language, or the right guru to access.
-                            </p>
-                            <p className="text-white/55 text-sm sm:text-base leading-relaxed mb-14 max-w-xl mx-auto">
-                                Ālāpana exists to change that. Whether you grew up in Chennai or Chicago, speak Tamil or not, have trained for decades or are hearing a raga for the very first time — the music meets you where you are.
-                            </p>
-
-                            <div className="grid grid-cols-3 gap-6 text-center">
-                                {[
-                                    { symbol: '🌍', title: 'Open to All', body: 'No geography, language, or lineage required to begin.' },
-                                    { symbol: '📿', title: 'Ancient Wisdom', body: '2,000 years of classical tradition — alive and unbroken.' },
-                                    { symbol: '✦', title: 'Modern Tools', body: 'Real-time pitch detection, guided lessons, and live raga recognition.' },
-                                ].map(({ symbol, title, body }) => (
-                                    <div key={title} className="flex flex-col items-center gap-2 px-1">
-                                        <span className="text-2xl mb-1">{symbol}</span>
-                                        <p className="text-c-gold text-[10px] font-semibold tracking-[0.2em] uppercase">{title}</p>
-                                        <p className="text-white/35 text-xs leading-relaxed">{body}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
                         {/* Feature grid  ·  revelation transition */}
                         <div
                             className="relative z-10 w-full max-w-6xl px-3 sm:px-5 flex flex-col items-center justify-center transition-all duration-1000 ease-out"
@@ -609,7 +567,7 @@ function App() {
                                 {[
                                     { label: 'Start Here', ids: ['sadhana', 'tutor'] },
                                     { label: 'Practice', ids: ['shruthi', 'talam', 'keyboard', 'singback'] },
-                                    { label: 'Explore', ids: ['listen', 'library', 'melakarta', 'bhedam'] },
+                                    { label: 'Explore', ids: ['listen', 'transcribe', 'library', 'melakarta', 'bhedam'] },
                                 ].map(({ label, ids }, groupIdx) => {
                                     const group = FEATURES.filter(f => ids.includes(f.id));
                                     return (
@@ -620,12 +578,28 @@ function App() {
                                                 <span className="bg-c-gold/15 border border-c-gold/45 rounded-full px-4 py-1 text-[9px] font-mono uppercase tracking-[0.25em] text-c-gold font-bold flex-shrink-0">{label}</span>
                                                 <div className="flex-1 h-px bg-c-gold/20" />
                                             </div>
-                                            <div className={`grid gap-3 ${ids.length === 2 ? 'grid-cols-2 max-w-xs mx-auto w-full' : 'grid-cols-2 sm:grid-cols-4'}`}>
+                                            <div className={`grid gap-3 ${
+                                                ids.length === 2
+                                                    ? 'grid-cols-2 max-w-xs mx-auto w-full'
+                                                    : ids.length === 5
+                                                    ? 'grid-cols-2 sm:grid-cols-6 max-w-3xl mx-auto w-full'
+                                                    : 'grid-cols-2 sm:grid-cols-4'
+                                            }`}>
                                                 {group.map(({ id, label: fLabel, desc, highlight }, idx) => (
                                                     <button
                                                         key={id}
                                                         onClick={() => goTo(id)}
-                                                        className="group relative flex flex-col items-center justify-center p-3.5 sm:p-4 text-center transition-all duration-500 hover:-translate-y-1.5 h-full w-full"
+                                                        className={`group relative flex flex-col items-center justify-center p-3.5 sm:p-4 text-center transition-all duration-500 hover:-translate-y-1.5 h-full w-full ${
+                                                            ids.length === 5
+                                                                ? 'sm:col-span-2'
+                                                                : ''
+                                                        } ${
+                                                            ids.length === 5 && idx === 3
+                                                                ? 'sm:col-start-2'
+                                                                : ids.length === 5 && idx === 4
+                                                                ? 'sm:col-start-4'
+                                                                : ''
+                                                        }`}
                                                         style={{
                                                             transitionDelay: showFeatures ? `${(groupIdx * 4 + idx) * 55}ms` : '0ms',
                                                             opacity: showFeatures ? 1 : 0,
@@ -658,6 +632,7 @@ function App() {
 
                 {/* ══ TUTOR ══ */}
                 {view === 'tutor' && <Tutor saFrequency={saFrequency} onSadhanaComplete={markSadhanaStep} />}
+                {view === 'transcribe' && <Tutor saFrequency={saFrequency} transcribeOnly={true} />}
 
                 {/* ══ LISTEN ══ */}
                 {view === 'listen' && (

@@ -785,12 +785,12 @@ export const RAGAS = {
     'Bilahari': {
         arohanam:     ['Sa', 'Ri2', 'Ga3', 'Pa', 'Da2', 'Sa'],
         avarohanam:   ['Sa', 'Ni3', 'Da2', 'Pa', 'Ma1', 'Ga3', 'Ri2', 'Sa'],
-        type:         'Janya · Shankarabharanam (29)',
+        type:         'Janya · Harikhamboji (28)',
         mood:         'Bright · Devotional',
         description:  'A radiant raga with a direct pentatonic ascent and a fuller descent. The missing Ma and Ni on the way up give Bilahari lift, while the descent restores them for a rounded, joyful return.',
         compositions: ['Rāravēṇu Gōpa Bāla  ·  Swarajathi', 'Paridāna Michitē  ·  Patnam Subramania Iyer'],
         color:        'teal',
-        video:        "",
+        video:        "https://www.youtube.com/shorts/b9V9zRQxnrI",
     },
     'Sahana': {
         arohanam:     ['Sa', 'Ri2', 'Ga3', 'Ma1', 'Pa', 'Ma1', 'Da2', 'Ni2', 'Sa'],
@@ -830,7 +830,7 @@ export const RAGAS = {
         description:  'A gentle morning raga traditionally used for early geethams. Its pentatonic ascent is simple and stable, while Ga3 appears only in the descent, giving the return phrase its characteristic color.',
         compositions: ['Śrī Gaṇanātha  ·  Purandara Dasa', 'Kuṇḍha Gowra  ·  Purandara Dasa'],
         color:        'maroon',
-        video:        "",
+        video:        "https://www.youtube.com/shorts/keIVfGjCIbI",
     },
     'Bhairavi': {
         arohanam:     ['Sa', 'Ri2', 'Ga2', 'Ma1', 'Pa', 'Da2', 'Ni2', 'Sa'], // Bhashanga: Da2 in ascent

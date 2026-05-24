@@ -41,16 +41,53 @@ const getTokenNotationSuffix = (token) => typeof token === 'object' ? (token.not
 const isBarToken = (token) => getTokenSwara(token) === '|' || getTokenSwara(token) === '||';
 const getPlainSwaras = (tokens) => tokens.map(getTokenSwara);
 const getTotalUnits = (tokens) => tokens.reduce((sum, token) => sum + (isBarToken(token) ? 0 : getTokenDuration(token)), 0);
-const renderNotationLabel = (swara, suffix = [], compact = false) => (
-    <span className="inline-flex items-baseline justify-center gap-0.5 leading-none">
-        <span>{swara}</span>
-        {suffix.length > 0 && (
-            <span className={`${compact ? 'text-[10px]' : 'text-xs'} text-c-gold-light tracking-tight`}>
-                {suffix.join('')}
+const parseDisplaySwara = (swara = '') => {
+    let base = swara;
+    let upperDot = false;
+    let lowerDot = false;
+
+    if (base.endsWith('^')) {
+        upperDot = true;
+        base = base.slice(0, -1);
+    }
+    if (base.endsWith('.')) {
+        lowerDot = true;
+        base = base.slice(0, -1);
+    }
+
+    if (base === 'Ṡ') {
+        base = 'Sa';
+        upperDot = true;
+    }
+
+    return { base, upperDot, lowerDot };
+};
+
+const renderNotationLabel = (swara, suffix = [], compact = false) => {
+    const { base, upperDot, lowerDot } = parseDisplaySwara(swara);
+    const dotSize = compact ? 'w-1 h-1' : 'w-1.5 h-1.5';
+    const topOffset = compact ? '-top-1.5' : '-top-2';
+    const bottomOffset = compact ? '-bottom-1.5' : '-bottom-2';
+
+    return (
+        <span className="inline-flex items-center justify-center gap-0.5 leading-none">
+            <span className="relative inline-flex items-center justify-center px-0.5">
+                {upperDot && (
+                    <span className={`absolute ${topOffset} left-1/2 -translate-x-1/2 rounded-full bg-c-gold ${dotSize}`} />
+                )}
+                <span>{base}</span>
+                {lowerDot && (
+                    <span className={`absolute ${bottomOffset} left-1/2 -translate-x-1/2 rounded-full bg-c-gold ${dotSize}`} />
+                )}
             </span>
-        )}
-    </span>
-);
+            {suffix.length > 0 && (
+                <span className={`${compact ? 'text-[10px]' : 'text-xs'} text-c-gold-light tracking-tight`}>
+                    {suffix.join('')}
+                </span>
+            )}
+        </span>
+    );
+};
 
 function TalaBadge({ tala, swaras }) {
     if (!tala) return null;
@@ -352,12 +389,18 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, octaveMode = 'a
     };
 
     const renderSwaras = () => {
-        // Split into lines on '|' and '||' — both are line breaks, neither is rendered
+        // Keep barlines visible: render '|' and '||' tokens.
+        // Start a new visual line only on '||' to keep notation readable.
         const lines = [];
         let currentLine = [];
         for (let idx = 0; idx < swaras.length; idx++) {
             const s = getTokenSwara(swaras[idx]);
-            if (s === '|' || s === '||') {
+            if (s === '|') {
+                currentLine.push({ token: swaras[idx], i: idx });
+                continue;
+            }
+            if (s === '||') {
+                currentLine.push({ token: swaras[idx], i: idx });
                 if (currentLine.length > 0) lines.push(currentLine);
                 currentLine = [];
                 continue;
@@ -375,19 +418,36 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, octaveMode = 'a
                             const suffix = getTokenNotationSuffix(token);
                             const duration = getTokenDuration(token);
                             const widthClass = duration >= 4 ? 'w-20 sm:w-24' : duration >= 3 ? 'w-16 sm:w-20' : duration >= 2 ? 'w-12 sm:w-14' : 'w-8 sm:w-10';
+                            if (s === '|') {
+                                return (
+                                    <div key={i} className="w-3 h-8 sm:h-10 flex items-center justify-center">
+                                        <span className="block h-5 sm:h-6 w-[2px] rounded bg-c-cream-dark/70" />
+                                    </div>
+                                );
+                            }
+                            if (s === '||') {
+                                return (
+                                    <div key={i} className="w-4 h-8 sm:h-10 flex items-center justify-center gap-[3px]">
+                                        <span className="block h-5 sm:h-6 w-[2px] rounded bg-c-cream-dark/80" />
+                                        <span className="block h-5 sm:h-6 w-[2px] rounded bg-c-cream-dark/80" />
+                                    </div>
+                                );
+                            }
                             if (s === ',') {
                                 return (
-                                    <div key={i} className={`${widthClass} h-8 sm:h-10 flex items-center justify-center text-c-cream-dark/30 font-mono text-xs`}>
-                                        –
+                                    <div key={i} className={`${widthClass} h-8 sm:h-10 flex items-center justify-center`}>
+                                        <span className="block h-1 w-3/4 rounded-full bg-c-gold/65" />
                                     </div>
                                 );
                             }
                             if (s === '-') {
                                 return (
-                                    <div key={i} className={`${widthClass} h-8 sm:h-10 flex items-center justify-center text-lg transition-all duration-100 ${
-                                        i === activeIdx ? 'text-c-gold scale-110' : 'text-c-cream-dark/25'
+                                    <div key={i} className={`${widthClass} h-8 sm:h-10 flex items-center justify-center transition-all duration-100 ${
+                                        i === activeIdx ? 'scale-110' : ''
                                     }`}>
-                                        ·
+                                        <span className={`block h-1 w-3/4 rounded-full ${
+                                            i === activeIdx ? 'bg-c-gold' : 'bg-c-cream-dark/55'
+                                        }`} />
                                     </div>
                                 );
                             }
@@ -2018,7 +2078,12 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                 let currentLine = [];
                 for (let idx = 0; idx < swaras.length; idx++) {
                     const s = getTokenSwara(swaras[idx]);
-                    if (s === '|' || s === '||') {
+                    if (s === '|') {
+                        currentLine.push({ token: swaras[idx], i: idx });
+                        continue;
+                    }
+                    if (s === '||') {
+                        currentLine.push({ token: swaras[idx], i: idx });
                         if (currentLine.length > 0) lines.push(currentLine);
                         currentLine = [];
                         continue;
@@ -2036,22 +2101,39 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                                     const suffix = getTokenNotationSuffix(token);
                                     const duration = getTokenDuration(token);
                                     const widthClass = duration >= 4 ? 'w-20 sm:w-24' : duration >= 3 ? 'w-16 sm:w-20' : duration >= 2 ? 'w-12 sm:w-14' : 'w-8 sm:w-9';
+                                    if (s === '|') {
+                                        return (
+                                            <div key={i} className="w-3 h-10 sm:h-11 flex items-center justify-center">
+                                                <span className="block h-6 sm:h-7 w-[2px] rounded bg-c-cream-dark/75" />
+                                            </div>
+                                        );
+                                    }
+                                    if (s === '||') {
+                                        return (
+                                            <div key={i} className="w-4 h-10 sm:h-11 flex items-center justify-center gap-[3px]">
+                                                <span className="block h-6 sm:h-7 w-[2px] rounded bg-c-cream-dark/80" />
+                                                <span className="block h-6 sm:h-7 w-[2px] rounded bg-c-cream-dark/80" />
+                                            </div>
+                                        );
+                                    }
                                     if (s === ',') {
                                         return (
-                                            <div key={i} className={`${widthClass} h-10 sm:h-11 flex items-center justify-center text-c-cream-dark/25 font-mono text-xs`}>
-                                                –
+                                            <div key={i} className={`${widthClass} h-10 sm:h-11 flex items-center justify-center`}>
+                                                <span className="block h-1 w-3/4 rounded-full bg-c-gold/65" />
                                             </div>
                                         );
                                     }
                                     if (s === '-') {
                                         return (
-                                            <div key={i} className={`${widthClass} h-10 sm:h-11 flex items-center justify-center text-lg transition-all duration-75 ${
-                                                i === activeIdx ? 'text-c-gold scale-110' :
-                                                statuses[i] === 'hit' ? 'text-emerald-700' :
-                                                statuses[i] === 'miss' ? 'text-red-700' :
-                                                'text-c-cream-dark/25'
+                                            <div key={i} className={`${widthClass} h-10 sm:h-11 flex items-center justify-center transition-all duration-75 ${
+                                                i === activeIdx ? 'scale-110' : ''
                                             }`}>
-                                                ·
+                                                <span className={`block h-1 w-3/4 rounded-full ${
+                                                    i === activeIdx ? 'bg-c-gold' :
+                                                    statuses[i] === 'hit' ? 'bg-emerald-700' :
+                                                    statuses[i] === 'miss' ? 'bg-red-700' :
+                                                    'bg-c-cream-dark/55'
+                                                }`} />
                                             </div>
                                         );
                                     }

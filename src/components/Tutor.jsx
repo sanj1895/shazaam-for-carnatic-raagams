@@ -3455,7 +3455,7 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
 
 // ─── Curriculum home ──────────────────────────────────────────────────────────
 
-function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset, onBackToCatalog, activeCurriculum = CURRICULUM }) {
+function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset, onBackToCatalog, activeCurriculum = CURRICULUM, structuredMode = false, onToggleStructuredMode }) {
     let totalLessons = 0;
     let completedLessons = 0;
     activeCurriculum.forEach(u => {
@@ -3484,6 +3484,16 @@ function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset, onBackToC
                 </div>
                 <div className="w-full h-2 bg-c-bg rounded-full overflow-hidden">
                     <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${totalLessons ? (completedLessons/totalLessons)*100 : 0}%` }} />
+                </div>
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-c-border/40">
+                    <span className="text-[10px] text-c-cream-dark">Structured progression (unlock in order)</span>
+                    <button
+                        onClick={onToggleStructuredMode}
+                        className={`relative w-9 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${structuredMode ? 'bg-c-gold' : 'bg-c-border'}`}
+                        aria-label="Toggle structured mode"
+                    >
+                        <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${structuredMode ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                    </button>
                 </div>
             </div>
             
@@ -3537,8 +3547,8 @@ function CurriculumHome({ progress, isUnlocked, onSelectUnit, onReset, onBackToC
 
 // ─── Unit view ────────────────────────────────────────────────────────────────
 
-function UnitView({ unit, progress, onSelectLesson, onBack }) {
-    const isUnlocked = (idx) => idx === 0 || !!progress[`${unit.id}/${unit.lessons[idx - 1].id}`];
+function UnitView({ unit, progress, onSelectLesson, onBack, structuredMode = false }) {
+    const isUnlocked = (idx) => !structuredMode || idx === 0 || !!progress[`${unit.id}/${unit.lessons[idx - 1].id}`];
     return (
         <div className="w-full max-w-lg flex flex-col gap-4">
             <div className="flex items-center gap-3">
@@ -3601,6 +3611,17 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
     const [progress, setProgress] = useState(() => {
         try { return JSON.parse(localStorage.getItem('tutor_progress_v2') || '{}'); } catch { return {}; }
     });
+    const [structuredMode, setStructuredMode] = useState(() => {
+        try { return localStorage.getItem('tutor_structured_mode') === 'true'; } catch { return false; }
+    });
+
+    const toggleStructuredMode = () => {
+        setStructuredMode(prev => {
+            const next = !prev;
+            try { localStorage.setItem('tutor_structured_mode', String(next)); } catch {}
+            return next;
+        });
+    };
 
     const updateSa = (newSa) => {
         setSa(newSa);
@@ -3635,7 +3656,7 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
     const activeCurriculum = activeCourse?.curriculum || CURRICULUM;
 
     const isUnlocked = (unitIdx) => {
-        if (unitIdx === 0) return true;
+        if (!structuredMode || unitIdx === 0) return true;
         const prev = activeCurriculum[unitIdx - 1];
         return prev.lessons.every(l => progress[`${prev.id}/${l.id}`]);
     };
@@ -3741,6 +3762,8 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
                                     onReset={resetProgress}
                                     onBackToCatalog={() => setSelectedCourseId(null)}
                                     activeCurriculum={activeCurriculum}
+                                    structuredMode={structuredMode}
+                                    onToggleStructuredMode={toggleStructuredMode}
                                 />
                             )
                         ) : (
@@ -3756,6 +3779,7 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
                     progress={progress}
                     onSelectLesson={(lesson) => { setActiveLesson(lesson); setScreen('lesson'); }}
                     onBack={() => setScreen('home')}
+                    structuredMode={structuredMode}
                 />
             )}
 

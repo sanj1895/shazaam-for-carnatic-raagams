@@ -123,9 +123,9 @@ const waitRhythmicUnits = async (units, delayMs, signal, tala) => {
     }
 };
 
-const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamakam = false, tala = null) => {
+const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamakam = false, tala = null, octaveMode = 'auto') => {
     const plainSwaras = getPlainSwaras(swaras);
-    const octaves = getOctaveSequence(plainSwaras);
+    const octaves = getOctaveSequence(plainSwaras, octaveMode);
     const toneDur = Math.min((delayMs / 1000) * 0.85, 1.1);
     let prevFreq = null;
     let prevNoteIdx = -1;
@@ -303,7 +303,7 @@ const TEMPO_OPTIONS = [
     { label: 'Fast', mult: 1.5 },
 ];
 
-function ExerciseListenSequence({ swaras, sa, instruction, tala, onDone }) {
+function ExerciseListenSequence({ swaras, sa, instruction, tala, octaveMode = 'auto', onDone }) {
     const [activeIdx, setActiveIdx] = useState(-1);
     const [finished, setFinished] = useState(false);
     const [tempoMult, setTempoMult] = useState(1);
@@ -311,7 +311,7 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, onDone }) {
     const abortRef = useRef(null);
 
     const plainSwaras = React.useMemo(() => getPlainSwaras(swaras), [swaras]);
-    const octaves = React.useMemo(() => getOctaveSequence(plainSwaras), [plainSwaras]);
+    const octaves = React.useMemo(() => getOctaveSequence(plainSwaras, octaveMode), [plainSwaras, octaveMode]);
 
     const stopPlayback = useCallback(() => {
         abortRef.current?.abort();
@@ -326,13 +326,13 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, onDone }) {
         setFinished(false);
         setIsPlaying(true);
         const delayMs = Math.round(750 / mult);
-        playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal, delayMs, false, tala).then(() => {
+        playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal, delayMs, false, tala, octaveMode).then(() => {
             if (!ctrl.signal.aborted) {
                 setFinished(true);
                 setIsPlaying(false);
             }
         });
-    }, [swaras, sa]);
+    }, [swaras, sa, octaveMode]);
 
     const run = useCallback(() => runAtTempo(tempoMult), [runAtTempo, tempoMult]);
 
@@ -1793,7 +1793,7 @@ function playTick(ctx, time) {
     oscClick.stop(time + 0.015);
 }
 
-function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swaras', tala, onDone }) {
+function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swaras', tala, octaveMode = 'auto', onDone }) {
     const [tempoMult, setTempoMult] = useState(1);
     const tempoMultRef = useRef(1); // ref so startRecording/playGuide always read the latest value
 
@@ -1826,7 +1826,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
         });
         return timeline;
     }, [swaras]);
-    const octaves = React.useMemo(() => getOctaveSequence(plainSwaras), [plainSwaras]);
+    const octaves = React.useMemo(() => getOctaveSequence(plainSwaras, octaveMode), [plainSwaras, octaveMode]);
     // For hold beats ('-'), pitch detection uses the preceding note's semitone
     const effectiveSemitones = React.useMemo(() => {
         let last = 0;
@@ -1876,7 +1876,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             const ctrl = new AbortController();
             guideAbortRef.current = ctrl;
             const beatMs = Math.round(800 / tempoMultRef.current) / speed;
-            await playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal, beatMs, gamakamEnabled, tala);
+            await playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal, beatMs, gamakamEnabled, tala, octaveMode);
             if (!ctrl.signal.aborted) {
                 setActiveIdx(-1);
             }
@@ -2176,6 +2176,9 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                             <span>🎙️ Start Singing</span>
                         </button>
                     </div>
+                    <button onClick={onDone} className="px-6 py-2 border border-c-border rounded-full text-xs text-c-cream-dim hover:text-c-cream transition-colors">
+                        Skip
+                    </button>
                 </div>
             )}
 

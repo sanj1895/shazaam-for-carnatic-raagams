@@ -2901,6 +2901,118 @@ export const VARNAM_CURRICULUM_RAW = [
 
 export const VARNAM_CURRICULUM = withCompositionRhythm(VARNAM_CURRICULUM_RAW);
 
+// ─── Kritis Curriculum ────────────────────────────────────────────────────────
+
+const KAPI_SWARAS = {
+    S:'Sa', s:'Sa.', R:'Ri2', r:'Ri2.', G:'Ga2', g:'Ga2.',
+    M:'Ma1', m:'Ma1.', P:'Pa', p:'Pa.', D:'Da2', d:'Da2.',
+    N:'Ni3', n:'Ni2.'
+};
+
+// Beat-group arrays for Enna Thavam Seidhanai pallavi part 1 (enna tavam sheidanai)
+const ET_P1_S1 = parseBeatGroups([
+    [';',',','g'],              // beat 1
+    [',','m','P'],              // beat 2: ,m P
+    ['m','g','G',',','-','r'], // beat 3: mgG,-r
+    [';','N'],                  // beat 4
+    '|',
+    ['S',';'],                  // beat 5
+    [';','n','s'],              // beat 6
+    '|',
+    ['R',',','g'],              // beat 7
+    ['R',';'],                  // beat 8
+    '||'
+], KAPI_SWARAS);
+
+const ET_P1_S2 = parseBeatGroups([
+    [';',',','g'],
+    [',','m','n','p'],          // beat 2: ,m np (fills in lower Ni before Pa)
+    ['m','g','G',',','-','r'],
+    [';','N'],
+    '|',
+    ['S',';'],
+    [';','n','s'],
+    '|',
+    ['R',',','g'],
+    ['g','s','R',';'],          // beat 8: gsR; (lower turn)
+    '||'
+], KAPI_SWARAS);
+
+const ET_P1_S3 = parseBeatGroups([
+    [';',',','g'],
+    [',','m','n','p'],
+    ['m','g','G',',','-','r'],
+    [';','N'],
+    '|',
+    ['S',';'],
+    [';','D'],                  // beat 6: ;D (middle Da)
+    '|',
+    ['n','n','d','p'],          // beat 7: nndp
+    ['m','g','g','r',';'],      // beat 8: mggr;
+    '||'
+], KAPI_SWARAS);
+
+const ET_P1_S4 = parseBeatGroups([
+    [';',',','g'],
+    [',','m','n','p'],
+    ['m','g','G',',','-','r'],
+    [';','N'],
+    '|',
+    ['S',';'],
+    [';','n','d'],              // beat 6: ;nd
+    '|',
+    ['n','n','d','p'],          // beat 7: nndp
+    ['m','g','g','r','R'],      // beat 8: mggr R (lands on middle Ri)
+    '||'
+], KAPI_SWARAS);
+
+const KRITIS_CURRICULUM_RAW = [
+    {
+        id: 'kriti_ennathavam',
+        title: 'Enna Thavam Seidhanai',
+        symbol: '🪔',
+        subtitle: 'Kapi · Adi · Papanasam Sivan',
+        color: '#1a1025',
+        tag: 'Kriti 1',
+        lessons: [
+            {
+                id: 'et_intro', title: 'About the Kriti', tag: 'Intro',
+                exercises: [
+                    { type: 'info', title: 'Enna Thavam Seidhanai', body: 'Rāga: Kapi (22nd mela janyam)\nTāḷam: Ādi\nComposer: Pāpanāsam Sivan · Language: Tamil\n\nArohanam: S R₂ M₁ P N₃ Ṡ\nAvarohanam: Ṡ N₂ D₂ N₂ P M₁ P G₂ R₂ S\n\nA beloved Tamil devotional kriti asking Yashoda what great tapas she performed to earn the grace of raising Krishna as her own child. Kapi\'s characteristic vakra (zigzag) phrases and its mix of N₃ in ascent and N₂/D₂ in descent give it a deeply expressive, bittersweet quality.' },
+                    { type: 'listen_sequence', octaveMode: 'strict', swaras: ['Sa','Ri2','Ma1','Pa','Ni3','Ṡ'], displayLabel: '♪', instruction: 'Listen to the Kapi arohanam: S R₂ M₁ P N₃ Ṡ.' },
+                    { type: 'listen_sequence', octaveMode: 'strict', swaras: ['Ṡ','Ni2','Da2','Ni2','Pa','Ma1','Pa','Ga2','Ri2','Sa'], displayLabel: '♪', instruction: 'Listen to the Kapi avarohanam: Ṡ N₂ D₂ N₂ P M₁ P G₂ R₂ S.' },
+                    { type: 'lyrics_practice', title: 'Pallavi', lyrics: ['enna tavam sheidanai yasOdA engum nirai parabhrammam ammAvenr-azhaikka'], meaning: 'Yashoda, what great tapas did you perform, that the all-pervading Supreme Being himself calls you "ammā" (mother)?' },
+                    { type: 'lyrics_practice', title: 'Anupallavi', lyrics: ['IrEzu bhuvanangaL paDaittavanai-kaiyil Endi shIrATTi pAlUTi tAlATTa nI'], meaning: 'You lifted in your arms the one who created the fourteen worlds, rocked him to sleep, and fed him milk.' },
+                ]
+            },
+            {
+                id: 'et_pallavi_p1', title: 'Pallavi — Enna Tavam Sheidanai', tag: 'Pallavi',
+                exercises: [
+                    { type: 'info', title: 'Pallavi Part 1', body: 'Tāḷam: Ādi (4 + 2 + 2)\n\n4 sangatis (elaborations) of the opening phrase. Each sangati adds more notes to the same beat skeleton — listen to how the phrase grows richer each time.' },
+                    { type: 'listen_sequence', octaveMode: 'strict', swaras: ET_P1_S1, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, displayLabel: '♪', instruction: 'Listen: Sangati 1 — the simplest form.' },
+                    { type: 'sing_sequence',   octaveMode: 'strict', swaras: ET_P1_S1, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, speed: 0.75, instruction: 'Sing: Sangati 1.' },
+                    { type: 'listen_sequence', octaveMode: 'strict', swaras: ET_P1_S2, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, displayLabel: '♪', instruction: 'Listen: Sangati 2 — beat 2 fills in n-p, beat 8 adds a lower turn.' },
+                    { type: 'sing_sequence',   octaveMode: 'strict', swaras: ET_P1_S2, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, speed: 0.75, instruction: 'Sing: Sangati 2.' },
+                    { type: 'listen_sequence', octaveMode: 'strict', swaras: ET_P1_S3, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, displayLabel: '♪', instruction: 'Listen: Sangati 3 — beat 6 rises to D, beats 7–8 descend through n-n-d-p.' },
+                    { type: 'sing_sequence',   octaveMode: 'strict', swaras: ET_P1_S3, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, speed: 0.73, instruction: 'Sing: Sangati 3.' },
+                    { type: 'listen_sequence', octaveMode: 'strict', swaras: ET_P1_S4, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, displayLabel: '♪', instruction: 'Listen: Sangati 4 — beat 6 adds n before d, beat 8 lands on middle R.' },
+                    { type: 'sing_sequence',   octaveMode: 'strict', swaras: ET_P1_S4, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, speed: 0.73, instruction: 'Sing: Sangati 4.' },
+                    { type: 'listen_sequence', octaveMode: 'strict', swaras: [...ET_P1_S1, ...ET_P1_S2, ...ET_P1_S3, ...ET_P1_S4], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, displayLabel: '♪', instruction: 'Listen: All 4 sangatis back to back.' },
+                    { type: 'sing_sequence',   octaveMode: 'strict', swaras: [...ET_P1_S1, ...ET_P1_S2, ...ET_P1_S3, ...ET_P1_S4], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, speed: 0.73, instruction: 'Sing: All 4 sangatis back to back.' },
+                ]
+            }
+        ]
+    }
+];
+
+export const KRITIS_CURRICULUM = KRITIS_CURRICULUM_RAW.map(stage => ({
+    ...stage,
+    lessons: stage.lessons.map(lesson => ({
+        ...lesson,
+        exercises: lesson.exercises.map((ex, i) => ({ ...ex, id: ex.id ?? `ex_${i}` }))
+    }))
+}));
+
 export const COURSES = [
     {
         id: 'foundations',
@@ -2980,7 +3092,7 @@ export const COURSES = [
         description: 'Classical, devotional masterworks that are the heart of a performance.',
         symbol: '🏛️',
         color: '#311025',
-        upcoming: true
+        curriculum: KRITIS_CURRICULUM
     },
     {
         id: 'manodharma_basics',

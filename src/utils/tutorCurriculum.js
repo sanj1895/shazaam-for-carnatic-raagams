@@ -1732,6 +1732,16 @@ export const VARNAM_CURRICULUM_RAW = [
                 ]
             },
             {
+                id: 'v1_order', title: 'Traditional Singing Order', tag: 'Flow',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Performance Sequence (Purvangam → Uttarangam)',
+                        body: 'Follow this exact order:\n\nPurvangam:\n1) Pallavi — first speed, then second speed.\n2) Anupallavi — first speed, then second speed.\n3) Muktaayi swaram — first speed, then second speed.\n\nUttarangam:\n4) Charanam — first speed.\n5) Chittaswaram 1 — first speed.\n6) Repeat Charanam + Chittaswaram 1 in second speed.\n7) Charanam — first speed.\n8) Chittaswaram 2 — first speed.\n9) Repeat Charanam + Chittaswaram 2 in second speed.\n10) Continue the same pattern for Chittaswarams 3 and 4.'
+                    }
+                ]
+            },
+            {
                 id: 'v1_pallavi_anupallavi', title: 'Pallavi and Anupallavi', tag: 'Sahityam',
                 exercises: [
                     {
@@ -1986,6 +1996,16 @@ export const VARNAM_CURRICULUM_RAW = [
                 ]
             },
             {
+                id: 'v2_order', title: 'Traditional Singing Order', tag: 'Flow',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Performance Sequence (Purvangam → Uttarangam)',
+                        body: 'Follow this exact order:\n\nPurvangam:\n1) Pallavi — first speed, then second speed.\n2) Anupallavi — first speed, then second speed.\n3) Muktaayi swaram — first speed, then second speed.\n\nUttarangam:\n4) Charanam — first speed.\n5) Chittaswaram 1 — first speed.\n6) Repeat Charanam + Chittaswaram 1 in second speed.\n7) Charanam — first speed.\n8) Chittaswaram 2 — first speed.\n9) Repeat Charanam + Chittaswaram 2 in second speed.\n10) Continue the same pattern for Chittaswarams 3 and 4.'
+                    }
+                ]
+            },
+            {
                 id: 'v2_core_lyrics', title: 'Pallavi, Anupallavi, Charanam', tag: 'Sahityam',
                 exercises: [
                     { type: 'lyrics_practice', title: 'Pallavi', lyrics: ['Evvari bodhanavini eelagu jesevura'], meaning: 'By hearing whose words are you behaving like this?' },
@@ -2166,6 +2186,16 @@ export const VARNAM_CURRICULUM_RAW = [
                     },
                     { type: 'listen_sequence', swaras: ['Sa', 'Ri2', 'Ga2', 'Ma1', 'Pa', 'Da2', 'Ni2', 'Ṡ'], displayLabel: '♪', instruction: 'Listen to Sankarabharanam arohanam.' },
                     { type: 'listen_sequence', swaras: ['Ṡ', 'Ni2', 'Da2', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to Sankarabharanam avarohanam.' },
+                ]
+            },
+            {
+                id: 'v3_order', title: 'Traditional Singing Order', tag: 'Flow',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Performance Sequence (Purvangam → Uttarangam)',
+                        body: 'Follow this exact order:\n\nPurvangam:\n1) Pallavi — first speed, then second speed.\n2) Anupallavi — first speed, then second speed.\n3) Muktaayi swaram — first speed, then second speed.\n\nUttarangam:\n4) Charanam — first speed.\n5) Chittaswaram 1 — first speed.\n6) Repeat Charanam + Chittaswaram 1 in second speed.\n7) Charanam — first speed.\n8) Chittaswaram 2 — first speed.\n9) Repeat Charanam + Chittaswaram 2 in second speed.\n10) Continue the same pattern for Chittaswarams 3 and 4.'
+                    }
                 ]
             },
             {
@@ -2366,6 +2396,16 @@ export const VARNAM_CURRICULUM_RAW = [
                 ]
             },
             {
+                id: 'v4_order', title: 'Traditional Singing Order', tag: 'Flow',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Performance Sequence (Purvangam → Uttarangam)',
+                        body: 'Follow this exact order:\n\nPurvangam:\n1) Pallavi — first speed, then second speed.\n2) Anupallavi — first speed, then second speed.\n3) Muktaayi swaram — first speed, then second speed.\n\nUttarangam:\n4) Charanam — first speed.\n5) Chittaswaram 1 — first speed.\n6) Repeat Charanam + Chittaswaram 1 in second speed.\n7) Charanam — first speed.\n8) Chittaswaram 2 — first speed.\n9) Repeat Charanam + Chittaswaram 2 in second speed.\n10) Continue the same pattern for Chittaswarams 3 and 4.'
+                    }
+                ]
+            },
+            {
                 id: 'v4_core_lyrics', title: 'Main Sahityam', tag: 'Sahityam',
                 exercises: [
                     { type: 'lyrics_practice', title: 'Pallavi', lyrics: ['Vanajakshi Ninne Kori yunnadira'], meaning: 'O lotus-eyed one, I am longing for you.' },
@@ -2551,6 +2591,16 @@ export const VARNAM_CURRICULUM_RAW = [
                 ]
             },
             {
+                id: 'v5_order', title: 'Traditional Singing Order', tag: 'Flow',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Performance Sequence (Purvangam → Uttarangam)',
+                        body: 'Follow this exact order:\n\nPurvangam:\n1) Pallavi — first speed, then second speed.\n2) Anupallavi — first speed, then second speed.\n3) Muktaayi swaram — first speed, then second speed.\n\nUttarangam:\n4) Charanam — first speed.\n5) Chittaswaram 1 — first speed.\n6) Repeat Charanam + Chittaswaram 1 in second speed.\n7) Charanam — first speed.\n8) Chittaswaram 2 — first speed.\n9) Repeat Charanam + Chittaswaram 2 in second speed.\n10) Continue the same pattern for Chittaswarams 3 and 4.'
+                    }
+                ]
+            },
+            {
                 id: 'v5_core_lyrics', title: 'Main Sahityam', tag: 'Sahityam',
                 exercises: [
                     { type: 'lyrics_practice', title: 'Pallavi', lyrics: ['Jalajakshi ninnedabasi chala marulu konnadira'], meaning: 'The lotus-eyed one is deeply distressed in separation from you.' },
@@ -2665,7 +2715,7 @@ export const VARNAM_CURRICULUM_RAW = [
                     {
                         type: 'listen_sequence',
                         octaveMode: 'strict',
-                        swaras: ['Ri2^', 'Sa^', 'Ni3', 'Pa', ',', 'Ni3', 'Ga3^', 'Ri2^', '|', 'Sa^', 'Ni3', ',', 'Pa', 'Ni3', 'Sa^', 'Ri2^', 'Ga3^', '|', 'Pa', ',', 'Ni3', 'Sa^', ',', 'Ni3', 'Sa^', ',', 'Ri2^', 'Ga3^', 'Ri2^', '|', 'Pa', 'Ni3', 'Sa^', 'Ri2^', 'Ga3^', 'Ri2^', 'Ni3', 'Ri2^', '||'],
+                        swaras: ['Ri2^', 'Sa^', 'Ni3', 'Pa', ',', 'Ni3', 'Ga3^', 'Ri2^', '|', 'Sa^', 'Ni3', ',', 'Pa', 'Ni3', 'Sa^', 'Ri2^', 'Ga3^', '|', 'Pa', ',', 'Ni3', 'Sa^', ',', 'Ri2^', 'Ga3^', 'Ri2^', '|', 'Pa', 'Ni3', 'Sa^', 'Ri2^', 'Ga3^', 'Ri2^', 'Ni3', 'Ri2^', '||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Muktayi swaram line 3.'
@@ -2673,7 +2723,7 @@ export const VARNAM_CURRICULUM_RAW = [
                     {
                         type: 'sing_sequence',
                         octaveMode: 'strict',
-                        swaras: ['Ri2^', 'Sa^', 'Ni3', 'Pa', ',', 'Ni3', 'Ga3^', 'Ri2^', '|', 'Sa^', 'Ni3', ',', 'Pa', 'Ni3', 'Sa^', 'Ri2^', 'Ga3^', '|', 'Pa', ',', 'Ni3', 'Sa^', ',', 'Ni3', 'Sa^', ',', 'Ri2^', 'Ga3^', 'Ri2^', '|', 'Pa', 'Ni3', 'Sa^', 'Ri2^', 'Ga3^', 'Ri2^', 'Ni3', 'Ri2^', '||'],
+                        swaras: ['Ri2^', 'Sa^', 'Ni3', 'Pa', ',', 'Ni3', 'Ga3^', 'Ri2^', '|', 'Sa^', 'Ni3', ',', 'Pa', 'Ni3', 'Sa^', 'Ri2^', 'Ga3^', '|', 'Pa', ',', 'Ni3', 'Sa^', ',', 'Ri2^', 'Ga3^', 'Ri2^', '|', 'Pa', 'Ni3', 'Sa^', 'Ri2^', 'Ga3^', 'Ri2^', 'Ni3', 'Ri2^', '||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.72,
                         instruction: 'Sing: Muktayi swaram line 3.'

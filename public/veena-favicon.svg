@@ -1,16 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
-  <circle cx="32" cy="32" r="31" fill="#1B102C"/>
+  <!-- Slim, transparent-background veena favicon -->
+  <ellipse cx="32" cy="48" rx="14" ry="10" fill="#E6B93C" stroke="#B8841B" stroke-width="1.4"/>
 
-  <!-- Favicon-optimized veena: bold, simplified, high contrast -->
-  <ellipse cx="32" cy="46" rx="18" ry="12" fill="#F4C542"/>
-  <ellipse cx="32" cy="46" rx="14" ry="8.5" fill="#1B102C" opacity="0.3"/>
+  <rect x="29.2" y="11" width="5.6" height="31" rx="2.8" fill="#E6B93C" stroke="#B8841B" stroke-width="1"/>
+  <line x1="31.1" y1="12" x2="31.1" y2="39" stroke="#FFF2C8" stroke-width="0.9"/>
+  <line x1="33" y1="12" x2="33" y2="39" stroke="#FFF2C8" stroke-width="0.9"/>
 
-  <rect x="28.5" y="10" width="7" height="32" rx="3.5" fill="#F4C542"/>
-  <line x1="31" y1="10" x2="31" y2="39" stroke="#FFF4CC" stroke-width="1.2" opacity="0.9"/>
-  <line x1="33" y1="10" x2="33" y2="39" stroke="#FFF4CC" stroke-width="1.2" opacity="0.9"/>
+  <line x1="25.5" y1="31" x2="38.5" y2="31" stroke="#FFF2C8" stroke-width="1.4"/>
+  <line x1="26.2" y1="24.8" x2="37.8" y2="24.8" stroke="#FFF2C8" stroke-width="1.2"/>
 
-  <line x1="24" y1="30" x2="40" y2="30" stroke="#FFF4CC" stroke-width="1.8"/>
-  <line x1="24" y1="24" x2="40" y2="24" stroke="#FFF4CC" stroke-width="1.6"/>
-
-  <path d="M32 10 Q25 7 27 4 Q29 2.5 32 5 Q35 7.5 32 9" fill="#F4C542"/>
+  <path d="M32 11 Q26.8 8.4 28.1 5.9 Q29.5 3.9 32 5.9 Q34.5 7.8 32 10" fill="#E6B93C" stroke="#B8841B" stroke-width="0.9"/>
 </svg>

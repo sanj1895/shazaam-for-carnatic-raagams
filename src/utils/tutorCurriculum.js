@@ -2619,7 +2619,7 @@ export const VARNAM_CURRICULUM_RAW = [
                     {
                         type: 'listen_sequence',
                         octaveMode: 'strict',
-                        swaras: ['Ga3',',','Ri2',',','Sa',',',',',',','Ni3.','Sa','Ri2','Ga3','Ri2','Ri2','Sa','Ni3.','|','Sa','Ri2','Sa','Sa','Ni3.','Pa.','Ni3.','Sa','Ri2','Pa.',',','Ni3.',',','Sa',',','Ri2','||'],
+                        swaras: ['Ga3',',','Ri2',',','Sa',',',',',',', '|', 'Ni3.','Sa','Ri2','Ga3','Ri2','Ri2','Sa','Ni3.','|','Sa','Ri2','Sa','Sa','Ni3.','Pa.','Ni3.','Sa', '|','Ri2','Pa.',',','Ni3.',',','Sa',',','Ri2','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Pallavi line 1.'
@@ -2627,7 +2627,7 @@ export const VARNAM_CURRICULUM_RAW = [
                     {
                         type: 'sing_sequence',
                         octaveMode: 'strict',
-                        swaras: ['Ga3',',','Ri2',',','Sa',',',',',',','Ni3.','Sa','Ri2','Ga3','Ri2','Ri2','Sa','Ni3.','|','Sa','Ri2','Sa','Sa','Ni3.','Pa.','Ni3.','Sa','Ri2','Pa.',',','Ni3.',',','Sa',',','Ri2','||'],
+                        swaras: ['Ga3',',','Ri2',',','Sa',',',',',',', '|', 'Ni3.','Sa','Ri2','Ga3','Ri2','Ri2','Sa','Ni3.','|','Sa','Ri2','Sa','Sa','Ni3.','Pa.','Ni3.','Sa', '|','Ri2','Pa.',',','Ni3.',',','Sa',',','Ri2','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.78,
                         instruction: 'Sing: Pallavi line 1.'
@@ -2635,7 +2635,7 @@ export const VARNAM_CURRICULUM_RAW = [
                     {
                         type: 'listen_sequence',
                         octaveMode: 'strict',
-                        swaras: ['Ga3','Ri2','Sa','Ni3.','Sa','Ri2','Pa.','Ni3.','Sa','Ri2','Ga3','Pa','Ga3','Ni3','Pa',',','|','Sa^','Ni3','Sa^','Ri2^',',','Sa^','Ni3','Pa','Pa','Ga3',',','Ri2',',','Sa',',','Ri2','||'],
+                        swaras: ['Ga3','Ri2','Sa','Ni3.','Sa','Ri2','Pa.','Ni3.','|','Sa','Ri2','Ga3','Pa','Ga3','Ni3','Pa',',','|','Sa^','Ni3','Sa^','Ri2^',',','Sa^','Ni3','Pa', '|','Pa','Ga3',',','Ri2',',','Sa',',','Ri2','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Pallavi line 2 and close.'
@@ -2643,7 +2643,7 @@ export const VARNAM_CURRICULUM_RAW = [
                     {
                         type: 'sing_sequence',
                         octaveMode: 'strict',
-                        swaras: ['Ga3','Ri2','Sa','Ni3.','Sa','Ri2','Pa.','Ni3.','Sa','Ri2','Ga3','Pa','Ga3','Ni3','Pa',',','|','Sa^','Ni3','Sa^','Ri2^',',','Sa^','Ni3','Pa','Pa','Ga3',',','Ri2',',','Sa',',','Ri2','||'],
+                        swaras: ['Ga3','Ri2','Sa','Ni3.','Sa','Ri2','Pa.','Ni3.','|','Sa','Ri2','Ga3','Pa','Ga3','Ni3','Pa',',','|','Sa^','Ni3','Sa^','Ri2^',',','Sa^','Ni3','Pa', '|','Pa','Ga3',',','Ri2',',','Sa',',','Ri2','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.76,
                         instruction: 'Sing: Pallavi line 2 and close.'
@@ -2667,7 +2667,7 @@ export const VARNAM_CURRICULUM_RAW = [
                     {
                         type: 'listen_sequence',
                         octaveMode: 'strict',
-                        swaras: ['Ri2^','Sa^','Ni3','Pa','Ni3','Sa^','Ri2^','Ga3^','|','Sa^','Ri2^','Ga3^','Pa^','Ga3^','Ri2^','Sa^','Ni3','|', 'Ri2^', 'Ri2^', ',', 'Sa^', 'Ni3', 'Pa', 'Pa', 'Ga3', '|', ',', 'Ri2', 'Sa', 'Ni3.', 'Pa.', 'Sa', 'Ri2', '||'],
+                        swaras: ['Ri2^','Sa^','Ni3','Pa','Ni3','Sa^','Ri2^','Ga3^','|','Sa^','Ri2^','Ga3^','Pa^','Ga3^','Ri2^','Sa^','Ni3','|', 'Ri2^', 'Ri2^', ',', 'Sa^', 'Ni3', 'Pa', 'Pa', 'Ga3', '|', ',', 'Ri2', 'Sa', 'Ni3.', 'Pa.', 'Ni3.','Sa', 'Ri2', '||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Anupallavi line 2.'
@@ -2675,7 +2675,7 @@ export const VARNAM_CURRICULUM_RAW = [
                     {
                         type: 'sing_sequence',
                         octaveMode: 'strict',
-                        swaras: ['Ri2^','Sa^','Ni3','Pa','Ni3','Sa^','Ri2^','Ga3^','|','Sa^','Ri2^','Ga3^','Pa^','Ga3^','Ri2^','Sa^','Ni3','|', 'Ri2^', 'Ri2^', ',', 'Sa^', 'Ni3', 'Pa', 'Pa', 'Ga3', '|', ',', 'Ri2', 'Sa', 'Ni3.', 'Pa.', 'Sa', 'Ri2', '||'],
+                        swaras: ['Ri2^','Sa^','Ni3','Pa','Ni3','Sa^','Ri2^','Ga3^','|','Sa^','Ri2^','Ga3^','Pa^','Ga3^','Ri2^','Sa^','Ni3','|', 'Ri2^', 'Ri2^', ',', 'Sa^', 'Ni3', 'Pa', 'Pa', 'Ga3', '|', ',', 'Ri2', 'Sa', 'Ni3.', 'Pa.', 'Ni3.','Sa', 'Ri2', '||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.74,
                         instruction: 'Sing: Anupallavi line 2.'

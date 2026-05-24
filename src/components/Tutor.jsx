@@ -389,17 +389,13 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, octaveMode = 'a
     };
 
     const renderSwaras = () => {
-        // Keep barlines visible: render '|' and '||' tokens.
-        // Start a new visual line only on '||' to keep notation readable.
+        // Keep barlines visible and break line on every bar token
+        // so phrases keep the grid-like readability.
         const lines = [];
         let currentLine = [];
         for (let idx = 0; idx < swaras.length; idx++) {
             const s = getTokenSwara(swaras[idx]);
-            if (s === '|') {
-                currentLine.push({ token: swaras[idx], i: idx });
-                continue;
-            }
-            if (s === '||') {
+            if (s === '|' || s === '||') {
                 currentLine.push({ token: swaras[idx], i: idx });
                 if (currentLine.length > 0) lines.push(currentLine);
                 currentLine = [];
@@ -436,7 +432,7 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, octaveMode = 'a
                             if (s === ',') {
                                 return (
                                     <div key={i} className={`${widthClass} h-8 sm:h-10 flex items-center justify-center`}>
-                                        <span className="block h-1 w-3/4 rounded-full bg-c-gold/65" />
+                                        <span className="block h-[2px] w-1/2 rounded-full bg-c-gold/55" />
                                     </div>
                                 );
                             }
@@ -445,7 +441,7 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, octaveMode = 'a
                                     <div key={i} className={`${widthClass} h-8 sm:h-10 flex items-center justify-center transition-all duration-100 ${
                                         i === activeIdx ? 'scale-110' : ''
                                     }`}>
-                                        <span className={`block h-1 w-3/4 rounded-full ${
+                                        <span className={`block h-[2px] w-1/2 rounded-full ${
                                             i === activeIdx ? 'bg-c-gold' : 'bg-c-cream-dark/55'
                                         }`} />
                                     </div>
@@ -2078,11 +2074,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                 let currentLine = [];
                 for (let idx = 0; idx < swaras.length; idx++) {
                     const s = getTokenSwara(swaras[idx]);
-                    if (s === '|') {
-                        currentLine.push({ token: swaras[idx], i: idx });
-                        continue;
-                    }
-                    if (s === '||') {
+                    if (s === '|' || s === '||') {
                         currentLine.push({ token: swaras[idx], i: idx });
                         if (currentLine.length > 0) lines.push(currentLine);
                         currentLine = [];
@@ -2119,7 +2111,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                                     if (s === ',') {
                                         return (
                                             <div key={i} className={`${widthClass} h-10 sm:h-11 flex items-center justify-center`}>
-                                                <span className="block h-1 w-3/4 rounded-full bg-c-gold/65" />
+                                                <span className="block h-[2px] w-1/2 rounded-full bg-c-gold/55" />
                                             </div>
                                         );
                                     }
@@ -2128,7 +2120,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                                             <div key={i} className={`${widthClass} h-10 sm:h-11 flex items-center justify-center transition-all duration-75 ${
                                                 i === activeIdx ? 'scale-110' : ''
                                             }`}>
-                                                <span className={`block h-1 w-3/4 rounded-full ${
+                                                <span className={`block h-[2px] w-1/2 rounded-full ${
                                                     i === activeIdx ? 'bg-c-gold' :
                                                     statuses[i] === 'hit' ? 'bg-emerald-700' :
                                                     statuses[i] === 'miss' ? 'bg-red-700' :

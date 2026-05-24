@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { getAudioCtx, detectPitch, startDrone, SWARA_SEMITONE, playNote, getOctaveSequence, playSequence } from '../utils/audioUtils';
 import { getSwaram, toSargam } from '../utils/ragaLogic';
+import { groqChatCompletion } from '../utils/groqIdentify';
 
-const GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY;
 const RECORD_SECS = 20;
 
 const PITCHES = [
@@ -311,19 +311,12 @@ Respond in exactly 3 short paragraphs, max 200 words total:
 
 Tone: warm but direct. Address them as a serious student. Do not mention numbers or cents.`;
 
-      if (GROQ_KEY) {
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_KEY}` },
-          body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: PROMPT }], temperature: 0.65 }),
-        });
-        if (!res.ok) throw new Error(`Groq API error ${res.status}`);
-        const data = await res.json();
-        setFeedback(data.choices[0]?.message?.content || 'No feedback generated.');
-      } else {
-        const hitAro = alignSequence(detected, expectedAro).filter(a => a.hit).length;
-        setFeedback(`You sang ${hitAro} of ${expectedAro.length} arohanam notes. Voice: ${resonanceLabel}. Breath: ${breathLabel}. ${ornamentLabel}.`);
-      }
+      const data = await groqChatCompletion({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: PROMPT }],
+        temperature: 0.65,
+      });
+      setFeedback(data.choices[0]?.message?.content || 'No feedback generated.');
 
       setPhase('result');
     } catch (err) {

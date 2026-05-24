@@ -167,9 +167,7 @@ const RagaLibrary = ({ onSelectRaga }) => {
         setAiLoading(true);
         setAiError(null);
         try {
-            const apiKey = import.meta.env.VITE_GROQ_API_KEY;
-            if (!apiKey) throw new Error('Groq API key not configured.');
-            const raga = await askGroqAboutRaga(searchQuery, apiKey);
+            const raga = await askGroqAboutRaga(searchQuery);
             if (raga.error) {
                 throw new Error(raga.error);
             }

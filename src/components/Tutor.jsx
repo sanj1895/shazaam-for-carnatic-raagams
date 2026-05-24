@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { RAGAS, getSwaram } from '../utils/ragaLogic';
 import { CURRICULUM, COURSES } from '../utils/tutorCurriculum';
+import { groqChatCompletion } from '../utils/groqIdentify';
 import { CuratedIcon, LockIcon, CheckIcon } from './IconLibrary';
 import {
     getAudioCtx, detectPitch as detectPitchAudio,
@@ -2202,7 +2203,6 @@ function MicCalibration({ onDone }) {
 // ─── Sing Along & AI Coaching Feedback Component ─────────────────────────────
 
 function SingAlongFeedback({ lesson, currentExercise, sa, onClose, onSadhanaComplete }) {
-    const GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY;
     const [phase, setPhase] = useState('idle'); // idle | recording | processing | result | error
     const [countdown, setCountdown] = useState(30);
     const [detectedNotes, setDetectedNotes] = useState([]);
@@ -2436,11 +2436,9 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose, onSadhanaComp
 
             const chronologicalDetectedSwaras = sequenceRef.current.join(' - ');
 
-            // Make Groq request if key is available, else mock dynamic feedback
             let feedbackText = '';
-            if (GROQ_KEY) {
-                const PROMPT = styleToUse === 'classic'
-                    ? `You are an expert classical Carnatic vocal coach (guru). 
+            const PROMPT = styleToUse === 'classic'
+                ? `You are an expert classical Carnatic vocal coach (guru). 
 The student is practicing a lesson in their foundational curriculum.
 
 LESSON CONTEXT:
@@ -2463,7 +2461,7 @@ CRITICAL INSTRUCTIONS FOR GURU:
 4. Highlight 1 key vocal strength (e.g., breath control, stable Sa foundation, or natural resonance).
 5. Highlight 1 clear vocal correction needed (e.g., slight sharp or flat drifts, sequence order mismatch, or pitch stability waver).
 6. Give 1 highly actionable classical vocal tip (e.g., visual pitch onset mapping, abdominal breathing, or anchoring ears to the Tambura drone). Do NOT mention cents or numbers in your final feedback.`
-                    : `You are an expert Carnatic vocal coach (guru) speaking to a child (12 years or younger) or an absolute beginner.
+                : `You are an expert Carnatic vocal coach (guru) speaking to a child (12 years or younger) or an absolute beginner.
 The student is practicing a lesson in their foundational curriculum.
 
 LESSON CONTEXT:
@@ -2483,47 +2481,12 @@ CRITICAL INSTRUCTIONS FOR GURU:
 6. Highlight 1 friendly little thing to practice with a playful, fun tip (e.g., "Try to hum like a little bee to make your voice super steady!" or "Imagine blowing out a tiny candle to support your breath!").
 7. Keep it very warm and under 120 words (2 short paragraphs maximum). Do NOT mention cents, numbers, or technical stability ratings.`;
 
-                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${GROQ_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: 'llama-3.3-70b-versatile',
-                        messages: [{ role: 'user', content: PROMPT }],
-                        temperature: 0.7
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Groq API returned status ${response.status}`);
-                }
-
-                const data = await response.json();
-                feedbackText = data.choices[0]?.message?.content || 'Unable to generate feedback at this time.';
-            } else {
-                // Mock pedagogical feedback using stats for offline/no-key usage
-                const sangNotes = sequenceRef.current;
-                
-                if (styleToUse === 'classic') {
-                    feedbackText = `### Guru Sing-Along Feedback (Classical)
-
-Namaste, my dear student. I appreciate your dedication to our classical foundations.
-
-In this practice of ${practiceType}, you were expected to sing: **${expectedString}**. Your actual performance was: **${sangNotes.join(' - ') || 'Silence'}**. 
-
-Your basic breath support is stable. To refine your sargam further, focus on keeping your Shruti alignment anchored to the base drone, minimizing minor pitch wavers.`;
-                } else {
-                    feedbackText = `### Guru Sing-Along Feedback (Simple & Warm)
-
-Namaste, my dear child! I am so happy to hear your beautiful voice today!
-
-For this exercise, we wanted to sing: **${expectedString}**, and you sang: **${sangNotes.join(' - ') || 'Silence'}**!
-
-You did a wonderful job bringing a bright and sweet energy to your singing. To make your notes even steadier, imagine humming like a little bumblebee! Keep practicing, you are doing great!`;
-                }
-            }
+            const data = await groqChatCompletion({
+                model: 'llama-3.3-70b-versatile',
+                messages: [{ role: 'user', content: PROMPT }],
+                temperature: 0.7
+            });
+            feedbackText = data.choices[0]?.message?.content || 'Unable to generate feedback at this time.';
 
             setFeedback(feedbackText);
             setPhase('result');

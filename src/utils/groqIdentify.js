@@ -1,9 +1,20 @@
 import { RAGAS } from './ragaLogic';
 
-export async function listGroqModels(apiKey) {
-    const response = await fetch(`https://api.groq.com/openai/v1/models`, {
-        headers: { 'Authorization': `Bearer ${apiKey}` }
+export async function groqChatCompletion(payload) {
+    const response = await fetch('/api/groq', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
     });
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error?.message || err.error || `Groq API error ${response.status}`);
+    }
+    return response.json();
+}
+
+export async function listGroqModels() {
+    const response = await fetch('/api/groq');
     if (!response.ok) return [];
     const data = await response.json();
     return data.data
@@ -12,7 +23,7 @@ export async function listGroqModels(apiKey) {
         .map(m => ({ id: m.id, displayName: m.id }));
 }
 
-export async function identifyRagaWithGroq(swaraString, apiKey, model = 'llama-3.3-70b-versatile') {
+export async function identifyRagaWithGroq(swaraString, model = 'llama-3.3-70b-versatile') {
     const ragaList = Object.entries(RAGAS).map(([name, data]) => `${name} | Arohanam: ${data.arohanam.join(' ')} | Avarohanam: ${data.avarohanam.join(' ')}`).join('\n');
 
     const PROMPT = `You are an expert Carnatic classical musician and musicologist.
@@ -41,33 +52,19 @@ Respond ONLY with valid JSON exactly matching this format:
   ]
 }`;
 
-    const response = await fetch(`https://api.groq.com/openai/v1/chat/completions`, {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-            model: model,
-            messages: [{ role: "user", content: PROMPT }],
-            temperature: 0.1,
-            response_format: { type: "json_object" }
-        }),
+    const data = await groqChatCompletion({
+        model: model,
+        messages: [{ role: "user", content: PROMPT }],
+        temperature: 0.1,
+        response_format: { type: "json_object" }
     });
-
-    if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.error?.message || `Groq API error ${response.status}`);
-    }
-
-    const data = await response.json();
     const text = data.choices[0]?.message?.content || '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('Could not parse Groq JSON response');
     return JSON.parse(jsonMatch[0]);
 }
 
-export async function askGroqAboutRaga(ragaName, apiKey, model = 'llama-3.3-70b-versatile') {
+export async function askGroqAboutRaga(ragaName, model = 'llama-3.3-70b-versatile') {
     const ragaRef = Object.entries(RAGAS)
         .map(([name, data]) => `${name}: Arohanam=[${data.arohanam.join(', ')}] Avarohanam=[${data.avarohanam.join(', ')}] Parent=${data.type}`)
         .join('\n');
@@ -96,25 +93,12 @@ Respond ONLY with valid JSON:
   "compositions": ["<only compositions you are 100% certain belong to this raga>"]
 }`;
 
-    const response = await fetch(`https://api.groq.com/openai/v1/chat/completions`, {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-            model: model,
-            messages: [{ role: "user", content: PROMPT }],
-            temperature: 0.1,
-            response_format: { type: "json_object" }
-        }),
+    const data = await groqChatCompletion({
+        model: model,
+        messages: [{ role: "user", content: PROMPT }],
+        temperature: 0.1,
+        response_format: { type: "json_object" }
     });
-
-    if (!response.ok) {
-        throw new Error('Groq API error when fetching raga info');
-    }
-
-    const data = await response.json();
     const text = data.choices[0]?.message?.content || '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('Could not parse Groq JSON response');

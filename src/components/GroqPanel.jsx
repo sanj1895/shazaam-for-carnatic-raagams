@@ -4,7 +4,6 @@ import { getSwaram, RAGAS } from '../utils/ragaLogic';
 
 /* global ml5 */
 
-const GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY;
 const RECORD_SECS = 30;
 const STATES = { IDLE: 'idle', RECORDING: 'recording', PROCESSING: 'processing', RESULT: 'result', ERROR: 'error' };
 
@@ -32,7 +31,7 @@ export default function GroqPanel({ saFrequency }) {
         setLoadingModels(true);
         setErrorMsg('');
         try {
-            const models = await listGroqModels(GROQ_KEY);
+            const models = await listGroqModels();
             if (models.length === 0) {
                 setLoadingModels(false);
                 return;
@@ -50,7 +49,7 @@ export default function GroqPanel({ saFrequency }) {
     };
 
     useEffect(() => {
-        if (GROQ_KEY) fetchModels();
+        fetchModels();
     }, []);
 
     const startRecording = async () => {
@@ -134,7 +133,7 @@ export default function GroqPanel({ saFrequency }) {
                 throw new Error('Not enough distinct musical notes detected. Please sing clearly into the mic.');
             }
 
-            const res = await identifyRagaWithGroq(condensed, GROQ_KEY, model);
+            const res = await identifyRagaWithGroq(condensed, model);
             setResult(res);
             setPanelState(STATES.RESULT);
         } catch (err) {

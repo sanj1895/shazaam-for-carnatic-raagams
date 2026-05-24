@@ -168,7 +168,7 @@ const waitRhythmicUnits = async (units, delayMs, signal, tala) => {
 const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamakam = false, tala = null, octaveMode = 'auto') => {
     const plainSwaras = getPlainSwaras(swaras);
     const octaves = getOctaveSequence(plainSwaras, octaveMode);
-    const toneDur = Math.min((delayMs / 1000) * 0.85, 1.1);
+    const unitSec = delayMs / 1000;
     let prevFreq = null;
     let prevNoteIdx = -1;
     let beatAcc = 0; // tracks beat position; tick fires only at integer boundaries
@@ -201,8 +201,10 @@ const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamak
         }
         const totalDuration = getTokenDuration(swaras[i]) + holdCount;
         const extDur = holdCount > 0
-            ? Math.min((totalDuration * delayMs / 1000) * 0.90, 8.0)
-            : toneDur;
+            ? Math.min((totalDuration * unitSec) * 0.90, 8.0)
+            // For non-hold notes, scale directly with rhythmic duration (including sub-beats),
+            // so multiple notes inside one beat are short and do not overlap.
+            : Math.max(0.05, (dur * unitSec) * 0.80);
         onIdx(i);
         const freq = swaraFreq(swara, sa) * Math.pow(2, octaves[i]);
         playSingleTone(freq, extDur, gamakam ? prevFreq : null);

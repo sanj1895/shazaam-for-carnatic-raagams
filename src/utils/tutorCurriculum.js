@@ -1763,6 +1763,208 @@ export const VARNAM_CURRICULUM_RAW = [
                         body: 'Use these emotional anchors while practicing the four chittaswaram sahityas:\n1) All devas worship him.\n2) Conch and discus-bearing protector.\n3) Kali-yuga karuna murti in jewel-like splendor.\n4) Gita-upadesha giver, beloved Venkataramana, eternal auspicious one.'
                     }
                 ]
+            },
+            {
+                id: 'v1_swaram_talam', title: 'Swaram Practice with Adi Tala', tag: 'Swaram',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Devar Munivar — Full Swaram Alignment',
+                        body: 'Tala: Adi (4 + 2 + 2)\n\nThese are section-wise notation-aligned practice lines from your provided version. Commas are sustained holds (karvai). Practice in first speed first, then second speed.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Sa',',',',','Ni2',',',',','Pa','Da1','Ni2','Ṡ','Ni2','Ṡ','Ni2','Da1','Pa','Ma2','|','Ga2',',',',','Ri2',',',',','Sa','Ri2','Ga2',',',',','Ma2',',','Pa','Da1','Ni2','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Pallavi line 1 (notation-aligned).'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Sa',',',',','Ni2',',',',','Pa','Da1','Ni2','Ṡ','Ni2','Ṡ','Ni2','Da1','Pa','Ma2','|','Ga2',',',',','Ri2',',',',','Sa','Ri2','Ga2',',',',','Ma2',',','Pa','Da1','Ni2','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.8,
+                        instruction: 'Sing: Pallavi line 1.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Sa','Ri2','Ga2','Sa',',','Ga2','Ri2','Ni2',',','Ri2','Sa','Ni2','Da1','Pa','Da1','Ni2','|','Sa','Ni2',',','Da1','Pa','Ma2','Ga2','Ri2',',','Sa','Ri2','Ga2','Ma2','Pa','Da1','Ni2','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Pallavi line 2 and closing.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Sa','Ri2','Ga2','Sa',',','Ga2','Ri2','Ni2',',','Ri2','Sa','Ni2','Da1','Pa','Da1','Ni2','|','Sa','Ni2',',','Da1','Pa','Ma2','Ga2','Ri2',',','Sa','Ri2','Ga2','Ma2','Pa','Da1','Ni2','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.75,
+                        instruction: 'Sing: Pallavi line 2 and closing.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ni2','Pa',',','Da1','Ni2','Da1','Pa','Ma2','Ga2','Ma2','Da1','Ma2','Ga2','Ri2','Sa','Ni2','|','Sa',',','Ri2','Ga2',',','Ma2','Pa',',','Da1',',','Da1','Ni2',',','Sa',',',',','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Anupallavi line 1.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ni2','Pa',',','Da1','Ni2','Da1','Pa','Ma2','Ga2','Ma2','Da1','Ma2','Ga2','Ri2','Sa','Ni2','|','Sa',',','Ri2','Ga2',',','Ma2','Pa',',','Da1',',','Da1','Ni2',',','Sa',',',',','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.75,
+                        instruction: 'Sing: Anupallavi line 1.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ri2','Ni2','Sa','Ri2',',','Sa','Ri2','Ga2',',','Pa','Ma2','Ga2',',','Ga2','Ri2','Ni2','|','Sa','Ri2',',','Ga2',',','Ga2','Ri2','Sa','Da1',',','Pa','Da1','Ma2','Pa','Da1','Ni2','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Anupallavi line 2.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ri2','Ni2','Sa','Ri2',',','Sa','Ri2','Ga2',',','Pa','Ma2','Ga2',',','Ga2','Ri2','Ni2','|','Sa','Ri2',',','Ga2',',','Ga2','Ri2','Sa','Da1',',','Pa','Da1','Ma2','Pa','Da1','Ni2','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.7,
+                        instruction: 'Sing: Anupallavi line 2.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Sa','Ri2','Sa','Da1',',','Ri2','Sa','Da1',',','Sa','Da1',',','Pa','Ma2','Ga2','Ma2','|','Pa',',',',',',',',',',',',',',',',','Ma2',',','Pa','Da1','Ni2','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Muktayi swaram opening cycle.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Sa','Ri2','Sa','Da1',',','Ri2','Sa','Da1',',','Sa','Da1',',','Pa','Ma2','Ga2','Ma2','|','Pa',',',',',',',',',',',',',',',',','Ma2',',','Pa','Da1','Ni2','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.7,
+                        instruction: 'Sing: Muktayi swaram opening cycle.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ni2',',',',','Da1','Pa','Da1','Ni2','Sa','Ni2','Da1','Pa','Ma2','Pa','Ga2','Ma2',',','|','Pa',',',',','Da1','Pa','Ga2',',',',','Ri2','Ga2','Ma2','Pa','Da1','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Charanam base swaram.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ni2',',',',','Da1','Pa','Da1','Ni2','Sa','Ni2','Da1','Pa','Ma2','Pa','Ga2','Ma2',',','|','Pa',',',',','Da1','Pa','Ga2',',',',','Ri2','Ga2','Ma2','Pa','Da1','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.7,
+                        instruction: 'Sing: Charanam base swaram.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ni2',',',',','Pa',',',',','Da1',',',',','Ma2',',',',','Pa',',',',','Ri2','|','Ga2',',',',','Ma2',',',',','Ga2',',',',','Da1',',',',',',','Ga2',',',',','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram (1) opening.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ni2',',',',','Pa',',',',','Da1',',',',','Ma2',',',',','Pa',',',',','Ri2','|','Ga2',',',',','Ma2',',',',','Ga2',',',',','Da1',',',',',',','Ga2',',',',','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.7,
+                        instruction: 'Sing: Chittaswaram (1) opening.'
+                    }
+                ]
+            },
+            {
+                id: 'v1_chittaswaram_full', title: 'Chittaswaram 1-4 Full Practice', tag: 'Advanced Swaram',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Full Chittaswaram Expansion',
+                        body: 'Tala: Adi (4 + 2 + 2)\n\nThis lesson expands Devar Munivar chittaswarams 1-4 in longer notation-aligned chunks. Keep all karvais steady and land every avartanam cleanly.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ni2',',',',','Pa',',',',','Da1',',',',','Ma2',',',',','Pa',',',',','Ri2','|',',','Ga2',',',',','Ma2',',',',','Ga2',',',',','Da1',',',',',',','Ga2',',',',','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 1 (complete phrase).'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ni2',',',',','Pa',',',',','Da1',',',',','Ma2',',',',','Pa',',',',','Ri2','|',',','Ga2',',',',','Ma2',',',',','Ga2',',',',','Da1',',',',',',','Ga2',',',',','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.68,
+                        instruction: 'Sing: Chittaswaram 1.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ni2',',','Da1','Pa',',','Ma2','Pa','Da1','Ni2',',','Sa','Ri2','Ga2','Ma2','Pa','Da1','|','Ni2',',','Da1','Pa','Da1','Ni2','Ri2','Sa','Ni2',',','Da1','Ni2','Ga2','Ga2','Ri2','Sa','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 2.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ni2',',','Da1','Pa',',','Ma2','Pa','Da1','Ni2',',','Sa','Ri2','Ga2','Ma2','Pa','Da1','|','Ni2',',','Da1','Pa','Da1','Ni2','Ri2','Sa','Ni2',',','Da1','Ni2','Ga2','Ga2','Ri2','Sa','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.66,
+                        instruction: 'Sing: Chittaswaram 2.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ni2','Da1','Ni2','Pa','Da1','Ma2','Pa','Ga2','Ni2','Ni2','Da1','Pa','Ma2','Ga2','Ri2','Sa','|','Ga2','Ri2','Ga2','Sa','Ri2','Pa','Da1','Ni2','Ga2','Ri2','Sa','Ri2','Ga2','Ni2','Da1','Pa','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 3 (part A).'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ni2','Da1','Ni2','Pa','Da1','Ma2','Pa','Ga2','Ni2','Ni2','Da1','Pa','Ma2','Ga2','Ri2','Sa','|','Ga2','Ri2','Ga2','Sa','Ri2','Pa','Da1','Ni2','Ga2','Ri2','Sa','Ri2','Ga2','Ni2','Da1','Pa','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.64,
+                        instruction: 'Sing: Chittaswaram 3 (part A).'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Da1','Ni2','Ga2','Ri2','Ga2','Pa','Ma2','Ga2','Ri2','Sa','Sa','Ri2','Ga2','Ni2','Da1','Ni2','|','Ri2','Sa','Ni2','Da1','Pa','Ma2','Pa','Ni2','Ga2','Ri2','Ga2','Ni2','Da1','Ni2','Ga2','Ri2','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 3 (part B).'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Da1','Ni2','Ga2','Ri2','Ga2','Pa','Ma2','Ga2','Ri2','Sa','Sa','Ri2','Ga2','Ni2','Da1','Ni2','|','Ri2','Sa','Ni2','Da1','Pa','Ma2','Pa','Ni2','Ga2','Ri2','Ga2','Ni2','Da1','Ni2','Ga2','Ri2','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.62,
+                        instruction: 'Sing: Chittaswaram 3 (part B).'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Sa',',',',','Pa',',','Sa',',','Ga2','Ri2','Sa','Ni2','Da1','Pa','Ma2','Ga2','Ri2','|','Sa',',',',','Sa','Ri2','Ga2',',','Ri2','Ga2','Ma2',',','Ga2','Ma2','Pa','Da1','Ni2','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 4 (part A).'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Sa',',',',','Pa',',','Sa',',','Ga2','Ri2','Sa','Ni2','Da1','Pa','Ma2','Ga2','Ri2','|','Sa',',',',','Sa','Ri2','Ga2',',','Ri2','Ga2','Ma2',',','Ga2','Ma2','Pa','Da1','Ni2','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.6,
+                        instruction: 'Sing: Chittaswaram 4 (part A).'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Sa','Ri2',',','Ga2','Ri2','Sa','Ni2','Da1','Ni2','Sa',',','Ri2','Sa','Ni2','Da1','Pa','|','Da1','Ni2',',','Sa','Ni2','Da1','Pa','Ma2','Sa','Ri2',',','Ga2',',','Ma2',',',',','Pa','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 4 (part B).'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Sa','Ri2',',','Ga2','Ri2','Sa','Ni2','Da1','Ni2','Sa',',','Ri2','Sa','Ni2','Da1','Pa','|','Da1','Ni2',',','Sa','Ni2','Da1','Pa','Ma2','Sa','Ri2',',','Ga2',',','Ma2',',',',','Pa','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.58,
+                        instruction: 'Sing: Chittaswaram 4 (part B).'
+                    }
+                ]
             }
         ]
     },
@@ -1798,6 +2000,152 @@ export const VARNAM_CURRICULUM_RAW = [
                         type: 'info',
                         title: 'Voice and Bhava Checklist',
                         body: '1) Keep Ga1 and Ma1 transitions clean (no over-sliding).\n2) In Madhyama kala passages, keep sahitya consonants crisp.\n3) Preserve the pleading tone in pallavi/anupallavi and emotional fragility in charanam.'
+                    }
+                ]
+            },
+            {
+                id: 'v2_swaram_talam', title: 'Swaram Practice with Adi Tala', tag: 'Swaram',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Evvari Bodhana — Notation Aligned Core',
+                        body: 'Tala: Adi (4 + 2 + 2)\n\nSection-wise notation-aligned swara practice from pallavi, anupallavi, muktayi, and charanam.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ri2',',','Ga1',',','Ga1','Ri2','Sa',',','Sa','Ri2','Sa','Sa','Da2','Ma1','Da2',',','|','Ma1','Da2','Ṡ','Da2',',','Ṡ','Da2','Sa','Ri2','Ga1',',','Ma1','Ga1','Ga1','Ri2','Sa','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Pallavi complete swara flow.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ri2',',','Ga1',',','Ga1','Ri2','Sa',',','Sa','Ri2','Sa','Sa','Da2','Ma1','Da2',',','|','Ma1','Da2','Ṡ','Da2',',','Ṡ','Da2','Sa','Ri2','Ga1',',','Ma1','Ga1','Ga1','Ri2','Sa','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.8,
+                        instruction: 'Sing: Pallavi complete swara flow.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Sa','Sa','Da2','Da2',',','Ma1','Da2','Da2','Ma1','Ga1',',','Ri2','Ga1','Ma1','Ri2','Ga1','|','Sa','Ri2','Ga1','Ma1',',','Ma1','Da2','Ma1','Ga1','Ri2','Ga1','Ma1','Da2','Da2','Sa',',','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Anupallavi complete swara flow.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Sa','Sa','Da2','Da2',',','Ma1','Da2','Da2','Ma1','Ga1',',','Ri2','Ga1','Ma1','Ri2','Ga1','|','Sa','Ri2','Ga1','Ma1',',','Ma1','Da2','Ma1','Ga1','Ri2','Ga1','Ma1','Da2','Da2','Sa',',','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.8,
+                        instruction: 'Sing: Anupallavi complete swara flow.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ri2','Ga1','Ma1','Ri2',',','Ga1','Sa','Ri2','Ga1',',','Sa',',','Ri2','Sa','Da2','Ma1','Da2','|','Sa','Da2','Sa','Ri2',',','Ri2','Ga1','Sa','Ri2','Ma1',',','Da2','Ma1','Ga1','Ri2','Sa','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Muktayi swaram full phrase.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ri2','Ga1','Ma1','Ri2',',','Ga1','Sa','Ri2','Ga1',',','Sa',',','Ri2','Sa','Da2','Ma1','Da2','|','Sa','Da2','Sa','Ri2',',','Ri2','Ga1','Sa','Ri2','Ma1',',','Da2','Ma1','Ga1','Ri2','Sa','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.76,
+                        instruction: 'Sing: Muktayi swaram full phrase.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ma1',',','Da2','Ma1','Da2',',',',',',','Da2','Sa','Da2','Ma1','Da2','Da2','Sa',',','|','Da2','Sa','Da2','Da2','Ma1','Ga1','Ma1','Ga1','Ri2','Sa','Ri2','Ga1','Sa','Ri2','Ga1','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Charanam swara flow.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ma1',',','Da2','Ma1','Da2',',',',',',','Da2','Sa','Da2','Ma1','Da2','Da2','Sa',',','|','Da2','Sa','Da2','Da2','Ma1','Ga1','Ma1','Ga1','Ri2','Sa','Ri2','Ga1','Sa','Ri2','Ga1','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.74,
+                        instruction: 'Sing: Charanam swara flow.'
+                    }
+                ]
+            },
+            {
+                id: 'v2_chittaswaram_full', title: 'Chittaswaram 1-4 Full Practice', tag: 'Advanced Swaram',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Evvari Chittaswaram Expansion',
+                        body: 'Tala: Adi (4 + 2 + 2)\n\nFull chittaswaram practice in notation-aligned chunks. Keep the Abhogi identity stable in every descent.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ma1',',',',',',','Da2',',','Ma1',',','Da2',',',',','Sa',',','|','Da2',',','Ma1',',',',','Ga1',',','Ri2',',','Sa',',',',','Ri2',',','Ga1','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 1.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ma1',',',',',',','Da2',',','Ma1',',','Da2',',',',','Sa',',','|','Da2',',','Ma1',',',',','Ga1',',','Ri2',',','Sa',',',',','Ri2',',','Ga1','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.7,
+                        instruction: 'Sing: Chittaswaram 1.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ma1','Da2','Sa','Da2',',','Ma1','Da2','Ma1','Ga1','Ri2',',','Ga1','Ma1','Ga1','Ri2','Sa','|','Da2','Sa',',','Ri2','Ga1','Ma1','Da2','Sa',',','Da2','Ma1','Ga1','Ri2','Sa','Ri2','Ga1','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 2.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ma1','Da2','Sa','Da2',',','Ma1','Da2','Ma1','Ga1','Ri2',',','Ga1','Ma1','Ga1','Ri2','Sa','|','Da2','Sa',',','Ri2','Ga1','Ma1','Da2','Sa',',','Da2','Ma1','Ga1','Ri2','Sa','Ri2','Ga1','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.68,
+                        instruction: 'Sing: Chittaswaram 2.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Da2','Sa','Da2','Ma1','Ga1','Ri2','Ga1','Ma1','Da2','Ma1','Ga1','Ri2','Ga1','Sa','Ri2','Sa','|','Ri2','Ga1','Ma1','Da2','Sa','Ri2','Ga1','Ri2','Sa','Da2','Ma1','Ga1','Ri2','Sa','Ri2','Ga1','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 3.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Da2','Sa','Da2','Ma1','Ga1','Ri2','Ga1','Ma1','Da2','Ma1','Ga1','Ri2','Ga1','Sa','Ri2','Sa','|','Ri2','Ga1','Ma1','Da2','Sa','Ri2','Ga1','Ri2','Sa','Da2','Ma1','Ga1','Ri2','Sa','Ri2','Ga1','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.66,
+                        instruction: 'Sing: Chittaswaram 3.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Sa',',',',','Sa',',','Sa','Ri2','Ga1','Sa','Ri2',',','Ri2','Sa','Da2','Ma1','Da2','|','Sa',',',',','Sa','Da2','Ri2','Sa','Da2',',','Sa','Da2','Ma1',',','Ga1','Ri2','Sa','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 4 (part A).'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Sa',',',',','Sa',',','Sa','Ri2','Ga1','Sa','Ri2',',','Ri2','Sa','Da2','Ma1','Da2','|','Sa',',',',','Sa','Da2','Ri2','Sa','Da2',',','Sa','Da2','Ma1',',','Ga1','Ri2','Sa','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.64,
+                        instruction: 'Sing: Chittaswaram 4 (part A).'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ri2','Ga1','Ma1','Da2',',','Sa','Ri2','Ga1','Ma1','Ri2',',','Ga1','Ri2','Sa','Da2','Sa','|','Ri2','Sa',',','Da2','Ma1','Da2','Sa','Da2',',','Ma1','Ga1','Ri2','Sa',',','Ri2','Ga1','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 4 (part B).'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ri2','Ga1','Ma1','Da2',',','Sa','Ri2','Ga1','Ma1','Ri2',',','Ga1','Ri2','Sa','Da2','Sa','|','Ri2','Sa',',','Da2','Ma1','Da2','Sa','Da2',',','Ma1','Ga1','Ri2','Sa',',','Ri2','Ga1','||'],
+                        tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+                        speed: 0.62,
+                        instruction: 'Sing: Chittaswaram 4 (part B).'
                     }
                 ]
             }
@@ -1837,6 +2185,40 @@ export const VARNAM_CURRICULUM_RAW = [
                         body: '1) First speed: perfect sruti and sahitya clarity.\n2) Second speed: maintain vowel length balance.\n3) Chittaswaram: no swallowed notes at phrase turns.\n4) Keep Sankarabharanam bright and open, never nasal.'
                     }
                 ]
+            },
+            {
+                id: 'v3_swaram_talam', title: 'Swaram Practice with Adi Tala', tag: 'Swaram',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Sami Ninne Swara Drills',
+                        body: 'Tala: Adi (4 + 2 + 2)\n\nWork these in 1st speed first. Keep long-karvai commas stable and do not clip phrase endings.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Sa','Ni2','Ṡ','Da2','Ni2','|','Pa','Ma1','Pa','Ga2','Ma1','|','Pa','Da2','Ni2','Pa','||'],
+                        displayLabel: '♪',
+                        instruction: 'Listen: Pallavi swara skeleton.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Sa','Ni2','Ṡ','Da2','Ni2','|','Pa','Ma1','Pa','Ga2','Ma1','|','Pa','Da2','Ni2','Pa','||'],
+                        speed: 0.8,
+                        instruction: 'Sing: Pallavi swara skeleton.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Sa','Ri2','Ni2','Sa','|','Da2','Ni2','Ṡ','Pa','|','Da2','Ni2','Ṡ','Da2','Pa','Ma1','||'],
+                        displayLabel: '♪',
+                        instruction: 'Listen: Muktayi opening phrase.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Pa','Da2','Ni2','Ṡ','|','Ṡ','Ni2','Da2','Pa','|','Ma1','Ga2','Ri2','Ga2','Ma1','Pa','||'],
+                        speed: 0.8,
+                        instruction: 'Sing: Charanam opening phrase.'
+                    }
+                ]
             }
         ]
     },
@@ -1872,6 +2254,40 @@ export const VARNAM_CURRICULUM_RAW = [
                         type: 'info',
                         title: 'Khanda Jathi Ata Practice Plan',
                         body: 'Use this progression daily:\n1) Recite tala counts (5+5+2+2) without singing.\n2) Sing only pallavi in first speed with strict eduppu alignment.\n3) Add muktayi swaram in chunks, always landing samam accurately.\n4) Only then increase speed.'
+                    }
+                ]
+            },
+            {
+                id: 'v4_swaram_talam', title: 'Swaram Practice with Ata Tala', tag: 'Swaram',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Vanajaksha Swara Drills',
+                        body: 'Tala: Khanda Jathi Ata (5 + 5 + 2 + 2)\n\nThis varnam needs strict count discipline. Sing these short passages while maintaining internal 5-count laghu feel.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Sa','Ni3','Da2','Ni3','Sa','Ri2','Ga3','|','Pa','Ma2','Ga3','Ri2','|','Ga3','Ma2','Pa','Ga3','||'],
+                        displayLabel: '♪',
+                        instruction: 'Listen: Pallavi opening contour.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Sa','Ni3','Da2','Ni3','Sa','Ri2','Ga3','|','Pa','Ma2','Ga3','Ri2','|','Ga3','Ma2','Pa','Ga3','||'],
+                        speed: 0.7,
+                        instruction: 'Sing: Pallavi opening in Ata tala.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ri2','Da2','Ni3','Sa','Ri2','Ga3','|','Ma2','Pa','Da2','Ni3','|','Pa','Ma2','Da2','Pa','||'],
+                        displayLabel: '♪',
+                        instruction: 'Listen: Anupallavi starter phrase.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ni3','Da2','Pa','Ma2','|','Ga3','Ri2','Ma2','Pa','|','Da2','Ni3','Ṡ','Ni3','Da2','Pa','||'],
+                        speed: 0.7,
+                        instruction: 'Sing: Charanam swara flow in tala.'
                     }
                 ]
             }

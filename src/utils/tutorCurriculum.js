@@ -331,6 +331,33 @@ export const CURRICULUM = [
     }
 ];
 
+// parseBeatGroups — converts beat-group arrays into a flat swaras array with fractional durations.
+// Each element of `groups` is either:
+//   '|' or '||'  → bar marker, passed through as-is
+//   [note, ...]  → all notes split equally within one beat
+//                  use ',' or ';' or '-' for rests within the group
+// swaraMap maps single characters to app note names (e.g. { S:'Sa', g:'Ga2.', N:'Ni3', n:'Ni2.' })
+// Example:
+//   parseBeatGroups([[',',',','g'], [',','m'], ['P'], ['m','g','G',',',',','r'], [',','N'], '|', ['S']], KAPI_SWARAS)
+export function parseBeatGroups(groups, swaraMap) {
+    const REST = new Set([',', ';', '-']);
+    const result = [];
+    for (const group of groups) {
+        if (group === '|' || group === '||') { result.push(group); continue; }
+        const n = group.length;
+        const dur = 1 / n;
+        for (const ch of group) {
+            if (REST.has(ch)) {
+                result.push(n === 1 ? ',' : { swara: ',', duration: dur });
+            } else {
+                const note = swaraMap ? (swaraMap[ch] ?? ch) : ch;
+                result.push(n === 1 ? note : { swara: note, duration: dur });
+            }
+        }
+    }
+    return result;
+}
+
 // parseMmgMandhra: same as parseMmg but also handles the `.` suffix for lower-octave (Mandhra) notes.
 // e.g. `n.` → 'Ni.'  `d.` → 'Da.'  `p.` → 'Pa.'  `m.` → 'Ma.'
 // Uppercase S → 'Ṡ' (upper Sa), plain lowercase → middle-octave names, as in parseMmg.

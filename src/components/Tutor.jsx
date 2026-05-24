@@ -150,12 +150,17 @@ const playSingleTone = (freq, duration = 0.7, prevFreq = null) => {
 };
 
 const waitRhythmicUnits = async (units, delayMs, signal, tala) => {
-    const count = Math.max(1, Math.round(units));
+    if (signal?.aborted) return;
+    // Sub-beat notes (duration < 1): sleep without firing intermediate ticks —
+    // the beat-boundary tick is handled by the beatAcc check in playSequenceAsync.
+    if (units < 1) {
+        await new Promise(r => setTimeout(r, units * delayMs));
+        return;
+    }
+    const count = Math.round(units);
     for (let unit = 0; unit < count; unit++) {
         if (signal?.aborted) return;
-        if (tala && unit > 0) {
-            playTick(getAudioCtx(), getAudioCtx().currentTime);
-        }
+        if (tala && unit > 0) playTick(getAudioCtx(), getAudioCtx().currentTime);
         await new Promise(r => setTimeout(r, delayMs));
     }
 };
@@ -166,18 +171,22 @@ const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamak
     const toneDur = Math.min((delayMs / 1000) * 0.85, 1.1);
     let prevFreq = null;
     let prevNoteIdx = -1;
+    let beatAcc = 0; // tracks beat position; tick fires only at integer boundaries
 
     for (let i = 0; i < swaras.length; i++) {
         if (signal?.aborted) return;
         const swara = getTokenSwara(swaras[i]);
         if (swara === '|' || swara === '||') continue;
-        if (tala) {
+        const dur = getTokenDuration(swaras[i]);
+        // Fire metronome tick only when we're at an integer beat position
+        if (tala && Math.abs(beatAcc - Math.round(beatAcc)) < 0.01) {
             playTick(getAudioCtx(), getAudioCtx().currentTime);
         }
         if (swara === ',' || swara === '-') {
             // hold — keep visual highlight on the sustained note, no new audio attack
             onIdx(prevNoteIdx);
-            await waitRhythmicUnits(getTokenDuration(swaras[i]), delayMs, signal, tala);
+            await waitRhythmicUnits(dur, delayMs, signal, tala);
+            beatAcc += dur;
             continue;
         }
         // Peek ahead: count hold beats ('-' or ',') to extend tone duration.
@@ -199,7 +208,8 @@ const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamak
         playSingleTone(freq, extDur, gamakam ? prevFreq : null);
         prevFreq = freq;
         prevNoteIdx = i;
-        await waitRhythmicUnits(getTokenDuration(swaras[i]), delayMs, signal, tala);
+        await waitRhythmicUnits(dur, delayMs, signal, tala);
+        beatAcc += dur;
     }
     onIdx(-1);
 };

@@ -3343,6 +3343,7 @@ function RagaSession({ ragaName, raga, sa, onBack }) {
 // ─── Tala-aligned Swara Transcriber ──────────────────────────────────────────
 
 function TalaSwaraTranscriber({ sa, setSa }) {
+    const isLikelyMobile = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || '');
     const TALA_PRESETS = [
         { id: 'adi', name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
         { id: 'rupaka', name: 'Rupaka', groups: [2, 4], unitLabel: '6-beat cycle' },
@@ -3366,6 +3367,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     const [isPlayingTranscription, setIsPlayingTranscription] = useState(false);
     const [isPreviewingTempo, setIsPreviewingTempo] = useState(false);
     const [anchorOnlyMode, setAnchorOnlyMode] = useState(false);
+    const [mobileMicMode, setMobileMicMode] = useState(isLikelyMobile);
 
     const streamRef = useRef(null);
     const sourceRef = useRef(null);
@@ -3441,12 +3443,13 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     const resolveOctaveWithHysteresis = useCallback((baseSwara, semitones) => {
         const candidate = Math.floor(Math.round(semitones) / 12);
         const st = octaveStateRef.current;
+        const lockFrames = mobileMicMode ? 4 : 3;
         if (candidate === st.stable) {
             st.pending = null;
             st.pendingCount = 0;
         } else if (st.pending === candidate) {
             st.pendingCount += 1;
-            if (st.pendingCount >= 3) {
+            if (st.pendingCount >= lockFrames) {
                 st.stable = candidate;
                 st.pending = null;
                 st.pendingCount = 0;
@@ -3459,7 +3462,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         if (octave >= 1) return `${baseSwara}^`;
         if (octave <= -1) return `${baseSwara}.`;
         return baseSwara;
-    }, []);
+    }, [mobileMicMode]);
 
     const transcribeFramesToSlots = useCallback((frames, totalSlots, slotMs) => {
         const grid = Array.from({ length: totalSlots }, () => []);
@@ -3614,11 +3617,17 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     }, [BEATS_PER_AVARTANA, avartanas, bpm, bucketsToTokens, cleanup, subdiv, tokensToReadableText, transcribeFramesToSlots]);
 
     const startRecording = useCallback(async () => {
-        setMicError('');
-        setTranscribed([]);
-        setTranscribedText('');
+            setMicError('');
+            setTranscribed([]);
+            setTranscribedText('');
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false,
+                },
+            });
             streamRef.current = stream;
 
             const ctx = getAudioCtx();
@@ -3669,16 +3678,19 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 analyserNode.getFloatTimeDomainData(buf);
                 const rms = Math.sqrt(buf.reduce((sum, v) => sum + v * v, 0) / buf.length);
                 const noiseFloor = (window.MIC_NOISE_FLOOR || 4) / 100;
-                if (rms < Math.max(0.01, noiseFloor)) {
+                const rmsGate = mobileMicMode ? Math.max(0.008, noiseFloor * 0.8) : Math.max(0.01, noiseFloor);
+                if (rms < rmsGate) {
                     frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
                     return;
                 }
 
                 const yin = yinEstimate(buf, getAudioCtx().sampleRate);
                 const acfFreq = detectPitchAudio(analyserNode, getAudioCtx().sampleRate);
-                const chosenFreq = yin?.confidence >= 0.48 ? yin.freq : acfFreq;
-                const confidence = yin?.confidence ?? 0.40;
-                if (!chosenFreq || confidence < 0.35) {
+                const yinPriorityThreshold = mobileMicMode ? 0.44 : 0.48;
+                const chosenFreq = yin?.confidence >= yinPriorityThreshold ? yin.freq : acfFreq;
+                const confidence = yin?.confidence ?? (mobileMicMode ? 0.42 : 0.40);
+                const minConfidence = mobileMicMode ? 0.30 : 0.35;
+                if (!chosenFreq || confidence < minConfidence) {
                     frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
                     return;
                 }
@@ -3701,13 +3713,13 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 const bucket = bucketsRef.current[slot];
                 const bucketLabel = (anchorOnlyMode && glide && prev?.label && prev.label !== ',') ? prev.label : swara;
                 bucket[bucketLabel] = (bucket[bucketLabel] || 0) + 1;
-            }, 20);
+            }, mobileMicMode ? 16 : 20);
         } catch {
             cleanup();
             setPhase('error');
             setMicError('Mic access is required for transcription.');
         }
-    }, [BEATS_PER_AVARTANA, avartanas, bpm, cleanup, finishRecording, sa, subdiv]);
+    }, [BEATS_PER_AVARTANA, avartanas, bpm, cleanup, finishRecording, mobileMicMode, resolveOctaveWithHysteresis, sa, subdiv]);
 
     const stopTempoPreview = useCallback(() => {
         if (previewTimerRef.current) clearInterval(previewTimerRef.current);
@@ -3815,6 +3827,10 @@ function TalaSwaraTranscriber({ sa, setSa }) {
             <label className="inline-flex items-center gap-2 text-xs text-c-cream-dim">
                 <input type="checkbox" checked={anchorOnlyMode} onChange={(e) => setAnchorOnlyMode(e.target.checked)} />
                 Anchor Notes Only (reduce gamaka transition noise)
+            </label>
+            <label className="inline-flex items-center gap-2 text-xs text-c-cream-dim">
+                <input type="checkbox" checked={mobileMicMode} onChange={(e) => setMobileMicMode(e.target.checked)} />
+                Mobile Mic Mode (better phone stability)
             </label>
 
             <div className="flex flex-wrap items-center gap-2 text-xs text-c-cream-dim">

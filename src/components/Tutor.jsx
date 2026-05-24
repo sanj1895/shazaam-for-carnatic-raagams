@@ -241,6 +241,37 @@ function ExerciseQuiz({ question, choices, correct, explanation, onDone }) {
     );
 }
 
+function ExerciseLyricsPractice({ title = 'Sahityam Practice', lyrics = [], meaning, instruction, onDone }) {
+    return (
+        <div className="flex flex-col gap-5 w-full max-w-md">
+            <div className="bg-c-surface border border-c-border rounded-xl p-5 flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                    <h3 className="font-playfair text-lg text-c-gold leading-snug">{title}</h3>
+                    {instruction && (
+                        <p className="text-xs text-c-cream-dark font-playfair italic leading-relaxed">{instruction}</p>
+                    )}
+                </div>
+                <div className="flex flex-col gap-2">
+                    {lyrics.map((line, idx) => (
+                        <div key={idx} className="px-3 py-2 rounded-lg border border-c-border/40 bg-c-card text-c-cream font-playfair text-base leading-relaxed text-center">
+                            {line}
+                        </div>
+                    ))}
+                </div>
+                {meaning && (
+                    <p className="text-xs text-c-cream-dim font-playfair leading-relaxed whitespace-pre-line border-t border-c-border/30 pt-3">
+                        {meaning}
+                    </p>
+                )}
+            </div>
+            <button onClick={onDone}
+                    className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity self-center">
+                I practiced the words
+            </button>
+        </div>
+    );
+}
+
 // ─── Shared: Listen exercise ──────────────────────────────────────────────────
 
 function ExerciseListen({ swara, sa, instruction, displayLabel, onDone }) {
@@ -2829,6 +2860,7 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete
         const key = `${lesson.id}-${idx}`;
         if (ex.type === 'info')            return <ExerciseInfo           key={key} {...ex} onDone={next} />;
         if (ex.type === 'quiz')            return <ExerciseQuiz           key={key} {...ex} onDone={next} />;
+        if (ex.type === 'lyrics_practice') return <ExerciseLyricsPractice  key={key} {...ex} onDone={next} />;
         if (ex.type === 'listen') {
             if (ex.swaras) {
                 return <ExerciseListenSequence key={key} {...ex} sa={sa} onDone={next} />;

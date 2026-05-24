@@ -1507,6 +1507,10 @@ const SWARAJATHI_CURRICULUM_RAW = [
                         's , , r g , p , d , S , n , d , |',
                         'p , d p m g r s | r s n. d. s , , ,'
                     ], BILAHARI_SWARAS), speed: 0.75, instruction: 'Sing the complete pallavi with the written comma holds.' },
+                    { type: 'lyrics_practice', title: 'Pallavi Words', lyrics: [
+                        'Rārā Vēṇugōpa Bāla',
+                        'Rājita Sadguṇa Jaya Śīla'
+                    ], instruction: 'Speak the words in the same two-line tāḷam shape, then sing them on the swaras you just practiced.', meaning: 'Please come, Lord Vēṇugōpāla, embodiment of adorable and victorious qualities.' },
                 ]
             },
             {
@@ -1521,6 +1525,10 @@ const SWARAJATHI_CURRICULUM_RAW = [
                         's , , r g , p , m , , g p , d , |',
                         'R , , S n , , d | p , , m g , , r'
                     ], BILAHARI_SWARAS), speed: 0.75, instruction: 'Sing the complete anupallavi, keeping every comma-count steady against Ādi tāḷam.' },
+                    { type: 'lyrics_practice', title: 'Anupallavi Words', lyrics: [
+                        'Sārasākṣa Nēra Mēmi',
+                        'Mārubāri Korvalērā'
+                    ], instruction: 'First speak the sahityam clearly. Then sing it slowly, keeping the longer syllables where the commas appear in notation.', meaning: 'O lotus-eyed one, what wrong have I done? I cannot bear the onslaught of love.' },
                 ]
             },
             {
@@ -1539,6 +1547,11 @@ const SWARAJATHI_CURRICULUM_RAW = [
                         'S , , S S , S , G R S n n d p , |',
                         'p d p m g g r , | g p m g r s r g'
                     ], BILAHARI_SWARAS), speed: 0.7, instruction: 'Sing Charanam 1 with exact comma holds, then return to the pallavi.' },
+                    { type: 'lyrics_practice', title: 'Charanam 1 Words', lyrics: [
+                        'Nandagōpālā Ne Nendu Pōjālā Nee',
+                        'Vindu Rārā Sadamalamadito',
+                        'Mudamala Raganā Keduruga Gadiyara'
+                    ], instruction: 'Practice the words slowly in chunks. The last line moves faster, so speak it rhythmically before singing.', meaning: 'O Nandagōpālā, I have nowhere else to go. Come here with a free mind and spread cheer.' },
                 ]
             },
             {
@@ -1557,6 +1570,12 @@ const SWARAJATHI_CURRICULUM_RAW = [
                         'r s n. d. s , , , m g r g p , , , |',
                         'd p d R S , , , | R S n d p m g r'
                     ], BILAHARI_SWARAS), speed: 0.7, instruction: 'Sing Charanam 2, keeping the long held endings steady before the faster answers.' },
+                    { type: 'lyrics_practice', title: 'Charanam 2 Words', lyrics: [
+                        'Palumārunugā Ravamuna Nin Pilachina',
+                        'Palukavu Nalugakurā',
+                        'Karivarada Marimarina Adharamugrō',
+                        'Larakani Karamuga'
+                    ], instruction: 'Speak each line with the same long-and-short shape as the swaras. Then sing the words without losing the tāḷam.', meaning: 'The devotee asks why Krishna does not respond, recalls Gajendra, and asks for quick protection.' },
                 ]
             },
             {
@@ -1583,6 +1602,12 @@ const SWARAJATHI_CURRICULUM_RAW = [
                         'g , , , s r g d p , , , R S R G |',
                         'S , , , G R S N d p m g r s r g'
                     ], BILAHARI_SWARAS), speed: 0.65, instruction: 'Sing Charanam 3 slowly first. Keep the comma notation visible in your mind as the tāḷam grid.' },
+                    { type: 'lyrics_practice', title: 'Charanam 3 Words', lyrics: [
+                        'Rā Nagadara Rā Murahara Rā Bhavahara Rāverā',
+                        'Ee Maguvanu Ee Lalalanu Ee Sogasini Chēkorā',
+                        'Kōrikalim Pondā Dendamu Neeyanda Chērenu Neechenta',
+                        'Maruvakurā Karamulachē Marimari Ninu Sharaṇanē Dara'
+                    ], instruction: 'This is the longest word section. Speak one line per breath first, then sing it slowly with the same held syllables as the notation.', meaning: 'The devotee calls Krishna by many names and seeks refuge again and again.' },
                 ]
             },
         ]

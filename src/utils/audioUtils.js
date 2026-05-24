@@ -43,6 +43,28 @@ export const SWARA_SEMITONE = {
   'Ga.': -8,
   'Da.': -4,
   'Ni.': -1,
+
+  // Tara Sthayi (upper octave) notes — semitones 12–23 encode frequency directly at octave 0
+  // Use ^ suffix to mirror the . suffix convention for mandhra sthayi.
+  'Sa^': 12,
+  'Ri1^': 13,
+  'Ri2^': 14, 'Ga1^': 14,
+  'Ga2^': 15, 'Ri3^': 15,
+  'Ga3^': 16,
+  'Ma1^': 17,
+  'Ma2^': 18,
+  'Pa^': 19,
+  'Da1^': 20,
+  'Da2^': 21, 'Ni1^': 21,
+  'Ni2^': 22, 'Da3^': 22,
+  'Ni3^': 23,
+
+  // Plain upper-octave aliases.
+  'Ri^': 13,
+  'Ga^': 16,
+  'Ma^': 17,
+  'Da^': 20,
+  'Ni^': 23,
 };
 
 export const SEMITONE_TO_SWARA = Object.fromEntries(
@@ -177,7 +199,7 @@ export function playNote(note, saHz, ctx, options = {}) {
  * Computes octave shifts for a sequence of notes.
  * Returns an array of integers representing the octave shift for each note.
  */
-export function getOctaveSequence(notes) {
+export function getOctaveSequence(notes, mode = 'auto') {
   const octaves = [];
   let octave = 0;
   let lastAbsSemi = null;
@@ -188,9 +210,18 @@ export function getOctaveSequence(notes) {
        continue;
     }
     const rawSemi = SWARA_SEMITONE[swara] ?? 0;
-    // Mandhra (lower-octave) notes have negative semitones that already encode the correct
-    // sub-Sa frequency — they always play at octave 0; no auto-shift needed.
-    if (rawSemi < 0) {
+    // In strict mode, keep all plain notes in the base octave.
+    // Only explicit octave-marked notes should move:
+    // - mandhra notes (e.g., Ni3.) are encoded as negative semitones
+    // - tara notes should be encoded as >= 12 semitones (e.g., Ṡ)
+    if (mode === 'strict') {
+      octaves.push(0);
+      lastAbsSemi = rawSemi;
+      continue;
+    }
+    // Mandhra/tara notes have semitones outside 0–11 that already encode the correct
+    // frequency — they always play at octave 0; no auto-shift needed.
+    if (rawSemi < 0 || rawSemi >= 12) {
       octaves.push(0);
       lastAbsSemi = rawSemi;
       continue;

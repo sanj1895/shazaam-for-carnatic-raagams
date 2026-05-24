@@ -2388,32 +2388,144 @@ export const VARNAM_CURRICULUM_RAW = [
                 exercises: [
                     {
                         type: 'info',
-                        title: 'Vanajaksha Swara Drills',
-                        body: 'Tala: Khanda Jathi Ata (5 + 5 + 2 + 2)\n\nThis varnam needs strict count discipline. Sing these short passages while maintaining internal 5-count laghu feel.'
+                        title: 'Vanajaksha — Notation Aligned Core',
+                        body: 'Tala: Khanda Jathi Ata (5 + 5 + 2 + 2)\n\nSection-wise notation-aligned swara practice from pallavi, anupallavi, muktayi, and charanam.'
                     },
                     {
                         type: 'listen_sequence',
-                        swaras: ['Sa','Ni3','Da2','Ni3','Sa','Ri2','Ga3','|','Pa','Ma2','Ga3','Ri2','|','Ga3','Ma2','Pa','Ga3','||'],
+                        swaras: ['Sa',',','Ni3','Da2','Ni3','Sa','Ri2','Ga3','Pa',',','Ma2',',','Ga3',',',',','Ri2','Ri2',',',',',',','|','Ga3','Ma2','Pa','Ga3','Ri2','Sa','Ni3','Da2','Ri2','Sa','Sa',',','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
                         displayLabel: '♪',
-                        instruction: 'Listen: Pallavi opening contour.'
+                        instruction: 'Listen: Pallavi line 1.'
                     },
                     {
                         type: 'sing_sequence',
-                        swaras: ['Sa','Ni3','Da2','Ni3','Sa','Ri2','Ga3','|','Pa','Ma2','Ga3','Ri2','|','Ga3','Ma2','Pa','Ga3','||'],
+                        swaras: ['Sa',',','Ni3','Da2','Ni3','Sa','Ri2','Ga3','Pa',',','Ma2',',','Ga3',',',',','Ri2','Ri2',',',',',',','|','Ga3','Ma2','Pa','Ga3','Ri2','Sa','Ni3','Da2','Ri2','Sa','Sa',',','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
                         speed: 0.7,
-                        instruction: 'Sing: Pallavi opening in Ata tala.'
+                        instruction: 'Sing: Pallavi line 1.'
                     },
                     {
                         type: 'listen_sequence',
-                        swaras: ['Ri2','Da2','Ni3','Sa','Ri2','Ga3','|','Ma2','Pa','Da2','Ni3','|','Pa','Ma2','Da2','Pa','||'],
+                        swaras: ['Ga3','Ma2','Pa','Ga3','Ri2','Sa','Ni3','Da2','Ri2','Sa','Sa',',','Ri2','Da2','Ga3','Ri2','|','Ga3','Pa','Ma2','Ri2','Ga3','Ma2','Pa','Da2','Pa','Ma2','Ni3','Da2','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
                         displayLabel: '♪',
-                        instruction: 'Listen: Anupallavi starter phrase.'
+                        instruction: 'Listen: Pallavi line 2 and close.'
                     },
                     {
                         type: 'sing_sequence',
-                        swaras: ['Ni3','Da2','Pa','Ma2','|','Ga3','Ri2','Ma2','Pa','|','Da2','Ni3','Ṡ','Ni3','Da2','Pa','||'],
+                        swaras: ['Ga3','Ma2','Pa','Ga3','Ri2','Sa','Ni3','Da2','Ri2','Sa','Sa',',','Ri2','Da2','Ga3','Ri2','|','Ga3','Pa','Ma2','Ri2','Ga3','Ma2','Pa','Da2','Pa','Ma2','Ni3','Da2','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
                         speed: 0.7,
-                        instruction: 'Sing: Charanam swara flow in tala.'
+                        instruction: 'Sing: Pallavi line 2 and close.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ri2',',',',','Da2','Ni3','Sa','Ri2','Ga3','Ma2','Pa','Da2','Ni3','Pa','Ma2','Da2','Pa','|','Pa','Ma2','Ma2','Ga3','Ni3','Da2','Ma2','Ga3','Pa','Ga3','Ri2','Sa','Ni3','Da2','Ma2','Ga3','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Anupallavi core phrase.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ri2',',',',','Da2','Ni3','Sa','Ri2','Ga3','Ma2','Pa','Da2','Ni3','Pa','Ma2','Da2','Pa','|','Pa','Ma2','Ma2','Ga3','Ni3','Da2','Ma2','Ga3','Pa','Ga3','Ri2','Sa','Ni3','Da2','Ma2','Ga3','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        speed: 0.68,
+                        instruction: 'Sing: Anupallavi core phrase.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ma2',',',',','Ga3','Pa','Ma2',',','Pa','Da2','Ga3','Ma2','Pa','|','Ni3','Da2','Pa','Ni3','Da2',',','Pa','Ma2','Da2','Ma2','Ga3','Ri2',',','Pa','Ma2','Ga3','Ri2','Sa','Ni3','Da2','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Muktayi swaram phrase.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ma2',',',',','Ga3','Pa','Ma2',',','Pa','Da2','Ga3','Ma2','Pa','|','Ni3','Da2','Pa','Ni3','Da2',',','Pa','Ma2','Da2','Ma2','Ga3','Ri2',',','Pa','Ma2','Ga3','Ri2','Sa','Ni3','Da2','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        speed: 0.66,
+                        instruction: 'Sing: Muktayi swaram phrase.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Sa','Ni3','Da2','Pa','Ma2','Ga3','Ma2','Ri2','Ga3','Ma2','Pa','Da2','|','Pa',',',',','Ga3','Ma2','Pa','Da2','Pa','Ma2','Pa','Da2','Da2','Ni3','Ni3','Sa','Sa','Ni3','Ni3','Da2','Pa','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Charanam opening.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Sa','Ni3','Da2','Pa','Ma2','Ga3','Ma2','Ri2','Ga3','Ma2','Pa','Da2','|','Pa',',',',','Ga3','Ma2','Pa','Da2','Pa','Ma2','Pa','Da2','Da2','Ni3','Ni3','Sa','Sa','Ni3','Ni3','Da2','Pa','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        speed: 0.64,
+                        instruction: 'Sing: Charanam opening.'
+                    }
+                ]
+            },
+            {
+                id: 'v4_chittaswaram_full', title: 'Chittaswaram 1-4 Full Practice', tag: 'Advanced Swaram',
+                exercises: [
+                    {
+                        type: 'info',
+                        title: 'Vanajaksha Chittaswaram Expansion',
+                        body: 'Tala: Khanda Jathi Ata (5 + 5 + 2 + 2)\n\nFull chittaswaram practice in notation-aligned chunks. Keep Ma2 and Ni3 intonation exact across long karvais.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ri2',',',',',',',',','Sa',',',',',',',',','Ri2',',','Sa',',','Ni3',',','Da2',',','|','Ni3',',','Pa',',',',',',','Ma2',',','Da2',',','Ma2',',','Ga3',',','Ri2',',','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 1.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ri2',',',',',',',',','Sa',',',',',',',',','Ri2',',','Sa',',','Ni3',',','Da2',',','|','Ni3',',','Pa',',',',',',','Ma2',',','Da2',',','Ma2',',','Ga3',',','Ri2',',','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        speed: 0.62,
+                        instruction: 'Sing: Chittaswaram 1.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Da2',',','Pa','Ma2','Pa','Ga3','Ma2',',','Pa','Ga3','Da2','Ma2','Ga3','Ri2','Pa','Ma2','|',',','Ga3','Ri2','Ni3','Sa','Ri2','Ga3','Pa','Ma2','Ga3','Ri2','Ni3','Da2','Da2','Ga3','Ri2','Ni3','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 2.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Da2',',','Pa','Ma2','Pa','Ga3','Ma2',',','Pa','Ga3','Da2','Ma2','Ga3','Ri2','Pa','Ma2','|',',','Ga3','Ri2','Ni3','Sa','Ri2','Ga3','Pa','Ma2','Ga3','Ri2','Ni3','Da2','Da2','Ga3','Ri2','Ni3','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        speed: 0.6,
+                        instruction: 'Sing: Chittaswaram 2.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Ma2','Ni3','Da2','Ma2','Pa','Ga3','Pa','Ma2','Pa',',',',','Ma2','Ga3','Da2','Ma2','Ga3','|','Ri2','Sa','Ni3','Ri2',',','Ri2','Da2','Ni3','Sa','Ri2',',','Ri2','Da2','Pa','Ma2','Ga3','Ma2','Pa','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 3.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Ma2','Ni3','Da2','Ma2','Pa','Ga3','Pa','Ma2','Pa',',',',','Ma2','Ga3','Da2','Ma2','Ga3','|','Ri2','Sa','Ni3','Ri2',',','Ri2','Da2','Ni3','Sa','Ri2',',','Ri2','Da2','Pa','Ma2','Ga3','Ma2','Pa','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        speed: 0.58,
+                        instruction: 'Sing: Chittaswaram 3.'
+                    },
+                    {
+                        type: 'listen_sequence',
+                        swaras: ['Da2',',','Ni3','Da2','Ma2','Ga3','Da2','Ma2','Ga3','Ri2',',','Ma2','Ga3','Ri2','Ni3','Da2',',','|','Ga3','Ri2','Ma2','Ga3','Ni3','Da2','Ga3','Ma2','Pa','Da2','Ni3','Pa','Da2','Ma2','Ga3','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        displayLabel: '♪',
+                        instruction: 'Listen: Chittaswaram 4.'
+                    },
+                    {
+                        type: 'sing_sequence',
+                        swaras: ['Da2',',','Ni3','Da2','Ma2','Ga3','Da2','Ma2','Ga3','Ri2',',','Ma2','Ga3','Ri2','Ni3','Da2',',','|','Ga3','Ri2','Ma2','Ga3','Ni3','Da2','Ga3','Ma2','Pa','Da2','Ni3','Pa','Da2','Ma2','Ga3','||'],
+                        tala: { name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+                        speed: 0.56,
+                        instruction: 'Sing: Chittaswaram 4.'
                     }
                 ]
             }

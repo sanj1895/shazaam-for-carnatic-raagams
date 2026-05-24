@@ -39,6 +39,27 @@ const getTokenSwara = (token) => typeof token === 'string' ? token : token?.swar
 const getTokenDuration = (token) => typeof token === 'object' && token?.duration ? token.duration : 1;
 const isBarToken = (token) => getTokenSwara(token) === '|' || getTokenSwara(token) === '||';
 const getPlainSwaras = (tokens) => tokens.map(getTokenSwara);
+const getTotalUnits = (tokens) => tokens.reduce((sum, token) => sum + (isBarToken(token) ? 0 : getTokenDuration(token)), 0);
+
+function TalaBadge({ tala, swaras }) {
+    if (!tala) return null;
+    const units = getTotalUnits(swaras);
+    return (
+        <div className="flex flex-wrap items-center justify-center gap-2 text-[10px] font-mono uppercase tracking-wider text-c-cream-dark">
+            <span className="px-2 py-1 rounded border border-c-gold/30 bg-c-gold/10 text-c-gold">
+                Tāḷam: {tala.name}
+            </span>
+            {tala.groups && (
+                <span className="px-2 py-1 rounded border border-c-border bg-c-card">
+                    {tala.groups.join(' + ')} · {tala.unitLabel}
+                </span>
+            )}
+            <span className="px-2 py-1 rounded border border-c-border bg-c-card">
+                {units} rhythmic units
+            </span>
+        </div>
+    );
+}
 
 const playSingleTone = (freq, duration = 0.7, prevFreq = null) => {
     try {
@@ -80,7 +101,18 @@ const playSingleTone = (freq, duration = 0.7, prevFreq = null) => {
     }
 };
 
-const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamakam = false) => {
+const waitRhythmicUnits = async (units, delayMs, signal, tala) => {
+    const count = Math.max(1, Math.round(units));
+    for (let unit = 0; unit < count; unit++) {
+        if (signal?.aborted) return;
+        if (tala && unit > 0) {
+            playTick(getAudioCtx(), getAudioCtx().currentTime);
+        }
+        await new Promise(r => setTimeout(r, delayMs));
+    }
+};
+
+const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamakam = false, tala = null) => {
     const plainSwaras = getPlainSwaras(swaras);
     const octaves = getOctaveSequence(plainSwaras);
     const toneDur = Math.min((delayMs / 1000) * 0.85, 1.1);
@@ -90,19 +122,21 @@ const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamak
     for (let i = 0; i < swaras.length; i++) {
         if (signal?.aborted) return;
         const swara = getTokenSwara(swaras[i]);
-        const tokenMs = delayMs * getTokenDuration(swaras[i]);
         if (swara === '|' || swara === '||') continue;
+        if (tala) {
+            playTick(getAudioCtx(), getAudioCtx().currentTime);
+        }
         if (swara === ',') {
             // rest/silence — clear highlight and wait
             onIdx(-1);
             prevFreq = null;
-            await new Promise(r => setTimeout(r, tokenMs));
+            await waitRhythmicUnits(getTokenDuration(swaras[i]), delayMs, signal, tala);
             continue;
         }
         if (swara === '-') {
             // hold — keep visual highlight on the sustained note, no new audio attack
             onIdx(prevNoteIdx);
-            await new Promise(r => setTimeout(r, tokenMs));
+            await waitRhythmicUnits(getTokenDuration(swaras[i]), delayMs, signal, tala);
             continue;
         }
         // Peek ahead: count consecutive hold beats to extend tone duration
@@ -117,7 +151,7 @@ const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamak
         playSingleTone(freq, extDur, gamakam ? prevFreq : null);
         prevFreq = freq;
         prevNoteIdx = i;
-        await new Promise(r => setTimeout(r, tokenMs));
+        await waitRhythmicUnits(getTokenDuration(swaras[i]), delayMs, signal, tala);
     }
     onIdx(-1);
 };
@@ -230,7 +264,7 @@ const TEMPO_OPTIONS = [
     { label: 'Fast', mult: 1.5 },
 ];
 
-function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
+function ExerciseListenSequence({ swaras, sa, instruction, tala, onDone }) {
     const [activeIdx, setActiveIdx] = useState(-1);
     const [finished, setFinished] = useState(false);
     const [tempoMult, setTempoMult] = useState(1);
@@ -253,7 +287,7 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
         setFinished(false);
         setIsPlaying(true);
         const delayMs = Math.round(750 / mult);
-        playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal, delayMs).then(() => {
+        playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal, delayMs, false, tala).then(() => {
             if (!ctrl.signal.aborted) {
                 setFinished(true);
                 setIsPlaying(false);
@@ -341,6 +375,7 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
     return (
         <div className="flex flex-col items-center gap-7 w-full">
             <p className="text-c-cream-dark text-sm font-playfair italic text-center max-w-sm leading-relaxed">{instruction}</p>
+            <TalaBadge tala={tala} swaras={swaras} />
             {renderSwaras()}
             <div className="flex flex-col items-center gap-5 w-full">
                 {/* Tempo Slider */}
@@ -1718,7 +1753,7 @@ function playTick(ctx, time) {
     oscClick.stop(time + 0.015);
 }
 
-function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swaras', _slowPass = false, onDone }) {
+function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swaras', _slowPass = false, tala, onDone }) {
     const [tempoMult, setTempoMult] = useState(1);
     const tempoMultRef = useRef(1); // ref so startRecording/playGuide always read the latest value
 
@@ -1801,7 +1836,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             const ctrl = new AbortController();
             guideAbortRef.current = ctrl;
             const beatMs = Math.round(800 / tempoMultRef.current) / speed;
-            await playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal, beatMs, gamakamEnabled);
+            await playSequenceAsync(swaras, sa, setActiveIdx, ctrl.signal, beatMs, gamakamEnabled, tala);
             if (!ctrl.signal.aborted) {
                 setActiveIdx(-1);
             }
@@ -1944,6 +1979,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                 </span>
             )}
             <p className="text-c-cream-dark text-sm font-playfair italic text-center leading-relaxed">{instruction}</p>
+            <TalaBadge tala={tala} swaras={swaras} />
             
             {(() => {
                 const lines = [];

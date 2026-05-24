@@ -377,6 +377,86 @@ export function parseMmg(str) {
     return tokens;
 }
 
+const cloneTokenWithDuration = (token, duration) => ({
+    swara: typeof token === 'string' ? token : token.swara,
+    duration
+});
+
+const sustainNotation = (tokens) => {
+    const rhythmic = [];
+    let lastPlayableIdx = -1;
+
+    tokens.forEach(token => {
+        const swara = typeof token === 'string' ? token : token?.swara;
+        if (swara === '|' || swara === '||') {
+            rhythmic.push(token);
+            return;
+        }
+
+        if (swara === ',' || swara === ';' || swara === '-') {
+            if (lastPlayableIdx >= 0) {
+                const prev = rhythmic[lastPlayableIdx];
+                rhythmic[lastPlayableIdx] = cloneTokenWithDuration(
+                    prev,
+                    (typeof prev === 'string' ? 1 : prev.duration || 1) + (typeof token === 'string' ? 1 : token.duration || 1)
+                );
+            } else {
+                rhythmic.push(cloneTokenWithDuration(',', typeof token === 'string' ? 1 : token.duration || 1));
+            }
+            return;
+        }
+
+        rhythmic.push(token);
+        lastPlayableIdx = rhythmic.length - 1;
+    });
+
+    return rhythmic;
+};
+
+const inferTala = (body = '') => {
+    if (body.includes('Khaṇḍa') || body.includes('khaṇḍa')) {
+        return { name: 'Khaṇḍa gati', groups: [5], unitLabel: '5 inner pulses per beat' };
+    }
+    if (body.includes('Miśra Chāpu') || body.includes('Misra Chapu')) {
+        return { name: 'Miśra Chāpu', groups: [3, 2, 2], unitLabel: '7-count cycle' };
+    }
+    if (body.includes('Ādi') || body.includes('Adi')) {
+        return { name: 'Ādi', groups: [4, 2, 2], unitLabel: '8-beat cycle' };
+    }
+    if (body.includes('Tisra Jāti Triputa')) {
+        return { name: 'Tisra Jāti Triputa', groups: [3, 2, 2], unitLabel: '7-beat cycle' };
+    }
+    if (body.includes('Chatusra Jāti Triputa')) {
+        return { name: 'Chatusra Jāti Triputa', groups: [4, 2, 2], unitLabel: '8-beat cycle' };
+    }
+    if (body.includes('Chatusra Jāti Rūpaka')) {
+        return { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' };
+    }
+    return null;
+};
+
+const withCompositionRhythm = (curriculum) => curriculum.map(stage => ({
+    ...stage,
+    lessons: stage.lessons.map(lesson => {
+        let currentTala = null;
+        const exercises = lesson.exercises.map(exercise => {
+            if (exercise.type === 'info') {
+                currentTala = inferTala(exercise.body) || currentTala;
+                return exercise;
+            }
+            if ((exercise.type === 'listen_sequence' || exercise.type === 'sing_sequence') && Array.isArray(exercise.swaras)) {
+                return {
+                    ...exercise,
+                    tala: exercise.tala || currentTala || null,
+                    swaras: sustainNotation(exercise.swaras)
+                };
+            }
+            return exercise;
+        });
+        return { ...lesson, exercises };
+    })
+}));
+
 export const SARALI_CURRICULUM = [
     {
         id: 'sarali_stage1', title: 'Elementary Foundations', symbol: '🌱',
@@ -1088,7 +1168,7 @@ export const ALANKARAM_CURRICULUM = [
     }
 ];
 
-export const GEETHAM_CURRICULUM = [
+const GEETHAM_CURRICULUM_RAW = [
     // ─── STAGE 1: MALAHARI ────────────────────────────────────────────────
     {
         id: 'geetham_stage1', title: 'Malahari Rāgam', symbol: '🌿',
@@ -1337,7 +1417,6 @@ const parseSwarajathi = (str, swaraMap) => {
         if (char === '|') {
             if (str[i + 1] === '|') { tokens.push('||'); i++; }
             else tokens.push('|');
-            lastPlayableIdx = -1;
         } else if (char === ',' || char === ';' || char === '-') {
             if (lastPlayableIdx >= 0) {
                 const prev = tokens[lastPlayableIdx];
@@ -1371,7 +1450,7 @@ const BHAIRAVI_SWARAS = {
     S: 'Ṡ', R: 'Ri2', G: 'Ga2', M: 'Ma1', P: 'Pa', D: 'Da1', N: 'Ni2'
 };
 
-export const SWARAJATHI_CURRICULUM = [
+const SWARAJATHI_CURRICULUM_RAW = [
     {
         id: 'swarajathi_stage1',
         title: 'Bilahari: Rāravēṇu',
@@ -1526,6 +1605,9 @@ export const SWARAJATHI_CURRICULUM = [
         ]
     },
 ];
+
+export const GEETHAM_CURRICULUM = withCompositionRhythm(GEETHAM_CURRICULUM_RAW);
+export const SWARAJATHI_CURRICULUM = withCompositionRhythm(SWARAJATHI_CURRICULUM_RAW);
 
 export const COURSES = [
     {

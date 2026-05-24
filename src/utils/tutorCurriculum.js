@@ -1329,6 +1329,193 @@ export const GEETHAM_CURRICULUM = [
     },
 ];
 
+const parseSwarajathi = (str, swaraMap) => {
+    const tokens = [];
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        if (char === '|') {
+            if (str[i + 1] === '|') { tokens.push('||'); i++; }
+            else tokens.push('|');
+        } else if (char === ',' || char === ';' || char === '-') {
+            tokens.push('-');
+        } else if (swaraMap[char]) {
+            tokens.push(swaraMap[char]);
+        }
+    }
+    return tokens;
+};
+
+const BILAHARI_SWARAS = {
+    s: 'Sa', r: 'Ri2', g: 'Ga3', m: 'Ma1', p: 'Pa', d: 'Da2', n: 'Ni3',
+    S: 'Ṡ', R: 'Ri2', G: 'Ga3', M: 'Ma1', P: 'Pa', D: 'Da2', N: 'Ni3'
+};
+
+const KHAMAS_SWARAS = {
+    s: 'Sa', r: 'Ri2', g: 'Ga3', m: 'Ma1', p: 'Pa', d: 'Da2', n: 'Ni2',
+    S: 'Ṡ', R: 'Ri2', G: 'Ga3', M: 'Ma1', P: 'Pa', D: 'Da2', N: 'Ni2'
+};
+
+const BHAIRAVI_SWARAS = {
+    s: 'Sa', r: 'Ri2', g: 'Ga2', m: 'Ma1', p: 'Pa', d: 'Da1', n: 'Ni2',
+    S: 'Ṡ', R: 'Ri2', G: 'Ga2', M: 'Ma1', P: 'Pa', D: 'Da1', N: 'Ni2'
+};
+
+export const SWARAJATHI_CURRICULUM = [
+    {
+        id: 'swarajathi_stage1',
+        title: 'Bilahari: Rāravēṇu',
+        symbol: '🎻',
+        subtitle: 'First swarajathi in Ādi tāḷam',
+        color: '#1f2a12',
+        tag: 'Swarajathi 1',
+        lessons: [
+            {
+                id: 'sj_form_intro', title: 'What Is a Swarajathi?', tag: 'Concept',
+                exercises: [
+                    { type: 'info', title: 'From Geetham to Swarajathi', body: 'Swarajathis are more sophisticated than geethams in both size and musical detail. They usually have a pallavi and charanams, and some include an anupallavi.\n\nA key practice method: sing each charanam first as swaras, then again with sahityam. This makes the form a bridge between simple songs and larger concert pieces.' },
+                    { type: 'quiz', question: 'How are swarajathi charanams commonly practiced?', choices: ['Only as lyrics', 'First as swaras, then as lyrics', 'Only as fast kalpana swaras', 'Without tāḷam'], correct: 'First as swaras, then as lyrics', explanation: 'The charanam is often rendered once with swaras and then repeated with the corresponding sahityam.' },
+                ]
+            },
+            {
+                id: 'sj_raaravenu_raga', title: 'Bilahari Rāgam', tag: 'Rāga',
+                exercises: [
+                    { type: 'info', title: 'Bilahari Rāgam', body: 'Rāravēṇu is set in Bilahari, a janya of the 29th mela, Dhīrasankarābharaṇam.\n\nArohanam: Sa Ri₂ Ga₃ Pa Da₂ Ṡ\nAvarohanam: Ṡ Ni₃ Da₂ Pa Ma₁ Ga₃ Ri₂ Sa\n\nThe ascent skips Ma and Ni, giving Bilahari a bright, direct lift. The descent restores Ni₃ and Ma₁, creating the characteristic rounded return.' },
+                    { type: 'listen_sequence', swaras: ['Sa','Ri2','Ga3','Pa','Da2','Ṡ'], displayLabel: '♪', instruction: 'Listen to the Bilahari arohanam: S R₂ G₃ P D₂ Ṡ.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ','Ni3','Da2','Pa','Ma1','Ga3','Ri2','Sa'], displayLabel: '♪', instruction: 'Listen to the Bilahari avarohanam: Ṡ N₃ D₂ P M₁ G₃ R₂ S.' },
+                    { type: 'sing_sequence', swaras: ['Sa','Ri2','Ga3','Pa','Da2','Ṡ'], speed: 1, instruction: 'Sing the Bilahari ascent cleanly, without Ma or Ni.' },
+                    { type: 'sing_sequence', swaras: ['Ṡ','Ni3','Da2','Pa','Ma1','Ga3','Ri2','Sa'], speed: 1, instruction: 'Sing the descent and notice where Ni₃ and Ma₁ return.' },
+                ]
+            },
+            {
+                id: 'sj_raaravenu_pallavi', title: 'Rāravēṇu Pallavi', tag: 'Pallavi',
+                exercises: [
+                    { type: 'info', title: 'Rāravēṇu', body: 'Rāga: Bilahari · Tāḷam: Ādi\n\nPallavi: Rārā Vēṇugōpa Bāla Rājita Sadguṇa Jaya Śīla\n\nMeaning: Please come, Lord Vēṇugōpāla, embodiment of adorable and victorious qualities.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('S , r G P D S N D | P d p m g r s r s n d S ; ||', BILAHARI_SWARAS), displayLabel: '♪', instruction: 'Listen to the full pallavi swara line: S , R G P D S N D | P D P M G R S R S N D S ||' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('S , r G P D S N D | P d p m g r s ||', BILAHARI_SWARAS), speed: 0.85, instruction: 'Sing the first half of the pallavi slowly.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('P d p m g r s r s n d S ; ||', BILAHARI_SWARAS), speed: 0.85, instruction: 'Sing the resolving phrase: P D P M G R S R S N D S.' },
+                ]
+            },
+            {
+                id: 'sj_raaravenu_anupallavi', title: 'Anupallavi', tag: 'Anupallavi',
+                exercises: [
+                    { type: 'info', title: 'Sārasākṣa', body: 'Anupallavi: Sārasākṣa Nēra Mēmi Mārubāri Korvalērā\n\nMeaning: O lotus-eyed one, what wrong have I done? I cannot bear the onslaught of love.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('S , r G P M , g P D | R , s N , d P , m G , r ||', BILAHARI_SWARAS), displayLabel: '♪', instruction: 'Listen to the anupallavi phrase, especially the G-P-M-G color.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('S , r G P M , g P D ||', BILAHARI_SWARAS), speed: 0.85, instruction: 'Sing: S , R G P M , G P D.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('R , s N , d P , m G , r ||', BILAHARI_SWARAS), speed: 0.85, instruction: 'Sing the answer phrase ending on Ri.' },
+                ]
+            },
+            {
+                id: 'sj_raaravenu_charanams', title: 'Charanam Practice', tag: 'Charanam',
+                exercises: [
+                    { type: 'info', title: 'Three Charanams', body: 'Charanam 1 appeals to Nandagopāla with nowhere else to go.\n\nCharanam 2 asks why Krishna responds to other devotees but not to this repeated call.\n\nCharanam 3 is a larger surrender: Govardhana-lifter, destroyer of Mura, remover of worldly sorrow, please protect me and do not forget me.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('S , r G G G ; ; r g | P , p P P P ; ; d p ||', BILAHARI_SWARAS), displayLabel: '♪', instruction: 'Listen to Charanam 1 opening: Nandagopālā Ne Nendu Pojālā Nee.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('S , s S S g r s n n d P | p d p m g g R g p m g r s r g ||', BILAHARI_SWARAS), speed: 0.8, instruction: 'Sing the flowing Charanam 1 continuation.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('p p P r r R g p m g G ; | g p m g m g r s r g r s S ; ||', BILAHARI_SWARAS), displayLabel: '♪', instruction: 'Listen to Charanam 2 opening and its quick turns around G-M-R-S.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('P ; m g r g D ; m g r g | P ; m g r g P P P ; ||', BILAHARI_SWARAS), speed: 0.8, instruction: 'Sing Charanam 3 opening: Rā Nagadara, Rā Murahara.' },
+                ]
+            },
+        ]
+    },
+    {
+        id: 'swarajathi_stage2',
+        title: 'Khamās: Sāmba Śivāyanavē',
+        symbol: '🕉️',
+        subtitle: 'Ādi tāḷam swarajathi with a khaṇḍa-gati ending',
+        color: '#2a1730',
+        tag: 'Swarajathi 2',
+        lessons: [
+            {
+                id: 'sj_samba_raga', title: 'Khamās Rāgam', tag: 'Rāga',
+                exercises: [
+                    { type: 'info', title: 'Khamās Rāgam', body: 'Sāmba Śivāyanavē is set in Khamās, a janya of the 28th mela, Harikambhoji.\n\nArohanam: Sa Ma₁ Ga₃ Ma₁ Pa Da₂ Ni₂ Ṡ\nAvarohanam: Ṡ Ni₂ Da₂ Pa Ma₁ Ga₃ Ri₂ Sa\n\nThe vakra opening Sa-Ma-Ga-Ma gives Khamās a graceful, curved identity. This swarajathi praises Lord Shiva as guru, deity, protector, and compassionate refuge.' },
+                    { type: 'listen_sequence', swaras: ['Sa','Ma1','Ga3','Ma1','Pa','Da2','Ni2','Ṡ'], displayLabel: '♪', instruction: 'Listen to Khamās arohanam with the vakra S-M-G-M opening.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ','Ni2','Da2','Pa','Ma1','Ga3','Ri2','Sa'], displayLabel: '♪', instruction: 'Listen to the Khamās descent.' },
+                    { type: 'sing_sequence', swaras: ['Sa','Ma1','Ga3','Ma1','Pa','Da2','Ni2','Ṡ'], speed: 0.9, instruction: 'Sing the Khamās arohanam, gently curving through M-G-M.' },
+                ]
+            },
+            {
+                id: 'sj_samba_pallavi_anupallavi', title: 'Pallavi and Anupallavi', tag: 'Core',
+                exercises: [
+                    { type: 'info', title: 'Sāmba Śivāyanavē', body: 'Pallavi: Sāmba Śivāyanavē Rājitagiri\nAnupallavi: Sāmbhavī Manōharā Parātparā Krpākarā Śrī\n\nMeaning: Pray to Shiva, who resides in the silver, snow-clad mountain. He is the beloved of Sāmbhavī, the supreme one, and the giver of grace.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('S , , , S , N , D , P , , M G , M , , , , , G , M , P , D , N ,', KHAMAS_SWARAS), displayLabel: '♪', instruction: 'Listen to the spacious pallavi line.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('S , , , S , N , D , P , , M G , M , , ,', KHAMAS_SWARAS), speed: 0.75, instruction: 'Sing the opening slowly, sustaining the long Sāmba call.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('S , , R N , , S D , , N P , , D M , , P M , , G M , , P D , , N', KHAMAS_SWARAS), displayLabel: '♪', instruction: 'Listen to the anupallavi and its stepped descent.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('M , , P M , , G M , , P D , , N', KHAMAS_SWARAS), speed: 0.8, instruction: 'Sing the Krpākarā Śrī ending phrase.' },
+                ]
+            },
+            {
+                id: 'sj_samba_charanams', title: 'Charanams 1-4', tag: 'Charanam',
+                exercises: [
+                    { type: 'info', title: 'Devotional Charanams', body: 'The first four charanams say: You alone are my guru and God; I always meditate on you; you are the treasure of compassion; you grant boons, remove fear, and protect devotees.\n\nPractice each section first as swaras. Then speak the sahityam rhythmically before singing it.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('S , R , S N - N , S , N D D , N , D P - P , D , M G S M , - G M P D N', KHAMAS_SWARAS), displayLabel: '♪', instruction: 'Listen to Charanam 1: Nīvē guru daivambaniyē.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('S , R , S N - N , S , N D D , N , D P', KHAMAS_SWARAS), speed: 0.75, instruction: 'Sing the first half of Charanam 1.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('S S S S M M M M P P P P D D D D N S N S N , D P D P M G M P D N', KHAMAS_SWARAS), displayLabel: '♪', instruction: 'Listen to the Mahādēva line with repeated-note strength.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('S M G S S , S , S R S S N , N , N S N D D , D , P D P M P , P ,', KHAMAS_SWARAS), speed: 0.8, instruction: 'Sing the Śritajana lōla phrase from Charanam 4.' },
+                ]
+            },
+            {
+                id: 'sj_samba_khanda', title: 'Khaṇḍa-Gati Ending', tag: 'Rhythm',
+                exercises: [
+                    { type: 'info', title: 'Charanam 5: Khaṇḍa Gati', body: 'The final charanam shifts to khaṇḍa gati: 5 units per beat. Keep the same Ādi tāḷam cycle in the hand, but feel five inner pulses inside each beat.\n\nText: Sāresāregu nī nāma mantram... Dāsuḍau Cinni Krishnuni ki dikku nīvēyani Śokkanāthuni nammukoni.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('S , R S , N , D N , S , N D , P , , , , P , D N , D , P M , P , M G , M , , , ,', KHAMAS_SWARAS), displayLabel: '♪', instruction: 'Listen to the first khaṇḍa-gati phrase in five-unit motion.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('S , R S , N , D N , S , N D , P , , , ,', KHAMAS_SWARAS), speed: 0.7, instruction: 'Sing the opening khaṇḍa-gati phrase slowly.' },
+                    { type: 'quiz', question: 'What changes in the final charanam of Sāmba Śivāyanavē?', choices: ['The raga changes', 'The gati changes to khaṇḍa', 'The tāḷam becomes Misra Chapu', 'It becomes a geetham'], correct: 'The gati changes to khaṇḍa', explanation: 'The final charanam keeps the composition in the same overall setting but moves into khaṇḍa gati, with five units per beat.' },
+                ]
+            },
+        ]
+    },
+    {
+        id: 'swarajathi_stage3',
+        title: 'Bhairavi: Kāmākṣi',
+        symbol: '🌺',
+        subtitle: 'Śyāma Śāstri swarajathi in Miśra Chāpu',
+        color: '#301520',
+        tag: 'Swarajathi 3',
+        lessons: [
+            {
+                id: 'sj_kamakshi_intro', title: 'Bhairavi and Miśra Chāpu', tag: 'Rāga',
+                exercises: [
+                    { type: 'info', title: 'Kāmākṣi', body: 'Rāga: Bhairavi · Tāḷam: Miśra Chāpu · Composer: Śyāma Śāstri\n\nThis is a major concert-worthy swarajathi. The pallavi says: O Goddess Kāmākṣi of Kanchi, I have placed my faith in your lotus feet as my only refuge.\n\nThe swara-sahityas expand the prayer through eight increasingly rich sections.' },
+                    { type: 'listen_sequence', swaras: ['Sa','Ri2','Ga2','Ma1','Pa','Da1','Ni2','Ṡ'], displayLabel: '♪', instruction: 'Listen to a simplified Bhairavi scale palette for pitch practice.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ','Ni2','Da1','Pa','Ma1','Ga2','Ri2','Sa'], displayLabel: '♪', instruction: 'Listen to the descending Bhairavi palette.' },
+                    { type: 'quiz', question: 'Who composed the Kāmākṣi swarajathi?', choices: ['Śyāma Śāstri', 'Tyāgarāja', 'Muthuswami Dikshitar', 'Cinnakrishna Dāsar'], correct: 'Śyāma Śāstri', explanation: 'Kāmākṣi is one of Śyāma Śāstri\'s celebrated swarajathis.' },
+                ]
+            },
+            {
+                id: 'sj_kamakshi_pallavi', title: 'Pallavi', tag: 'Pallavi',
+                exercises: [
+                    { type: 'info', title: 'Kāmākṣi Pallavi', body: 'Pallavi: Kāmākṣi Anudinamu Maravakanē Nī Pādamula Dikkanuchi Nammitin Śrī Kanchi\n\nMeaning: Goddess Kāmākṣi, ever remembering that your lotus feet are my only refuge, I place my faith in you, O goddess of Kanchi.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('N , | ; ; || D , | ; ; || P , | ; d n || S , | ; s r ||', BHAIRAVI_SWARAS), displayLabel: '♪', instruction: 'Listen to the opening Kāmākṣi call.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('N , | ; ; || D , | ; ; || P , | ; d n ||', BHAIRAVI_SWARAS), speed: 0.7, instruction: 'Sing the spacious opening N-D-P phrase.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('s r g | m p m g || R , | ; N || S r | g m P || d n s | N d p || m G | R g r ||', BHAIRAVI_SWARAS), displayLabel: '♪', instruction: 'Listen to the later pallavi movement into Nammitin Śrī Kanchi.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('S r | g m P || d n s | N d p || m G | R g r ||', BHAIRAVI_SWARAS), speed: 0.75, instruction: 'Sing the closing pallavi phrase.' },
+                ]
+            },
+            {
+                id: 'sj_kamakshi_swara_sahitya_1_4', title: 'Swara-Sahityas 1-4', tag: 'Swara Sahitya',
+                exercises: [
+                    { type: 'info', title: 'First Four Swara-Sahityas', body: '1. Mother, your teeth are like jasmine and your eyes are like lotuses. Protect me.\n2. You have a conch-like neck, rain-cloud dark tresses, and moon-like face.\n3. Your feet are adored by Brahma, Vishnu, and Shiva. Solve my troubles quickly.\n4. Wish-yielding creeper for devotees, ocean of compassion, daughter of the mountain: protect this surrendered one without delay.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('S r | n s R || , n r | s n d p || M , | ; P || D n | , S r ||', BHAIRAVI_SWARAS), displayLabel: '♪', instruction: 'Listen to Swara-Sahitya 1: Kundaradana.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('R g | r g S || , n g | r s R || , n r | s n D || , N | , G r ||', BHAIRAVI_SWARAS), speed: 0.75, instruction: 'Sing Swara-Sahitya 2: Kambugala.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('G m | g r s r || N s | n s r g || M p | g r g m || P d | m g r s ||', BHAIRAVI_SWARAS), displayLabel: '♪', instruction: 'Listen to the opening of Swara-Sahitya 3.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('M p | n d M || p d p | M g r || G m | P g m || P - g | p m g r ||', BHAIRAVI_SWARAS), speed: 0.75, instruction: 'Sing the opening of Swara-Sahitya 4.' },
+                ]
+            },
+            {
+                id: 'sj_kamakshi_swara_sahitya_5_8', title: 'Swara-Sahityas 5-8', tag: 'Swara Sahitya',
+                exercises: [
+                    { type: 'info', title: 'Final Four Swara-Sahityas', body: '5. Remove my sins and grant steady devotion to your feet.\n6. You are known in the world as the giver of boons to those who bow to you.\n7. You reside in the sacred forest, hold a lotus, destroy afflictions, and grant abundance to those who remember you.\n8. Sister of Śyāmakrishna, Śivaśankari, Parameśwari: I am your child. Please protect me now, Śrī Bhairavi.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('P d | p m g r || G m | P m g || R g | M g r || N s | R ; ||', BHAIRAVI_SWARAS), displayLabel: '♪', instruction: 'Listen to Swara-Sahitya 5: Pātakamulanu.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('d p n | D p m || g R | g m p d || P , | ; m g ||', BHAIRAVI_SWARAS), speed: 0.75, instruction: 'Sing Swara-Sahitya 6: Kalushahārini.' },
+                    { type: 'listen_sequence', swaras: parseSwarajathi('N r | s r - n r || N d | p d m p || G r | s r n s || r g m | P m p ||', BHAIRAVI_SWARAS), displayLabel: '♪', instruction: 'Listen to Swara-Sahitya 7 opening: Nī pāvana nilayā.' },
+                    { type: 'sing_sequence', swaras: parseSwarajathi('S g | R s r || S r | N d m || P d | N d n || S , | ; g r ||', BHAIRAVI_SWARAS), speed: 0.75, instruction: 'Sing Swara-Sahitya 8 opening: Śyāmakrishna sahōdhari.' },
+                    { type: 'quiz', question: 'What is the emotional center of Kāmākṣi?', choices: ['Surrender to the goddess as refuge', 'A playful dance song', 'A raga scale drill only', 'A praise of Krishna as cowherd'], correct: 'Surrender to the goddess as refuge', explanation: 'The repeated meaning is supplication to Kāmākṣi: protect me, hear me, remove my troubles, and accept my surrender.' },
+                ]
+            },
+        ]
+    },
+];
+
 export const COURSES = [
     {
         id: 'foundations',
@@ -1392,7 +1579,7 @@ export const COURSES = [
         description: 'Structured, expressive compositions bridging simple geetams and advanced varnams.',
         symbol: '🎭',
         color: '#0f172a',
-        upcoming: true
+        curriculum: SWARAJATHI_CURRICULUM
     },
     {
         id: 'varnams',

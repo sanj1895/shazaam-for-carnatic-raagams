@@ -2542,10 +2542,10 @@ export const VARNAM_CURRICULUM_RAW = [
                     {
                         type: 'info',
                         title: 'Jalajakshi — Overview',
-                        body: 'Raga: Hamsadhwani (29th mela janyam)\nTala: Adi\nComposer: Maanambuchaavadi Venkatasubbaiyer\n\nArohanam: Sa Ri2 Ga2 Pa Ni2 Ṡ\nAvarohanam: Ṡ Ni2 Pa Ga2 Ri2 Sa\n\nA brisk rakti varnam with clear pentatonic geometry. Keep phrase endings crisp and avoid over-gliding in fast passages.'
+                        body: 'Raga: Hamsadhwani (29th mela janyam)\nTala: Adi\nComposer: Maanambuchaavadi Venkatasubbaiyer\n\nArohanam: Sa Ri2 Ga3 Pa Ni3 Ṡ\nAvarohanam: Ṡ Ni3 Pa Ga3 Ri2 Sa\n\nA brisk rakti varnam with clear pentatonic geometry. Keep phrase endings crisp and avoid over-gliding in fast passages.'
                     },
-                    { type: 'listen_sequence', swaras: ['Sa', 'Ri2', 'Ga2', 'Pa', 'Ni2', 'Ṡ'], displayLabel: '♪', instruction: 'Listen to Hamsadhwani arohanam.' },
-                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ni2', 'Pa', 'Ga2', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to Hamsadhwani avarohanam.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri2', 'Ga3', 'Pa', 'Ni3', 'Ṡ'], displayLabel: '♪', instruction: 'Listen to Hamsadhwani arohanam.' },
+                    { type: 'listen_sequence', swaras: ['Ṡ', 'Ni3', 'Pa', 'Ga3', 'Ri2', 'Sa'], displayLabel: '♪', instruction: 'Listen to Hamsadhwani avarohanam.' },
                 ]
             },
             {
@@ -2566,70 +2566,70 @@ export const VARNAM_CURRICULUM_RAW = [
                     },
                     {
                         type: 'listen_sequence',
-                        swaras: ['Ga2',',','Ri2',',','Sa',',',',',',','Ni2','Sa','Ri2','Ga2','Ri2','Ri2','Sa','Ni2','|','Sa','Ri2','Sa','Sa','Ni2','Pa','Ni2','Sa','Ri2','Pa',',','Ni2',',','Sa',',','Ri2','||'],
+                        swaras: ['Ga3',',','Ri2',',','Sa',',',',',',','Ni3','Sa','Ri2','Ga3','Ri2','Ri2','Sa','Ni3','|','Sa','Ri2','Sa','Sa','Ni3','Pa','Ni3','Sa','Ri2','Pa',',','Ni3',',','Sa',',','Ri2','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Pallavi line 1.'
                     },
                     {
                         type: 'sing_sequence',
-                        swaras: ['Ga2',',','Ri2',',','Sa',',',',',',','Ni2','Sa','Ri2','Ga2','Ri2','Ri2','Sa','Ni2','|','Sa','Ri2','Sa','Sa','Ni2','Pa','Ni2','Sa','Ri2','Pa',',','Ni2',',','Sa',',','Ri2','||'],
+                        swaras: ['Ga3',',','Ri2',',','Sa',',',',',',','Ni3','Sa','Ri2','Ga3','Ri2','Ri2','Sa','Ni3','|','Sa','Ri2','Sa','Sa','Ni3','Pa','Ni3','Sa','Ri2','Pa',',','Ni3',',','Sa',',','Ri2','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.78,
                         instruction: 'Sing: Pallavi line 1.'
                     },
                     {
                         type: 'listen_sequence',
-                        swaras: ['Ga2','Ri2','Sa','Ni2','Sa','Ri2','Pa','Ni2','Sa','Ri2','Ga2','Pa','Ga2','Ni2','Pa',',','|','Sa','Ni2','Sa','Ri2','Sa','Ni2','Pa','Pa','Ga2','Ri2',',','Sa',',','Ri2','||'],
+                        swaras: ['Ga3','Ri2','Sa','Ni3','Sa','Ri2','Pa','Ni3','Sa','Ri2','Ga3','Pa','Ga3','Ni3','Pa',',','|','Sa','Ni3','Sa','Ri2','Sa','Ni3','Pa','Pa','Ga3','Ri2',',','Sa',',','Ri2','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Pallavi line 2 and close.'
                     },
                     {
                         type: 'sing_sequence',
-                        swaras: ['Ga2','Ri2','Sa','Ni2','Sa','Ri2','Pa','Ni2','Sa','Ri2','Ga2','Pa','Ga2','Ni2','Pa',',','|','Sa','Ni2','Sa','Ri2','Sa','Ni2','Pa','Pa','Ga2','Ri2',',','Sa',',','Ri2','||'],
+                        swaras: ['Ga3','Ri2','Sa','Ni3','Sa','Ri2','Pa','Ni3','Sa','Ri2','Ga3','Pa','Ga3','Ni3','Pa',',','|','Sa','Ni3','Sa','Ri2','Sa','Ni3','Pa','Pa','Ga3','Ri2',',','Sa',',','Ri2','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.76,
                         instruction: 'Sing: Pallavi line 2 and close.'
                     },
                     {
                         type: 'listen_sequence',
-                        swaras: ['Pa','Ga2','Ri2','Sa','Ni2','Sa','Ri2',',','Ga2',',','Ri2','Ri2','Sa','Sa','Ni2','Pa','|','Ni2','Sa','Ri2','Ga2',',','Sa','Ga2','Ri2','Ga2','Pa',',','Ni2','Sa',',',',',',','||'],
+                        swaras: ['Pa','Ga3','Ri2','Sa','Ni3','Sa','Ri2',',','Ga3',',','Ri2','Ri2','Sa','Sa','Ni3','Pa','|','Ni3','Sa','Ri2','Ga3',',','Sa','Ga3','Ri2','Ga3','Pa',',','Ni3','Sa',',',',',',','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Anupallavi phrase set.'
                     },
                     {
                         type: 'sing_sequence',
-                        swaras: ['Pa','Ga2','Ri2','Sa','Ni2','Sa','Ri2',',','Ga2',',','Ri2','Ri2','Sa','Sa','Ni2','Pa','|','Ni2','Sa','Ri2','Ga2',',','Sa','Ga2','Ri2','Ga2','Pa',',','Ni2','Sa',',',',',',','||'],
+                        swaras: ['Pa','Ga3','Ri2','Sa','Ni3','Sa','Ri2',',','Ga3',',','Ri2','Ri2','Sa','Sa','Ni3','Pa','|','Ni3','Sa','Ri2','Ga3',',','Sa','Ga3','Ri2','Ga3','Pa',',','Ni3','Sa',',',',',',','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.74,
                         instruction: 'Sing: Anupallavi phrase set.'
                     },
                     {
                         type: 'listen_sequence',
-                        swaras: ['Ga2',',','Ri2','Ga2','Ri2','Sa','Ri2',',','Ni2','Sa','Ri2','Ga2','Ri2','Ri2','Sa','Ni2','|','Ri2',',','Ni2','Ga2','Ri2','Ni2','Sa','Ri2','Pa','Ni2','Sa','Ri2','Ga2',',',',','Pa','||'],
+                        swaras: ['Ga3',',','Ri2','Ga3','Ri2','Sa','Ri2',',','Ni3','Sa','Ri2','Ga3','Ri2','Ri2','Sa','Ni3','|','Ri2',',','Ni3','Ga3','Ri2','Ni3','Sa','Ri2','Pa','Ni3','Sa','Ri2','Ga3',',',',','Pa','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Muktayi swaram opening.'
                     },
                     {
                         type: 'sing_sequence',
-                        swaras: ['Ga2',',','Ri2','Ga2','Ri2','Sa','Ri2',',','Ni2','Sa','Ri2','Ga2','Ri2','Ri2','Sa','Ni2','|','Ri2',',','Ni2','Ga2','Ri2','Ni2','Sa','Ri2','Pa','Ni2','Sa','Ri2','Ga2',',',',','Pa','||'],
+                        swaras: ['Ga3',',','Ri2','Ga3','Ri2','Sa','Ri2',',','Ni3','Sa','Ri2','Ga3','Ri2','Ri2','Sa','Ni3','|','Ri2',',','Ni3','Ga3','Ri2','Ni3','Sa','Ri2','Pa','Ni3','Sa','Ri2','Ga3',',',',','Pa','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.72,
                         instruction: 'Sing: Muktayi swaram opening.'
                     },
                     {
                         type: 'listen_sequence',
-                        swaras: ['Ni2',',',',',',',',','Sa',',','Ri2',',','Sa','Ni2','Pa','Pa','Ga2','Ri2','|','Ga2',',',',','Ga2','Ri2','Sa','Ri2',',','Ri2','Sa','Ni2','Sa','Ri2','Ga2',',','Pa','||'],
+                        swaras: ['Ni3',',',',',',',',','Sa',',','Ri2',',','Sa','Ni3','Pa','Pa','Ga3','Ri2','|','Ga3',',',',','Ga3','Ri2','Sa','Ri2',',','Ri2','Sa','Ni3','Sa','Ri2','Ga3',',','Pa','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Charanam swara flow.'
                     },
                     {
                         type: 'sing_sequence',
-                        swaras: ['Ni2',',',',',',',',','Sa',',','Ri2',',','Sa','Ni2','Pa','Pa','Ga2','Ri2','|','Ga2',',',',','Ga2','Ri2','Sa','Ri2',',','Ri2','Sa','Ni2','Sa','Ri2','Ga2',',','Pa','||'],
+                        swaras: ['Ni3',',',',',',',',','Sa',',','Ri2',',','Sa','Ni3','Pa','Pa','Ga3','Ri2','|','Ga3',',',',','Ga3','Ri2','Sa','Ri2',',','Ri2','Sa','Ni3','Sa','Ri2','Ga3',',','Pa','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.7,
                         instruction: 'Sing: Charanam swara flow.'
@@ -2646,84 +2646,84 @@ export const VARNAM_CURRICULUM_RAW = [
                     },
                     {
                         type: 'listen_sequence',
-                        swaras: ['Ni2',',',',','Pa',',',',','Ga2',',',',','Ri2',',',',','Sa',',','Ni2',',','|','Pa',',',',','Ri2',',',',','Ni2',',','Sa',',','Ri2',',','Ga2',',','Pa','||'],
+                        swaras: ['Ni3',',',',','Pa',',',',','Ga3',',',',','Ri2',',',',','Sa',',','Ni3',',','|','Pa',',',',','Ri2',',',',','Ni3',',','Sa',',','Ri2',',','Ga3',',','Pa','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Chittaswaram 1.'
                     },
                     {
                         type: 'sing_sequence',
-                        swaras: ['Ni2',',',',','Pa',',',',','Ga2',',',',','Ri2',',',',','Sa',',','Ni2',',','|','Pa',',',',','Ri2',',',',','Ni2',',','Sa',',','Ri2',',','Ga2',',','Pa','||'],
+                        swaras: ['Ni3',',',',','Pa',',',',','Ga3',',',',','Ri2',',',',','Sa',',','Ni3',',','|','Pa',',',',','Ri2',',',',','Ni3',',','Sa',',','Ri2',',','Ga3',',','Pa','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.68,
                         instruction: 'Sing: Chittaswaram 1.'
                     },
                     {
                         type: 'listen_sequence',
-                        swaras: ['Ni2',',','Pa','Ga2','Ri2','Sa','Ri2',',','Ga2','Ri2','Sa','Ni2','Pa',',','Ri2','Ni2','|',',','Ga2','Ri2','Ni2','Pa','Ni2','Sa','Ri2',',','Ri2','Ga2','Ni2','Sa','Ri2','Ga2','Pa','||'],
+                        swaras: ['Ni3',',','Pa','Ga3','Ri2','Sa','Ri2',',','Ga3','Ri2','Sa','Ni3','Pa',',','Ri2','Ni3','|',',','Ga3','Ri2','Ni3','Pa','Ni3','Sa','Ri2',',','Ri2','Ga3','Ni3','Sa','Ri2','Ga3','Pa','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Chittaswaram 2.'
                     },
                     {
                         type: 'sing_sequence',
-                        swaras: ['Ni2',',','Pa','Ga2','Ri2','Sa','Ri2',',','Ga2','Ri2','Sa','Ni2','Pa',',','Ri2','Ni2','|',',','Ga2','Ri2','Ni2','Pa','Ni2','Sa','Ri2',',','Ri2','Ga2','Ni2','Sa','Ri2','Ga2','Pa','||'],
+                        swaras: ['Ni3',',','Pa','Ga3','Ri2','Sa','Ri2',',','Ga3','Ri2','Sa','Ni3','Pa',',','Ri2','Ni3','|',',','Ga3','Ri2','Ni3','Pa','Ni3','Sa','Ri2',',','Ri2','Ga3','Ni3','Sa','Ri2','Ga3','Pa','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.66,
                         instruction: 'Sing: Chittaswaram 2.'
                     },
                     {
                         type: 'listen_sequence',
-                        swaras: ['Ni2','Pa','Ga2','Ri2','Ni2','Ga2','Ri2','Ni2','Pa','Ni2','Pa','Sa','Ni2','Ri2','Sa','Ga2','|','Ri2','Pa','Ga2','Ni2','Pa','Sa','Ni2','Ri2','Ni2','Ga2','Ri2','Ni2','Ri2','Ni2','Pa','Ga2','||'],
+                        swaras: ['Ni3','Pa','Ga3','Ri2','Ni3','Ga3','Ri2','Ni3','Pa','Ni3','Pa','Sa','Ni3','Ri2','Sa','Ga3','|','Ri2','Pa','Ga3','Ni3','Pa','Sa','Ni3','Ri2','Ni3','Ga3','Ri2','Ni3','Ri2','Ni3','Pa','Ga3','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Chittaswaram 3 (part A).'
                     },
                     {
                         type: 'sing_sequence',
-                        swaras: ['Ni2','Pa','Ga2','Ri2','Ni2','Ga2','Ri2','Ni2','Pa','Ni2','Pa','Sa','Ni2','Ri2','Sa','Ga2','|','Ri2','Pa','Ga2','Ni2','Pa','Sa','Ni2','Ri2','Ni2','Ga2','Ri2','Ni2','Ri2','Ni2','Pa','Ga2','||'],
+                        swaras: ['Ni3','Pa','Ga3','Ri2','Ni3','Ga3','Ri2','Ni3','Pa','Ni3','Pa','Sa','Ni3','Ri2','Sa','Ga3','|','Ri2','Pa','Ga3','Ni3','Pa','Sa','Ni3','Ri2','Ni3','Ga3','Ri2','Ni3','Ri2','Ni3','Pa','Ga3','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.64,
                         instruction: 'Sing: Chittaswaram 3 (part A).'
                     },
                     {
                         type: 'listen_sequence',
-                        swaras: ['Pa','Ni2','Sa','Ri2','Ga2','Ga2','Pa','Ni2','Sa','Ri2','Ri2','Ga2','Pa','Ni2','Sa','Ni2','|','Ga2','Ri2','Sa','Ni2','Pa','Ri2','Sa','Ni2','Pa','Ga2','Ri2','Ni2','Sa','Ri2','Ga2','Pa','||'],
+                        swaras: ['Pa','Ni3','Sa','Ri2','Ga3','Ga3','Pa','Ni3','Sa','Ri2','Ri2','Ga3','Pa','Ni3','Sa','Ni3','|','Ga3','Ri2','Sa','Ni3','Pa','Ri2','Sa','Ni3','Pa','Ga3','Ri2','Ni3','Sa','Ri2','Ga3','Pa','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Chittaswaram 3 (part B).'
                     },
                     {
                         type: 'sing_sequence',
-                        swaras: ['Pa','Ni2','Sa','Ri2','Ga2','Ga2','Pa','Ni2','Sa','Ri2','Ri2','Ga2','Pa','Ni2','Sa','Ni2','|','Ga2','Ri2','Sa','Ni2','Pa','Ri2','Sa','Ni2','Pa','Ga2','Ri2','Ni2','Sa','Ri2','Ga2','Pa','||'],
+                        swaras: ['Pa','Ni3','Sa','Ri2','Ga3','Ga3','Pa','Ni3','Sa','Ri2','Ri2','Ga3','Pa','Ni3','Sa','Ni3','|','Ga3','Ri2','Sa','Ni3','Pa','Ri2','Sa','Ni3','Pa','Ga3','Ri2','Ni3','Sa','Ri2','Ga3','Pa','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.62,
                         instruction: 'Sing: Chittaswaram 3 (part B).'
                     },
                     {
                         type: 'listen_sequence',
-                        swaras: ['Sa',',',',',',',',','Ni2','Ri2','Sa','Ni2','Pa','Ga2','Ri2','Sa','Ri2','Ga2','|','Pa',',',',',',',',','Sa','Ni2','Pa','Ga2','Ri2','Sa','Ri2','Ga2','Pa','Ni2','||'],
+                        swaras: ['Sa',',',',',',',',','Ni3','Ri2','Sa','Ni3','Pa','Ga3','Ri2','Sa','Ri2','Ga3','|','Pa',',',',',',',',','Sa','Ni3','Pa','Ga3','Ri2','Sa','Ri2','Ga3','Pa','Ni3','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Chittaswaram 4 (part A).'
                     },
                     {
                         type: 'sing_sequence',
-                        swaras: ['Sa',',',',',',',',','Ni2','Ri2','Sa','Ni2','Pa','Ga2','Ri2','Sa','Ri2','Ga2','|','Pa',',',',',',',',','Sa','Ni2','Pa','Ga2','Ri2','Sa','Ri2','Ga2','Pa','Ni2','||'],
+                        swaras: ['Sa',',',',',',',',','Ni3','Ri2','Sa','Ni3','Pa','Ga3','Ri2','Sa','Ri2','Ga3','|','Pa',',',',',',',',','Sa','Ni3','Pa','Ga3','Ri2','Sa','Ri2','Ga3','Pa','Ni3','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.6,
                         instruction: 'Sing: Chittaswaram 4 (part A).'
                     },
                     {
                         type: 'listen_sequence',
-                        swaras: ['Ga2','Ri2',',','Ni2','Sa','Ri2','Pa','Ga2',',','Ri2','Sa','Ni2','Pa','Ni2','Sa','Ri2','|','Sa',',',',','Pa',',',',','Ni2','Pa','Ga2','Ri2','Sa','Ni2','Sa','Ri2','Ga2','Pa','||'],
+                        swaras: ['Ga3','Ri2',',','Ni3','Sa','Ri2','Pa','Ga3',',','Ri2','Sa','Ni3','Pa','Ni3','Sa','Ri2','|','Sa',',',',','Pa',',',',','Ni3','Pa','Ga3','Ri2','Sa','Ni3','Sa','Ri2','Ga3','Pa','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Chittaswaram 4 (part B).'
                     },
                     {
                         type: 'sing_sequence',
-                        swaras: ['Ga2','Ri2',',','Ni2','Sa','Ri2','Pa','Ga2',',','Ri2','Sa','Ni2','Pa','Ni2','Sa','Ri2','|','Sa',',',',','Pa',',',',','Ni2','Pa','Ga2','Ri2','Sa','Ni2','Sa','Ri2','Ga2','Pa','||'],
+                        swaras: ['Ga3','Ri2',',','Ni3','Sa','Ri2','Pa','Ga3',',','Ri2','Sa','Ni3','Pa','Ni3','Sa','Ri2','|','Sa',',',',','Pa',',',',','Ni3','Pa','Ga3','Ri2','Sa','Ni3','Sa','Ri2','Ga3','Pa','||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.58,
                         instruction: 'Sing: Chittaswaram 4 (part B).'

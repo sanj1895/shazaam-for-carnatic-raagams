@@ -912,6 +912,16 @@ export const RAGAS = {
         color:        'navy',
         video:        "https://www.youtube.com/watch?v=yTD1q8GvXT0",
     },
+    'Kapi': {
+        arohanam:     ['Sa', 'Ri2', 'Ma1', 'Pa', 'Ni3', 'Sa'],
+        avarohanam:   ['Sa', 'Ni2', 'Da2', 'Ni2', 'Pa', 'Ma1', 'Ga2', 'Ri2', 'Sa'],
+        type:         'Janya (Bhashanga) · Kharaharapriya (22)',
+        mood:         'Devotion · Pathos · Longing',
+        description:  'A highly expressive, bhava-rich raga with vakra movement and bhasanga color. The ascent commonly uses Ni3 while the descent leans on Ni2, giving Kapi its distinctive emotional pull.',
+        compositions: ['Jagadodharana  ·  Purandara Dasa', 'Meevalla Guna Dosha  ·  Tyagaraja'],
+        color:        'maroon',
+        video:        "https://www.youtube.com/watch?v=q8z8FXwqYqE",
+    },
     'Durga': {
         arohanam:     ['Sa', 'Ri2', 'Ma1', 'Pa', 'Da2', 'Sa'],
         avarohanam:   ['Sa', 'Da2', 'Pa', 'Ma1', 'Ri2', 'Sa'],

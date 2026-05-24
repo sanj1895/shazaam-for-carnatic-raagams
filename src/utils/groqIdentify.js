@@ -26,16 +26,30 @@ export async function listGroqModels() {
 export async function identifyRagaWithGroq(swaraString, model = 'llama-3.3-70b-versatile') {
     const ragaList = Object.entries(RAGAS).map(([name, data]) => `${name} | Arohanam: ${data.arohanam.join(' ')} | Avarohanam: ${data.avarohanam.join(' ')}`).join('\n');
 
-    const PROMPT = `You are an expert Carnatic classical musician and musicologist.
-Listen to this transcribed sequence of consecutive swaras from a performance:
+    const PROMPT = `You are an expert Carnatic classical musician and musicologist with deep knowledge of gamakam ornamentation.
+
+CRITICAL CONTEXT — GAMAKAM SINGING:
+This transcription is from a live vocal performance that may include Carnatic gamakams (pitch ornaments). When a singer performs gamakams, the voice slides through intermediate semitones — these appear as brief "transitional" notes between the true target swaras. These transitional pitches are NOT separate scale notes and must NOT be treated as alien notes.
+
+Example: A singer performing Ma2 with gamakam will slide through Ma1 on the way up. Ma1 will appear in the transcription even though the raga uses Ma2. Always trust the NOTE FREQUENCY SUMMARY over the raw sequence when they conflict.
+
+HOW TO IDENTIFY CORRECTLY:
+1. The NOTE FREQUENCY SUMMARY is your primary evidence. High-frequency notes that also appear as (long) are TRUE scale swaras. Low-frequency notes with no long occurrences are gamakam artifacts.
+2. The Madhyama variant is the single most critical distinguishing factor between raga families — identify it from the most frequent and longest Ma notes FIRST, before making any other decisions.
+   — Ma1 (suddha madhyama) = semitone 5
+   — Ma2 (prati madhyama) = semitone 6
+3. Do NOT count a low-frequency note as an "alien note" if it sits one semitone away from a high-frequency note — it is almost certainly a slide artifact.
+4. Notes marked (long) or (very long) are established swaras. Plain notes may be passing tones.
+
+Transcribed swara sequence:
 ${swaraString}
 
-Here is a reference dictionary of valid Carnatic Ragas and their scales:
+Reference Raga Dictionary:
 ${ragaList}
 
-Using the reference dictionary provided above as your strict baseline, identify the Top 3 most likely Carnatic raagams being sung from the transcribed sequence. Focus on comparing the exact notes present (especially held/long notes) and the notes entirely MISSING from the sequence to the Arohanam and Avarohanam provided.
+Using the reference dictionary as your strict baseline, identify the Top 3 most likely Carnatic raagams. Determine the correct madhyama from the prominent/long notes before comparing against the full scale.
 
-CRITICAL INSTRUCTION: If the sequence precisely matches the scale of a specific Janya raga (e.g., Margahindolam, Abhogi, Hindolam) defined in the dictionary, you MUST select that Janya raga as your top choice. DO NOT default to a parent Melakarta (like Natabhairavi) unless the specific signature notes (like the missing Pa/Ri, or the vakra phrases) of the Janya are clearly absent. Only fall back to parent Melakartas if you strongly believe the Janya is NOT in the reference dictionary.
+CRITICAL INSTRUCTION: If the sequence precisely matches the scale of a specific Janya raga (e.g., Margahindolam, Abhogi, Hindolam) defined in the dictionary, you MUST select that Janya raga as your top choice. DO NOT default to a parent Melakarta (like Natabhairavi) unless the specific signature notes (like the missing Pa/Ri, or the vakra phrases) of the Janya are clearly absent from the LONG notes. Only fall back to parent Melakartas if you strongly believe the Janya is NOT in the reference dictionary.
 
 Respond ONLY with valid JSON exactly matching this format:
 {

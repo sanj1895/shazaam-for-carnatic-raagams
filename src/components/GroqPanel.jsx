@@ -133,7 +133,21 @@ export default function GroqPanel({ saFrequency }) {
                 throw new Error('Not enough distinct musical notes detected. Please sing clearly into the mic.');
             }
 
-            const res = await identifyRagaWithGroq(condensed, model);
+            // Build a frequency summary so the AI can distinguish true scale notes
+            // from brief gamakam transitional pitches
+            const noteCounts = {};
+            const longNoteCounts = {};
+            validNotes.forEach(x => {
+                noteCounts[x.note] = (noteCounts[x.note] || 0) + 1;
+                if (x.duration > 800) longNoteCounts[x.note] = (longNoteCounts[x.note] || 0) + 1;
+            });
+            const freqSummary = Object.entries(noteCounts)
+                .sort((a, b) => b[1] - a[1])
+                .map(([note, count]) => `${note}×${count}${longNoteCounts[note] ? `(${longNoteCounts[note]} long)` : ''}`)
+                .join(', ');
+            const condensedWithSummary = `${condensed}\n\nNOTE FREQUENCY SUMMARY (most→least frequent): ${freqSummary}`;
+
+            const res = await identifyRagaWithGroq(condensedWithSummary, model);
             setResult(res);
             setPanelState(STATES.RESULT);
         } catch (err) {

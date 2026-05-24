@@ -37,9 +37,20 @@ const swaraFreq = (swara, sa) => noteFreq(swara === 'Ṡ' ? 'Sa' : swara, sa) * 
 
 const getTokenSwara = (token) => typeof token === 'string' ? token : token?.swara;
 const getTokenDuration = (token) => typeof token === 'object' && token?.duration ? token.duration : 1;
+const getTokenNotationSuffix = (token) => typeof token === 'object' ? (token.notationSuffix || []) : [];
 const isBarToken = (token) => getTokenSwara(token) === '|' || getTokenSwara(token) === '||';
 const getPlainSwaras = (tokens) => tokens.map(getTokenSwara);
 const getTotalUnits = (tokens) => tokens.reduce((sum, token) => sum + (isBarToken(token) ? 0 : getTokenDuration(token)), 0);
+const renderNotationLabel = (swara, suffix = [], compact = false) => (
+    <span className="inline-flex items-baseline justify-center gap-0.5 leading-none">
+        <span>{swara}</span>
+        {suffix.length > 0 && (
+            <span className={`${compact ? 'text-[10px]' : 'text-xs'} text-c-gold-light tracking-tight`}>
+                {suffix.join('')}
+            </span>
+        )}
+    </span>
+);
 
 function TalaBadge({ tala, swaras }) {
     if (!tala) return null;
@@ -329,6 +340,7 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, onDone }) {
                     <div key={lIdx} className="flex flex-wrap justify-center gap-1 sm:gap-2">
                         {line.map(({ token, i }) => {
                             const s = getTokenSwara(token);
+                            const suffix = getTokenNotationSuffix(token);
                             const duration = getTokenDuration(token);
                             const widthClass = duration >= 4 ? 'w-20 sm:w-24' : duration >= 3 ? 'w-16 sm:w-20' : duration >= 2 ? 'w-12 sm:w-14' : 'w-8 sm:w-10';
                             if (s === '|') {
@@ -362,7 +374,7 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, onDone }) {
                                         i === activeIdx ? 'border-c-gold bg-c-gold text-c-bg scale-115 font-extrabold shadow-lg shadow-c-gold/20' : 'border-c-border text-c-cream-dark bg-c-surface'
                                     }`}
                                 >
-                                    {s}
+                                    {renderNotationLabel(s, suffix)}
                                 </button>
                             );
                         })}
@@ -1999,6 +2011,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                             <div key={lIdx} className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
                                 {line.map(({ token, i }) => {
                                     const s = getTokenSwara(token);
+                                    const suffix = getTokenNotationSuffix(token);
                                     const duration = getTokenDuration(token);
                                     const widthClass = duration >= 4 ? 'w-20 sm:w-24' : duration >= 3 ? 'w-16 sm:w-20' : duration >= 2 ? 'w-12 sm:w-14' : 'w-8 sm:w-9';
                                     if (s === '|' || s === '||') {
@@ -2038,7 +2051,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                                                 'border-c-border/50 bg-c-card text-c-cream-dim'
                                             }`}
                                         >
-                                            {mode === 'akaram' ? 'A' : s.replace(/[0-9]/g, '')}
+                                            {mode === 'akaram' ? 'A' : renderNotationLabel(s.replace(/[0-9]/g, ''), suffix, true)}
                                         </button>
                                     );
                                 })}

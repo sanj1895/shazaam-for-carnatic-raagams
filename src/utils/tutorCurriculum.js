@@ -377,9 +377,13 @@ export function parseMmg(str) {
     return tokens;
 }
 
-const cloneTokenWithDuration = (token, duration) => ({
+const cloneTokenWithDuration = (token, duration, notationSuffix = []) => ({
     swara: typeof token === 'string' ? token : token.swara,
-    duration
+    duration,
+    notationSuffix: [
+        ...(typeof token === 'string' ? [] : token.notationSuffix || []),
+        ...notationSuffix
+    ]
 });
 
 const sustainNotation = (tokens) => {
@@ -398,7 +402,8 @@ const sustainNotation = (tokens) => {
                 const prev = rhythmic[lastPlayableIdx];
                 rhythmic[lastPlayableIdx] = cloneTokenWithDuration(
                     prev,
-                    (typeof prev === 'string' ? 1 : prev.duration || 1) + (typeof token === 'string' ? 1 : token.duration || 1)
+                    (typeof prev === 'string' ? 1 : prev.duration || 1) + (typeof token === 'string' ? 1 : token.duration || 1),
+                    [swara]
                 );
             } else {
                 rhythmic.push(cloneTokenWithDuration(',', typeof token === 'string' ? 1 : token.duration || 1));
@@ -1422,7 +1427,11 @@ const parseSwarajathi = (str, swaraMap) => {
                 const prev = tokens[lastPlayableIdx];
                 tokens[lastPlayableIdx] = {
                     swara: typeof prev === 'string' ? prev : prev.swara,
-                    duration: (typeof prev === 'string' ? 1 : prev.duration || 1) + 1
+                    duration: (typeof prev === 'string' ? 1 : prev.duration || 1) + 1,
+                    notationSuffix: [
+                        ...(typeof prev === 'string' ? [] : prev.notationSuffix || []),
+                        char
+                    ]
                 };
             } else {
                 tokens.push({ swara: ',', duration: 1 });

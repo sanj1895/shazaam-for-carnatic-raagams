@@ -2649,7 +2649,7 @@ export const VARNAM_CURRICULUM_RAW = [
                     {
                         type: 'listen_sequence',
                         octaveMode: 'strict',
-                        swaras: ['Ga3','Ri2', 'Sa', 'Ri2', ',', 'Ga3', 'Pa', 'Ni3', '|', 'Ri2', 'Ga3', 'Pa', 'Ni3.', 'Sa', 'Ri2', 'Ga3', 'Pa', '|', 'Pa.', 'Ni.', 'Sa', 'Ri2', ',', 'Ga3', 'Pa', 'Ni3', '|', 'Ri2', 'Ga3', 'Pa', 'Ni3', 'Sa^', ',', ',', 'Ri^', '||'],
+                        swaras: ['Ga3','Ri2', 'Sa', 'Ri2', ',', 'Ga3', 'Pa', 'Ni3', '|', 'Ri2', 'Ga3', 'Pa', 'Ni3.', 'Sa', 'Ri2', 'Ga3', 'Pa', '|', 'Pa.', 'Ni.', 'Sa', 'Ri2', ',', 'Ga3', 'Pa', 'Ni3', '|', 'Ri2', 'Ga3', 'Pa', 'Ni3', 'Sa^', ',', ',', 'Ri2^', '||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         displayLabel: '♪',
                         instruction: 'Listen: Muktayi swaram line 2.'
@@ -2657,7 +2657,7 @@ export const VARNAM_CURRICULUM_RAW = [
                     {
                         type: 'sing_sequence',
                         octaveMode: 'strict',
-                        swaras: ['Ga3','Ri2', 'Sa', 'Ri2', ',', 'Ga3', 'Pa', 'Ni3', '|', 'Ri2', 'Ga3', 'Pa', 'Ni3.', 'Sa', 'Ri2', 'Ga3', 'Pa', '|', 'Pa.', 'Ni.', 'Sa', 'Ri2', ',', 'Ga3', 'Pa', 'Ni3', '|', 'Ri2', 'Ga3', 'Pa', 'Ni3', 'Sa^', ',', ',', 'Ri^', '||'],
+                        swaras: ['Ga3','Ri2', 'Sa', 'Ri2', ',', 'Ga3', 'Pa', 'Ni3', '|', 'Ri2', 'Ga3', 'Pa', 'Ni3.', 'Sa', 'Ri2', 'Ga3', 'Pa', '|', 'Pa.', 'Ni.', 'Sa', 'Ri2', ',', 'Ga3', 'Pa', 'Ni3', '|', 'Ri2', 'Ga3', 'Pa', 'Ni3', 'Sa^', ',', ',', 'Ri2^', '||'],
                         tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
                         speed: 0.72,
                         instruction: 'Sing: Muktayi swaram line 2.'

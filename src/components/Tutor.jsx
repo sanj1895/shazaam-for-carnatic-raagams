@@ -3340,6 +3340,399 @@ function RagaSession({ ragaName, raga, sa, onBack }) {
     );
 }
 
+// ─── Tala-aligned Swara Transcriber ──────────────────────────────────────────
+
+function TalaSwaraTranscriber({ sa, setSa }) {
+    const TALA_PRESETS = [
+        { id: 'adi', name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' },
+        { id: 'rupaka', name: 'Rupaka', groups: [2, 4], unitLabel: '6-beat cycle' },
+        { id: 'misra_chapu', name: 'Misra Chapu', groups: [3, 2, 2], unitLabel: '7-beat cycle' },
+        { id: 'khanda_chapu', name: 'Khanda Chapu', groups: [2, 3], unitLabel: '5-beat cycle' },
+        { id: 'ata', name: 'Khanda Jathi Ata', groups: [5, 5, 2, 2], unitLabel: '14-beat cycle' },
+    ];
+
+    const [talaId, setTalaId] = useState('adi');
+    const [bpm, setBpm] = useState(64);
+    const [subdiv, setSubdiv] = useState(4);
+    const [avartanas, setAvartanas] = useState(2);
+    const [phase, setPhase] = useState('idle'); // idle | countdown | recording | done | error
+    const [countdown, setCountdown] = useState(4);
+    const [micError, setMicError] = useState('');
+    const [currentBeat, setCurrentBeat] = useState(0);
+    const [progressPct, setProgressPct] = useState(0);
+    const [transcribed, setTranscribed] = useState([]);
+    const [transcribedText, setTranscribedText] = useState('');
+    const [playIdx, setPlayIdx] = useState(-1);
+    const [isPlayingTranscription, setIsPlayingTranscription] = useState(false);
+    const [isPreviewingTempo, setIsPreviewingTempo] = useState(false);
+
+    const streamRef = useRef(null);
+    const sourceRef = useRef(null);
+    const analyserRef = useRef(null);
+    const bucketsRef = useRef([]);
+    const startTimeRef = useRef(0);
+    const intervalRef = useRef(null);
+    const beatTimerRef = useRef(null);
+    const previewTimerRef = useRef(null);
+    const playAbortRef = useRef(null);
+
+    const activeTala = TALA_PRESETS.find(t => t.id === talaId) || TALA_PRESETS[0];
+    const talaGroups = activeTala.groups;
+    const BEATS_PER_AVARTANA = talaGroups.reduce((a, b) => a + b, 0);
+    const talaSpec = { name: activeTala.name, groups: activeTala.groups, unitLabel: activeTala.unitLabel };
+
+    const detectSwaraWithOctave = useCallback((freqHz) => {
+        if (!freqHz || !sa) return null;
+        const base = getSwaram(freqHz, sa);
+        if (!base) return null;
+
+        // Relative semitone distance from base Sa; this preserves octave register.
+        const semitones = 12 * (Math.log(freqHz / sa) / Math.log(2));
+        const rounded = Math.round(semitones);
+        const octaveShift = Math.floor(rounded / 12);
+
+        // Support one register above/below base in current notation system.
+        if (octaveShift >= 1) return `${base}^`;
+        if (octaveShift <= -1) return `${base}.`;
+        return base;
+    }, [sa]);
+
+    const cleanup = useCallback(() => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        if (beatTimerRef.current) clearInterval(beatTimerRef.current);
+        if (previewTimerRef.current) clearInterval(previewTimerRef.current);
+        intervalRef.current = null;
+        beatTimerRef.current = null;
+        previewTimerRef.current = null;
+        setIsPreviewingTempo(false);
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(t => t.stop());
+            streamRef.current = null;
+        }
+        sourceRef.current = null;
+        analyserRef.current = null;
+    }, []);
+
+    useEffect(() => () => cleanup(), [cleanup]);
+
+    const stopTranscriptionPlayback = useCallback(() => {
+        playAbortRef.current?.abort();
+        setIsPlayingTranscription(false);
+        setPlayIdx(-1);
+    }, []);
+
+    useEffect(() => () => stopTranscriptionPlayback(), [stopTranscriptionPlayback]);
+
+    const bucketsToTokens = useCallback((slotNotes) => {
+        const unitDur = 1 / subdiv;
+        const tokens = [];
+        let prev = null;
+        let run = 0;
+
+        const flush = () => {
+            if (!prev || run <= 0) return;
+            const dur = run * unitDur;
+            tokens.push(dur === 1 ? prev : { swara: prev, duration: dur });
+        };
+
+        slotNotes.forEach((n, idx) => {
+            const isBar = ((idx + 1) % subdiv) === 0;
+            if (prev === n) run += 1;
+            else {
+                flush();
+                prev = n;
+                run = 1;
+            }
+
+            if (isBar) {
+                flush();
+                const beatIdx = Math.floor((idx + 1) / subdiv);
+                const isAvartanaEnd = (beatIdx % BEATS_PER_AVARTANA) === 0;
+                tokens.push(isAvartanaEnd ? '||' : '|');
+                prev = null;
+                run = 0;
+            }
+        });
+
+        flush();
+        return tokens;
+    }, [subdiv, BEATS_PER_AVARTANA]);
+
+    const tokensToReadableText = useCallback((tokens) => (
+        tokens.map((t) => {
+            const s = getTokenSwara(t);
+            if (s === '|' || s === '||' || s === ',') return s;
+            const d = getTokenDuration(t);
+            return d === 1 ? s : `${s}(${d.toFixed(2)})`;
+        }).join(' ')
+    ), []);
+
+    const finishRecording = useCallback(() => {
+        const slotBuckets = bucketsRef.current;
+        const slotNotes = slotBuckets.map((bucket) => {
+            const entries = Object.entries(bucket);
+            if (entries.length === 0) return ',';
+            entries.sort((a, b) => b[1] - a[1]);
+            return entries[0][0];
+        });
+        const tokens = bucketsToTokens(slotNotes);
+        setTranscribed(tokens);
+        setTranscribedText(tokensToReadableText(tokens));
+        cleanup();
+        setPhase('done');
+    }, [bucketsToTokens, cleanup, tokensToReadableText]);
+
+    const startRecording = useCallback(async () => {
+        setMicError('');
+        setTranscribed([]);
+        setTranscribedText('');
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            streamRef.current = stream;
+
+            const ctx = getAudioCtx();
+            const source = ctx.createMediaStreamSource(stream);
+            const analyser = ctx.createAnalyser();
+            analyser.fftSize = 2048;
+            source.connect(analyser);
+            sourceRef.current = source;
+            analyserRef.current = analyser;
+
+            const totalSlots = BEATS_PER_AVARTANA * subdiv * avartanas;
+            bucketsRef.current = Array.from({ length: totalSlots }, () => ({}));
+
+            const beatMs = (60 / bpm) * 1000;
+            const slotMs = beatMs / subdiv;
+            startTimeRef.current = performance.now();
+            setPhase('recording');
+            setCurrentBeat(1);
+            setProgressPct(0);
+            playTick(ctx, ctx.currentTime);
+
+            let beatCounter = 1;
+            beatTimerRef.current = setInterval(() => {
+                beatCounter += 1;
+                if (beatCounter > BEATS_PER_AVARTANA) beatCounter = 1;
+                setCurrentBeat(beatCounter);
+                playTick(ctx, ctx.currentTime);
+            }, beatMs);
+
+            intervalRef.current = setInterval(() => {
+                const analyserNode = analyserRef.current;
+                if (!analyserNode) return;
+
+                const elapsed = performance.now() - startTimeRef.current;
+                const slot = Math.floor(elapsed / slotMs);
+
+                if (slot >= totalSlots) {
+                    finishRecording();
+                    return;
+                }
+
+                const progress = Math.min(100, (slot / totalSlots) * 100);
+                setProgressPct(progress);
+
+                const buf = new Float32Array(analyserNode.fftSize);
+                analyserNode.getFloatTimeDomainData(buf);
+                const rms = Math.sqrt(buf.reduce((sum, v) => sum + v * v, 0) / buf.length);
+                const noiseFloor = (window.MIC_NOISE_FLOOR || 4) / 100;
+                if (rms < Math.max(0.01, noiseFloor)) return;
+
+                const freq = detectPitchAudio(analyserNode, getAudioCtx().sampleRate);
+                if (!freq || freq < 60 || freq > 1500) return;
+
+                const swara = detectSwaraWithOctave(freq);
+                if (!swara) return;
+
+                const bucket = bucketsRef.current[slot];
+                bucket[swara] = (bucket[swara] || 0) + 1;
+            }, 35);
+        } catch {
+            cleanup();
+            setPhase('error');
+            setMicError('Mic access is required for transcription.');
+        }
+    }, [BEATS_PER_AVARTANA, avartanas, bpm, cleanup, finishRecording, sa, subdiv]);
+
+    const stopTempoPreview = useCallback(() => {
+        if (previewTimerRef.current) clearInterval(previewTimerRef.current);
+        previewTimerRef.current = null;
+        setIsPreviewingTempo(false);
+        setCurrentBeat(0);
+    }, []);
+
+    const startTempoPreview = useCallback(() => {
+        if (isPreviewingTempo || phase === 'countdown' || phase === 'recording') return;
+        const ctx = getAudioCtx();
+        const beatMs = (60 / bpm) * 1000;
+        let beatCounter = 1;
+        setIsPreviewingTempo(true);
+        setCurrentBeat(beatCounter);
+        playTick(ctx, ctx.currentTime);
+        previewTimerRef.current = setInterval(() => {
+            beatCounter += 1;
+            if (beatCounter > BEATS_PER_AVARTANA) beatCounter = 1;
+            setCurrentBeat(beatCounter);
+            playTick(ctx, ctx.currentTime);
+        }, beatMs);
+    }, [BEATS_PER_AVARTANA, bpm, isPreviewingTempo, phase]);
+
+    const startWithCountdown = useCallback(() => {
+        stopTempoPreview();
+        cleanup();
+        setPhase('countdown');
+        setCountdown(4);
+        const ctx = getAudioCtx();
+        const beatMs = Math.round((60 / bpm) * 1000);
+        let c = 4;
+        // Audible lead-in on "4"
+        playTick(ctx, ctx.currentTime);
+        const t = setInterval(() => {
+            c -= 1;
+            if (c <= 0) {
+                clearInterval(t);
+                startRecording();
+            } else {
+                // Audible count for 3,2,1
+                playTick(ctx, ctx.currentTime);
+                setCountdown(c);
+            }
+        }, beatMs);
+    }, [bpm, cleanup, startRecording, stopTempoPreview]);
+
+    const stopNow = useCallback(() => {
+        cleanup();
+        setPhase('idle');
+        setCurrentBeat(0);
+        setProgressPct(0);
+    }, [cleanup]);
+
+    const playTranscribed = useCallback(() => {
+        if (!transcribed.length || isPlayingTranscription) return;
+        stopTranscriptionPlayback();
+        const ctrl = new AbortController();
+        playAbortRef.current = ctrl;
+        setIsPlayingTranscription(true);
+        const delayMs = Math.round((60 / bpm) * 1000);
+        playSequenceAsync(transcribed, sa, setPlayIdx, ctrl.signal, delayMs, false, talaSpec, 'strict')
+            .then(() => {
+                if (!ctrl.signal.aborted) {
+                    setIsPlayingTranscription(false);
+                    setPlayIdx(-1);
+                }
+            });
+    }, [bpm, isPlayingTranscription, sa, stopTranscriptionPlayback, talaSpec, transcribed]);
+
+    return (
+        <div className="w-full max-w-4xl rounded-xl border border-c-border bg-c-surface p-5 flex flex-col gap-4">
+            <h3 className="font-playfair text-xl text-c-gold">Tala Swara Transcriber</h3>
+            <p className="text-xs text-c-cream-dim">Sing your own variation against your chosen tala and get swaras transcribed on a rhythmic grid.</p>
+
+            <div className="grid sm:grid-cols-4 gap-3">
+                <label className="text-xs text-c-cream-dim flex flex-col gap-1">Talam
+                    <select value={talaId} onChange={e => setTalaId(e.target.value)} className="bg-c-card border border-c-border rounded px-2 py-1 text-c-cream">
+                        {TALA_PRESETS.map(t => (
+                            <option key={t.id} value={t.id}>{t.name} ({t.groups.join(' + ')})</option>
+                        ))}
+                    </select>
+                </label>
+                <label className="text-xs text-c-cream-dim flex flex-col gap-1">Tempo (BPM)
+                    <input type="range" min="40" max="120" step="1" value={bpm} onChange={e => setBpm(Number(e.target.value))} />
+                    <span className="font-mono text-c-gold">{bpm}</span>
+                </label>
+                <label className="text-xs text-c-cream-dim flex flex-col gap-1">Subdivisions / beat
+                    <select value={subdiv} onChange={e => setSubdiv(Number(e.target.value))} className="bg-c-card border border-c-border rounded px-2 py-1 text-c-cream">
+                        <option value={1}>1 (quarter)</option>
+                        <option value={2}>2 (half-beat)</option>
+                        <option value={4}>4 (chatusra)</option>
+                        <option value={8}>8 (faster sangatis)</option>
+                    </select>
+                </label>
+                <label className="text-xs text-c-cream-dim flex flex-col gap-1">Avartanas
+                    <select value={avartanas} onChange={e => setAvartanas(Number(e.target.value))} className="bg-c-card border border-c-border rounded px-2 py-1 text-c-cream">
+                        <option value={1}>1</option>
+                        <option value={2}>2</option>
+                        <option value={4}>4</option>
+                    </select>
+                </label>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 text-xs text-c-cream-dim">
+                <span>Sa used for transcription:</span>
+                <span className="px-2 py-1 rounded border border-c-gold/30 bg-c-gold/10 text-c-gold font-mono">{sa.toFixed(2)} Hz</span>
+                <button onClick={() => setSa(Math.max(120, Number((sa - 1).toFixed(2))))} className="px-2 py-1 rounded border border-c-border hover:border-c-gold/50 text-c-cream">-1 Hz</button>
+                <button onClick={() => setSa(Number((sa + 1).toFixed(2)))} className="px-2 py-1 rounded border border-c-border hover:border-c-gold/50 text-c-cream">+1 Hz</button>
+                <span className="text-[10px] opacity-80">Tip: tune this first; wrong Sa shifts all note names.</span>
+            </div>
+
+            {phase === 'countdown' && <div className="text-c-gold font-mono text-lg">Starting in {countdown}…</div>}
+            {phase === 'recording' && (
+                <div className="flex flex-col gap-2">
+                    <div className="text-xs text-c-cream">Recording... Beat <span className="text-c-gold font-mono">{currentBeat}</span> / {BEATS_PER_AVARTANA}</div>
+                    <div className="w-full h-2 bg-c-bg rounded-full overflow-hidden">
+                        <div className="h-full bg-c-gold transition-all duration-100" style={{ width: `${progressPct}%` }} />
+                    </div>
+                </div>
+            )}
+            {micError && <div className="text-xs text-red-400">{micError}</div>}
+
+            <div className="flex gap-3">
+                {(phase === 'idle' || phase === 'done' || phase === 'error') && (
+                    <button onClick={startWithCountdown} className="px-5 py-2 rounded-full bg-c-gold text-c-bg font-playfair font-bold">Start Transcribing</button>
+                )}
+                {(phase === 'countdown' || phase === 'recording') && (
+                    <button onClick={stopNow} className="px-5 py-2 rounded-full border border-red-700/40 text-red-400">Stop</button>
+                )}
+                {(phase === 'idle' || phase === 'done' || phase === 'error') && !isPreviewingTempo && (
+                    <button onClick={startTempoPreview} className="px-5 py-2 rounded-full border border-c-border text-c-cream hover:border-c-gold/50">
+                        🔊 Preview Tempo
+                    </button>
+                )}
+                {isPreviewingTempo && (
+                    <button onClick={stopTempoPreview} className="px-5 py-2 rounded-full border border-red-700/40 text-red-400">
+                        ■ Stop Preview
+                    </button>
+                )}
+                {transcribed.length > 0 && !isPlayingTranscription && (
+                    <button onClick={playTranscribed} className="px-5 py-2 rounded-full border border-c-gold/40 text-c-gold hover:bg-c-gold hover:text-c-bg">
+                        ▶ Play Transcription
+                    </button>
+                )}
+                {isPlayingTranscription && (
+                    <button onClick={stopTranscriptionPlayback} className="px-5 py-2 rounded-full border border-red-700/40 text-red-400">
+                        ■ Stop Playback
+                    </button>
+                )}
+            </div>
+
+            {transcribed.length > 0 && (
+                <div className="bg-c-card border border-c-border rounded-lg p-3 flex flex-col gap-2">
+                    <div className="text-[10px] uppercase tracking-wider text-c-cream-dark font-mono">Transcribed Notation</div>
+                    <div className="font-mono text-sm text-c-cream break-words">{transcribedText}</div>
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                        {transcribed.map((t, i) => {
+                            const s = getTokenSwara(t);
+                            if (s === '|') return <span key={i} className="text-c-cream-dark">|</span>;
+                            if (s === '||') return <span key={i} className="text-c-cream-dark">||</span>;
+                            if (s === ',') return <span key={i} className="text-c-cream-dark">—</span>;
+                            return (
+                                <span
+                                    key={i}
+                                    className={`px-1.5 py-0.5 rounded border text-xs font-mono ${
+                                        i === playIdx ? 'border-c-gold bg-c-gold text-c-bg' : 'border-c-border text-c-cream'
+                                    }`}
+                                >
+                                    {s}
+                                </span>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
 // ─── Raga Practice: browser ───────────────────────────────────────────────────
 
 function RagaPractice({ sa }) {
@@ -3683,7 +4076,7 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
     });
     
     const [tunerOpen, setTunerOpen] = useState(false);
-    const [tab, setTab]         = useState('curriculum'); // curriculum | practice
+    const [tab, setTab]         = useState('curriculum'); // curriculum | practice | transcribe
     const [screen, setScreen]   = useState('home');       // home | unit | lesson
     const [activeUnit, setActiveUnit]     = useState(null);
     const [activeLesson, setActiveLesson] = useState(null);
@@ -3818,6 +4211,12 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
                                         <path d="M2 12 C5 6, 9 6, 12 12 S19 18, 22 12" />
                                     </svg>
                                 )},
+                                { id: 'transcribe', label: 'Transcribe', icon: (
+                                    <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M4 6h16M4 12h16M4 18h10" />
+                                        <path d="M17 16l2 2 4-4" />
+                                    </svg>
+                                )},
                             ].map(({ id, label, icon }) => (
                                 <button key={id} onClick={() => setTab(id)}
                                         className={`px-5 py-2 text-xs font-playfair tracking-wide transition-colors relative flex items-center gap-1.5 ${
@@ -3846,8 +4245,10 @@ export default function Tutor({ saFrequency, onSadhanaComplete }) {
                                     onToggleStructuredMode={toggleStructuredMode}
                                 />
                             )
-                        ) : (
+                        ) : tab === 'practice' ? (
                             <RagaPractice sa={sa} setSa={updateSa} />
+                        ) : (
+                            <TalaSwaraTranscriber sa={sa} setSa={updateSa} />
                         )}
                     </div>
                 </>

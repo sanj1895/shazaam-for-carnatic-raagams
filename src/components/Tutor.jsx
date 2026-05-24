@@ -349,11 +349,12 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, octaveMode = 'a
     };
 
     const renderSwaras = () => {
-        // Split into lines on '||' — use || purely as a line break, don't render it
+        // Split into lines on '|' and '||' — both are line breaks, neither is rendered
         const lines = [];
         let currentLine = [];
         for (let idx = 0; idx < swaras.length; idx++) {
-            if (getTokenSwara(swaras[idx]) === '||') {
+            const s = getTokenSwara(swaras[idx]);
+            if (s === '|' || s === '||') {
                 if (currentLine.length > 0) lines.push(currentLine);
                 currentLine = [];
                 continue;
@@ -371,13 +372,6 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, octaveMode = 'a
                             const suffix = getTokenNotationSuffix(token);
                             const duration = getTokenDuration(token);
                             const widthClass = duration >= 4 ? 'w-20 sm:w-24' : duration >= 3 ? 'w-16 sm:w-20' : duration >= 2 ? 'w-12 sm:w-14' : 'w-8 sm:w-10';
-                            if (s === '|') {
-                                return (
-                                    <div key={i} className="flex items-center text-c-gold/40 font-light mx-0.5 sm:mx-1">
-                                        {s}
-                                    </div>
-                                );
-                            }
                             if (s === ',') {
                                 return (
                                     <div key={i} className={`${widthClass} h-8 sm:h-10 flex items-center justify-center text-c-cream-dark/30 font-mono text-xs`}>
@@ -2020,11 +2014,13 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                 const lines = [];
                 let currentLine = [];
                 for (let idx = 0; idx < swaras.length; idx++) {
-                    currentLine.push({ token: swaras[idx], i: idx });
-                    if (getTokenSwara(swaras[idx]) === '||') {
-                        lines.push(currentLine);
+                    const s = getTokenSwara(swaras[idx]);
+                    if (s === '|' || s === '||') {
+                        if (currentLine.length > 0) lines.push(currentLine);
                         currentLine = [];
+                        continue;
                     }
+                    currentLine.push({ token: swaras[idx], i: idx });
                 }
                 if (currentLine.length > 0) lines.push(currentLine);
 
@@ -2037,13 +2033,6 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                                     const suffix = getTokenNotationSuffix(token);
                                     const duration = getTokenDuration(token);
                                     const widthClass = duration >= 4 ? 'w-20 sm:w-24' : duration >= 3 ? 'w-16 sm:w-20' : duration >= 2 ? 'w-12 sm:w-14' : 'w-8 sm:w-9';
-                                    if (s === '|' || s === '||') {
-                                        return (
-                                            <div key={i} className={`flex items-center text-c-gold/40 font-light mx-0.5 sm:mx-1 ${s === '||' ? 'tracking-widest' : ''}`}>
-                                                {s}
-                                            </div>
-                                        );
-                                    }
                                     if (s === ',') {
                                         return (
                                             <div key={i} className={`${widthClass} h-10 sm:h-11 flex items-center justify-center text-c-cream-dark/25 font-mono text-xs`}>

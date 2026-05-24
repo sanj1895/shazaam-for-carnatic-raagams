@@ -9,13 +9,7 @@ const STEPS = [
     body: "Your complete Carnatic music practice companion. Let me take you on a quick tour of each feature.",
     isWelcome: true,
   },
-  {
-    view: 'shruthi',
-    feature: 'Shruthi Box',
-    title: 'Start here — your drone',
-    body: "Every practice session begins with the Shruthi Box. It plays a continuous drone tone so your ear locks onto the tonic (Sa) before you sing a single note.",
-    hint: 'Keep this running in the background while you sing',
-  },
+  // ── START HERE ──
   {
     view: 'tutor',
     feature: 'Svara Gurukul',
@@ -24,17 +18,47 @@ const STEPS = [
     hint: "Best place to start if you're a complete beginner",
   },
   {
-    view: 'tutor',
-    feature: 'Raga Practice',
-    title: 'Master Arohanam & Avarohanam',
-    body: "Once you know the notes, practice ascending and descending the full scale of any raga in the library — the AI Guru corrects your pitch as you go.",
-    hint: 'Intermediate and advanced singers can jump straight here',
+    view: 'sadhana',
+    feature: 'Daily Sadhana',
+    title: 'Your daily practice routine',
+    body: "Sadhana ties all the features together into a 4-step daily ritual — drone warm-up, vocal curriculum, keyboard exploration, and ear training. Complete all 4 to build your streak.",
+    hint: 'Steps reset each morning — consistency is everything',
   },
+  // ── PRACTICE ──
+  {
+    view: 'shruthi',
+    feature: 'Shruthi Box',
+    title: 'Your practice drone',
+    body: "The Shruthi Box plays a continuous drone tone so your ear locks onto the tonic (Sa) before you sing a single note. Choose Harmonium or Tambura.",
+    hint: 'Keep this running in the background while you sing',
+  },
+  {
+    view: 'talam',
+    feature: 'Talam',
+    title: 'Feel the rhythmic cycle',
+    body: "Carnatic music is organized into rhythmic cycles called Talam. Practice internalizing the 8-beat Adi Tala — the most common cycle — by tapping along as you sing.",
+    hint: 'Try it while you practice scales in Svara Gurukul',
+  },
+  {
+    view: 'keyboard',
+    feature: 'Swara Keyboard',
+    title: 'Play swaras on virtual keys',
+    body: "Tap any swara to hear it at your exact Sa. Use the keyboard to understand raga scales visually and aurally before trying to sing them.",
+    hint: 'Select a raga to highlight its notes on the keyboard',
+  },
+  {
+    view: 'singback',
+    feature: 'Sing-Back',
+    title: 'Challenge your raga memory',
+    body: "A phrase plays — you reproduce it by ear. Aim for 80%+ accuracy to sharpen pitch memory and muscle memory together.",
+    hint: 'Gets harder as your ear improves',
+  },
+  // ── EXPLORE ──
   {
     view: 'listen',
     feature: 'Dhwani',
     title: 'Sing and discover your raga',
-    body: "Sing freely and Dhwani listens in real time — it maps every note you produce onto a swara and builds a picture of which raga you might be singing. Use Ālaap AI for a deeper analysis of the full phrase.",
+    body: "Sing freely and Dhwani listens in real time — it maps every note onto a swara and builds a picture of which raga you might be singing. Use Ālaap AI for a deeper phrase analysis.",
     hint: 'Set your Sa first so it calibrates to your voice',
   },
   {
@@ -43,13 +67,6 @@ const STEPS = [
     title: 'The treasury of ragas',
     body: "Browse and search an encyclopedia of Carnatic ragas — scales, moods, time of day, famous compositions, and reference performances. The Practice tab has AI vocal coaching built in.",
     hint: 'Search any raga by name or browse by parent melakarta',
-  },
-  {
-    view: 'talam',
-    feature: 'Talam',
-    title: 'Feel the rhythmic cycle',
-    body: "Carnatic music is organized into rhythmic cycles called Talam. Practice internalizing the 8-beat Adi Tala — the most common cycle — by tapping along as you sing.",
-    hint: 'Try it while you practice scales in Svara Gurukul',
   },
   {
     view: 'melakarta',
@@ -66,16 +83,9 @@ const STEPS = [
     hint: 'Hear how Shankarabharanam becomes Kalyani',
   },
   {
-    view: 'sadhana',
-    feature: 'Daily Sadhana',
-    title: 'Your daily practice routine',
-    body: "Once you know the features, Sadhana ties them together into a 4-step daily ritual — drone warm-up, vocal curriculum, keyboard exploration, and ear training. Complete all 4 to build your streak.",
-    hint: 'Steps reset each morning — consistency is everything',
-  },
-  {
     view: null,
     title: "You're ready to begin",
-    body: "Start with the Svara Gurukul curriculum to learn from scratch, or jump straight to any feature from the navigation bar.",
+    body: "Open Svara Gurukul to start the structured curriculum from scratch, or jump straight to any feature from the navigation.",
     isLast: true,
   },
 ];

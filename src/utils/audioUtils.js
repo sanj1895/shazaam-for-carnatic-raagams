@@ -15,6 +15,7 @@ export const SWARA_SEMITONE = {
   'Ni3': 11,
   
   // Plain names mapping to standard Mayamalavagowla (first beginner raga) notes for simplified curriculum
+  'Ṙ': 1,   // tara Ri1 — display symbol for upper-octave Ri in Malahari/Saveri; octave auto-detected by getOctaveSequence
   'Ri': 1,
   'Ga': 4,
   'Ma': 5,

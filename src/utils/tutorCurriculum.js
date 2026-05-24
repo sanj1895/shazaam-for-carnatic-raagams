@@ -1417,6 +1417,7 @@ const GEETHAM_CURRICULUM_RAW = [
 const parseSwarajathi = (str, swaraMap) => {
     const tokens = [];
     let lastPlayableIdx = -1;
+    const lowerOctaveMap = { s: 'Sa.', r: 'Ri.', g: 'Ga.', m: 'Ma.', p: 'Pa.', d: 'Da.', n: 'Ni.' };
     for (let i = 0; i < str.length; i++) {
         const char = str[i];
         if (char === '|') {
@@ -1437,12 +1438,22 @@ const parseSwarajathi = (str, swaraMap) => {
                 tokens.push({ swara: ',', duration: 1 });
             }
         } else if (swaraMap[char]) {
-            tokens.push(swaraMap[char]);
+            if (str[i + 1] === '.' && lowerOctaveMap[char]) {
+                tokens.push(lowerOctaveMap[char]);
+                i++;
+            } else {
+                tokens.push(swaraMap[char]);
+            }
             lastPlayableIdx = tokens.length - 1;
         }
     }
     return tokens;
 };
+
+const parseAuditedSwarajathi = (lines, swaraMap) => lines.flatMap((line, idx) => {
+    const parsedLine = parseSwarajathi(line, swaraMap);
+    return idx === lines.length - 1 ? parsedLine : [...parsedLine, '||'];
+});
 
 const BILAHARI_SWARAS = {
     s: 'Sa', r: 'Ri2', g: 'Ga3', m: 'Ma1', p: 'Pa', d: 'Da2', n: 'Ni3',
@@ -1489,28 +1500,90 @@ const SWARAJATHI_CURRICULUM_RAW = [
                 id: 'sj_raaravenu_pallavi', title: 'Rāravēṇu Pallavi', tag: 'Pallavi',
                 exercises: [
                     { type: 'info', title: 'Rāravēṇu', body: 'Rāga: Bilahari · Tāḷam: Ādi\n\nPallavi: Rārā Vēṇugōpa Bāla Rājita Sadguṇa Jaya Śīla\n\nMeaning: Please come, Lord Vēṇugōpāla, embodiment of adorable and victorious qualities.' },
-                    { type: 'listen_sequence', swaras: parseSwarajathi('S , r G P D S N D | P d p m g r s r s n d S ; ||', BILAHARI_SWARAS), displayLabel: '♪', instruction: 'Listen to the full pallavi swara line: S , R G P D S N D | P D P M G R S R S N D S ||' },
-                    { type: 'sing_sequence', swaras: parseSwarajathi('S , r G P D S N D | P d p m g r s ||', BILAHARI_SWARAS), speed: 0.85, instruction: 'Sing the first half of the pallavi slowly.' },
-                    { type: 'sing_sequence', swaras: parseSwarajathi('P d p m g r s r s n d S ; ||', BILAHARI_SWARAS), speed: 0.85, instruction: 'Sing the resolving phrase: P D P M G R S R S N D S.' },
+                    { type: 'listen_sequence', swaras: parseAuditedSwarajathi([
+                        's , , r g , p , d , S , n , d , |',
+                        'p , d p m g r s | r s n. d. s , , ,'
+                    ], BILAHARI_SWARAS), displayLabel: '♪', instruction: 'Listen to the audited pallavi in two Ādi āvartanams. Read the commas as sustained units: Rārā Vēṇugōpa Bāla | Rājita Sadguṇa Jaya Śīla.' },
+                    { type: 'sing_sequence', swaras: parseAuditedSwarajathi([
+                        's , , r g , p , d , S , n , d , |',
+                        'p , d p m g r s | r s n. d. s , , ,'
+                    ], BILAHARI_SWARAS), speed: 0.75, instruction: 'Sing the complete pallavi with the written comma holds.' },
                 ]
             },
             {
                 id: 'sj_raaravenu_anupallavi', title: 'Anupallavi', tag: 'Anupallavi',
                 exercises: [
                     { type: 'info', title: 'Sārasākṣa', body: 'Anupallavi: Sārasākṣa Nēra Mēmi Mārubāri Korvalērā\n\nMeaning: O lotus-eyed one, what wrong have I done? I cannot bear the onslaught of love.' },
-                    { type: 'listen_sequence', swaras: parseSwarajathi('S , r G P M , g P D | R , s N , d P , m G , r ||', BILAHARI_SWARAS), displayLabel: '♪', instruction: 'Listen to the anupallavi phrase, especially the G-P-M-G color.' },
-                    { type: 'sing_sequence', swaras: parseSwarajathi('S , r G P M , g P D ||', BILAHARI_SWARAS), speed: 0.85, instruction: 'Sing: S , R G P M , G P D.' },
-                    { type: 'sing_sequence', swaras: parseSwarajathi('R , s N , d P , m G , r ||', BILAHARI_SWARAS), speed: 0.85, instruction: 'Sing the answer phrase ending on Ri.' },
+                    { type: 'listen_sequence', swaras: parseAuditedSwarajathi([
+                        's , , r g , p , m , , g p , d , |',
+                        'R , , S n , , d | p , , m g , , r'
+                    ], BILAHARI_SWARAS), displayLabel: '♪', instruction: 'Listen to the audited anupallavi: Sārasākṣa Nēra Mēmi | Mārubāri Korvalērā.' },
+                    { type: 'sing_sequence', swaras: parseAuditedSwarajathi([
+                        's , , r g , p , m , , g p , d , |',
+                        'R , , S n , , d | p , , m g , , r'
+                    ], BILAHARI_SWARAS), speed: 0.75, instruction: 'Sing the complete anupallavi, keeping every comma-count steady against Ādi tāḷam.' },
                 ]
             },
             {
-                id: 'sj_raaravenu_charanams', title: 'Charanam Practice', tag: 'Charanam',
+                id: 'sj_raaravenu_charanam1', title: 'Charanam 1', tag: 'Charanam',
                 exercises: [
-                    { type: 'info', title: 'Three Charanams', body: 'Charanam 1 appeals to Nandagopāla with nowhere else to go.\n\nCharanam 2 asks why Krishna responds to other devotees but not to this repeated call.\n\nCharanam 3 is a larger surrender: Govardhana-lifter, destroyer of Mura, remover of worldly sorrow, please protect me and do not forget me.' },
-                    { type: 'listen_sequence', swaras: parseSwarajathi('S , r G G G ; ; r g | P , p P P P ; ; d p ||', BILAHARI_SWARAS), displayLabel: '♪', instruction: 'Listen to Charanam 1 opening: Nandagopālā Ne Nendu Pojālā Nee.' },
-                    { type: 'sing_sequence', swaras: parseSwarajathi('S , s S S g r s n n d P | p d p m g g R g p m g r s r g ||', BILAHARI_SWARAS), speed: 0.8, instruction: 'Sing the flowing Charanam 1 continuation.' },
-                    { type: 'listen_sequence', swaras: parseSwarajathi('p p P r r R g p m g G ; | g p m g m g r s r g r s S ; ||', BILAHARI_SWARAS), displayLabel: '♪', instruction: 'Listen to Charanam 2 opening and its quick turns around G-M-R-S.' },
-                    { type: 'sing_sequence', swaras: parseSwarajathi('P ; m g r g D ; m g r g | P ; m g r g P P P ; ||', BILAHARI_SWARAS), speed: 0.8, instruction: 'Sing Charanam 3 opening: Rā Nagadara, Rā Murahara.' },
+                    { type: 'info', title: 'Nandagōpālā', body: 'Charanam 1: Nandagōpālā Ne Nendu Pōjālā Nee / Vindu Rārā Sadamalamadito Mudamala Raganā Keduruga Gadiyara\n\nMeaning: O Nandagōpālā, I have nowhere else to go. Come here with a free mind and spread cheer.' },
+                    { type: 'listen_sequence', swaras: parseAuditedSwarajathi([
+                        's , , r g , g , g , , , g , r g |',
+                        'p , , p p , p , | p , , , p , d p',
+                        'S , , S S , S , G R S n n d p , |',
+                        'p d p m g g r , | g p m g r s r g'
+                    ], BILAHARI_SWARAS), displayLabel: '♪', instruction: 'Listen to audited Charanam 1 across four Ādi lines. Notice the long openings and the faster closing run.' },
+                    { type: 'sing_sequence', swaras: parseAuditedSwarajathi([
+                        's , , r g , g , g , , , g , r g |',
+                        'p , , p p , p , | p , , , p , d p',
+                        'S , , S S , S , G R S n n d p , |',
+                        'p d p m g g r , | g p m g r s r g'
+                    ], BILAHARI_SWARAS), speed: 0.7, instruction: 'Sing Charanam 1 with exact comma holds, then return to the pallavi.' },
+                ]
+            },
+            {
+                id: 'sj_raaravenu_charanam2', title: 'Charanam 2', tag: 'Charanam',
+                exercises: [
+                    { type: 'info', title: 'Palumārunugā', body: 'Charanam 2 asks why Krishna, who responds to other devotees, does not respond to these repeated calls. It recalls Gajendra and asks for quick protection.' },
+                    { type: 'listen_sequence', swaras: parseAuditedSwarajathi([
+                        'p p p , r r r , g p m g g , , , |',
+                        'g p m g m g r s | r g r s s , , ,',
+                        'r s n. d. s , , , m g r g p , , , |',
+                        'd p d R S , , , | R S n d p m g r'
+                    ], BILAHARI_SWARAS), displayLabel: '♪', instruction: 'Listen to audited Charanam 2. Track the repeated-note calls and the lower n.d. descent.' },
+                    { type: 'sing_sequence', swaras: parseAuditedSwarajathi([
+                        'p p p , r r r , g p m g g , , , |',
+                        'g p m g m g r s | r g r s s , , ,',
+                        'r s n. d. s , , , m g r g p , , , |',
+                        'd p d R S , , , | R S n d p m g r'
+                    ], BILAHARI_SWARAS), speed: 0.7, instruction: 'Sing Charanam 2, keeping the long held endings steady before the faster answers.' },
+                ]
+            },
+            {
+                id: 'sj_raaravenu_charanam3', title: 'Charanam 3', tag: 'Charanam',
+                exercises: [
+                    { type: 'info', title: 'Rā Nagadara', body: 'Charanam 3 is the full surrender: Come, lifter of Govardhana; destroyer of Mura; remover of worldly sorrow. Do not leave this devotee alone. I seek refuge again and again.' },
+                    { type: 'listen_sequence', swaras: parseAuditedSwarajathi([
+                        'p , , , m g r g d , , , m g r g |',
+                        'p , , , m g r g p , p , p , , ,',
+                        'G , , , R S n d R , , , R S n d |',
+                        'S , , , R S n d S , S , S , , ,',
+                        'G , R S R , R , R , , , R , S n |',
+                        'd , d , d , , , p , m g g , g ,',
+                        'g , , , s r g d p , , , R S R G |',
+                        'S , , , G R S N d p m g r s r g'
+                    ], BILAHARI_SWARAS), displayLabel: '♪', instruction: 'Listen to audited Charanam 3. This is the longest section: slow invocations, then surrender phrases with faster cadences.' },
+                    { type: 'sing_sequence', swaras: parseAuditedSwarajathi([
+                        'p , , , m g r g d , , , m g r g |',
+                        'p , , , m g r g p , p , p , , ,',
+                        'G , , , R S n d R , , , R S n d |',
+                        'S , , , R S n d S , S , S , , ,',
+                        'G , R S R , R , R , , , R , S n |',
+                        'd , d , d , , , p , m g g , g ,',
+                        'g , , , s r g d p , , , R S R G |',
+                        'S , , , G R S N d p m g r s r g'
+                    ], BILAHARI_SWARAS), speed: 0.65, instruction: 'Sing Charanam 3 slowly first. Keep the comma notation visible in your mind as the tāḷam grid.' },
                 ]
             },
         ]

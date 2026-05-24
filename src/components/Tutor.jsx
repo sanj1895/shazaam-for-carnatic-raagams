@@ -3365,6 +3365,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     const [playIdx, setPlayIdx] = useState(-1);
     const [isPlayingTranscription, setIsPlayingTranscription] = useState(false);
     const [isPreviewingTempo, setIsPreviewingTempo] = useState(false);
+    const [anchorOnlyMode, setAnchorOnlyMode] = useState(false);
 
     const streamRef = useRef(null);
     const sourceRef = useRef(null);
@@ -3375,6 +3376,8 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     const beatTimerRef = useRef(null);
     const previewTimerRef = useRef(null);
     const playAbortRef = useRef(null);
+    const frameHistoryRef = useRef([]);
+    const octaveStateRef = useRef({ stable: 0, pending: null, pendingCount: 0 });
 
     const activeTala = TALA_PRESETS.find(t => t.id === talaId) || TALA_PRESETS[0];
     const talaGroups = activeTala.groups;
@@ -3397,6 +3400,126 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         return base;
     }, [sa]);
 
+    const yinEstimate = useCallback((buffer, sampleRate) => {
+        const threshold = 0.14;
+        const maxTau = Math.min(1024, Math.floor(sampleRate / 60));
+        const minTau = Math.max(2, Math.floor(sampleRate / 1200));
+        const yin = new Float32Array(maxTau + 1);
+
+        for (let tau = 1; tau <= maxTau; tau++) {
+            let sum = 0;
+            for (let i = 0; i < buffer.length - tau; i++) {
+                const d = buffer[i] - buffer[i + tau];
+                sum += d * d;
+            }
+            yin[tau] = sum;
+        }
+
+        yin[0] = 1;
+        let runningSum = 0;
+        for (let tau = 1; tau <= maxTau; tau++) {
+            runningSum += yin[tau];
+            yin[tau] = runningSum === 0 ? 1 : (yin[tau] * tau) / runningSum;
+        }
+
+        let tauEstimate = -1;
+        for (let tau = minTau; tau <= maxTau; tau++) {
+            if (yin[tau] < threshold) {
+                while (tau + 1 <= maxTau && yin[tau + 1] < yin[tau]) tau++;
+                tauEstimate = tau;
+                break;
+            }
+        }
+        if (tauEstimate === -1) return null;
+
+        const confidence = Math.max(0, 1 - yin[tauEstimate]);
+        const freq = sampleRate / tauEstimate;
+        if (!Number.isFinite(freq) || freq < 60 || freq > 1500) return null;
+        return { freq, confidence };
+    }, []);
+
+    const resolveOctaveWithHysteresis = useCallback((baseSwara, semitones) => {
+        const candidate = Math.floor(Math.round(semitones) / 12);
+        const st = octaveStateRef.current;
+        if (candidate === st.stable) {
+            st.pending = null;
+            st.pendingCount = 0;
+        } else if (st.pending === candidate) {
+            st.pendingCount += 1;
+            if (st.pendingCount >= 3) {
+                st.stable = candidate;
+                st.pending = null;
+                st.pendingCount = 0;
+            }
+        } else {
+            st.pending = candidate;
+            st.pendingCount = 1;
+        }
+        const octave = st.stable;
+        if (octave >= 1) return `${baseSwara}^`;
+        if (octave <= -1) return `${baseSwara}.`;
+        return baseSwara;
+    }, []);
+
+    const transcribeFramesToSlots = useCallback((frames, totalSlots, slotMs) => {
+        const grid = Array.from({ length: totalSlots }, () => []);
+        const slotDurSec = slotMs / 1000;
+        const onsetTolerance = slotDurSec * 0.35;
+        const minSegSec = Math.max(slotDurSec * 0.35, 0.045);
+
+        // Smooth labels with local majority to suppress one-frame flips.
+        const smoothed = frames.map((_, i) => {
+            const window = frames.slice(Math.max(0, i - 2), Math.min(frames.length, i + 3));
+            const counts = {};
+            window.forEach(f => {
+                const k = f.label || ',';
+                counts[k] = (counts[k] || 0) + 1;
+            });
+            return { ...frames[i], label: Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || ',' };
+        });
+
+        // Segment contiguous labels.
+        const segments = [];
+        let cur = null;
+        smoothed.forEach((f) => {
+            if (!cur || cur.label !== f.label) {
+                if (cur) segments.push(cur);
+                cur = { label: f.label, start: f.time, end: f.time, glideCount: f.glide ? 1 : 0, count: 1 };
+            } else {
+                cur.end = f.time;
+                cur.count += 1;
+                if (f.glide) cur.glideCount += 1;
+            }
+        });
+        if (cur) segments.push(cur);
+
+        // Place note segments into quantized onset/duration slots.
+        segments.forEach(seg => {
+            const segDurSec = Math.max(0.001, seg.end - seg.start);
+            if (seg.label === ',' || segDurSec < minSegSec) return;
+            const glideRatio = seg.glideCount / Math.max(1, seg.count);
+            if (anchorOnlyMode && glideRatio > 0.55 && segDurSec < slotDurSec * 1.1) return;
+
+            const rawSlot = seg.start / slotDurSec;
+            const snappedSlot = Math.round(rawSlot);
+            const snapErrSec = Math.abs(snappedSlot - rawSlot) * slotDurSec;
+            const onsetSlot = snapErrSec <= onsetTolerance ? snappedSlot : Math.floor(rawSlot);
+            const durSlots = Math.max(1, Math.round(segDurSec / slotDurSec));
+
+            for (let k = 0; k < durSlots; k++) {
+                const idx = onsetSlot + k;
+                if (idx >= 0 && idx < totalSlots) grid[idx].push(seg.label);
+            }
+        });
+
+        return grid.map(bucket => {
+            if (!bucket.length) return ',';
+            const counts = {};
+            bucket.forEach(n => { counts[n] = (counts[n] || 0) + 1; });
+            return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+        });
+    }, [anchorOnlyMode]);
+
     const cleanup = useCallback(() => {
         if (intervalRef.current) clearInterval(intervalRef.current);
         if (beatTimerRef.current) clearInterval(beatTimerRef.current);
@@ -3405,6 +3528,8 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         beatTimerRef.current = null;
         previewTimerRef.current = null;
         setIsPreviewingTempo(false);
+        frameHistoryRef.current = [];
+        octaveStateRef.current = { stable: 0, pending: null, pendingCount: 0 };
         if (streamRef.current) {
             streamRef.current.getTracks().forEach(t => t.stop());
             streamRef.current = null;
@@ -3468,19 +3593,25 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     ), []);
 
     const finishRecording = useCallback(() => {
-        const slotBuckets = bucketsRef.current;
-        const slotNotes = slotBuckets.map((bucket) => {
+        const beatMs = (60 / bpm) * 1000;
+        const slotMs = beatMs / subdiv;
+        const totalSlots = BEATS_PER_AVARTANA * subdiv * avartanas;
+        const frameSlotNotes = transcribeFramesToSlots(frameHistoryRef.current, totalSlots, slotMs);
+        const fallbackSlotBuckets = bucketsRef.current;
+        const fallbackSlotNotes = fallbackSlotBuckets.map((bucket) => {
             const entries = Object.entries(bucket);
             if (entries.length === 0) return ',';
             entries.sort((a, b) => b[1] - a[1]);
             return entries[0][0];
         });
-        const tokens = bucketsToTokens(slotNotes);
+        const frameTokens = bucketsToTokens(frameSlotNotes);
+        const fallbackTokens = bucketsToTokens(fallbackSlotNotes);
+        const tokens = frameTokens.length ? frameTokens : fallbackTokens;
         setTranscribed(tokens);
         setTranscribedText(tokensToReadableText(tokens));
         cleanup();
         setPhase('done');
-    }, [bucketsToTokens, cleanup, tokensToReadableText]);
+    }, [BEATS_PER_AVARTANA, avartanas, bpm, bucketsToTokens, cleanup, subdiv, tokensToReadableText, transcribeFramesToSlots]);
 
     const startRecording = useCallback(async () => {
         setMicError('');
@@ -3500,6 +3631,8 @@ function TalaSwaraTranscriber({ sa, setSa }) {
 
             const totalSlots = BEATS_PER_AVARTANA * subdiv * avartanas;
             bucketsRef.current = Array.from({ length: totalSlots }, () => ({}));
+            frameHistoryRef.current = [];
+            octaveStateRef.current = { stable: 0, pending: null, pendingCount: 0 };
 
             const beatMs = (60 / bpm) * 1000;
             const slotMs = beatMs / subdiv;
@@ -3536,16 +3669,38 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 analyserNode.getFloatTimeDomainData(buf);
                 const rms = Math.sqrt(buf.reduce((sum, v) => sum + v * v, 0) / buf.length);
                 const noiseFloor = (window.MIC_NOISE_FLOOR || 4) / 100;
-                if (rms < Math.max(0.01, noiseFloor)) return;
+                if (rms < Math.max(0.01, noiseFloor)) {
+                    frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
+                    return;
+                }
 
-                const freq = detectPitchAudio(analyserNode, getAudioCtx().sampleRate);
-                if (!freq || freq < 60 || freq > 1500) return;
+                const yin = yinEstimate(buf, getAudioCtx().sampleRate);
+                const acfFreq = detectPitchAudio(analyserNode, getAudioCtx().sampleRate);
+                const chosenFreq = yin?.confidence >= 0.55 ? yin.freq : acfFreq;
+                const confidence = yin?.confidence ?? 0.45;
+                if (!chosenFreq || confidence < 0.45) {
+                    frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
+                    return;
+                }
 
-                const swara = detectSwaraWithOctave(freq);
-                if (!swara) return;
+                const base = getSwaram(chosenFreq, sa);
+                if (!base) {
+                    frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
+                    return;
+                }
+                const semitones = 12 * (Math.log(chosenFreq / sa) / Math.log(2));
+                const swara = resolveOctaveWithHysteresis(base, semitones);
+
+                const prev = frameHistoryRef.current[frameHistoryRef.current.length - 1];
+                const prevSemi = prev?.freqSemi;
+                const centsPerSec = prevSemi != null ? Math.abs((semitones - prevSemi) * 100) / Math.max(0.001, (elapsed / 1000) - prev.time) : 0;
+                const glide = centsPerSec > 450; // fast continuous motion likely gamaka glide
+
+                frameHistoryRef.current.push({ time: elapsed / 1000, label: swara, glide, freqSemi: semitones });
 
                 const bucket = bucketsRef.current[slot];
-                bucket[swara] = (bucket[swara] || 0) + 1;
+                const bucketLabel = glide && prev?.label && prev.label !== ',' ? prev.label : swara;
+                bucket[bucketLabel] = (bucket[bucketLabel] || 0) + 1;
             }, 35);
         } catch {
             cleanup();
@@ -3656,6 +3811,11 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                     </select>
                 </label>
             </div>
+
+            <label className="inline-flex items-center gap-2 text-xs text-c-cream-dim">
+                <input type="checkbox" checked={anchorOnlyMode} onChange={(e) => setAnchorOnlyMode(e.target.checked)} />
+                Anchor Notes Only (reduce gamaka transition noise)
+            </label>
 
             <div className="flex flex-wrap items-center gap-2 text-xs text-c-cream-dim">
                 <span>Sa used for transcription:</span>

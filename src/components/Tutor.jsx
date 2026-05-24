@@ -143,10 +143,13 @@ const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamak
             await waitRhythmicUnits(getTokenDuration(swaras[i]), delayMs, signal, tala);
             continue;
         }
-        // Peek ahead: count consecutive hold beats ('-' or ',') to extend tone duration
+        // Peek ahead: count hold beats ('-' or ',') to extend tone duration.
+        // Important: barlines do NOT break a sustain chain.
+        // Example: ['Sa^', '|', ',', 'Ni3'] should hold Sa^ across the barline.
         let holdCount = 0;
         for (let k = i + 1; k < swaras.length; k++) {
             const nxt = getTokenSwara(swaras[k]);
+            if (nxt === '|' || nxt === '||') continue;
             if (nxt !== '-' && nxt !== ',') break;
             holdCount += getTokenDuration(swaras[k]);
         }

@@ -2199,9 +2199,14 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             {phase === 'fail' && (
                 <div className="flex flex-col items-center gap-3 animate-fade-in">
                     <div className="text-red-400 text-sm font-playfair italic">Keep practicing to improve accuracy.</div>
-                    <button onClick={() => setPhase('idle')} className="px-8 py-2 border border-c-gold text-c-gold rounded-full text-sm font-playfair font-bold hover:bg-c-gold hover:text-c-bg transition-colors">
-                        Try Again
-                    </button>
+                    <div className="flex flex-wrap justify-center gap-3">
+                        <button onClick={() => setPhase('idle')} className="px-8 py-2 border border-c-gold text-c-gold rounded-full text-sm font-playfair font-bold hover:bg-c-gold hover:text-c-bg transition-colors">
+                            Try Again
+                        </button>
+                        <button onClick={onDone} className="px-8 py-2 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold hover:opacity-90 transition-opacity">
+                            Continue Anyway
+                        </button>
+                    </div>
                 </div>
             )}
             

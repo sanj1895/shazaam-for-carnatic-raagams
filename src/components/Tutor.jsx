@@ -506,7 +506,7 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, octaveMode = 'a
                     />
                 </div>
                 
-                <div className="flex items-center gap-4">
+                <div className="flex flex-wrap items-center justify-center gap-3">
                     {isPlaying ? (
                         <button onClick={stopPlayback} className="px-6 py-2 border border-red-500/40 bg-red-950/10 text-red-400 hover:bg-red-500 hover:text-c-bg rounded-full text-xs font-playfair transition-colors flex items-center gap-1.5 shadow-sm">
                             <span>■ Stop Listening</span>
@@ -769,7 +769,7 @@ function ExerciseTaalam({ instruction, onDone }) {
 
                 <p className="text-[11px] text-c-cream-dark font-mono uppercase tracking-widest self-start">Beat {stepIdx + 1} of 8</p>
 
-                <div className="w-full bg-c-surface border border-c-gold/30 rounded-2xl p-8 flex flex-col items-center gap-4">
+                <div className="w-full bg-c-surface border border-c-gold/30 rounded-2xl p-5 sm:p-8 flex flex-col items-center gap-4">
                     <div className="text-c-gold animate-pulse"><CuratedIcon icon={g.icon} className="w-16 h-16" /></div>
                     <span className="text-xl font-mono font-bold text-c-gold">{g.label}</span>
                     <p className="text-sm text-c-cream font-playfair text-center leading-relaxed">{g.desc}</p>
@@ -1050,7 +1050,7 @@ function ExerciseTuning({ instruction, sa, onDone }) {
     const beatHz = (diffCents * 0.15).toFixed(1);
     
     return (
-        <div className="flex flex-col items-center gap-6 w-full max-w-sm mx-auto bg-c-surface border border-c-border p-6 rounded-2xl shadow-lg relative overflow-hidden heritage-card">
+        <div className="flex flex-col items-center gap-6 w-full max-w-sm mx-auto bg-c-surface border border-c-border p-4 sm:p-6 rounded-2xl shadow-lg relative overflow-hidden heritage-card">
             <div className="heritage-border-corner heritage-corner-tl" />
             <div className="heritage-border-corner heritage-corner-tr" />
             <div className="heritage-border-corner heritage-corner-bl" />
@@ -1252,7 +1252,7 @@ function ExerciseShrutiSetup({ sa, setSa, onDone }) {
     };
 
     return (
-        <div className="w-full max-w-md mx-auto bg-c-surface border border-c-border p-6 rounded-2xl flex flex-col gap-5 shadow-lg relative overflow-hidden heritage-card animate-fade-in">
+        <div className="w-full max-w-md mx-auto bg-c-surface border border-c-border p-4 sm:p-6 rounded-2xl flex flex-col gap-5 shadow-lg relative overflow-hidden heritage-card animate-fade-in">
             <div className="heritage-border-corner heritage-corner-tl" />
             <div className="heritage-border-corner heritage-corner-tr" />
             <div className="heritage-border-corner heritage-corner-bl" />
@@ -2237,7 +2237,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                         </div>
                     )}
                     
-                    <div className="flex gap-4 items-center">
+                    <div className="flex flex-wrap gap-3 items-center justify-center">
                         {isPlayingGuide ? (
                             <button onClick={stopPlayback}
                                     className="px-6 py-2.5 border border-red-500/40 bg-red-950/10 text-red-400 hover:bg-red-500 hover:text-c-bg rounded-full text-xs font-playfair transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer">
@@ -2727,7 +2727,7 @@ CRITICAL INSTRUCTIONS FOR GURU:
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-            <div className="bg-c-surface border border-c-border rounded-2xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-4 max-h-[85vh] overflow-y-auto relative heritage-card">
+            <div className="bg-c-surface border border-c-border rounded-2xl w-full max-w-md p-4 sm:p-6 shadow-2xl flex flex-col gap-4 max-h-[85vh] overflow-y-auto relative heritage-card">
                 {/* Heritage Decorative Corners */}
                 <div className="heritage-border-corner heritage-corner-tl" />
                 <div className="heritage-border-corner heritage-corner-tr" />
@@ -2968,7 +2968,7 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete
                 <button onClick={onBack} className="text-c-cream-dark hover:text-c-gold text-lg leading-none transition-colors" title="Exit Lesson">✕</button>
             </div>
             <p className="text-[11px] text-c-cream-dark font-playfair italic text-center">{lesson.title}</p>
-            <div className="min-h-[340px] flex items-center justify-center py-4">
+            <div className="min-h-[260px] sm:min-h-[340px] flex items-center justify-center py-4">
                 {renderEx()}
             </div>
 
@@ -3225,7 +3225,7 @@ function RagaSession({ ragaName, raga, sa, onBack }) {
                 )}
 
                 {phase === 'quiz' && (
-                    <div className="flex flex-col items-center gap-5 w-full max-w-sm bg-c-surface border border-c-border rounded-2xl p-6 text-center animate-fade-in">
+                    <div className="flex flex-col items-center gap-5 w-full max-w-sm bg-c-surface border border-c-border rounded-2xl p-4 sm:p-6 text-center animate-fade-in">
                         <span className="text-3xl">🧠</span>
                         <h4 className="font-playfair text-lg text-c-gold font-bold">Step 8: Ear Challenge Test</h4>
                         <p className="text-xs text-c-cream-dark leading-relaxed">
@@ -4324,7 +4324,7 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
                             </div>
                             <div>
                                 <div className="flex items-center gap-2 mb-0.5">
-                                    <h2 className="font-playfair text-3xl sm:text-4xl font-bold text-c-gold tracking-tight uppercase">Svara Gurukul</h2>
+                                    <h2 className="font-playfair text-2xl sm:text-3xl md:text-4xl font-bold text-c-gold tracking-tight uppercase">Svara Gurukul</h2>
                                     <span className="px-2.5 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase bg-c-gold/15 border border-c-gold/30 text-c-gold self-center shadow-sm">Academy</span>
                                 </div>
                                 <p className="text-c-cream-dark text-xs leading-relaxed font-playfair opacity-80">
@@ -4396,10 +4396,13 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
                                 )},
                             ].map(({ id, label, icon }) => (
                                 <button key={id} onClick={() => setTab(id)}
-                                        className={`px-5 py-2 text-xs font-playfair tracking-wide transition-colors relative flex items-center gap-1.5 ${
+                                        className={`px-2 sm:px-5 py-2 text-xs font-playfair tracking-wide transition-colors relative flex items-center gap-1 sm:gap-1.5 ${
                                             tab === id ? 'text-c-gold' : 'text-c-cream-dim hover:text-c-cream'
                                         }`}>
-                                    {icon}{label}
+                                    {icon}
+                                    {id === 'practice'
+                                        ? <><span className="hidden sm:inline">Raga </span>Practice</>
+                                        : label}
                                     {tab === id && <span className="absolute bottom-0 left-0 right-0 h-px bg-c-gold" />}
                                 </button>
                             ))}

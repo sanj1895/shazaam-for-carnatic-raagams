@@ -920,7 +920,7 @@ export const RAGAS = {
         description:  'A highly expressive, bhava-rich raga with vakra movement and bhasanga color. The ascent commonly uses Ni3 while the descent leans on Ni2, giving Kapi its distinctive emotional pull.',
         compositions: ['Jagadodharana  ·  Purandara Dasa', 'Meevalla Guna Dosha  ·  Tyagaraja'],
         color:        'maroon',
-        video:        "https://www.youtube.com/watch?v=q8z8FXwqYqE",
+        video:        "https://www.youtube.com/shorts/GoJ21Nf1n6E",
     },
     'Durga': {
         arohanam:     ['Sa', 'Ri2', 'Ma1', 'Pa', 'Da2', 'Sa'],

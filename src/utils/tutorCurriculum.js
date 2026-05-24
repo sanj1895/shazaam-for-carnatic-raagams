@@ -1331,15 +1331,26 @@ export const GEETHAM_CURRICULUM = [
 
 const parseSwarajathi = (str, swaraMap) => {
     const tokens = [];
+    let lastPlayableIdx = -1;
     for (let i = 0; i < str.length; i++) {
         const char = str[i];
         if (char === '|') {
             if (str[i + 1] === '|') { tokens.push('||'); i++; }
             else tokens.push('|');
+            lastPlayableIdx = -1;
         } else if (char === ',' || char === ';' || char === '-') {
-            tokens.push('-');
+            if (lastPlayableIdx >= 0) {
+                const prev = tokens[lastPlayableIdx];
+                tokens[lastPlayableIdx] = {
+                    swara: typeof prev === 'string' ? prev : prev.swara,
+                    duration: (typeof prev === 'string' ? 1 : prev.duration || 1) + 1
+                };
+            } else {
+                tokens.push({ swara: ',', duration: 1 });
+            }
         } else if (swaraMap[char]) {
             tokens.push(swaraMap[char]);
+            lastPlayableIdx = tokens.length - 1;
         }
     }
     return tokens;

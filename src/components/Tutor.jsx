@@ -35,6 +35,11 @@ const SEMITONES = { ...SWARA_SEMITONE, 'Ṡ': 12 };
 
 const swaraFreq = (swara, sa) => noteFreq(swara === 'Ṡ' ? 'Sa' : swara, sa) * (swara === 'Ṡ' ? 2 : 1);
 
+const getTokenSwara = (token) => typeof token === 'string' ? token : token?.swara;
+const getTokenDuration = (token) => typeof token === 'object' && token?.duration ? token.duration : 1;
+const isBarToken = (token) => getTokenSwara(token) === '|' || getTokenSwara(token) === '||';
+const getPlainSwaras = (tokens) => tokens.map(getTokenSwara);
+
 const playSingleTone = (freq, duration = 0.7, prevFreq = null) => {
     try {
         const ctx = getAudioCtx();
@@ -76,40 +81,43 @@ const playSingleTone = (freq, duration = 0.7, prevFreq = null) => {
 };
 
 const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamakam = false) => {
-    const octaves = getOctaveSequence(swaras);
+    const plainSwaras = getPlainSwaras(swaras);
+    const octaves = getOctaveSequence(plainSwaras);
     const toneDur = Math.min((delayMs / 1000) * 0.85, 1.1);
     let prevFreq = null;
     let prevNoteIdx = -1;
 
     for (let i = 0; i < swaras.length; i++) {
         if (signal?.aborted) return;
-        const swara = swaras[i];
+        const swara = getTokenSwara(swaras[i]);
+        const tokenMs = delayMs * getTokenDuration(swaras[i]);
         if (swara === '|' || swara === '||') continue;
         if (swara === ',') {
             // rest/silence — clear highlight and wait
             onIdx(-1);
             prevFreq = null;
-            await new Promise(r => setTimeout(r, delayMs));
+            await new Promise(r => setTimeout(r, tokenMs));
             continue;
         }
         if (swara === '-') {
             // hold — keep visual highlight on the sustained note, no new audio attack
             onIdx(prevNoteIdx);
-            await new Promise(r => setTimeout(r, delayMs));
+            await new Promise(r => setTimeout(r, tokenMs));
             continue;
         }
         // Peek ahead: count consecutive hold beats to extend tone duration
         let holdCount = 0;
-        for (let k = i + 1; k < swaras.length && swaras[k] === '-'; k++) holdCount++;
+        for (let k = i + 1; k < swaras.length && getTokenSwara(swaras[k]) === '-'; k++) holdCount += getTokenDuration(swaras[k]);
+        const totalDuration = getTokenDuration(swaras[i]) + holdCount;
         const extDur = holdCount > 0
-            ? Math.min(((1 + holdCount) * delayMs / 1000) * 0.90, 8.0)
+            ? Math.min((totalDuration * delayMs / 1000) * 0.90, 8.0)
             : toneDur;
         onIdx(i);
         const freq = swaraFreq(swara, sa) * Math.pow(2, octaves[i]);
         playSingleTone(freq, extDur, gamakam ? prevFreq : null);
         prevFreq = freq;
         prevNoteIdx = i;
-        await new Promise(r => setTimeout(r, delayMs));
+        await new Promise(r => setTimeout(r, tokenMs));
     }
     onIdx(-1);
 };
@@ -229,7 +237,8 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
     const [isPlaying, setIsPlaying] = useState(false);
     const abortRef = useRef(null);
 
-    const octaves = React.useMemo(() => getOctaveSequence(swaras), [swaras]);
+    const plainSwaras = React.useMemo(() => getPlainSwaras(swaras), [swaras]);
+    const octaves = React.useMemo(() => getOctaveSequence(plainSwaras), [plainSwaras]);
 
     const stopPlayback = useCallback(() => {
         abortRef.current?.abort();
@@ -271,12 +280,12 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
         const lines = [];
         let currentLine = [];
         for (let idx = 0; idx < swaras.length; idx++) {
-            if (swaras[idx] === '||') {
+            if (getTokenSwara(swaras[idx]) === '||') {
                 if (currentLine.length > 0) lines.push(currentLine);
                 currentLine = [];
                 continue;
             }
-            currentLine.push({ s: swaras[idx], i: idx });
+            currentLine.push({ token: swaras[idx], i: idx });
         }
         if (currentLine.length > 0) lines.push(currentLine);
 
@@ -284,7 +293,10 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
             <div className="flex flex-col gap-3 items-center w-full px-4">
                 {lines.map((line, lIdx) => (
                     <div key={lIdx} className="flex flex-wrap justify-center gap-1 sm:gap-2">
-                        {line.map(({ s, i }) => {
+                        {line.map(({ token, i }) => {
+                            const s = getTokenSwara(token);
+                            const duration = getTokenDuration(token);
+                            const widthClass = duration >= 4 ? 'w-20 sm:w-24' : duration >= 3 ? 'w-16 sm:w-20' : duration >= 2 ? 'w-12 sm:w-14' : 'w-8 sm:w-10';
                             if (s === '|') {
                                 return (
                                     <div key={i} className="flex items-center text-c-gold/40 font-light mx-0.5 sm:mx-1">
@@ -294,14 +306,14 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
                             }
                             if (s === ',') {
                                 return (
-                                    <div key={i} className="w-8 sm:w-10 h-8 sm:h-10 flex items-center justify-center text-c-cream-dark/30 font-mono text-xs">
+                                    <div key={i} className={`${widthClass} h-8 sm:h-10 flex items-center justify-center text-c-cream-dark/30 font-mono text-xs`}>
                                         –
                                     </div>
                                 );
                             }
                             if (s === '-') {
                                 return (
-                                    <div key={i} className={`w-8 sm:w-10 h-8 sm:h-10 flex items-center justify-center text-lg transition-all duration-100 ${
+                                    <div key={i} className={`${widthClass} h-8 sm:h-10 flex items-center justify-center text-lg transition-all duration-100 ${
                                         i === activeIdx ? 'text-c-gold scale-110' : 'text-c-cream-dark/25'
                                     }`}>
                                         ·
@@ -312,7 +324,7 @@ function ExerciseListenSequence({ swaras, sa, instruction, onDone }) {
                                 <button
                                     key={i}
                                     onClick={() => handleNoteClick(s, i)}
-                                    className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2.5 rounded-lg border font-mono text-xs sm:text-sm font-bold transition-all duration-100 cursor-pointer hover:border-c-gold/75 hover:bg-c-gold/5 active:scale-95 ${
+                                    className={`${widthClass} py-1.5 sm:py-2.5 rounded-lg border font-mono text-xs sm:text-sm font-bold transition-all duration-100 cursor-pointer hover:border-c-gold/75 hover:bg-c-gold/5 active:scale-95 ${
                                         i === activeIdx ? 'border-c-gold bg-c-gold text-c-bg scale-115 font-extrabold shadow-lg shadow-c-gold/20' : 'border-c-border text-c-cream-dark bg-c-surface'
                                     }`}
                                 >
@@ -1720,14 +1732,33 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
     
     const [isPlayingGuide, setIsPlayingGuide] = useState(false);
     
-    const beatToSwaraIdx = React.useMemo(() => swaras.map((s, i) => (s !== '|' && s !== '||') ? i : -1).filter(i => i !== -1), [swaras]);
-    const octaves = React.useMemo(() => getOctaveSequence(swaras), [swaras]);
+    const plainSwaras = React.useMemo(() => getPlainSwaras(swaras), [swaras]);
+    const beatToSwaraIdx = React.useMemo(() => swaras.map((s, i) => !isBarToken(s) ? i : -1).filter(i => i !== -1), [swaras]);
+    const tokenStartUnits = React.useMemo(() => {
+        let unit = 0;
+        return swaras.map(token => {
+            const start = unit;
+            if (!isBarToken(token)) unit += getTokenDuration(token);
+            return start;
+        });
+    }, [swaras]);
+    const unitToSwaraIdx = React.useMemo(() => {
+        const timeline = [];
+        swaras.forEach((token, idx) => {
+            if (isBarToken(token)) return;
+            const duration = Math.max(1, Math.round(getTokenDuration(token)));
+            for (let unit = 0; unit < duration; unit++) timeline.push(idx);
+        });
+        return timeline;
+    }, [swaras]);
+    const octaves = React.useMemo(() => getOctaveSequence(plainSwaras), [plainSwaras]);
     // For hold beats ('-'), pitch detection uses the preceding note's semitone
     const effectiveSemitones = React.useMemo(() => {
         let last = 0;
         return swaras.map(s => {
-            if (s === '-') return last;
-            const st = SEMITONES[s];
+            const swara = getTokenSwara(s);
+            if (swara === '-') return last;
+            const st = SEMITONES[swara];
             if (st !== undefined) last = st;
             return st ?? last;
         });
@@ -1833,11 +1864,11 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             const elapsed = now - startMs;
             const currentBeat = Math.floor(elapsed / noteMs);
             
-            if (currentBeat >= beatToSwaraIdx.length) {
+            if (currentBeat >= unitToSwaraIdx.length) {
                 cleanup();
                 // Evaluate
                 const finalStatuses = scoresRef.current.map((s, i) => {
-                    if (swaras[i] === '|' || swaras[i] === '||') return null;
+                    if (isBarToken(swaras[i])) return null;
                     return (s.total > 0 && s.hits / s.total > 0.3) ? 'hit' : 'miss';
                 });
                 setStatuses(finalStatuses);
@@ -1851,11 +1882,11 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                 return;
             }
 
-            const currentIdx = beatToSwaraIdx[currentBeat];
+            const currentIdx = unitToSwaraIdx[currentBeat];
 
             if (currentIdx !== activeIdx) {
                 setActiveIdx(currentIdx);
-                const beatIdx = Math.floor(currentBeat / speed);
+                const beatIdx = Math.floor(tokenStartUnits[currentIdx] / speed);
                 if (beatIdx !== lastBeat) {
                     playTick(ctx, ctx.currentTime);
                     lastBeat = beatIdx;
@@ -1863,7 +1894,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
             }
 
             // Check pitch
-            const swara = swaras[currentIdx];
+            const swara = getTokenSwara(swaras[currentIdx]);
             if (swara && swara !== ',') {
                 const targetSt = effectiveSemitones[currentIdx];
                 const buf = new Float32Array(analyser.fftSize);
@@ -1918,8 +1949,8 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                 const lines = [];
                 let currentLine = [];
                 for (let idx = 0; idx < swaras.length; idx++) {
-                    currentLine.push({ s: swaras[idx], i: idx });
-                    if (swaras[idx] === '||') {
+                    currentLine.push({ token: swaras[idx], i: idx });
+                    if (getTokenSwara(swaras[idx]) === '||') {
                         lines.push(currentLine);
                         currentLine = [];
                     }
@@ -1930,7 +1961,10 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                     <div className="flex flex-col gap-3.5 items-center w-full px-4">
                         {lines.map((line, lIdx) => (
                             <div key={lIdx} className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
-                                {line.map(({ s, i }) => {
+                                {line.map(({ token, i }) => {
+                                    const s = getTokenSwara(token);
+                                    const duration = getTokenDuration(token);
+                                    const widthClass = duration >= 4 ? 'w-20 sm:w-24' : duration >= 3 ? 'w-16 sm:w-20' : duration >= 2 ? 'w-12 sm:w-14' : 'w-8 sm:w-9';
                                     if (s === '|' || s === '||') {
                                         return (
                                             <div key={i} className={`flex items-center text-c-gold/40 font-light mx-0.5 sm:mx-1 ${s === '||' ? 'tracking-widest' : ''}`}>
@@ -1940,14 +1974,14 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                                     }
                                     if (s === ',') {
                                         return (
-                                            <div key={i} className="w-8 sm:w-9 h-10 sm:h-11 flex items-center justify-center text-c-cream-dark/25 font-mono text-xs">
+                                            <div key={i} className={`${widthClass} h-10 sm:h-11 flex items-center justify-center text-c-cream-dark/25 font-mono text-xs`}>
                                                 –
                                             </div>
                                         );
                                     }
                                     if (s === '-') {
                                         return (
-                                            <div key={i} className={`w-8 sm:w-9 h-10 sm:h-11 flex items-center justify-center text-lg transition-all duration-75 ${
+                                            <div key={i} className={`${widthClass} h-10 sm:h-11 flex items-center justify-center text-lg transition-all duration-75 ${
                                                 i === activeIdx ? 'text-c-gold scale-110' :
                                                 statuses[i] === 'hit' ? 'text-emerald-700' :
                                                 statuses[i] === 'miss' ? 'text-red-700' :
@@ -1961,7 +1995,7 @@ function ExerciseSingSequence({ swaras, sa, speed = 1, instruction, mode = 'swar
                                         <button
                                             key={i}
                                             onClick={() => handleNoteClick(s, i)}
-                                            className={`w-8 sm:w-9 h-10 sm:h-11 flex items-center justify-center font-mono text-xs sm:text-sm font-bold border rounded-md transition-all duration-75 cursor-pointer hover:border-c-gold/75 hover:bg-c-gold/5 active:scale-95 ${
+                                            className={`${widthClass} h-10 sm:h-11 flex items-center justify-center font-mono text-xs sm:text-sm font-bold border rounded-md transition-all duration-75 cursor-pointer hover:border-c-gold/75 hover:bg-c-gold/5 active:scale-95 ${
                                                 i === activeIdx ? 'scale-115 shadow-lg border-c-gold bg-c-gold/25 text-c-gold font-extrabold' :
                                                 statuses[i] === 'hit' ? 'border-emerald-800/30 bg-emerald-800/15 text-emerald-800 font-bold' :
                                                 statuses[i] === 'miss' ? 'border-red-700/30 bg-red-950/15 text-red-800 font-bold' :
@@ -2211,7 +2245,7 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose, onSadhanaComp
     const [rmsVolume, setRmsVolume] = useState(0);
     const [guruStyle, setGuruStyle] = useState('classic'); // 'classic' | 'young'
 
-    const expectedSwaras = currentExercise?.swaras || (currentExercise?.swara ? [currentExercise.swara] : []);
+    const expectedSwaras = currentExercise?.swaras ? getPlainSwaras(currentExercise.swaras) : (currentExercise?.swara ? [currentExercise.swara] : []);
     const expectedString = expectedSwaras.length > 0 ? expectedSwaras.join(' - ') : 'Sustain Sa / Hmmm';
 
     let practiceType = 'Sustained Pitch';

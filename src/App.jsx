@@ -594,6 +594,10 @@ function App() {
                                                                 ? 'sm:col-span-2'
                                                                 : ''
                                                         } ${
+                                                            ids.length === 5 && idx === 4
+                                                                ? 'col-span-2 justify-self-center max-w-[calc(50%-0.375rem)] sm:max-w-none'
+                                                                : ''
+                                                        } ${
                                                             ids.length === 5 && idx === 3
                                                                 ? 'sm:col-start-2'
                                                                 : ids.length === 5 && idx === 4

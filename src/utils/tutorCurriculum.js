@@ -1199,28 +1199,43 @@ export const ALANKARAM_CURRICULUM = [
     }
 ];
 
-const SG_PALLAVI_L1 = ['Ma1','Pa','|','Da1','Ṡ','Ṡ','Ṙ','||','Ṙ','Ṡ','|','Da1','Pa','Ma1','Pa','||'];
-const SG_PALLAVI_L2 = ['Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||'];
-const SG_PALLAVI_L3 = ['Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'];
-const SG_PALLAVI_L4 = ['Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||'];
-const SG_PALLAVI_L5 = ['Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'];
+const SG_PALLAVI_L1 = parseBeatGroups([
+    ['Ma1'], ['Pa'], '|', ['Da1'], ['Ṡ'], ['Ṡ'], ['Ṙ'], '||',
+    ['Ṙ'], ['Ṡ'], '|', ['Da1'], ['Pa'], ['Ma1'], ['Pa'], '||',
+]);
+const SG_PALLAVI_L2 = parseBeatGroups([
+    ['Ri1'], ['Ma1'], '|', ['Pa'], ['Da1'], ['Ma1'], ['Pa'], '||',
+    ['Da1'], ['Pa'], '|', ['Ma1'], ['Ga3'], ['Ri1'], ['Sa'], '||',
+]);
+const SG_PALLAVI_L3 = parseBeatGroups([
+    ['Sa'], [','], '|', ['Ri1'], ['Ma1'], ['Ga3'], ['Ri1'], '||',
+    ['Sa'], ['Ri1'], '|', ['Ga3'], ['Ri1'], ['Sa'], [','], '||',
+]);
+const SG_PALLAVI_L4 = parseBeatGroups([
+    ['Ri1'], ['Ma1'], '|', ['Pa'], ['Da1'], ['Ma1'], ['Pa'], '||',
+    ['Da1'], ['Pa'], '|', ['Ma1'], ['Ga3'], ['Ri1'], ['Sa'], '||',
+]);
+const SG_PALLAVI_L5 = parseBeatGroups([
+    ['Sa'], [','], '|', ['Ri1'], ['Ma1'], ['Ga3'], ['Ri1'], '||',
+    ['Sa'], ['Ri1'], '|', ['Ga3'], ['Ri1'], ['Sa'], [','], '||',
+]);
 const SG_PALLAVI_FULL = [...SG_PALLAVI_L1, ...SG_PALLAVI_L2, ...SG_PALLAVI_L3, ...SG_PALLAVI_L4, ...SG_PALLAVI_L5];
 
-const SG_PALLAVI_L1_BEATS = ['Śrī -', 'Ga na na tha', 'sin dhu', '- ra var na'];
-const SG_PALLAVI_L2_BEATS = ['Ka ru', 'na Sā ga ra', 'ka ri', 'va dha - na'];
-const SG_PALLAVI_L3_BEATS = ['Lam -', 'bo - dha ra', 'la ku', 'mi ka ra -'];
-const SG_PALLAVI_L4_BEATS = ['Am -', 'bā - su tha', 'a ma', 'ra vi nu tha'];
-const SG_PALLAVI_L5_BEATS = ['Lam -', 'bo - dha ra', 'la ku', 'mi ka ra -'];
+const SG_PALLAVI_L1_BEATS = ['Śrī', '-', 'Ga', 'na', 'na', 'tha', 'sin', 'dhu', '-', 'ra', 'var', 'ṇa'];
+const SG_PALLAVI_L2_BEATS = ['Ka', 'ru', 'na', 'Sā', 'ga', 'ra', 'ka', 'ri', 'va', 'dha', '-', 'na'];
+const SG_PALLAVI_L3_BEATS = ['Lam', '-', 'bo', '-', 'dha', 'ra', 'la', 'ku', 'mi', 'ka', 'ra', '-'];
+const SG_PALLAVI_L4_BEATS = ['Am', '-', 'bā', '-', 'su', 'tha', 'a', 'ma', 'ra', 'vi', 'nu', 'tha'];
+const SG_PALLAVI_L5_BEATS = ['Lam', '-', 'bo', '-', 'dha', 'ra', 'la', 'ku', 'mi', 'ka', 'ra', '-'];
 
 const SG_CHAR1_L1 = SG_PALLAVI_L1;
 const SG_CHAR1_L2 = SG_PALLAVI_L2;
-const SG_CHAR1_L1_BEATS = ['Sid dha', 'chā - ra ṇa', 'ga ṇa', 'sē - vi tha'];
-const SG_CHAR1_L2_BEATS = ['Sid dhi', 'vi nā ya ka', 'tē -', 'na mō na mō'];
+const SG_CHAR1_L1_BEATS = ['Sid', 'dha', 'chā', '-', 'ra', 'ṇa', 'ga', 'ṇa', 'sē', '-', 'vi', 'tha'];
+const SG_CHAR1_L2_BEATS = ['Sid', 'dhi', 'vi', 'nā', 'ya', 'ka', 'tē', '-', 'na', 'mō', 'na', 'mō'];
 
 const SG_CHAR2_L1 = SG_PALLAVI_L1;
 const SG_CHAR2_L2 = SG_PALLAVI_L2;
-const SG_CHAR2_L1_BEATS = ['Sa ka', 'la vid yā -', '- dhi', 'pū - ji tha'];
-const SG_CHAR2_L2_BEATS = ['Sa -', 'rvō - tta ma', 'tē -', 'na mō na mō'];
+const SG_CHAR2_L1_BEATS = ['Sa', 'ka', 'la', 'vi', 'dyā', '-', '-', 'dhi', 'pū', '-', 'ji', 'tha'];
+const SG_CHAR2_L2_BEATS = ['Sa', '-', 'rvō', '-', 'tta', 'ma', 'tē', '-', 'na', 'mō', 'na', 'mō'];
 
 const GEETHAM_CURRICULUM_RAW = [
     // ─── STAGE 1: MALAHARI ────────────────────────────────────────────────

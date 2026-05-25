@@ -92,14 +92,19 @@ const renderNotationLabel = (swara, suffix = [], compact = false) => {
 const splitSwarasIntoBeatGroups = (swaras = []) => {
     const beats = [];
     let current = [];
+    let durSum = 0;
     swaras.forEach((token) => {
         const swara = getTokenSwara(token);
         if (swara === '|' || swara === '||') {
-            if (current.length) beats.push(current);
-            current = [];
             return;
         }
         current.push(token);
+        durSum += getTokenDuration(token);
+        if (durSum >= 0.999) {
+            beats.push(current);
+            current = [];
+            durSum = 0;
+        }
     });
     if (current.length) beats.push(current);
     return beats;
@@ -115,55 +120,63 @@ function SahityaBeatMap({ swaras = [], lyricsBeats = [], tala, compact = false, 
     const beatWidth = compact ? 'min-w-[92px]' : 'min-w-[110px]';
     const noteGap = compact ? 'gap-1' : 'gap-1.5';
     const textClass = compact ? 'text-[11px]' : 'text-xs';
+    const beatsPerCycle = tala?.groups?.reduce((sum, group) => sum + group, 0) || 0;
+    const totalCycles = beatsPerCycle ? Math.ceil(beats.length / beatsPerCycle) : 1;
 
     return (
         <div className={`flex flex-wrap justify-center ${gapClass} w-full`}>
             {beats.map((beat, idx) => (
-                <div
-                    key={idx}
-                    className={`${beatWidth} rounded-xl border px-2 py-2 flex flex-col gap-2 transition-all ${
-                        idx === activeBeat
-                            ? 'border-c-gold bg-c-gold/10 shadow-[0_0_12px_rgba(200,148,31,0.18)]'
-                            : 'border-c-border/40 bg-c-card'
-                    }`}
-                >
-                    <div className="flex items-center justify-between">
-                        <span className="text-[9px] font-mono uppercase tracking-wider text-c-cream-dark">Beat {idx + 1}</span>
-                        {tala?.groups?.length ? (
-                            <span className="text-[9px] font-mono text-c-gold/70">
-                                {((idx % tala.groups.reduce((a, b) => a + b, 0)) + 1)}
+                <React.Fragment key={idx}>
+                    {beatsPerCycle > 0 && idx > 0 && idx % beatsPerCycle === 0 && (
+                        <div className="basis-full h-0" aria-hidden="true" />
+                    )}
+                    <div
+                        className={`${beatWidth} rounded-xl border px-2 py-2 flex flex-col gap-2 transition-all ${
+                            idx === activeBeat
+                                ? 'border-c-gold bg-c-gold/10 shadow-[0_0_12px_rgba(200,148,31,0.18)]'
+                                : 'border-c-border/40 bg-c-card'
+                        }`}
+                    >
+                        <div className="flex items-center justify-between gap-2">
+                            <span className="text-[9px] font-mono uppercase tracking-wider text-c-cream-dark">
+                                Beat {beatsPerCycle ? ((idx % beatsPerCycle) + 1) : (idx + 1)}
                             </span>
-                        ) : null}
-                    </div>
-                    <div className={`flex flex-wrap items-center justify-center ${noteGap}`}>
-                        {beat.map((token, tokenIdx) => {
-                            const s = getTokenSwara(token);
-                            const suffix = getTokenNotationSuffix(token);
-                            const duration = getTokenDuration(token);
-                            if (s === ',') {
+                            {beatsPerCycle > 0 && totalCycles > 1 ? (
+                                <span className="text-[9px] font-mono text-c-gold/70">
+                                    Cycle {Math.floor(idx / beatsPerCycle) + 1}
+                                </span>
+                            ) : null}
+                        </div>
+                        <div className={`flex flex-wrap items-center justify-center ${noteGap}`}>
+                            {beat.map((token, tokenIdx) => {
+                                const s = getTokenSwara(token);
+                                const suffix = getTokenNotationSuffix(token);
+                                const duration = getTokenDuration(token);
+                                if (s === ',') {
+                                    return (
+                                        <span key={tokenIdx} className="inline-flex items-center justify-center px-2 text-c-gold/70">
+                                            <span className="block h-[2px] w-5 rounded-full bg-c-gold/55" />
+                                        </span>
+                                    );
+                                }
                                 return (
-                                    <span key={tokenIdx} className="inline-flex items-center justify-center px-2 text-c-gold/70">
-                                        <span className="block h-[2px] w-5 rounded-full bg-c-gold/55" />
+                                    <span
+                                        key={tokenIdx}
+                                        className={`inline-flex items-center justify-center rounded-md border border-c-border/40 px-2 py-1 font-mono ${textClass} text-c-cream`}
+                                        style={duration > 0 ? { minWidth: `${Math.max(32, duration * 28)}px` } : undefined}
+                                    >
+                                        {renderNotationLabel(s.replace(/[0-9]/g, ''), suffix, true)}
                                     </span>
                                 );
-                            }
-                            return (
-                                <span
-                                    key={tokenIdx}
-                                    className={`inline-flex items-center justify-center rounded-md border border-c-border/40 px-2 py-1 font-mono ${textClass} text-c-cream`}
-                                    style={duration > 0 ? { minWidth: `${Math.max(32, duration * 28)}px` } : undefined}
-                                >
-                                    {renderNotationLabel(s.replace(/[0-9]/g, ''), suffix, true)}
-                                </span>
-                            );
-                        })}
+                            })}
+                        </div>
+                        <div className="rounded-lg bg-c-bg/55 px-2 py-1.5 min-h-[44px] flex items-center justify-center text-center">
+                            <span className={`${compact ? 'text-[11px]' : 'text-xs'} font-playfair text-c-cream leading-snug`}>
+                                {lyricsBeats[idx] || '—'}
+                            </span>
+                        </div>
                     </div>
-                    <div className="rounded-lg bg-c-bg/55 px-2 py-1.5 min-h-[44px] flex items-center justify-center text-center">
-                        <span className={`${compact ? 'text-[11px]' : 'text-xs'} font-playfair text-c-cream leading-snug`}>
-                            {lyricsBeats[idx] || '—'}
-                        </span>
-                    </div>
-                </div>
+                </React.Fragment>
             ))}
         </div>
     );
@@ -402,47 +415,7 @@ function ExerciseLyricsPractice({ title = 'Sahityam Practice', lyrics = [], mean
 }
 
 function ExerciseLyricsListen({ title = 'Listen to the Words', lyrics = [], instruction, meaning, onDone }) {
-    const [activeIdx, setActiveIdx] = useState(-1);
-    const [isPlaying, setIsPlaying] = useState(false);
     const lines = React.useMemo(() => flattenLyricsInput(lyrics), [lyrics]);
-
-    const stopSpeaking = useCallback(() => {
-        if (typeof window !== 'undefined' && window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-        }
-        setIsPlaying(false);
-        setActiveIdx(-1);
-    }, []);
-
-    useEffect(() => () => stopSpeaking(), [stopSpeaking]);
-
-    const speakLines = useCallback(() => {
-        if (typeof window === 'undefined' || !window.speechSynthesis || !lines.length) return;
-        window.speechSynthesis.cancel();
-        setIsPlaying(true);
-        let index = 0;
-        const speakNext = () => {
-            if (index >= lines.length) {
-                setActiveIdx(-1);
-                setIsPlaying(false);
-                return;
-            }
-            const utterance = new SpeechSynthesisUtterance(lines[index]);
-            utterance.rate = 0.78;
-            utterance.pitch = 1;
-            utterance.onstart = () => setActiveIdx(index);
-            utterance.onend = () => {
-                index += 1;
-                setTimeout(speakNext, 250);
-            };
-            utterance.onerror = () => {
-                setIsPlaying(false);
-                setActiveIdx(-1);
-            };
-            window.speechSynthesis.speak(utterance);
-        };
-        speakNext();
-    }, [lines]);
 
     return (
         <div className="flex flex-col gap-5 w-full max-w-md">
@@ -455,15 +428,16 @@ function ExerciseLyricsListen({ title = 'Listen to the Words', lyrics = [], inst
                     {lines.map((line, idx) => (
                         <div
                             key={idx}
-                            className={`px-3 py-2 rounded-lg border text-center font-playfair text-base leading-relaxed transition-all ${
-                                idx === activeIdx
-                                    ? 'border-c-gold bg-c-gold/10 text-c-gold shadow-[0_0_12px_rgba(200,148,31,0.12)]'
-                                    : 'border-c-border/40 bg-c-card text-c-cream'
-                            }`}
+                            className="px-3 py-2 rounded-lg border text-center font-playfair text-base leading-relaxed border-c-border/40 bg-c-card text-c-cream"
                         >
                             {line}
                         </div>
                     ))}
+                </div>
+                <div className="rounded-lg border border-c-gold/20 bg-c-gold/5 px-3 py-3">
+                    <p className="text-[11px] text-c-cream leading-relaxed font-playfair">
+                        Browser text-to-speech is disabled here because it mispronounces Carnatic sahityam. Use this screen as a pronunciation reading guide and model the words yourself or from your own reference audio.
+                    </p>
                 </div>
                 {meaning && (
                     <p className="text-xs text-c-cream-dim font-playfair leading-relaxed whitespace-pre-line border-t border-c-border/30 pt-3">
@@ -472,14 +446,6 @@ function ExerciseLyricsListen({ title = 'Listen to the Words', lyrics = [], inst
                 )}
             </div>
             <div className="flex flex-wrap justify-center gap-3">
-                {typeof window !== 'undefined' && window.speechSynthesis && (
-                    <button
-                        onClick={isPlaying ? stopSpeaking : speakLines}
-                        className="px-6 py-2.5 border border-c-border bg-c-surface text-c-cream-dim text-sm rounded-full font-playfair hover:border-c-gold/40 hover:text-c-gold transition-all"
-                    >
-                        {isPlaying ? '■ Stop Lyrics Guide' : '🔈 Hear Words'}
-                    </button>
-                )}
                 <button
                     onClick={onDone}
                     className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity"

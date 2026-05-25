@@ -2900,8 +2900,9 @@ CRITICAL INSTRUCTIONS FOR GURU:
 
 // ─── Lesson runner ────────────────────────────────────────────────────────────
 
-function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete }) {
+function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete, nextLesson = null, onNextLesson }) {
     const [idx, setIdx] = useState(0);
+    const [completed, setCompleted] = useState(false);
 
     const exercises = lesson.exercises;
 
@@ -2912,6 +2913,12 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete
 
     const requiresMic = exercises.some(e => e.type === 'sing' || e.type === 'free_sing' || e.type === 'sing_sequence');
     const [calibrated, setCalibrated] = useState(!!window.MIC_NOISE_FLOOR);
+
+    useEffect(() => {
+        setIdx(0);
+        setCompleted(false);
+        setShowAIFeedback(false);
+    }, [lesson.id]);
     
     if (requiresMic && !calibrated) {
         return (
@@ -2927,12 +2934,65 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete
     const next = () => {
         if (idx + 1 >= exercises.length) {
             onSadhanaComplete?.('tutor');
-            onComplete();
+            setCompleted(true);
         } else {
             setIdx(i => i + 1);
         }
     };
     const prev = () => idx > 0 ? setIdx(i => i - 1) : onBack();
+
+    if (completed) {
+        return (
+            <div className="w-full max-w-lg mx-auto flex flex-col gap-5 relative animate-fade-in">
+                <div className="flex items-center gap-3">
+                    <div className="flex-1 h-2 bg-c-border rounded-full overflow-hidden">
+                        <div className="h-full bg-c-gold rounded-full" style={{ width: '100%' }} />
+                    </div>
+                    <span className="text-[11px] text-c-cream-dark font-mono tabular-nums">{exercises.length}/{exercises.length}</span>
+                    <button onClick={onBack} className="text-c-cream-dark hover:text-c-gold text-lg leading-none transition-colors" title="Exit Lesson">✕</button>
+                </div>
+
+                <div className="min-h-[340px] flex items-center justify-center py-4">
+                    <div className="w-full rounded-2xl border border-c-border bg-c-surface px-6 py-8 flex flex-col items-center text-center gap-4">
+                        <div className="w-16 h-16 rounded-full border border-c-gold/30 bg-c-gold/10 text-c-gold flex items-center justify-center text-2xl">
+                            ✓
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <p className="font-playfair text-2xl text-c-gold font-bold">Lesson Complete</p>
+                            <p className="text-c-cream text-sm font-playfair">{lesson.title}</p>
+                            <p className="text-xs text-c-cream-dark max-w-sm leading-relaxed">
+                                Nice work. You can move straight into the next lesson without backing out through the curriculum.
+                            </p>
+                        </div>
+
+                        <div className="w-full max-w-sm flex flex-col gap-3 mt-2">
+                            {nextLesson && onNextLesson ? (
+                                <button
+                                    onClick={onNextLesson}
+                                    className="w-full px-5 py-3 rounded-full bg-c-gold text-c-bg font-playfair font-bold hover:opacity-90 transition-opacity"
+                                >
+                                    Continue to {nextLesson.title} →
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={onComplete}
+                                    className="w-full px-5 py-3 rounded-full bg-c-gold text-c-bg font-playfair font-bold hover:opacity-90 transition-opacity"
+                                >
+                                    Back to Lessons
+                                </button>
+                            )}
+                            <button
+                                onClick={onComplete}
+                                className="w-full px-5 py-2.5 rounded-full border border-c-border text-c-cream hover:border-c-gold/40 transition-colors"
+                            >
+                                {nextLesson ? 'Back to Lesson List' : 'Done'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     const renderEx = () => {
         const key = `${lesson.id}-${idx}`;
@@ -4368,6 +4428,19 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
 
     const activeCourse = COURSES.find(c => c.id === selectedCourseId);
     const activeCurriculum = activeCourse?.curriculum || CURRICULUM;
+    const nextLesson = activeUnit && activeLesson
+        ? (() => {
+            const unitIdx = activeCurriculum.findIndex((unit) => unit.id === activeUnit.id);
+            if (unitIdx === -1) return null;
+            const lessonIdx = activeCurriculum[unitIdx].lessons.findIndex((lesson) => lesson.id === activeLesson.id);
+            if (lessonIdx === -1) return null;
+            const followingLesson = activeCurriculum[unitIdx].lessons[lessonIdx + 1];
+            if (followingLesson) return { unit: activeCurriculum[unitIdx], lesson: followingLesson };
+            const followingUnit = activeCurriculum[unitIdx + 1];
+            if (!followingUnit?.lessons?.length) return null;
+            return { unit: followingUnit, lesson: followingUnit.lessons[0] };
+        })()
+        : null;
 
     useEffect(() => {
         if (transcribeOnly || !launchTarget?.courseId || !launchTarget?.unitId || !launchTarget?.lessonId) return;
@@ -4557,6 +4630,13 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
                     }}
                     onBack={() => setScreen('unit')}
                     onSadhanaComplete={onSadhanaComplete}
+                    nextLesson={nextLesson?.lesson || null}
+                    onNextLesson={nextLesson ? (() => {
+                        saveProgress(activeUnit.id, activeLesson.id);
+                        setActiveUnit(nextLesson.unit);
+                        setActiveLesson(nextLesson.lesson);
+                        setScreen('lesson');
+                    }) : null}
                 />
             )}
         </div>

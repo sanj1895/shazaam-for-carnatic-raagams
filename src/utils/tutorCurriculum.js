@@ -2966,6 +2966,96 @@ const ET_P1_S4 = parseBeatGroups([
     '||'
 ], KAPI_SWARAS);
 
+// Beat-group arrays for Enna Thavam Seidhanai pallavi part 2
+// ("engum nirai parabhrammam ammAvenrazhaikka / enna tavam sheidanai yasOdA")
+const ET_P2_S1A = parseBeatGroups([
+    [';',',','r'],              // beat 1: ;,r
+    [',','m','-','M'],          // beat 2: ,m-M
+    ['P',';'],                  // beat 3: P;
+    [',','n','N'],              // beat 4: ,nN
+    '|',
+    ['S',',','s'],              // beat 5: S,s
+    [';','-','p','d'],          // beat 6: ; - pd
+    '|',
+    ['n','r','s','-','m','n'],  // beat 7: nrs-mn
+    [',','d','M'],              // beat 8: ,dM
+    '||'
+], KAPI_SWARAS);
+
+const ET_P2_S1B = parseBeatGroups([
+    ['P',','],                  // beat 1: P,
+    ['n'],                      // beat 2: n
+    ['s','n','P'],              // beat 3: snP
+    ['m','g','G',',','-','r'],  // beat 4: mgG,-r
+    '|',
+    [';','N'],                  // beat 5: ;N
+    ['S',';',';','r','s'],      // beat 6: S;;rs
+    '|',
+    ['m','r','p','m'],          // beat 7: mrpm
+    ['n','d','p','m'],          // beat 8: ndpm
+    '||'
+], KAPI_SWARAS);
+
+const ET_P2_S2A = parseBeatGroups([
+    ['g','r','s','-','r'],      // beat 1: grs-r
+    [',','m','-','P'],          // beat 2: ,m-P
+    ['N',';'],                  // beat 3: N;
+    [',','s','R'],              // beat 4: ,sR
+    '|',
+    ['s','r','M'],              // beat 5: srM
+    ['g','r','-','s','n','-','p','d'], // beat 6: gr-sn-pd
+    '|',
+    ['n','r','s','-','m','n'],  // beat 7: nrs-mn
+    [',','d','M'],              // beat 8: ,dM
+    '||'
+], KAPI_SWARAS);
+
+const ET_P2_S2B = parseBeatGroups([
+    ['P',','],
+    ['n'],
+    ['s','n','P'],
+    ['m','g','G',',','-','r'],
+    '|',
+    [';','N'],
+    ['S',';',';','r','s'],
+    '|',
+    ['m','r','p','m'],
+    ['n','d','p','m'],
+    '||'
+], KAPI_SWARAS);
+
+const ET_P2_S3A = parseBeatGroups([
+    ['g','r','s','-','r'],
+    [',','m','-','P'],
+    ['N',';'],
+    [',','s','R'],
+    '|',
+    ['s','r','M'],
+    ['g','r','-','s','n','-','p','d'],
+    '|',
+    ['n','r','s','-','m','n'],
+    [',','d','M'],
+    '||'
+], KAPI_SWARAS);
+
+const ET_P2_S3B = parseBeatGroups([
+    ['P',','],                  // beat 1: P,
+    ['p','n'],                  // beat 2: pn
+    ['S','-','n','P'],          // beat 3: S-nP
+    ['m','g','G',',','-','r'],  // beat 4: mgG,-r
+    '|',
+    [';','N'],                  // beat 5: ;N
+    ['G',';',';',';'],          // beat 6: G;;;
+    '|',
+    [';',';',';'],              // beat 7: ;;;
+    [';',';'],                  // beat 8: ;;
+    '||'
+], KAPI_SWARAS);
+
+const ET_P2_S1 = [...ET_P2_S1A, ...ET_P2_S1B];
+const ET_P2_S2 = [...ET_P2_S2A, ...ET_P2_S2B];
+const ET_P2_S3 = [...ET_P2_S3A, ...ET_P2_S3B];
+
 const KRITIS_CURRICULUM_RAW = [
     {
         id: 'kriti_ennathavam',
@@ -2999,6 +3089,20 @@ const KRITIS_CURRICULUM_RAW = [
                     { type: 'sing_sequence',   octaveMode: 'strict', swaras: ET_P1_S4, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, speed: 0.73, instruction: 'Sing: Sangati 4.' },
                     { type: 'listen_sequence', octaveMode: 'strict', swaras: [...ET_P1_S1, ...ET_P1_S2, ...ET_P1_S3, ...ET_P1_S4], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, displayLabel: '♪', instruction: 'Listen: All 4 sangatis back to back.' },
                     { type: 'sing_sequence',   octaveMode: 'strict', swaras: [...ET_P1_S1, ...ET_P1_S2, ...ET_P1_S3, ...ET_P1_S4], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, speed: 0.73, instruction: 'Sing: All 4 sangatis back to back.' },
+                ]
+            },
+            {
+                id: 'et_pallavi_p2', title: 'Pallavi — Engum Nirai Parabhrammam', tag: 'Pallavi',
+                exercises: [
+                    { type: 'info', title: 'Pallavi Part 2', body: 'Tāḷam: Ādi (4 + 2 + 2)\n\nThis is the second half of the pallavi phrase, continuing from “engum nirai parabhrammam…” back into “enna tavam sheidanai yasOdA.” As in Part 1, several beats contain multiple swaras packed into a single beat-group — keep the tala steady and let each sangati preserve the same lyric placement while the melody becomes richer.' },
+                    { type: 'listen_sequence', octaveMode: 'strict', swaras: ET_P2_S1, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, displayLabel: '♪', instruction: 'Listen: Sangati 1 — the plain continuation into the return phrase.' },
+                    { type: 'sing_sequence',   octaveMode: 'strict', swaras: ET_P2_S1, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, speed: 0.72, instruction: 'Sing: Sangati 1.' },
+                    { type: 'listen_sequence', octaveMode: 'strict', swaras: ET_P2_S2, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, displayLabel: '♪', instruction: 'Listen: Sangati 2 — the opening becomes denser and the middle phrase grows more active.' },
+                    { type: 'sing_sequence',   octaveMode: 'strict', swaras: ET_P2_S2, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, speed: 0.7, instruction: 'Sing: Sangati 2.' },
+                    { type: 'listen_sequence', octaveMode: 'strict', swaras: ET_P2_S3, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, displayLabel: '♪', instruction: 'Listen: Sangati 3 — a broader close with a more elaborate return and final repose.' },
+                    { type: 'sing_sequence',   octaveMode: 'strict', swaras: ET_P2_S3, tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, speed: 0.68, instruction: 'Sing: Sangati 3.' },
+                    { type: 'listen_sequence', octaveMode: 'strict', swaras: [...ET_P2_S1, ...ET_P2_S2, ...ET_P2_S3], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, displayLabel: '♪', instruction: 'Listen: All 3 sangatis back to back.' },
+                    { type: 'sing_sequence',   octaveMode: 'strict', swaras: [...ET_P2_S1, ...ET_P2_S2, ...ET_P2_S3], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, speed: 0.68, instruction: 'Sing: All 3 sangatis back to back.' },
                 ]
             }
         ]

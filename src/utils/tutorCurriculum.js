@@ -2906,7 +2906,7 @@ export const VARNAM_CURRICULUM = withCompositionRhythm(VARNAM_CURRICULUM_RAW);
 const KAPI_SWARAS = {
     S:'Sa', s:'Sa.', R:'Ri2', r:'Ri2.', G:'Ga2', g:'Ga2.',
     M:'Ma1', m:'Ma1.', P:'Pa', p:'Pa.', D:'Da2', d:'Da2.',
-    N:'Ni3', n:'Ni2.'
+    N:'Ni3', n:'Ni2.', nn:'Ni3.'
 };
 
 // Beat-group arrays for Enna Thavam Seidhanai pallavi part 1 (enna tavam sheidanai)
@@ -2914,7 +2914,7 @@ const ET_P1_S1 = parseBeatGroups([
     [';',',','g'],              // beat 1
     [',','m','P'],              // beat 2: ,m P
     ['m','g','G',',','-','r'], // beat 3: mgG,-r
-    [';','n'],                  // beat 4
+    [';','nn'],                  // beat 4
     '|',
     ['S',';'],                  // beat 5
     [';','n','S'],              // beat 6
@@ -2928,7 +2928,7 @@ const ET_P1_S2 = parseBeatGroups([
     [';',',','g'],
     [',','m','n','p'],          // beat 2: ,m np (fills in lower Ni before Pa)
     ['m','g','G',',','-','r'],
-    [';','n'],
+    [';','nn'],
     '|',
     ['S',';'],
     [';','n','S'],
@@ -2942,7 +2942,7 @@ const ET_P1_S3 = parseBeatGroups([
     [';',',','g'],
     [',','m','n','p'],
     ['m','g','G',',','-','r'],
-    [';','n'],
+    [';','nn'],
     '|',
     ['S',';'],
     [';','D'],                  // beat 6: ;D (middle Da)
@@ -2956,7 +2956,7 @@ const ET_P1_S4 = parseBeatGroups([
     [';',',','g'],
     [',','m','n','p'],
     ['m','g','G',',','-','r'],
-    [';','s'],
+    [';','nn'],
     '|',
     ['S',';'],
     [';','n','d'],              // beat 6: ;nd

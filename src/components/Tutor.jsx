@@ -2960,9 +2960,6 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete
                         <div className="flex flex-col gap-2">
                             <p className="font-playfair text-2xl text-c-gold font-bold">Lesson Complete</p>
                             <p className="text-c-cream text-sm font-playfair">{lesson.title}</p>
-                            <p className="text-xs text-c-cream-dark max-w-sm leading-relaxed">
-                                Nice work. You can move straight into the next lesson without backing out through the curriculum.
-                            </p>
                         </div>
 
                         <div className="w-full max-w-sm flex flex-col gap-3 mt-2">

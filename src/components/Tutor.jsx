@@ -89,6 +89,86 @@ const renderNotationLabel = (swara, suffix = [], compact = false) => {
     );
 };
 
+const splitSwarasIntoBeatGroups = (swaras = []) => {
+    const beats = [];
+    let current = [];
+    swaras.forEach((token) => {
+        const swara = getTokenSwara(token);
+        if (swara === '|' || swara === '||') {
+            if (current.length) beats.push(current);
+            current = [];
+            return;
+        }
+        current.push(token);
+    });
+    if (current.length) beats.push(current);
+    return beats;
+};
+
+const flattenLyricsInput = (lyrics = []) => (
+    lyrics.flatMap((line) => Array.isArray(line) ? line : [line]).filter(Boolean)
+);
+
+function SahityaBeatMap({ swaras = [], lyricsBeats = [], tala, compact = false, activeBeat = -1 }) {
+    const beats = React.useMemo(() => splitSwarasIntoBeatGroups(swaras), [swaras]);
+    const gapClass = compact ? 'gap-2' : 'gap-3';
+    const beatWidth = compact ? 'min-w-[92px]' : 'min-w-[110px]';
+    const noteGap = compact ? 'gap-1' : 'gap-1.5';
+    const textClass = compact ? 'text-[11px]' : 'text-xs';
+
+    return (
+        <div className={`flex flex-wrap justify-center ${gapClass} w-full`}>
+            {beats.map((beat, idx) => (
+                <div
+                    key={idx}
+                    className={`${beatWidth} rounded-xl border px-2 py-2 flex flex-col gap-2 transition-all ${
+                        idx === activeBeat
+                            ? 'border-c-gold bg-c-gold/10 shadow-[0_0_12px_rgba(200,148,31,0.18)]'
+                            : 'border-c-border/40 bg-c-card'
+                    }`}
+                >
+                    <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-mono uppercase tracking-wider text-c-cream-dark">Beat {idx + 1}</span>
+                        {tala?.groups?.length ? (
+                            <span className="text-[9px] font-mono text-c-gold/70">
+                                {((idx % tala.groups.reduce((a, b) => a + b, 0)) + 1)}
+                            </span>
+                        ) : null}
+                    </div>
+                    <div className={`flex flex-wrap items-center justify-center ${noteGap}`}>
+                        {beat.map((token, tokenIdx) => {
+                            const s = getTokenSwara(token);
+                            const suffix = getTokenNotationSuffix(token);
+                            const duration = getTokenDuration(token);
+                            if (s === ',') {
+                                return (
+                                    <span key={tokenIdx} className="inline-flex items-center justify-center px-2 text-c-gold/70">
+                                        <span className="block h-[2px] w-5 rounded-full bg-c-gold/55" />
+                                    </span>
+                                );
+                            }
+                            return (
+                                <span
+                                    key={tokenIdx}
+                                    className={`inline-flex items-center justify-center rounded-md border border-c-border/40 px-2 py-1 font-mono ${textClass} text-c-cream`}
+                                    style={duration > 0 ? { minWidth: `${Math.max(32, duration * 28)}px` } : undefined}
+                                >
+                                    {renderNotationLabel(s.replace(/[0-9]/g, ''), suffix, true)}
+                                </span>
+                            );
+                        })}
+                    </div>
+                    <div className="rounded-lg bg-c-bg/55 px-2 py-1.5 min-h-[44px] flex items-center justify-center text-center">
+                        <span className={`${compact ? 'text-[11px]' : 'text-xs'} font-playfair text-c-cream leading-snug`}>
+                            {lyricsBeats[idx] || '—'}
+                        </span>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+}
+
 function TalaBadge({ tala, swaras }) {
     if (!tala) return null;
     const units = getTotalUnits(swaras);
@@ -317,6 +397,529 @@ function ExerciseLyricsPractice({ title = 'Sahityam Practice', lyrics = [], mean
                     className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity self-center">
                 I practiced the words
             </button>
+        </div>
+    );
+}
+
+function ExerciseLyricsListen({ title = 'Listen to the Words', lyrics = [], instruction, meaning, onDone }) {
+    const [activeIdx, setActiveIdx] = useState(-1);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const lines = React.useMemo(() => flattenLyricsInput(lyrics), [lyrics]);
+
+    const stopSpeaking = useCallback(() => {
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        setIsPlaying(false);
+        setActiveIdx(-1);
+    }, []);
+
+    useEffect(() => () => stopSpeaking(), [stopSpeaking]);
+
+    const speakLines = useCallback(() => {
+        if (typeof window === 'undefined' || !window.speechSynthesis || !lines.length) return;
+        window.speechSynthesis.cancel();
+        setIsPlaying(true);
+        let index = 0;
+        const speakNext = () => {
+            if (index >= lines.length) {
+                setActiveIdx(-1);
+                setIsPlaying(false);
+                return;
+            }
+            const utterance = new SpeechSynthesisUtterance(lines[index]);
+            utterance.rate = 0.78;
+            utterance.pitch = 1;
+            utterance.onstart = () => setActiveIdx(index);
+            utterance.onend = () => {
+                index += 1;
+                setTimeout(speakNext, 250);
+            };
+            utterance.onerror = () => {
+                setIsPlaying(false);
+                setActiveIdx(-1);
+            };
+            window.speechSynthesis.speak(utterance);
+        };
+        speakNext();
+    }, [lines]);
+
+    return (
+        <div className="flex flex-col gap-5 w-full max-w-md">
+            <div className="bg-c-surface border border-c-border rounded-xl p-5 flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                    <h3 className="font-playfair text-lg text-c-gold leading-snug">{title}</h3>
+                    {instruction && <p className="text-xs text-c-cream-dark font-playfair italic leading-relaxed">{instruction}</p>}
+                </div>
+                <div className="flex flex-col gap-2">
+                    {lines.map((line, idx) => (
+                        <div
+                            key={idx}
+                            className={`px-3 py-2 rounded-lg border text-center font-playfair text-base leading-relaxed transition-all ${
+                                idx === activeIdx
+                                    ? 'border-c-gold bg-c-gold/10 text-c-gold shadow-[0_0_12px_rgba(200,148,31,0.12)]'
+                                    : 'border-c-border/40 bg-c-card text-c-cream'
+                            }`}
+                        >
+                            {line}
+                        </div>
+                    ))}
+                </div>
+                {meaning && (
+                    <p className="text-xs text-c-cream-dim font-playfair leading-relaxed whitespace-pre-line border-t border-c-border/30 pt-3">
+                        {meaning}
+                    </p>
+                )}
+            </div>
+            <div className="flex flex-wrap justify-center gap-3">
+                {typeof window !== 'undefined' && window.speechSynthesis && (
+                    <button
+                        onClick={isPlaying ? stopSpeaking : speakLines}
+                        className="px-6 py-2.5 border border-c-border bg-c-surface text-c-cream-dim text-sm rounded-full font-playfair hover:border-c-gold/40 hover:text-c-gold transition-all"
+                    >
+                        {isPlaying ? '■ Stop Lyrics Guide' : '🔈 Hear Words'}
+                    </button>
+                )}
+                <button
+                    onClick={onDone}
+                    className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity"
+                >
+                    Continue
+                </button>
+            </div>
+        </div>
+    );
+}
+
+function ExerciseLyricsRepeat({ title = 'Repeat the Words', lyrics = [], instruction, onDone }) {
+    const fragments = React.useMemo(() => flattenLyricsInput(lyrics), [lyrics]);
+    return (
+        <div className="flex flex-col gap-5 w-full max-w-md">
+            <div className="bg-c-surface border border-c-border rounded-xl p-5 flex flex-col gap-4">
+                <h3 className="font-playfair text-lg text-c-gold leading-snug">{title}</h3>
+                {instruction && <p className="text-xs text-c-cream-dark font-playfair italic leading-relaxed">{instruction}</p>}
+                <div className="flex flex-col gap-2">
+                    {fragments.map((fragment, idx) => (
+                        <div key={idx} className="rounded-xl border border-c-border/40 bg-c-card px-4 py-3">
+                            <div className="text-[10px] font-mono uppercase tracking-wider text-c-cream-dark mb-1">Fragment {idx + 1}</div>
+                            <div className="font-playfair text-base text-c-cream text-center">{fragment}</div>
+                        </div>
+                    ))}
+                </div>
+                <div className="rounded-lg border border-c-gold/20 bg-c-gold/5 px-3 py-3">
+                    <p className="text-[11px] text-c-cream leading-relaxed font-playfair">
+                        Focus only on diction and pulse here. Do not worry about pitch yet. Speak each fragment clearly, clap the tala, and let long syllables breathe.
+                    </p>
+                </div>
+            </div>
+            <button onClick={onDone}
+                    className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity self-center">
+                I repeated the words
+            </button>
+        </div>
+    );
+}
+
+function ExerciseSahityaSwaraMap({ title = 'Sahitya and Swara Map', swaras = [], lyricsBeats = [], tala, instruction, onDone }) {
+    return (
+        <div className="flex flex-col gap-5 w-full max-w-4xl">
+            <div className="bg-c-surface border border-c-border rounded-xl p-5 flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                    <h3 className="font-playfair text-lg text-c-gold leading-snug">{title}</h3>
+                    {instruction && <p className="text-xs text-c-cream-dark font-playfair italic leading-relaxed">{instruction}</p>}
+                </div>
+                <TalaBadge tala={tala} swaras={swaras} />
+                <SahityaBeatMap swaras={swaras} lyricsBeats={lyricsBeats} tala={tala} />
+                <p className="text-[11px] text-c-cream-dim font-playfair leading-relaxed">
+                    Read this beat by beat. Top row: swaras inside each beat. Bottom row: the sahityam that lives on that beat. Hyphens show a stretched syllable; multiple words inside one cell show faster movement inside a single beat.
+                </p>
+            </div>
+            <button onClick={onDone}
+                    className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity self-center">
+                Continue
+            </button>
+        </div>
+    );
+}
+
+function ExerciseSahityaRhythm({ title = 'Sahitya in Tala', swaras = [], lyricsBeats = [], tala, instruction, onDone }) {
+    const [activeBeat, setActiveBeat] = useState(-1);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const timerRef = useRef(null);
+    const beatCount = React.useMemo(() => splitSwarasIntoBeatGroups(swaras).length, [swaras]);
+
+    const stopPreview = useCallback(() => {
+        if (timerRef.current) clearInterval(timerRef.current);
+        timerRef.current = null;
+        setIsPlaying(false);
+        setActiveBeat(-1);
+    }, []);
+
+    useEffect(() => () => stopPreview(), [stopPreview]);
+
+    const playRhythmGuide = useCallback(() => {
+        stopPreview();
+        const ctx = getAudioCtx();
+        const beatMs = 720;
+        let idx = 0;
+        setIsPlaying(true);
+        setActiveBeat(0);
+        playTick(ctx, ctx.currentTime);
+        timerRef.current = setInterval(() => {
+            idx += 1;
+            if (idx >= beatCount) {
+                stopPreview();
+                return;
+            }
+            setActiveBeat(idx);
+            playTick(ctx, ctx.currentTime);
+        }, beatMs);
+    }, [beatCount, stopPreview]);
+
+    return (
+        <div className="flex flex-col gap-5 w-full max-w-4xl">
+            <div className="bg-c-surface border border-c-border rounded-xl p-5 flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                    <h3 className="font-playfair text-lg text-c-gold leading-snug">{title}</h3>
+                    {instruction && <p className="text-xs text-c-cream-dark font-playfair italic leading-relaxed">{instruction}</p>}
+                </div>
+                <TalaBadge tala={tala} swaras={swaras} />
+                <SahityaBeatMap swaras={swaras} lyricsBeats={lyricsBeats} tala={tala} activeBeat={activeBeat} />
+                <p className="text-[11px] text-c-cream-dim font-playfair leading-relaxed">
+                    Clap the tala and recite the sahityam in rhythm only. Do not sing yet. The highlighted beat is where your spoken words should sit.
+                </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-3">
+                <button
+                    onClick={isPlaying ? stopPreview : playRhythmGuide}
+                    className="px-6 py-2.5 border border-c-border bg-c-surface text-c-cream-dim text-sm rounded-full font-playfair hover:border-c-gold/40 hover:text-c-gold transition-all"
+                >
+                    {isPlaying ? '■ Stop Tala Guide' : '🥁 Hear Tala Guide'}
+                </button>
+                <button onClick={onDone}
+                        className="px-10 py-2.5 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold tracking-wide hover:opacity-90 transition-opacity">
+                    I recited it in tala
+                </button>
+            </div>
+        </div>
+    );
+}
+
+function ExerciseSingSahityaChunk({ title = 'Sing the Sahityam', swaras, lyrics = [], lyricsBeats = [], sa, tala, instruction, speed = 1, onDone }) {
+    const [tempoMult, setTempoMult] = useState(1);
+    const tempoMultRef = useRef(1);
+    const [phase, setPhase] = useState('idle');
+    const [countdown, setCountdown] = useState(4);
+    const [activeBeat, setActiveBeat] = useState(-1);
+    const [feedback, setFeedback] = useState(null);
+    const [micError, setMicError] = useState('');
+    const [isPlayingGuide, setIsPlayingGuide] = useState(false);
+
+    const beatGroups = React.useMemo(() => splitSwarasIntoBeatGroups(swaras), [swaras]);
+    const effectiveSemitones = React.useMemo(() => {
+        let last = 0;
+        return swaras.map((token) => {
+            const swara = getTokenSwara(token);
+            if (swara === '-') return last;
+            if (swara === '|' || swara === '||') return last;
+            const st = SEMITONES[swara];
+            if (st !== undefined) last = st;
+            return st ?? last;
+        });
+    }, [swaras]);
+    const beatGroupSemitones = React.useMemo(() => {
+        const groups = [];
+        let current = [];
+        swaras.forEach((token, idx) => {
+            const swara = getTokenSwara(token);
+            if (swara === '|' || swara === '||') {
+                if (current.length) groups.push(current);
+                current = [];
+                return;
+            }
+            current.push(effectiveSemitones[idx]);
+        });
+        if (current.length) groups.push(current);
+        return groups;
+    }, [effectiveSemitones, swaras]);
+    const unitToBeatIdx = React.useMemo(() => {
+        const timeline = [];
+        let beatIdx = 0;
+        swaras.forEach((token) => {
+            const swara = getTokenSwara(token);
+            if (swara === '|' || swara === '||') {
+                beatIdx += 1;
+                return;
+            }
+            const duration = Math.max(1, Math.round(getTokenDuration(token)));
+            for (let unit = 0; unit < duration; unit++) timeline.push(beatIdx);
+        });
+        return timeline;
+    }, [swaras]);
+
+    const streamRef = useRef(null);
+    const intervalRef = useRef(null);
+    const guideAbortRef = useRef(null);
+    const frameStatsRef = useRef([]);
+
+    const stopEverything = useCallback(() => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        intervalRef.current = null;
+        guideAbortRef.current?.abort();
+        streamRef.current?.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+        setIsPlayingGuide(false);
+        setActiveBeat(-1);
+    }, []);
+
+    useEffect(() => () => stopEverything(), [stopEverything]);
+
+    const playGuide = useCallback(async () => {
+        stopEverything();
+        setFeedback(null);
+        setIsPlayingGuide(true);
+        try {
+            const ctrl = new AbortController();
+            guideAbortRef.current = ctrl;
+            const beatMs = Math.round(800 / tempoMultRef.current) / speed;
+            await playSequenceAsync(swaras, sa, (tokenIdx) => {
+                if (tokenIdx < 0) {
+                    setActiveBeat(-1);
+                    return;
+                }
+                const beatIdx = unitToBeatIdx[Math.max(0, tokenIdx)] ?? -1;
+                setActiveBeat(beatIdx);
+            }, ctrl.signal, beatMs, false, tala, 'auto');
+        } finally {
+            setIsPlayingGuide(false);
+            setActiveBeat(-1);
+        }
+    }, [sa, speed, stopEverything, swaras, tala, unitToBeatIdx]);
+
+    const evaluateAttempt = useCallback((noteMs) => {
+        const frames = frameStatsRef.current;
+        const voiced = frames.filter((frame) => frame.voiced);
+        const totalDuration = unitToBeatIdx.length * noteMs;
+        const firstVoiced = voiced[0]?.elapsed ?? totalDuration;
+        const lastVoiced = voiced.length ? voiced[voiced.length - 1].elapsed : 0;
+        const beatSummaries = beatGroups.map((_, beatIdx) => {
+            const beatFrames = frames.filter((frame) => frame.beatIdx === beatIdx);
+            const voicedFrames = beatFrames.filter((frame) => frame.voiced);
+            const pitchFrames = voicedFrames.filter((frame) => frame.inTune);
+            return {
+                voicedRatio: beatFrames.length ? voicedFrames.length / beatFrames.length : 0,
+                pitchRatio: voicedFrames.length ? pitchFrames.length / voicedFrames.length : 0,
+            };
+        });
+
+        const talaHits = beatSummaries.filter((beat) => beat.voicedRatio >= 0.32).length;
+        const sustainTargets = lyricsBeats.filter((text) => (text || '').includes('-')).length || 1;
+        const sustainHits = beatSummaries.filter((beat, idx) => (lyricsBeats[idx] || '').includes('-') && beat.voicedRatio >= 0.6).length;
+        const contourHits = beatSummaries.filter((beat) => beat.pitchRatio >= 0.42).length;
+        const completionRatio = totalDuration > 0 ? lastVoiced / totalDuration : 0;
+        const onsetRatio = totalDuration > 0 ? firstVoiced / noteMs : 2;
+
+        return {
+            talaAlignment: talaHits / Math.max(1, beatGroups.length),
+            chunkCompletion: completionRatio,
+            pitchContour: contourHits / Math.max(1, beatGroups.length),
+            sustainedSyllables: sustainHits / sustainTargets,
+            onsetTiming: onsetRatio,
+        };
+    }, [beatGroups, lyricsBeats, unitToBeatIdx.length]);
+
+    const startRecording = useCallback(async () => {
+        stopEverything();
+        setMicError('');
+        setFeedback(null);
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            streamRef.current = stream;
+            const ctx = getAudioCtx();
+
+            setPhase('countdown');
+            setCountdown(4);
+            playTick(ctx, ctx.currentTime);
+
+            const beatMs = Math.round(800 / tempoMultRef.current);
+            const noteMs = beatMs / speed;
+            let c = 4;
+            const iv = setInterval(() => {
+                c -= 1;
+                if (c > 0) {
+                    setCountdown(c);
+                    playTick(ctx, ctx.currentTime);
+                } else {
+                    clearInterval(iv);
+                    const source = ctx.createMediaStreamSource(stream);
+                    const analyser = ctx.createAnalyser();
+                    analyser.fftSize = 4096;
+                    source.connect(analyser);
+                    setPhase('singing');
+                    frameStatsRef.current = [];
+                    const startMs = Date.now();
+                    let lastBeat = -1;
+
+                    intervalRef.current = setInterval(() => {
+                        const elapsed = Date.now() - startMs;
+                        const unitIdx = Math.floor(elapsed / noteMs);
+                        if (unitIdx >= unitToBeatIdx.length) {
+                            stopEverything();
+                            const metrics = evaluateAttempt(noteMs);
+                            setFeedback(metrics);
+                            setPhase(metrics.talaAlignment >= 0.55 && metrics.pitchContour >= 0.45 ? 'success' : 'fail');
+                            return;
+                        }
+
+                        const beatIdx = unitToBeatIdx[unitIdx];
+                        if (beatIdx !== lastBeat) {
+                            setActiveBeat(beatIdx);
+                            playTick(ctx, ctx.currentTime);
+                            lastBeat = beatIdx;
+                        }
+
+                        const buf = new Float32Array(analyser.fftSize);
+                        analyser.getFloatTimeDomainData(buf);
+                        const rms = Math.sqrt(buf.reduce((sum, v) => sum + v * v, 0) / buf.length);
+                        const freq = detectPitchAudio(analyser, ctx.sampleRate);
+                        const voiced = !!(freq && rms > 0.003);
+                        let inTune = false;
+                        if (voiced) {
+                            const targetSemis = (beatGroupSemitones[beatIdx] || []).filter((val) => Number.isFinite(val));
+                            inTune = targetSemis.some((targetSt) => Math.abs(centsToNearest(freq, targetSt, sa)) <= 70);
+                        }
+                        frameStatsRef.current.push({ elapsed, beatIdx, voiced, inTune });
+                    }, 50);
+                }
+            }, beatMs);
+        } catch {
+            setMicError('Mic access required. Please allow mic and try again.');
+            setPhase('idle');
+        }
+    }, [beatGroupSemitones, evaluateAttempt, sa, speed, stopEverything, swaras, unitToBeatIdx]);
+
+    const feedbackRows = feedback ? [
+        {
+            label: 'Tala alignment',
+            value: feedback.talaAlignment >= 0.72 ? 'Strong' : feedback.talaAlignment >= 0.55 ? 'Mostly there' : 'Needs more pulse control',
+        },
+        {
+            label: 'Lyric chunk completion',
+            value: feedback.chunkCompletion >= 0.82 ? 'Finished on time' : feedback.chunkCompletion >= 0.65 ? 'Stopped a little early' : 'Ended too soon',
+        },
+        {
+            label: 'Pitch contour',
+            value: feedback.pitchContour >= 0.65 ? 'Contour matched well' : feedback.pitchContour >= 0.45 ? 'Partly matched' : 'Needs more melodic shape',
+        },
+        {
+            label: 'Sustained syllables',
+            value: feedback.sustainedSyllables >= 0.65 ? 'Long syllables held' : 'Hold the stretched syllables longer',
+        },
+        {
+            label: 'Consonant timing',
+            value: feedback.onsetTiming <= 0.45 ? 'Prompt entry' : feedback.onsetTiming <= 0.9 ? 'Slightly late' : 'Entered late',
+        },
+    ] : [];
+
+    return (
+        <div className="flex flex-col items-center gap-6 w-full">
+            <div className="flex flex-col items-center gap-1">
+                <h3 className="font-playfair text-lg text-c-gold text-center leading-snug">{title}</h3>
+                <p className="text-c-cream-dark text-sm font-playfair italic text-center leading-relaxed max-w-xl">{instruction}</p>
+            </div>
+            <TalaBadge tala={tala} swaras={swaras} />
+            <div className="w-full max-w-4xl bg-c-surface border border-c-border rounded-xl p-4">
+                <SahityaBeatMap swaras={swaras} lyricsBeats={lyricsBeats} tala={tala} activeBeat={activeBeat} />
+            </div>
+            {lyrics.length > 0 && (
+                <div className="max-w-xl text-center text-xs text-c-cream-dim font-playfair leading-relaxed">
+                    {flattenLyricsInput(lyrics).join('  ')}
+                </div>
+            )}
+            <p className="max-w-xl text-center text-[11px] text-c-cream-dark font-playfair leading-relaxed">
+                This first version scores timing, contour, sustained syllables, and onset placement. It does not do full speech-recognition of every consonant yet, but it is designed to teach lyric-shaped singing instead of note-isolation.
+            </p>
+
+            {phase === 'idle' && (
+                <div className="flex flex-col items-center gap-5 w-full">
+                    <div className="flex flex-col items-center gap-1.5 w-full max-w-xs px-4">
+                        <div className="flex justify-between w-full text-[9px] font-mono text-c-cream-dark/60">
+                            <span>Slow (0.4x)</span>
+                            <span className="text-c-gold font-bold">{tempoMult.toFixed(1)}x Tempo</span>
+                            <span>Fast (2.0x)</span>
+                        </div>
+                        <input
+                            type="range"
+                            min="0.4"
+                            max="2.0"
+                            step="0.1"
+                            value={tempoMult}
+                            onChange={(e) => {
+                                const val = parseFloat(e.target.value);
+                                tempoMultRef.current = val;
+                                setTempoMult(val);
+                            }}
+                            className="w-full h-1.5 bg-c-border/30 rounded-lg appearance-none cursor-pointer"
+                            style={{ accentColor: '#8B5C10' }}
+                        />
+                    </div>
+                    <div className="flex flex-wrap gap-3 items-center justify-center">
+                        <button onClick={isPlayingGuide ? stopEverything : playGuide}
+                                className="px-6 py-2.5 border border-c-border bg-c-surface text-c-cream-dim text-sm rounded-full font-playfair hover:border-c-gold/40 hover:text-c-gold transition-all">
+                            {isPlayingGuide ? '■ Stop Swara Guide' : '🔈 Hear Swara Guide'}
+                        </button>
+                        <button onClick={startRecording}
+                                className="px-8 py-2.5 border border-c-gold/60 bg-c-gold-faint text-c-gold rounded-full font-playfair text-sm hover:bg-c-gold hover:text-c-bg transition-colors">
+                            🎙️ Sing With Words
+                        </button>
+                    </div>
+                    <button onClick={onDone} className="px-6 py-2 border border-c-border rounded-full text-xs text-c-cream-dim hover:text-c-cream transition-colors">
+                        Skip
+                    </button>
+                </div>
+            )}
+
+            {phase === 'countdown' && (
+                <div className="flex flex-col items-center gap-4 animate-fade-in">
+                    <p className="text-c-gold text-4xl font-mono animate-bounce">{countdown}</p>
+                    <p className="text-[10px] text-c-cream-dim uppercase tracking-widest">Get Ready</p>
+                </div>
+            )}
+
+            {phase === 'singing' && (
+                <div className="flex flex-col items-center gap-3 animate-fade-in">
+                    <p className="text-c-gold text-xs font-mono animate-pulse">Listening for timing, contour, and sustained syllables...</p>
+                    <button onClick={stopEverything} className="px-6 py-2 border border-red-500/40 bg-red-950/10 text-red-400 hover:bg-red-500 hover:text-c-bg rounded-full text-xs font-playfair transition-colors">
+                        ■ Stop Singing
+                    </button>
+                </div>
+            )}
+
+            {(phase === 'success' || phase === 'fail') && feedback && (
+                <div className="w-full max-w-xl bg-c-surface border border-c-border rounded-xl p-4 flex flex-col gap-3 animate-fade-in">
+                    <div className={`text-sm font-playfair font-bold ${phase === 'success' ? 'text-emerald-800' : 'text-red-400'}`}>
+                        {phase === 'success' ? 'The chunk is settling in well.' : 'The chunk needs another pass, especially for timing and shape.'}
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-2">
+                        {feedbackRows.map((row) => (
+                            <div key={row.label} className="rounded-lg border border-c-border/40 bg-c-card px-3 py-2">
+                                <div className="text-[10px] font-mono uppercase tracking-wider text-c-cream-dark">{row.label}</div>
+                                <div className="text-xs font-playfair text-c-cream mt-1">{row.value}</div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex flex-wrap justify-center gap-3 pt-1">
+                        <button onClick={() => setPhase('idle')} className="px-8 py-2 border border-c-gold text-c-gold rounded-full text-sm font-playfair font-bold hover:bg-c-gold hover:text-c-bg transition-colors">
+                            Try Again
+                        </button>
+                        <button onClick={onDone} className="px-8 py-2 bg-c-gold text-c-bg rounded-full text-sm font-playfair font-bold hover:opacity-90 transition-opacity">
+                            Continue
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {micError && <p className="text-red-400 text-xs font-playfair italic">{micError}</p>}
         </div>
     );
 }
@@ -2911,7 +3514,13 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete
 
     const [showAIFeedback, setShowAIFeedback] = useState(false);
 
-    const requiresMic = exercises.some(e => e.type === 'sing' || e.type === 'free_sing' || e.type === 'sing_sequence');
+    const requiresMic = exercises.some(e =>
+        e.type === 'sing' ||
+        e.type === 'free_sing' ||
+        e.type === 'sing_sequence' ||
+        e.type === 'sing_sahitya_chunk' ||
+        e.type === 'sing_with_words'
+    );
     const [calibrated, setCalibrated] = useState(!!window.MIC_NOISE_FLOOR);
 
     useEffect(() => {
@@ -2996,6 +3605,16 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete
         if (ex.type === 'info')            return <ExerciseInfo           key={key} {...ex} onDone={next} />;
         if (ex.type === 'quiz')            return <ExerciseQuiz           key={key} {...ex} onDone={next} />;
         if (ex.type === 'lyrics_practice') return <ExerciseLyricsPractice  key={key} {...ex} onDone={next} />;
+        if (ex.type === 'lyrics_listen')   return <ExerciseLyricsListen    key={key} {...ex} onDone={next} />;
+        if (ex.type === 'lyrics_repeat' || ex.type === 'lyrics_pronunciation') {
+            return <ExerciseLyricsRepeat key={key} {...ex} onDone={next} />;
+        }
+        if (ex.type === 'sahitya_swara_map') {
+            return <ExerciseSahityaSwaraMap key={key} {...ex} onDone={next} />;
+        }
+        if (ex.type === 'sahitya_rhythm') {
+            return <ExerciseSahityaRhythm key={key} {...ex} onDone={next} />;
+        }
         if (ex.type === 'listen') {
             if (ex.swaras) {
                 return <ExerciseListenSequence key={key} {...ex} sa={sa} onDone={next} />;
@@ -3012,6 +3631,9 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete
         if (ex.type === 'shruti_setup')    return <ExerciseShrutiSetup    key={key} {...ex} sa={sa} setSa={setSa} onDone={next} />;
         if (ex.type === 'sing')            return <ExerciseSing           key={key} {...ex} sa={sa} onDone={next} />;
         if (ex.type === 'sing_sequence')   return <ExerciseSingSequence   key={key} {...ex} sa={sa} onDone={next} />;
+        if (ex.type === 'sing_sahitya_chunk' || ex.type === 'sing_with_words') {
+            return <ExerciseSingSahityaChunk key={key} {...ex} sa={sa} onDone={next} />;
+        }
     };
 
     return (
@@ -3030,7 +3652,7 @@ function LessonRunner({ lesson, sa, setSa, onComplete, onBack, onSadhanaComplete
             </div>
 
             {/* Sing Along & AI Coaching Button */}
-            {ex && (ex.type === 'sing' || ex.type === 'sing_sequence') && (
+            {ex && (ex.type === 'sing' || ex.type === 'sing_sequence' || ex.type === 'sing_sahitya_chunk' || ex.type === 'sing_with_words') && (
                 <div className="border-t border-c-border/20 pt-4 mt-2 flex flex-col gap-3 animate-fade-in">
                     <button 
                         onClick={() => setShowAIFeedback(true)} 

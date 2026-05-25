@@ -1199,6 +1199,29 @@ export const ALANKARAM_CURRICULUM = [
     }
 ];
 
+const SG_PALLAVI_L1 = ['Ma1','Pa','|','Da1','Ṡ','Ṡ','Ṙ','||','Ṙ','Ṡ','|','Da1','Pa','Ma1','Pa','||'];
+const SG_PALLAVI_L2 = ['Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||'];
+const SG_PALLAVI_L3 = ['Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'];
+const SG_PALLAVI_L4 = ['Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||'];
+const SG_PALLAVI_L5 = ['Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'];
+const SG_PALLAVI_FULL = [...SG_PALLAVI_L1, ...SG_PALLAVI_L2, ...SG_PALLAVI_L3, ...SG_PALLAVI_L4, ...SG_PALLAVI_L5];
+
+const SG_PALLAVI_L1_BEATS = ['Śrī -', 'Ga na na tha', 'sin dhu', '- ra var na'];
+const SG_PALLAVI_L2_BEATS = ['Ka ru', 'na Sā ga ra', 'ka ri', 'va dha - na'];
+const SG_PALLAVI_L3_BEATS = ['Lam -', 'bo - dha ra', 'la ku', 'mi ka ra -'];
+const SG_PALLAVI_L4_BEATS = ['Am -', 'bā - su tha', 'a ma', 'ra vi nu tha'];
+const SG_PALLAVI_L5_BEATS = ['Lam -', 'bo - dha ra', 'la ku', 'mi ka ra -'];
+
+const SG_CHAR1_L1 = SG_PALLAVI_L1;
+const SG_CHAR1_L2 = SG_PALLAVI_L2;
+const SG_CHAR1_L1_BEATS = ['Sid dha', 'chā - ra ṇa', 'ga ṇa', 'sē - vi tha'];
+const SG_CHAR1_L2_BEATS = ['Sid dhi', 'vi nā ya ka', 'tē -', 'na mō na mō'];
+
+const SG_CHAR2_L1 = SG_PALLAVI_L1;
+const SG_CHAR2_L2 = SG_PALLAVI_L2;
+const SG_CHAR2_L1_BEATS = ['Sa ka', 'la vid yā -', '- dhi', 'pū - ji tha'];
+const SG_CHAR2_L2_BEATS = ['Sa -', 'rvō - tta ma', 'tē -', 'na mō na mō'];
+
 const GEETHAM_CURRICULUM_RAW = [
     // ─── STAGE 1: MALAHARI ────────────────────────────────────────────────
     {
@@ -1220,38 +1243,63 @@ const GEETHAM_CURRICULUM_RAW = [
                 id: 'gm1', title: 'Geetham 1: Śrī Gaṇanātha', tag: 'Geetham',
                 exercises: [
                     { type: 'info', title: 'Śrī Gaṇanātha', body: 'Rāga: Malahari · Tāḷam: Chatusra Jāti Rūpaka (2+4 per cycle)\n\nThis geetham is a devotional invocation to Lord Ganesha, the remover of obstacles. "Śrī Gaṇanātha" means "the auspicious lord of the Ganas (celestial beings)."\n\nLook for the characteristic ascending phrase Ma–Pa–Da–Ṡ, followed by the tara Ṙ (high Ri) and the beautiful descent through the full Malahari Avarohanam.' },
-                    { type: 'lyrics_practice', title: 'Pallavi Words', lyrics: [
+                    { type: 'lyrics_practice', title: 'Pallavi Meaning', lyrics: [
                         'Śrī Gaṇanātha Sindhūra Varṇa',
                         'Karuṇā Sāgara Kari Vadana',
                         'Lambōdhara Lakumi-kara',
                         'Ambā Suta Amara Vinuta'
-                    ], instruction: 'First speak the pallavi in four small chunks. Keep the words aligned to the Rūpaka pulse instead of rushing them as one long sentence.', meaning: 'O auspicious lord of the ganas, vermilion-hued one, ocean of compassion, elephant-faced one, pot-bellied one, bearer of Lakshmi, son of Amba, praised by the devas.' },
-                    { type: 'listen_sequence', swaras: ['Ma1','Pa','|','Da1','Ṡ','Ṡ','Ṙ','||','Ṙ','Ṡ','|','Da1','Pa','Ma1','Pa','||'], displayLabel: '♪', instruction: 'Listen to Pallavi line 1: “Śrī Gaṇanātha Sindhūra Varṇa.” Hear how the phrase climbs to tara Ri before descending.' },
-                    { type: 'sing_sequence', swaras: ['Ma1','Pa','|','Da1','Ṡ','Ṡ','Ṙ','||','Ṙ','Ṡ','|','Da1','Pa','Ma1','Pa','||'], speed: 0.9, instruction: 'Sing Pallavi line 1 slowly: M P | D Ṡ Ṡ Ṙ || Ṙ Ṡ | D P M P ||' },
-                    { type: 'listen_sequence', swaras: ['Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||'], displayLabel: '♪', instruction: 'Listen to Pallavi line 2: “Karuṇā Sāgara Kari Vadana.” Notice the gentle descent back toward Sa.' },
-                    { type: 'sing_sequence', swaras: ['Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||'], speed: 0.9, instruction: 'Sing Pallavi line 2: R M | P D M P || D P | M G R S ||' },
-                    { type: 'listen_sequence', swaras: ['Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'], displayLabel: '♪', instruction: 'Listen to Pallavi line 3: “Lambōdhara Lakumi-kara.” Feel the held Sa and the compact ending.' },
-                    { type: 'sing_sequence', swaras: ['Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'], speed: 0.9, instruction: 'Sing Pallavi line 3: S , | R M G R || S R | G R S , ||' },
-                    { type: 'listen_sequence', swaras: ['Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||','Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'], displayLabel: '♪', instruction: 'Listen to Pallavi lines 4–5 together: “Ambā Suta Amara Vinuta | Lambōdhara Lakumi-kara.” The fourth line returns to the line-2 melody, then the fifth line repeats the closing cadence.' },
-                    { type: 'sing_sequence', swaras: ['Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||','Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'], speed: 0.88, instruction: 'Sing Pallavi lines 4–5 together, keeping the repeat of “Lambōdhara Lakumi-kara” calm and steady.' },
-                    { type: 'listen_sequence', swaras: ['Ma1','Pa','|','Da1','Ṡ','Ṡ','Ṙ','||','Ṙ','Ṡ','|','Da1','Pa','Ma1','Pa','||','Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||','Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||','Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||','Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'], displayLabel: '♪', instruction: 'Listen to the full pallavi from start to finish in notation order.' },
-                    { type: 'sing_sequence', swaras: ['Ma1','Pa','|','Da1','Ṡ','Ṡ','Ṙ','||','Ṙ','Ṡ','|','Da1','Pa','Ma1','Pa','||','Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||','Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||','Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||','Sa',',','|','Ri1','Ma1','Ga3','Ri1','||','Sa','Ri1','|','Ga3','Ri1','Sa',',','||'], speed: 0.86, instruction: 'Sing the complete pallavi. Keep each lyric chunk attached to its phrase instead of treating it like one continuous breath.' },
-                    { type: 'lyrics_practice', title: 'Charanam 1 Words', lyrics: [
+                    ], instruction: 'Read the meaning first, then notice how the pallavi naturally falls into four short lyrical gestures.', meaning: 'O auspicious lord of the ganas, vermilion-hued one, ocean of compassion, elephant-faced one, pot-bellied one, bearer of Lakshmi, son of Amba, praised by the devas.' },
+                    { type: 'lyrics_listen', title: 'Pallavi Lyrics Guide', lyrics: [
+                        'Śrī Gaṇanātha Sindhūra Varṇa',
+                        'Karuṇā Sāgara Kari Vadana',
+                        'Lambōdhara Lakumi-kara',
+                        'Ambā Suta Amara Vinuta'
+                    ], instruction: 'Listen to the words alone first. No swara accuracy yet, just pronunciation, stress, and phrase shape.' },
+                    { type: 'lyrics_repeat', title: 'Pallavi Word Repetition', lyrics: [
+                        'Śrī Gaṇanātha Sindhūra Varṇa',
+                        'Karuṇā Sāgara Kari Vadana',
+                        'Lambōdhara Lakumi-kara',
+                        'Ambā Suta Amara Vinuta'
+                    ], instruction: 'Repeat each fragment clearly in speech. Keep the syllables even and avoid swallowing the consonants.' },
+                    { type: 'sahitya_swara_map', title: 'Pallavi Line 1 Map', swaras: SG_PALLAVI_L1, lyricsBeats: SG_PALLAVI_L1_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, instruction: 'See how the words sit inside the beat-groups. One beat can hold multiple swaras and one lyric syllable can stretch across a full beat.' },
+                    { type: 'sahitya_rhythm', title: 'Pallavi Line 1 in Rhythm', swaras: SG_PALLAVI_L1, lyricsBeats: SG_PALLAVI_L1_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, instruction: 'Clap the Rūpaka tala and recite line 1 in rhythm only.' },
+                    { type: 'listen_sequence', swaras: SG_PALLAVI_L1, displayLabel: '♪', instruction: 'Listen to Pallavi line 1: “Śrī Gaṇanātha Sindhūra Varṇa.” Hear how the phrase climbs to tara Ri before descending.' },
+                    { type: 'sing_sequence', swaras: SG_PALLAVI_L1, speed: 0.9, instruction: 'Sing the swaras only for Pallavi line 1 before adding the words.' },
+                    { type: 'sing_sahitya_chunk', title: 'Sing Pallavi Line 1 With Words', swaras: SG_PALLAVI_L1, lyrics: ['Śrī Gaṇanātha Sindhūra Varṇa'], lyricsBeats: SG_PALLAVI_L1_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, speed: 0.85, instruction: 'Now sing the words on the melody. Focus on tala alignment, long syllables, and the overall rise-and-fall contour.' },
+                    { type: 'sahitya_swara_map', title: 'Pallavi Line 2 Map', swaras: SG_PALLAVI_L2, lyricsBeats: SG_PALLAVI_L2_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, instruction: 'Map line 2 beat by beat before you sing it. Watch how “Karuṇā Sāgara” spreads across the larger 4-beat half.' },
+                    { type: 'sahitya_rhythm', title: 'Pallavi Line 2 in Rhythm', swaras: SG_PALLAVI_L2, lyricsBeats: SG_PALLAVI_L2_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, instruction: 'Speak line 2 in tala. Let “vadana” settle instead of rushing the ending.' },
+                    { type: 'listen_sequence', swaras: SG_PALLAVI_L2, displayLabel: '♪', instruction: 'Listen to Pallavi line 2: “Karuṇā Sāgara Kari Vadana.” Notice the graceful descent back toward Sa.' },
+                    { type: 'sing_sequence', swaras: SG_PALLAVI_L2, speed: 0.9, instruction: 'Sing the swaras only for Pallavi line 2.' },
+                    { type: 'sing_sahitya_chunk', title: 'Sing Pallavi Line 2 With Words', swaras: SG_PALLAVI_L2, lyrics: ['Karuṇā Sāgara Kari Vadana'], lyricsBeats: SG_PALLAVI_L2_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, speed: 0.84, instruction: 'Sing line 2 with sahityam. Keep the lyric chunk full and connected all the way into the cadence.' },
+                    { type: 'sahitya_swara_map', title: 'Pallavi Line 3 Map', swaras: SG_PALLAVI_L3, lyricsBeats: SG_PALLAVI_L3_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, instruction: 'Notice the held opening Sa and the compact close in this shorter line.' },
+                    { type: 'listen_sequence', swaras: SG_PALLAVI_L3, displayLabel: '♪', instruction: 'Listen to Pallavi line 3: “Lambōdhara Lakumi-kara.” Feel the held Sa and the compact ending.' },
+                    { type: 'sing_sahitya_chunk', title: 'Sing Pallavi Line 3 With Words', swaras: SG_PALLAVI_L3, lyrics: ['Lambōdhara Lakumi-kara'], lyricsBeats: SG_PALLAVI_L3_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, speed: 0.84, instruction: 'Sing line 3 with the words. This line is a good test of sustained syllables at the opening.' },
+                    { type: 'listen_sequence', swaras: [...SG_PALLAVI_L4, ...SG_PALLAVI_L5], displayLabel: '♪', instruction: 'Listen to Pallavi lines 4–5 together: “Ambā Suta Amara Vinuta | Lambōdhara Lakumi-kara.” The fourth line returns to the line-2 melody, then the fifth line repeats the closing cadence.' },
+                    { type: 'sing_with_words', title: 'Join Pallavi Lines 4–5', swaras: [...SG_PALLAVI_L4, ...SG_PALLAVI_L5], lyrics: ['Ambā Suta Amara Vinuta', 'Lambōdhara Lakumi-kara'], lyricsBeats: [...SG_PALLAVI_L4_BEATS, ...SG_PALLAVI_L5_BEATS], tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, speed: 0.82, instruction: 'Join the last two pallavi lines. Treat them as one flowing response rather than two isolated drills.' },
+                    { type: 'listen_sequence', swaras: SG_PALLAVI_FULL, displayLabel: '♪', instruction: 'Listen to the full pallavi from start to finish in notation order.' },
+                    { type: 'sing_with_words', title: 'Sing the Full Pallavi', swaras: SG_PALLAVI_FULL, lyrics: [
+                        'Śrī Gaṇanātha Sindhūra Varṇa',
+                        'Karuṇā Sāgara Kari Vadana',
+                        'Lambōdhara Lakumi-kara',
+                        'Ambā Suta Amara Vinuta',
+                        'Lambōdhara Lakumi-kara'
+                    ], lyricsBeats: [...SG_PALLAVI_L1_BEATS, ...SG_PALLAVI_L2_BEATS, ...SG_PALLAVI_L3_BEATS, ...SG_PALLAVI_L4_BEATS, ...SG_PALLAVI_L5_BEATS], tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, speed: 0.8, instruction: 'Now sing the full pallavi with words. Think in phrase chunks, not isolated notes.' },
+                    { type: 'lyrics_listen', title: 'Charanam 1 Lyrics Guide', lyrics: [
                         'Siddha Chāraṇa Gaṇa Sēvita',
                         'Siddhi Vināyaka Tē Namo Namo'
-                    ], instruction: 'Speak Charanam 1 in two balanced lines. The first line is descriptive, the second resolves into salutation.', meaning: 'Holy beings and the gana followers worship you; O Siddhi Vinayaka, salutations again and again.' },
-                    { type: 'listen_sequence', swaras: ['Ma1','Pa','|','Da1','Ṡ','Ṡ','Ṙ','||','Ṙ','Ṡ','|','Da1','Pa','Ma1','Pa','||'], displayLabel: '♪', instruction: 'Listen to Charanam 1 line 1: “Siddha Chāraṇa Gaṇa Sēvita.” It uses the same melodic frame as the opening pallavi line.' },
-                    { type: 'sing_sequence', swaras: ['Ma1','Pa','|','Da1','Ṡ','Ṡ','Ṙ','||','Ṙ','Ṡ','|','Da1','Pa','Ma1','Pa','||'], speed: 0.9, instruction: 'Sing Charanam 1 line 1 on the opening melodic frame.' },
-                    { type: 'listen_sequence', swaras: ['Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||'], displayLabel: '♪', instruction: 'Listen to Charanam 1 line 2: “Siddhi Vināyaka Tē Namo Namo.” It resolves through the same descent as pallavi line 2.' },
-                    { type: 'sing_sequence', swaras: ['Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||'], speed: 0.9, instruction: 'Sing Charanam 1 line 2, then mentally hear the return to “Lambōdhara Lakumi-kara.”' },
-                    { type: 'lyrics_practice', title: 'Charanam 2 Words', lyrics: [
+                    ], instruction: 'Listen to the charanam words first. Hear the difference between the descriptive first line and the salutation line.', meaning: 'Holy beings and the gana followers worship you; O Siddhi Vinayaka, salutations again and again.' },
+                    { type: 'sahitya_swara_map', title: 'Charanam 1 Line 1 Map', swaras: SG_CHAR1_L1, lyricsBeats: SG_CHAR1_L1_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, instruction: 'Read line 1 beat by beat before singing it.' },
+                    { type: 'sing_sahitya_chunk', title: 'Sing Charanam 1 Line 1', swaras: SG_CHAR1_L1, lyrics: ['Siddha Chāraṇa Gaṇa Sēvita'], lyricsBeats: SG_CHAR1_L1_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, speed: 0.84, instruction: 'Sing Charanam 1 line 1 with sahityam.' },
+                    { type: 'sahitya_swara_map', title: 'Charanam 1 Line 2 Map', swaras: SG_CHAR1_L2, lyricsBeats: SG_CHAR1_L2_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, instruction: 'Now map the salutation line and notice how the final “namo namo” sits inside the closing descent.' },
+                    { type: 'sing_with_words', title: 'Sing Charanam 1', swaras: [...SG_CHAR1_L1, ...SG_CHAR1_L2], lyrics: ['Siddha Chāraṇa Gaṇa Sēvita', 'Siddhi Vināyaka Tē Namo Namo'], lyricsBeats: [...SG_CHAR1_L1_BEATS, ...SG_CHAR1_L2_BEATS], tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, speed: 0.82, instruction: 'Join both lines of Charanam 1. Keep the return to the salutation calm and well-timed.' },
+                    { type: 'lyrics_listen', title: 'Charanam 2 Lyrics Guide', lyrics: [
                         'Sakala Vidyādi Poojitha',
                         'Sarvōttama Tē Namo Namo'
-                    ], instruction: 'Speak Charanam 2 slowly. Watch the stretched “vidyādi” and “sarvōttama” syllables before singing.', meaning: 'You are the one first worshipped in all learning; O supreme one, salutations again and again.' },
-                    { type: 'listen_sequence', swaras: ['Ma1','Pa','|','Da1','Ṡ','Ṡ','Ṙ','||','Ṙ','Ṡ','|','Da1','Pa','Ma1','Pa','||'], displayLabel: '♪', instruction: 'Listen to Charanam 2 line 1: “Sakala Vidyādi Poojitha.” The swara frame is familiar, so focus on fitting the words cleanly into the same rhythm.' },
-                    { type: 'sing_sequence', swaras: ['Ma1','Pa','|','Da1','Ṡ','Ṡ','Ṙ','||','Ṙ','Ṡ','|','Da1','Pa','Ma1','Pa','||'], speed: 0.88, instruction: 'Sing Charanam 2 line 1, taking care with the stretched syllables in “vidyādi.”' },
-                    { type: 'listen_sequence', swaras: ['Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||'], displayLabel: '♪', instruction: 'Listen to Charanam 2 line 2: “Sarvōttama Tē Namo Namo.” This closes exactly like Charanam 1 line 2.' },
-                    { type: 'sing_sequence', swaras: ['Ri1','Ma1','|','Pa','Da1','Ma1','Pa','||','Da1','Pa','|','Ma1','Ga3','Ri1','Sa','||'], speed: 0.88, instruction: 'Sing Charanam 2 line 2 and let the phrase settle cleanly into Sa at the end.' },
+                    ], instruction: 'Listen to Charanam 2 and prepare for the longer stretched syllables in “vidyādi” and “sarvōttama.”', meaning: 'You are the one first worshipped in all learning; O supreme one, salutations again and again.' },
+                    { type: 'sahitya_swara_map', title: 'Charanam 2 Line 1 Map', swaras: SG_CHAR2_L1, lyricsBeats: SG_CHAR2_L1_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, instruction: 'Watch how the stretched “vidyādi” crosses the middle of the line.' },
+                    { type: 'sing_sahitya_chunk', title: 'Sing Charanam 2 Line 1', swaras: SG_CHAR2_L1, lyrics: ['Sakala Vidyādi Poojitha'], lyricsBeats: SG_CHAR2_L1_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, speed: 0.82, instruction: 'Sing Charanam 2 line 1, keeping the long syllables supported and even.' },
+                    { type: 'sahitya_swara_map', title: 'Charanam 2 Line 2 Map', swaras: SG_CHAR2_L2, lyricsBeats: SG_CHAR2_L2_BEATS, tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, instruction: 'Map the closing salutation before singing the full charanam.' },
+                    { type: 'sing_with_words', title: 'Sing Charanam 2', swaras: [...SG_CHAR2_L1, ...SG_CHAR2_L2], lyrics: ['Sakala Vidyādi Poojitha', 'Sarvōttama Tē Namo Namo'], lyricsBeats: [...SG_CHAR2_L1_BEATS, ...SG_CHAR2_L2_BEATS], tala: { name: 'Chatusra Jāti Rūpaka', groups: [2, 4], unitLabel: '6-beat cycle' }, speed: 0.8, instruction: 'Sing both lines of Charanam 2 with words and pulse. Focus on phrase completion and stable landings.' },
                 ]
             },
             {

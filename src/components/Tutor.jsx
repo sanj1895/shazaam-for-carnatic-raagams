@@ -4106,14 +4106,21 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         }
 
         let tauEstimate = -1;
+        let bestTau = minTau;
         for (let tau = minTau; tau <= maxTau; tau++) {
+            if (yin[tau] < yin[bestTau]) bestTau = tau;
             if (yin[tau] < threshold) {
                 while (tau + 1 <= maxTau && yin[tau + 1] < yin[tau]) tau++;
                 tauEstimate = tau;
                 break;
             }
         }
-        if (tauEstimate === -1) return null;
+        if (tauEstimate === -1) {
+            // Fall back to the strongest low-CMND candidate so softer or ornamented
+            // frames still contribute to transcription instead of disappearing.
+            if (yin[bestTau] > 0.34) return null;
+            tauEstimate = bestTau;
+        }
 
         const confidence = Math.max(0, 1 - yin[tauEstimate]);
         const freq = sampleRate / tauEstimate;
@@ -4124,7 +4131,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     const resolveOctaveWithHysteresis = useCallback((baseSwara, semitones) => {
         const candidate = Math.floor(Math.round(semitones) / 12);
         const st = octaveStateRef.current;
-        const lockFrames = mobileMicMode ? 4 : 3;
+        const lockFrames = mobileMicMode ? 3 : 2;
         if (candidate === st.stable) {
             st.pending = null;
             st.pendingCount = 0;
@@ -4148,12 +4155,13 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     const transcribeFramesToSlots = useCallback((frames, totalSlots, slotMs) => {
         const grid = Array.from({ length: totalSlots }, () => []);
         const slotDurSec = slotMs / 1000;
-        const onsetTolerance = slotDurSec * 0.35;
-        const minSegSec = Math.max(slotDurSec * 0.12, 0.015);
+        const onsetTolerance = slotDurSec * 0.28;
+        const minSegSec = Math.max(slotDurSec * 0.08, 0.012);
 
-        // Smooth labels with local majority to suppress one-frame flips.
+        // Smooth labels lightly so we keep real fast note turns instead of ironing
+        // them away during geetham/manodharma transcription.
         const smoothed = frames.map((_, i) => {
-            const window = frames.slice(Math.max(0, i - 2), Math.min(frames.length, i + 3));
+            const window = frames.slice(Math.max(0, i - 1), Math.min(frames.length, i + 2));
             const counts = {};
             window.forEach(f => {
                 const k = f.label || ',';
@@ -4187,11 +4195,11 @@ function TalaSwaraTranscriber({ sa, setSa }) {
             const rawSlot = seg.start / slotDurSec;
             const snappedSlot = Math.round(rawSlot);
             const snapErrSec = Math.abs(snappedSlot - rawSlot) * slotDurSec;
-            const onsetSlot = snapErrSec <= onsetTolerance ? snappedSlot : Math.floor(rawSlot);
-            const durSlots = Math.max(1, Math.round(segDurSec / slotDurSec));
+            const onsetSlot = Math.max(0, snapErrSec <= onsetTolerance ? snappedSlot : Math.floor(rawSlot));
+            const rawEndSlot = (seg.end / slotDurSec) - 0.02;
+            const releaseSlot = Math.max(onsetSlot, Math.ceil(rawEndSlot));
 
-            for (let k = 0; k < durSlots; k++) {
-                const idx = onsetSlot + k;
+            for (let idx = onsetSlot; idx <= releaseSlot; idx++) {
                 if (idx >= 0 && idx < totalSlots) grid[idx].push(seg.label);
             }
         });
@@ -4341,7 +4349,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
             const source = ctx.createMediaStreamSource(stream);
             const analyser = ctx.createAnalyser();
             analyser.fftSize = mobileMicMode ? 2048 : 4096;
-            analyser.smoothingTimeConstant = mobileMicMode ? 0.72 : 0.8;
+            analyser.smoothingTimeConstant = mobileMicMode ? 0.48 : 0.58;
             source.connect(analyser);
             sourceRef.current = source;
             analyserRef.current = analyser;
@@ -4396,11 +4404,28 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                     : (noiseProfileRef.current * 0.92) + (rms * 0.08);
                 const adaptiveFloor = noiseProfileRef.current;
                 const rmsGate = mobileMicMode
-                    ? Math.max(0.006, noiseFloor * 0.45, adaptiveFloor * 2.2)
-                    : Math.max(0.0075, noiseFloor * 0.55, adaptiveFloor * 2.6);
-                const sustainGate = recentNote ? rmsGate * 0.72 : rmsGate;
+                    ? Math.max(0.0042, noiseFloor * 0.26, adaptiveFloor * 1.55)
+                    : Math.max(0.0048, noiseFloor * 0.3, adaptiveFloor * 1.8);
+                const sustainGate = recentNote ? rmsGate * 0.58 : rmsGate;
 
                 if (rms < sustainGate) {
+                    if (recentNote && sustainBridgeRef.current.label === prevLabel && sustainBridgeRef.current.frames < 5 && rms >= sustainGate * 0.42) {
+                        sustainBridgeRef.current = {
+                            label: prevLabel,
+                            freqSemi: prev?.freqSemi ?? sustainBridgeRef.current.freqSemi,
+                            frames: sustainBridgeRef.current.frames + 1,
+                        };
+                        frameHistoryRef.current.push({
+                            time: elapsed / 1000,
+                            label: prevLabel,
+                            glide: false,
+                            freqSemi: prev?.freqSemi ?? sustainBridgeRef.current.freqSemi,
+                        });
+                        const bucket = bucketsRef.current[slot];
+                        bucket[prevLabel] = (bucket[prevLabel] || 0) + 1;
+                        return;
+                    }
+
                     sustainBridgeRef.current = { label: ',', freqSemi: null, frames: 0 };
                     frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
                     return;
@@ -4408,15 +4433,15 @@ function TalaSwaraTranscriber({ sa, setSa }) {
 
                 const yin = yinEstimate(buf, sampleRate);
                 const acfFreq = detectPitchAudio(analyserNode, sampleRate);
-                const yinPriorityThreshold = mobileMicMode ? 0.44 : 0.48;
-                const minConfidence = mobileMicMode ? 0.30 : 0.35;
+                const yinPriorityThreshold = mobileMicMode ? 0.31 : 0.34;
+                const minConfidence = mobileMicMode ? 0.18 : 0.2;
                 let chosenFreq = null;
                 if (yin?.freq && yin.confidence >= yinPriorityThreshold) chosenFreq = yin.freq;
                 else if (acfFreq) chosenFreq = acfFreq;
                 else if (yin?.freq && yin.confidence >= minConfidence) chosenFreq = yin.freq;
 
                 if (!chosenFreq) {
-                    if (recentNote && sustainBridgeRef.current.label === prevLabel && sustainBridgeRef.current.frames < 3) {
+                    if (recentNote && sustainBridgeRef.current.label === prevLabel && sustainBridgeRef.current.frames < 5) {
                         sustainBridgeRef.current = {
                             label: prevLabel,
                             freqSemi: prev?.freqSemi ?? sustainBridgeRef.current.freqSemi,
@@ -4457,7 +4482,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 const bucket = bucketsRef.current[slot];
                 const bucketLabel = (anchorOnlyMode && glide && prev?.label && prev.label !== ',') ? prev.label : swara;
                 bucket[bucketLabel] = (bucket[bucketLabel] || 0) + 1;
-            }, mobileMicMode ? 16 : 20);
+            }, mobileMicMode ? 12 : 14);
         } catch {
             cleanup();
             setPhase('error');

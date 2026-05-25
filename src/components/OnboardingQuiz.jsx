@@ -101,6 +101,7 @@ function getPath(totalScore, learner, age) {
             note: isOther ? 'Activities are designed to be accessible and joyful for very young learners.' : null,
             action: 'tutor',
             cta: 'Start Foundations',
+            target: { courseId: 'foundations', unitId: 'stage1', lessonId: 'm1_1' },
         };
     }
 
@@ -113,6 +114,7 @@ function getPath(totalScore, learner, age) {
             note: isChild && isOther ? 'The exercises are designed to be accessible and engaging for young learners.' : null,
             action: 'tutor',
             cta: 'Start Foundations',
+            target: { courseId: 'foundations', unitId: 'stage1', lessonId: 'm1_1' },
         };
     } else if (totalScore <= 5) {
         return {
@@ -123,6 +125,7 @@ function getPath(totalScore, learner, age) {
             note: isChild && isOther ? "Sarali Varisai is ideal for building a young learner's musical ear and muscle memory." : null,
             action: 'tutor',
             cta: 'Start Sarali Varisai',
+            target: { courseId: 'sarali_varisai', unitId: 'sarali_stage1', lessonId: 's_1' },
         };
     } else {
         return {
@@ -190,7 +193,9 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate }) {
     };
 
     const handleBegin = () => {
-        const dest = path.action;
+        const dest = path.target
+            ? { view: path.action, target: path.target }
+            : path.action;
         dismiss();
         onNavigate?.(dest);
     };

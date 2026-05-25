@@ -4307,7 +4307,7 @@ function UnitView({ unit, progress, onSelectLesson, onBack, structuredMode = fal
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly = false }) {
+export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly = false, launchTarget = null, onLaunchHandled }) {
     const [sa, setSa] = useState(() => {
         try {
             return Number(localStorage.getItem('tutor_base_sa') || saFrequency || 261.63);
@@ -4368,6 +4368,27 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
 
     const activeCourse = COURSES.find(c => c.id === selectedCourseId);
     const activeCurriculum = activeCourse?.curriculum || CURRICULUM;
+
+    useEffect(() => {
+        if (transcribeOnly || !launchTarget?.courseId || !launchTarget?.unitId || !launchTarget?.lessonId) return;
+
+        const course = COURSES.find((c) => c.id === launchTarget.courseId);
+        const curriculum = course?.curriculum || [];
+        const unit = curriculum.find((entry) => entry.id === launchTarget.unitId);
+        const lesson = unit?.lessons.find((entry) => entry.id === launchTarget.lessonId);
+
+        if (!course || !unit || !lesson) {
+            onLaunchHandled?.();
+            return;
+        }
+
+        setTab('curriculum');
+        setSelectedCourseId(course.id);
+        setActiveUnit(unit);
+        setActiveLesson(lesson);
+        setScreen('lesson');
+        onLaunchHandled?.();
+    }, [launchTarget, onLaunchHandled, transcribeOnly]);
 
     const isUnlocked = (unitIdx) => {
         if (!structuredMode || unitIdx === 0) return true;

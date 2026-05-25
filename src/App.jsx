@@ -109,6 +109,7 @@ function App() {
     const [activeMode, setActiveMode] = useState('standard');
     const [tourActive, setTourActive] = useState(false);
     const [quizActive, setQuizActive] = useState(false);
+    const [tutorLaunchTarget, setTutorLaunchTarget] = useState(null);
     const [sadhana, setSadhana] = useState(loadSadhanaState);
     const [sadhanaToast, setSadhanaToast] = useState(null); // { title, stepName }
     const [selectedRaga, setSelectedRaga] = useState(null); // { raga, hasClearMatch, type: 'library' | 'identify' | 'melakarta' }
@@ -222,8 +223,10 @@ function App() {
         return () => window.removeEventListener('hashchange', handleHashChange);
     }, []);
 
-    const goTo = (id) => {
+    const goTo = (id, options = {}) => {
+        const { tutorTarget = null } = options;
         if (id !== 'listen') handleReset();
+        setTutorLaunchTarget(id === 'tutor' ? tutorTarget : null);
         setView(id);
         if (id === 'home') {
             setShowFeatures(false);
@@ -238,7 +241,14 @@ function App() {
             <OnboardingQuiz
                 active={quizActive}
                 onDismiss={() => setQuizActive(false)}
-                onNavigate={(view) => { setQuizActive(false); goTo(view); }}
+                onNavigate={(dest) => {
+                    setQuizActive(false);
+                    if (typeof dest === 'string') {
+                        goTo(dest);
+                        return;
+                    }
+                    goTo(dest.view, { tutorTarget: dest.target || null });
+                }}
             />
             <OnboardingTour
                 active={tourActive} 
@@ -635,7 +645,14 @@ function App() {
             )}
 
                 {/* ══ TUTOR ══ */}
-                {view === 'tutor' && <Tutor saFrequency={saFrequency} onSadhanaComplete={markSadhanaStep} />}
+                {view === 'tutor' && (
+                    <Tutor
+                        saFrequency={saFrequency}
+                        onSadhanaComplete={markSadhanaStep}
+                        launchTarget={tutorLaunchTarget}
+                        onLaunchHandled={() => setTutorLaunchTarget(null)}
+                    />
+                )}
                 {view === 'transcribe' && <Tutor saFrequency={saFrequency} transcribeOnly={true} />}
 
                 {/* ══ LISTEN ══ */}

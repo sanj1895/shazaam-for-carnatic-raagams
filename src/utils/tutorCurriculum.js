@@ -2914,10 +2914,10 @@ const ET_P1_S1 = parseBeatGroups([
     [';',',','g'],              // beat 1
     [',','m','P'],              // beat 2: ,m P
     ['m','g','G',',','-','r'], // beat 3: mgG,-r
-    [';','N'],                  // beat 4
+    [';','n'],                  // beat 4
     '|',
     ['S',';'],                  // beat 5
-    [';','n','s'],              // beat 6
+    [';','n','S'],              // beat 6
     '|',
     ['R',',','g'],              // beat 7
     ['R',';'],                  // beat 8
@@ -2928,10 +2928,10 @@ const ET_P1_S2 = parseBeatGroups([
     [';',',','g'],
     [',','m','n','p'],          // beat 2: ,m np (fills in lower Ni before Pa)
     ['m','g','G',',','-','r'],
-    [';','N'],
+    [';','n'],
     '|',
     ['S',';'],
-    [';','n','s'],
+    [';','n','S'],
     '|',
     ['R',',','g'],
     ['g','s','R',';'],          // beat 8: gsR; (lower turn)
@@ -2942,7 +2942,7 @@ const ET_P1_S3 = parseBeatGroups([
     [';',',','g'],
     [',','m','n','p'],
     ['m','g','G',',','-','r'],
-    [';','N'],
+    [';','n'],
     '|',
     ['S',';'],
     [';','D'],                  // beat 6: ;D (middle Da)
@@ -2956,7 +2956,7 @@ const ET_P1_S4 = parseBeatGroups([
     [';',',','g'],
     [',','m','n','p'],
     ['m','g','G',',','-','r'],
-    [';','N'],
+    [';','s'],
     '|',
     ['S',';'],
     [';','n','d'],              // beat 6: ;nd
@@ -3006,6 +3006,188 @@ const KRITIS_CURRICULUM_RAW = [
 ];
 
 export const KRITIS_CURRICULUM = KRITIS_CURRICULUM_RAW.map(stage => ({
+    ...stage,
+    lessons: stage.lessons.map(lesson => ({
+        ...lesson,
+        exercises: lesson.exercises.map((ex, i) => ({ ...ex, id: ex.id ?? `ex_${i}` }))
+    }))
+}));
+
+// ─── Manodharma Basics Curriculum ─────────────────────────────────────────────
+
+const MANODHARMA_CURRICULUM_RAW = [
+    // ── Stage 1: Sangati Exploitation ──────────────────────────────────────────
+    {
+        id: 'mano_stage1', title: 'Stage 1: Sangati Exploitation',
+        symbol: '🎭',
+        subtitle: 'Stretch the lines you already know',
+        color: '#2a1a08',
+        tag: 'Stage 1',
+        lessons: [
+            {
+                id: 'mano_1_1', title: 'The Four Pillars of Manodharma', tag: 'Concept',
+                exercises: [
+                    { type: 'info', title: 'What is Manodharma?', body: 'Manodharma Sangeetam (மனோதர்ம சங்கீதம்) means "music of the mind\'s vision" — the living, spontaneous heart of a Carnatic performance.\n\nThere are four main forms, studied in this order:\n\n1. Sangati — variation of a composed line\n2. Kalpanaswaram — improvised rhythmic swara phrases\n3. Raga Alapana — freeform raga exploration without any beat\n4. Tanam & Neraval — advanced forms covered later\n\nEvery improvisation must obey the raga\'s rules. Stray outside the scale and it sounds wrong. The raga is your creative boundary — and within it, you are completely free.' },
+                    { type: 'quiz', question: 'Which form of Manodharma strips away the beat (tala) entirely?', choices: ['Kalpanaswaram', 'Sangati', 'Raga Alapana', 'Neraval'], correct: 'Raga Alapana', explanation: 'Raga Alapana is completely freeform — sung without any rhythmic cycle. The singer explores the raga\'s character and emotion at any tempo, guided only by the raga\'s phrases.' },
+                    { type: 'quiz', question: 'What is the strict creative boundary that all Manodharma must respect?', choices: ['The exact tempo of the tambura drone', 'The lyrics of the krithi being performed', 'The rules of the raga (allowed notes and phrases)', 'The singer\'s personal vocal comfort range'], correct: 'The rules of the raga (allowed notes and phrases)', explanation: 'Every improvised phrase — whether a sangati, kalpanaswaram, or alapana — must obey the raga\'s ascending and descending rules. Violating this is the most fundamental mistake in Manodharma.' }
+                ]
+            },
+            {
+                id: 'mano_1_2', title: 'Understanding Sangatis', tag: 'Concept',
+                exercises: [
+                    { type: 'info', title: 'What is a Sangati?', body: 'A sangati (சங்கதி) is a melodic variation of a composed line. The lyrics stay the same. The tala stays the same. Only the melody expands.\n\nYou heard 4 sangatis of the Enna Thavam pallavi in the Kritis section. Each one added new notes to the same rhythmic skeleton:\n\nSangati 1 → Simplest form, fewest notes\nSangati 2 → Beat 2 fills in with more movement\nSangati 3 → Beats 6–7 get richer phrases\nSangati 4 → Most elaborate, densest ornamentation\n\nA sangati always begins with the simplest version and progressively elaborates — like zooming in on a musical detail.' },
+                    { type: 'info', title: 'The Key Insight: Duration and Glide', body: 'To create a new sangati, you do not need to invent entirely new notes. You only need one or two of these:\n\n→ Extend a note: hold it one beat longer than written\n→ Subdivide a beat: fit more notes within one beat\n→ Add a gamakam: a gentle pitch oscillation or glide on a note\n→ Add a lower-octave approach: swoop from the note below before landing\n\nEven ONE of these changes, in the right place, creates a new sangati. The rest of the line can stay identical.\n\nThis is why we say: "The composer has given you the clay. Manodharma is how you shape it."' },
+                    { type: 'quiz', question: 'What stays exactly the same when you create a new sangati?', choices: ['The melody — only the words change', 'The lyrics and the tala cycle — only the melody elaborates', 'The notes — only the speed changes', 'The raga changes to a related one'], correct: 'The lyrics and the tala cycle — only the melody elaborates', explanation: 'In a sangati, the words (sahityam) and the rhythmic cycle (tala) remain completely fixed. Only the melodic content is elaborated or varied, while still arriving at the correct lyric on the correct beat.' },
+                    { type: 'quiz', question: 'Which of these is NOT a sangati technique?', choices: ['Extending a note\'s duration', 'Adding a gamakam glide', 'Changing the words of the krithi', 'Subdividing a beat with more notes'], correct: 'Changing the words of the krithi', explanation: 'The lyrics (sahityam) of a krithi are never changed. A sangati only varies the melodic content within each beat — the words remain sacred and fixed.' }
+                ]
+            },
+            {
+                id: 'mano_1_3', title: 'Overcoming the Fear of Variation', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Change Just One Thing', body: 'The main obstacle for beginners is fear — the feeling that changing even one note will ruin the composition.\n\nHere is the truth: holding the last note of a phrase for one extra beat, or adding one small glide at the end, does not ruin anything. It is the first step toward creative musicianship.\n\nExercise:\n1. Sing the Enna Thavam pallavi line (Sangati 1) aloud.\n2. On the very last note of the phrase, hold it for 2 extra beats instead of stopping.\n3. That is it. That small change is already your own sangati.\n\nYour ear will tell you immediately if it sounds right. Trust it.' },
+                    { type: 'free_sing', duration: 8, instruction: 'Sing the Enna Thavam pallavi in your head, then aloud. On the final note, deliberately hold it longer than the written version. Let the sound ring out. Feel the phrase breathe.' },
+                    { type: 'free_sing', duration: 10, instruction: 'Now add a tiny glide on the final note: just before landing, slide upward from the note below. Sing the phrase again. Notice how even this micro-change makes the line feel different.' },
+                    { type: 'quiz', question: 'What is the simplest way to create your own sangati from an existing line?', choices: ['Replace all the notes with new ones', 'Change just one note\'s duration or add a small glide', 'Sing the line in a completely different raga', 'Remove some of the tala beats'], correct: 'Change just one note\'s duration or add a small glide', explanation: 'Starting small is correct. A sangati does not require reinventing the phrase — extending one note or adding one glide is a legitimate technique used by concert artists. Build from small changes, not large ones.' }
+                ]
+            }
+        ]
+    },
+
+    // ── Stage 2: Kalpanaswaram Level 1 ─────────────────────────────────────────
+    {
+        id: 'mano_stage2', title: 'Stage 2: Kalpanaswaram — Level 1',
+        symbol: '🔢',
+        subtitle: 'Improvised swara phrases that land back on the lyric',
+        color: '#0e2a2a',
+        tag: 'Stage 2',
+        lessons: [
+            {
+                id: 'mano_2_1', title: 'What is Kalpanaswaram?', tag: 'Concept',
+                exercises: [
+                    { type: 'info', title: 'Improvised Swaras', body: 'Kalpanaswaram (கல்பனாஸ்வரம்) means "imagined swaras" — notes you improvise on the spot, in the raga, in the tala.\n\nThe structure is always:\n[Sing the krithi lyric] → [Improvise swara phrases] → [Land back on the krithi lyric]\n\nThe most important skill is not making the swaras beautiful — it is making them LAND on the right beat. This is called the Idam (இடம்), the exact beat where the lyric must restart.\n\nIf your swaras run long and miss the Idam, even a beautiful improvisation fails. If your swaras land on the Idam, even a simple three-note pattern succeeds.' },
+                    { type: 'quiz', question: 'What is the "Idam" in Kalpanaswaram?', choices: ['The loudest note in the improvisation', 'The exact beat where the krithi lyric must restart after the swara phrases', 'A type of gamakam ornament', 'The name of the opening note of the raga'], correct: 'The exact beat where the krithi lyric must restart after the swara phrases', explanation: 'The Idam is the landing point — the specific beat where you return to the krithi lyric after improvising. Missing the Idam is the most common beginner error in Kalpanaswaram.' },
+                    { type: 'info', title: 'Choose a Krithi That Starts on Samam', body: 'For Level 1 Kalpanaswaram, you must practice with a krithi where the first lyric falls exactly on Beat 1 (Samam) of Adi Tala.\n\nWhy? Because your improvised swaras fill the remaining beats and must land cleanly back on Beat 1. This is the simplest version of the exercise.\n\nImportant: Enna Thavam Seidhanai does NOT start on Beat 1. Its lyric falls on Beat 2 — so it cannot be used for Level 1 Kalpanaswaram practice.\n\nKrithis that start on Samam (Beat 1):\n• Vatapi Ganapathim — Hamsadhwani, Adi\n• Endaro Mahanubhavulu — Sri, Adi\n• Kurai Ondrum Illai — Madhyamavati, Adi\n\nFor now, we practice the landing skill using Mayamalavagowla (your training raga), treating Sa as the "lyric home."' },
+                    { type: 'quiz', question: 'Why must you choose a krithi starting on Beat 1 (Samam) for basic Kalpanaswaram?', choices: ['Because Beat 1 is louder', 'Because your improvised swaras can then fill a predictable number of beats and land cleanly back on Beat 1', 'Because only Beat 1 songs are taught to beginners', 'Because other beat positions violate raga rules'], correct: 'Because your improvised swaras can then fill a predictable number of beats and land cleanly back on Beat 1', explanation: 'When the Idam is on Beat 1 (Samam), you always know exactly how many beats you have for improvisation. This predictability makes counting and landing manageable for beginners.' }
+                ]
+            },
+            {
+                id: 'mano_2_2', title: 'The Internal Clock', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Counting While Singing', body: 'The secret to Kalpanaswaram is maintaining two processes simultaneously:\n\n1. Your MOUTH sings notes (melody)\n2. Your HAND keeps the tala (pulse)\n\nBeginners instinctively stop one when they start the other. This is the root cause of missing the Idam.\n\nThe Rule: Keep your hand moving in Adi Tala at ALL TIMES — even while improvising, even if you forget a note. The hand never stops.\n\nStart with 4 beats of improvisation. Count [1, 2, 3, 4] while singing [Sa, Ri, Ga, Ma]. The goal is that 4 beats feels like 4 in your body, not just your mind.' },
+                    { type: 'taalam', instruction: 'Keep the Adi Tala going. Do not let your hand stop. Practice the full 8-beat cycle until it feels completely automatic — your hand should move without thinking.' },
+                    { type: 'info', title: 'A Simple 4-Beat Frame', body: 'Start with the simplest possible Kalpanaswaram: 4 beats of swara phrases followed by 4 beats back to the "lyric" (Sa).\n\nUsing Mayamalavagowla (Sa Ri1 Ga3 Ma1 Pa Da1 Ni3):\n\nOption A (ascending): Sa · Ri1 · Ga3 · Ma1\nOption B (descending): Pa · Ga3 · Ri1 · Sa\nOption C (with hold): Sa · Sa · Ri1 · Ga3 (hold Sa for 2 beats)\n\nAfter 4 beats of swaras, land on Sa (your "lyric"). Practice this loop until the landing feels inevitable.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', '|', 'Pa', 'Ga3', '|', 'Ri1', 'Sa'], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, instruction: 'Listen: 4 beats ascending, then 4 beats descending back to Sa. Count the beats with your hand as it plays. Feel the final Sa as the landing.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', '|', 'Pa', 'Ga3', '|', 'Ri1', 'Sa'], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, instruction: 'Sing this phrase while keeping tala. It takes exactly one Adi Tala cycle (8 beats). The final Sa is your Idam — your landing note.' },
+                    { type: 'free_sing', duration: 12, instruction: 'Keep Adi Tala going with your hand. Improvise any notes from Mayamalavagowla for 8 beats, then land on Sa. Repeat this loop 3–4 times. Keep the phrases simple. Focus only on landing cleanly.' }
+                ]
+            },
+            {
+                id: 'mano_2_3', title: 'Patterns That Return Home', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'The Golden Rule: Landing First, Beauty Second', body: 'In your first Kalpanaswaram attempts, beauty is a bonus — not the goal. Landing on the Idam IS the goal.\n\nMany students try to sing complex, ornate phrases and then miss the landing beat. A simple "Sa Ri Ga Sa" that lands perfectly on Beat 1 is better than a beautiful 10-note phrase that arrives on Beat 3.\n\nWork up to complexity only after your body automatically counts and lands. The music becomes beautiful on its own once the rhythm is solid.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', '|', 'Sa', 'Sa', '|', 'Ga3', 'Sa'], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, instruction: 'Listen: 4 ascending notes, hold Sa for 2 beats (beats 5–6), then a quick descent to land on Sa. One complete Adi Tala cycle ending cleanly at home.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', '|', 'Sa', 'Sa', '|', 'Ga3', 'Sa'], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, instruction: 'Sing this Kalpanaswaram phrase. Feel the final Sa as the Idam — the moment the "lyric" restarts.' },
+                    { type: 'free_sing', duration: 15, instruction: 'Improvise your own Kalpanaswaram. Keep Adi Tala going with your hand. After every 8 beats, land on Sa. Use Mayamalavagowla notes. Keep phrases simple — landing on time is the entire goal right now.' },
+                    { type: 'quiz', question: 'In beginner Kalpanaswaram practice, what takes priority over musical beauty?', choices: ['Singing the highest possible notes in the raga', 'Landing on the Idam (correct beat) accurately', 'Using as many different notes as possible', 'Singing very quickly to impress'], correct: 'Landing on the Idam (correct beat) accurately', explanation: 'Landing on the Idam is the foundational skill of Kalpanaswaram. A simple phrase that arrives on time is more musical than a complex phrase that misses the landing. Beauty and complexity are built on top of rhythmic accuracy — never before it.' }
+                ]
+            }
+        ]
+    },
+
+    // ── Stage 3: Kalpanaswaram Level 2 ─────────────────────────────────────────
+    {
+        id: 'mano_stage3', title: 'Stage 3: Kalpanaswaram — Level 2',
+        symbol: '🌀',
+        subtitle: 'Leaping patterns, strategic holds, and grand finales',
+        color: '#1a0a2a',
+        tag: 'Stage 3',
+        lessons: [
+            {
+                id: 'mano_3_1', title: 'Dhaatu — Leaping Patterns', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Moving Beyond Straight Scales', body: 'Level 1 Kalpanaswaram uses straight ascending or descending patterns: S R G M P D N.\n\nLevel 2 introduces Dhaatu — phrases that deliberately skip over notes, creating melodic leaps that give the music angular energy and interest.\n\nInstead of Sa Ri Ga Ma (straight), try:\n→ Sa Ga Ri Ma Ga Pa (leap up, step back, leap up again)\n→ Pa Ma Ga Ri Ga Ma (a wave pattern)\n→ Ni Pa Ga Ma Pa Ni (jumping toward the peak)\n\nThe key constraint: Dhaatu patterns must use only the raga\'s permitted notes. You cannot leap to a note that the raga excludes.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ga3', 'Ri1', 'Ma1', '|', 'Ga3', 'Pa', '|', 'Da1', 'Ni3'], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, instruction: 'Listen to an ascending Dhaatu (leaping) pattern in Mayamalavagowla: Sa Ga Ri Ma · Ga Pa · Da Ni. It leaps over the neighboring note at each step.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ga3', 'Ri1', 'Ma1', '|', 'Ga3', 'Pa', '|', 'Da1', 'Ni3'], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, instruction: 'Sing the ascending Dhaatu pattern. Feel how it sounds more angular and interesting than a straight scale.' },
+                    { type: 'listen_sequence', swaras: ['Ni3', 'Da1', 'Pa', 'Ga3', '|', 'Ma1', 'Ri1', '|', 'Ga3', 'Sa'], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, instruction: 'Listen to a descending Dhaatu pattern that lands on Sa — the Idam: Ni Da Pa Ga · Ma Ri · Ga Sa.' },
+                    { type: 'sing_sequence', swaras: ['Ni3', 'Da1', 'Pa', 'Ga3', '|', 'Ma1', 'Ri1', '|', 'Ga3', 'Sa'], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, instruction: 'Sing the descending Dhaatu phrase and land on Sa. The leap from Ga3 to Sa at the end is your Idam.' },
+                    { type: 'free_sing', duration: 12, instruction: 'Improvise your own Dhaatu patterns in Mayamalavagowla. Deliberately skip over one note at a time. Keep tala going with your hand. Land on Sa after 8 beats.' }
+                ]
+            },
+            {
+                id: 'mano_3_2', title: 'Karvai — The Thinking Note', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Holds as Strategy', body: 'Advanced Kalpanaswaram singers do not fill every beat with rapid notes. They use Karvai (கர்வை) — holding a single note for 2 or 3 beats — as a strategic pause.\n\nTwo reasons:\n1. Musical: A sustained note creates tension and anticipation, making the next phrase more impactful.\n2. Practical: It gives your brain time to plan the next phrase without panicking.\n\nThe best note to hold is Pa (the 5th). Pa is stable in almost every raga — holding it never sounds wrong and always sounds intentional.\n\nStructure example:\nSa · Ri · Ga · [Pa — hold 2 beats] · Ga · Ri · Sa\n(1)  (2)  (3)   (4)       (5)       (6)  (7)  (8)' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Pa', '|', 'Pa', 'Ga3', '|', 'Ri1', 'Sa'], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, instruction: 'Listen to a Karvai pattern: Sa Ri Ga — hold Pa across beats 4 and 5 — Ga Ri Sa. Notice the breathing space the hold creates before the descent.' },
+                    { type: 'sing_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Pa', '|', 'Pa', 'Ga3', '|', 'Ri1', 'Sa'], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, instruction: 'Sing the Karvai phrase. Use the 2-beat hold on Pa to mentally plan the descent before you sing it. The hold is intentional — not a mistake.' },
+                    { type: 'free_sing', duration: 12, instruction: 'Improvise in Adi Tala. When you feel stuck or need time to think, hold Pa for 2 full beats. Let the hold be deliberate. Then find your way home to Sa.' },
+                    { type: 'quiz', question: 'What is the practical benefit of using a Karvai (note hold) during Kalpanaswaram?', choices: ['It impresses the audience with vibrato technique', 'It gives the brain time to plan the next phrase while still sounding musical', 'It signals a change of raga', 'It eliminates the need to keep tala'], correct: 'It gives the brain time to plan the next phrase while still sounding musical', explanation: 'A Karvai is both musically expressive AND strategically useful. Holding a stable note buys the singer thinking time — turning moments of uncertainty into deliberate, musical pauses.' }
+                ]
+            },
+            {
+                id: 'mano_3_3', title: 'The Teermanam — Your Grand Finale', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'The Three-Times Resolution', body: 'A Teermanam (தீர்மானம்) is a short rhythmic phrase repeated exactly 3 times that resolves powerfully onto the Idam.\n\nThe repetition × 3 structure creates strong rhythmic anticipation:\n• First time: the audience hears the pattern\n• Second time: they recognise it\n• Third time: they feel the inevitable resolution\n\nSimple Teermanam structure using Pa Ma Ga:\nP M G (rest) · P M G (rest) · P M G → Sa\n\nMathematically: each group is 4 beats → 3 × 4 = 12 beats. This means your Teermanam starts 12 beats before the Idam — so you plan accordingly.\n\nFor now, focus on the feel: sing the phrase 3 times, then resolve to Sa.' },
+                    { type: 'listen_sequence', swaras: ['Pa', 'Ma1', 'Ga3', ',', 'Pa', 'Ma1', 'Ga3', ',', 'Pa', 'Ma1', 'Ga3', 'Sa'], instruction: 'Listen: P M G (rest) · P M G (rest) · P M G Sa — a simple Teermanam. The phrase repeats 3 times and resolves to Sa. Count each group as 4 beats.' },
+                    { type: 'sing_sequence', swaras: ['Pa', 'Ma1', 'Ga3', ',', 'Pa', 'Ma1', 'Ga3', ',', 'Pa', 'Ma1', 'Ga3', 'Sa'], instruction: 'Sing the Teermanam. Mentally say "P M G / P M G / P M G Sa" as you go. Feel the pull of the resolution onto Sa at the end.' },
+                    { type: 'free_sing', duration: 15, instruction: 'Improvise a complete Kalpanaswaram using all three tools: (1) Begin with a Dhaatu leaping phrase, (2) Hold a note (Karvai) in the middle, (3) End with a 3-time Teermanam that resolves to Sa. Keep tala the entire time.' },
+                    { type: 'quiz', question: 'How many times is a Teermanam phrase repeated?', choices: ['Twice', 'Three times', 'Four times', 'As many times as the singer likes'], correct: 'Three times', explanation: 'A Teermanam is always repeated exactly 3 times. This triple repetition creates a sense of rhythmic inevitability — the audience hears, recognises, and then feels the resolution. Three is the fundamental number of Carnatic rhythmic closure.' }
+                ]
+            }
+        ]
+    },
+
+    // ── Stage 4: Raga Alapana ───────────────────────────────────────────────────
+    {
+        id: 'mano_stage4', title: 'Stage 4: Raga Alapana',
+        symbol: '🌊',
+        subtitle: 'Freeform melody — no beat, only the raga\'s emotion',
+        color: '#0a1a2a',
+        tag: 'Stage 4',
+        lessons: [
+            {
+                id: 'mano_4_1', title: 'What is Raga Alapana?', tag: 'Concept',
+                exercises: [
+                    { type: 'info', title: 'Singing the Raga\'s Soul', body: 'Raga Alapana (ராக ஆலாபனை) is the most personal form of Carnatic improvisation. There is no rhythm, no lyrics, no tala — just you, the raga, and the emotion.\n\nYou sing on neutral syllables:\n• "Aaaa" — pure open vowel, most common\n• "Naa" or "Ni" — gives nasal resonance\n• "Tha-na-na" — creates a flowing connection between notes\n• "Ri-ee" — used for bright, high phrases\n\nThink of it like a painter showing each colour before the painting: they hold each colour up, show it in light and shadow, blend it with neighboring colours. An alapana shows each note of the raga in exactly this way — its character, its approach, and its departure.' },
+                    { type: 'quiz', question: 'What is the primary role of Raga Alapana in a Carnatic performance?', choices: ['To warm up the voice before the krithi', 'To introduce the raga\'s character and emotional identity to the audience', 'To demonstrate tala-keeping skill', 'To practice gamakam ornaments in isolation'], correct: 'To introduce the raga\'s character and emotional identity to the audience', explanation: 'Raga Alapana is a living introduction to the raga — the singer explores its special phrases, its characteristic note-holding patterns, and its emotional texture before any composed piece begins.' },
+                    { type: 'info', title: 'No Rules on Syllables — Only on Notes', body: 'In an alapana you can mix syllables freely. Sing "Aa" for a long phrase, switch to "Naa" for a cascading descent, use "tha-na" for a fast passage.\n\nThe only rules are:\n1. Stay within the raga\'s permitted notes\n2. Respect the raga\'s characteristic phrases (how notes approach each other)\n3. Build from slow and quiet to more energetic — this arc is the classic alapana shape\n\nSpeed of the notes is completely free. You may hold any note for as long as you feel — a single note can be held for several seconds. This freedom is the beauty of alapana.' },
+                    { type: 'quiz', question: 'Which of these is NOT a rule in Raga Alapana?', choices: ['Stay within the raga\'s permitted notes', 'Keep a steady tala cycle with hand gestures', 'Respect the raga\'s characteristic phrases', 'Build naturally from slow and quiet to more energetic'], correct: 'Keep a steady tala with hand gestures', explanation: 'Raga Alapana is completely free of rhythmic cycle. There is no tala, no hand gestures, no beat counting — the singer is entirely liberated from rhythm and focuses purely on melodic phrases and the emotional quality of the raga.' }
+                ]
+            },
+            {
+                id: 'mano_4_2', title: 'The Three Zones', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Structure Through Zones', body: 'A full Raga Alapana is divided into three zones, each progressively expanding the pitch range:\n\nZone A — The Foundation:\nBegin around the lower Pa (Pa below middle Sa) and explore up to middle Sa. Slow, meditative phrases. Establish the raga\'s identity in the low register.\n\nZone B — The Heart:\nFrom middle Sa, explore all the raga\'s notes through to Pa. This is the richest zone — the raga\'s personality lives here. Spend the most time here.\n\nZone C — The Peak:\nFrom Pa, ascend to the high Sa (Sa^). Arrive at it clearly, hold it, then cascade all the way back down through the full scale.\n\nBeginners: start with Zone B only. Once Zone B feels natural, add Zone A before it and Zone C after.' },
+                    { type: 'listen_sequence', octaveMode: 'strict', swaras: ['Pa.', 'Ri1.', 'Sa', ',', '|', ',', 'Ri1', '|', 'Ga3', 'Ma1'], instruction: 'Zone A: Starting from lower Pa (Pa.), through lower Ri (Ri1.), landing on middle Sa, then rising gently to Ga3 and Ma1. This is the grounding phase.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ri1', 'Ga3', 'Ma1', '|', 'Pa', 'Da1', '|', 'Ni3', 'Pa'], tala: { name: 'Adi', groups: [4, 2, 2], unitLabel: '8-beat cycle' }, instruction: 'Zone B: The full middle register of Mayamalavagowla — Sa up to Ni3, resting on Pa. This is the heart of the raga, where its character is clearest.' },
+                    { type: 'listen_sequence', octaveMode: 'strict', swaras: ['Pa', 'Ni3', 'Sa^', ',', '|', 'Ni3', 'Pa', '|', 'Ga3', 'Sa'], instruction: 'Zone C: Ascending from Pa to high Sa (Sa^), holding it, then cascading down through Ni3, Pa, Ga3 back to middle Sa. This is the climax and resolution.' },
+                    { type: 'free_sing', duration: 12, instruction: 'Zone B practice: Using Mayamalavagowla (Sa Ri1 Ga3 Ma1 Pa Da1 Ni3), explore the middle register freely. No tala. Sing "Aaa" or "Naa." Move slowly. Let notes breathe. Return often to Ga3.' },
+                    { type: 'free_sing', duration: 15, instruction: 'Zone C practice: From Pa, rise to high Sa. Hold it clearly. Then slowly cascade all the way down to middle Sa. Repeat this arc 2–3 times, each time slightly different. No tala — just the arc.' }
+                ]
+            },
+            {
+                id: 'mano_4_3', title: 'Jiva Swaras — Soul Notes', tag: 'Concept',
+                exercises: [
+                    { type: 'info', title: 'Every Raga Has Anchor Notes', body: 'Every raga has 1 or 2 Jiva Swaras (ஜீவ ஸ்வரங்கள்) — "living notes" — that define its personality. Returning to these notes frequently gives the alapana its raga identity.\n\nExamples of Jiva Swaras:\n• Mayamalavagowla: Ga3 (Antara Gandhara) — its haunting, ancient quality\n• Bhairavi: Ga2 (lowered Ga) — gives the raga its sorrowful depth\n• Kalyani: Ma2 (raised Ma) — the immediately recognisable "Kalyani note"\n• Hamsadhwani: Pa and Ni3 — its bright, auspicious character\n• Kapi: Ga2 in descent — creates the emotional tension that defines the raga\n\nIn an alapana: keep returning to the Jiva Swara as an anchor. Let other notes decorate around it, but always come home to it.' },
+                    { type: 'quiz', question: 'What is the function of the Jiva Swara in a Raga Alapana?', choices: ['It is always the highest note in the raga', 'It is the anchor note that most clearly signals the raga\'s identity, returned to frequently', 'It is always the note Sa', 'It is only sung once, at the very end'], correct: 'It is the anchor note that most clearly signals the raga\'s identity, returned to frequently', explanation: 'The Jiva Swara is the characteristic note of the raga — the one that most immediately signals to a listener which raga is being sung. Ornamenting it, resting on it, and returning to it repeatedly gives the alapana its coherent identity.' },
+                    { type: 'quiz', question: 'Which note is the Jiva Swara of Mayamalavagowla, giving it its ancient and haunting quality?', choices: ['Sa', 'Ri1 (Shuddha Rishabha)', 'Ga3 (Antara Gandhara)', 'Pa'], correct: 'Ga3 (Antara Gandhara)', explanation: 'Ga3 (Antara Gandhara — the high natural third) is the defining note of Mayamalavagowla. Its contrast with the low Ri1 (Shuddha Rishabha) creates the raga\'s distinctive ancient, meditative quality that no other raga shares.' },
+                    { type: 'listen_sequence', swaras: ['Sa', 'Ga3', 'Ga3', 'Ri1', '|', 'Ga3', ',', '|', 'Ri1', 'Sa'], instruction: 'Listen to Ga3 as an anchor: approached from Sa, held, approached again from Ri1, held again, then resolved. The phrase keeps returning to Ga3 — this is Jiva Swara practice.' },
+                    { type: 'free_sing', duration: 12, instruction: 'Sing freely in Mayamalavagowla. Keep returning to Ga3 as your anchor. Approach it from Sa below, from Pa above, from Ri1. Rest on it. Ornament it slightly. Then depart. This is Jiva Swara practice.' }
+                ]
+            },
+            {
+                id: 'mano_4_4', title: 'Your First Alapana', tag: 'Practice',
+                exercises: [
+                    { type: 'info', title: 'Putting It Together', body: 'You now have all the tools for a complete alapana:\n\n✓ Zone A: Begin in the lower octave\n✓ Zone B: Explore the heart of the raga in the middle register\n✓ Zone C: Ascend to the peak and cascade back down\n✓ Jiva Swara: Keep returning to Ga3 as your anchor\n✓ Syllables: Sing "Aa," "Naa," or "Tha-na-na"\n✓ No tala: Let the phrases breathe at your natural pace\n\nFor your first alapana, do only Zone B. Start slowly. Move from note to note without rushing. Hold any note that feels right. Return to Ga3 often. Build intensity gradually. There is no wrong note as long as it belongs to Mayamalavagowla.' },
+                    { type: 'free_sing', duration: 8, instruction: 'Mini-alapana: Slowly sing Sa, then rise to Ga3. Hold Ga3 for several counts. Move to Ma1 then return to Ga3. That arc — approach, hold, depart — is a complete alapana phrase. Repeat it.' },
+                    { type: 'free_sing', duration: 20, instruction: 'Your First Alapana: Sing freely in Mayamalavagowla for 20 seconds. Start near Sa, build upward, return to Ga3 often, aim for Sa^ at the peak, then slowly cascade back down. No tala. No lyrics. Only the raga.' },
+                    { type: 'quiz', question: 'In what order are the three zones of a Raga Alapana explored?', choices: ['Peak (Zone C) → Heart (Zone B) → Foundation (Zone A)', 'Heart (Zone B) → Foundation (Zone A) → Peak (Zone C)', 'Foundation (Zone A) → Heart (Zone B) → Peak (Zone C)', 'Any order works equally well'], correct: 'Foundation (Zone A) → Heart (Zone B) → Peak (Zone C)', explanation: 'A Raga Alapana always builds from the lower register upward to the peak. This mirrors the natural arc of musical storytelling: establish the foundation, explore the heart of the raga, then climax at the peak before resolving back down.' }
+                ]
+            }
+        ]
+    }
+];
+
+export const MANODHARMA_CURRICULUM = MANODHARMA_CURRICULUM_RAW.map(stage => ({
     ...stage,
     lessons: stage.lessons.map(lesson => ({
         ...lesson,
@@ -3100,7 +3282,7 @@ export const COURSES = [
         description: 'Introduction to creative improvisation, including Alapana and Kalpanaswaras.',
         symbol: '🌊',
         color: '#3a2b0e',
-        upcoming: true
+        curriculum: MANODHARMA_CURRICULUM
     },
     {
         id: 'manodharma_advanced',

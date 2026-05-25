@@ -3595,6 +3595,13 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         }).join(' ')
     ), []);
 
+    const hasDetectedNotes = useCallback((tokens) => (
+        tokens.some((token) => {
+            const swara = getTokenSwara(token);
+            return swara && swara !== ',' && swara !== '|' && swara !== '||';
+        })
+    ), []);
+
     const finishRecording = useCallback(() => {
         const beatMs = (60 / bpm) * 1000;
         const slotMs = beatMs / subdiv;
@@ -3609,28 +3616,45 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         });
         const frameTokens = bucketsToTokens(frameSlotNotes);
         const fallbackTokens = bucketsToTokens(fallbackSlotNotes);
-        const tokens = frameTokens.length ? frameTokens : fallbackTokens;
+        const tokens = hasDetectedNotes(frameTokens)
+            ? frameTokens
+            : (hasDetectedNotes(fallbackTokens) ? fallbackTokens : []);
+
+        if (!tokens.length) {
+            setTranscribed([]);
+            setTranscribedText('');
+            setMicError('No clear notes were detected. Try singing a little closer to the mic, verify Sa, or enable Mobile Mic Mode.');
+            cleanup();
+            setPhase('error');
+            return;
+        }
+
         setTranscribed(tokens);
         setTranscribedText(tokensToReadableText(tokens));
         cleanup();
         setPhase('done');
-    }, [BEATS_PER_AVARTANA, avartanas, bpm, bucketsToTokens, cleanup, subdiv, tokensToReadableText, transcribeFramesToSlots]);
+    }, [BEATS_PER_AVARTANA, avartanas, bpm, bucketsToTokens, cleanup, hasDetectedNotes, subdiv, tokensToReadableText, transcribeFramesToSlots]);
 
     const startRecording = useCallback(async () => {
-            setMicError('');
-            setTranscribed([]);
-            setTranscribedText('');
+        setMicError('');
+        setTranscribed([]);
+        setTranscribedText('');
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    echoCancellation: false,
-                    noiseSuppression: false,
-                    autoGainControl: false,
-                },
-            });
+            const stream = await navigator.mediaDevices.getUserMedia(
+                mobileMicMode
+                    ? {
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true,
+                        },
+                    }
+                    : { audio: true }
+            );
             streamRef.current = stream;
 
             const ctx = getAudioCtx();
+            const sampleRate = ctx.sampleRate;
             const source = ctx.createMediaStreamSource(stream);
             const analyser = ctx.createAnalyser();
             analyser.fftSize = 2048;
@@ -3684,13 +3708,16 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                     return;
                 }
 
-                const yin = yinEstimate(buf, getAudioCtx().sampleRate);
-                const acfFreq = detectPitchAudio(analyserNode, getAudioCtx().sampleRate);
+                const yin = yinEstimate(buf, sampleRate);
+                const acfFreq = detectPitchAudio(analyserNode, sampleRate);
                 const yinPriorityThreshold = mobileMicMode ? 0.44 : 0.48;
-                const chosenFreq = yin?.confidence >= yinPriorityThreshold ? yin.freq : acfFreq;
-                const confidence = yin?.confidence ?? (mobileMicMode ? 0.42 : 0.40);
                 const minConfidence = mobileMicMode ? 0.30 : 0.35;
-                if (!chosenFreq || confidence < minConfidence) {
+                let chosenFreq = null;
+                if (yin?.freq && yin.confidence >= yinPriorityThreshold) chosenFreq = yin.freq;
+                else if (acfFreq) chosenFreq = acfFreq;
+                else if (yin?.freq && yin.confidence >= minConfidence) chosenFreq = yin.freq;
+
+                if (!chosenFreq) {
                     frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
                     return;
                 }

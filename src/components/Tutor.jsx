@@ -3380,6 +3380,8 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     const playAbortRef = useRef(null);
     const frameHistoryRef = useRef([]);
     const octaveStateRef = useRef({ stable: 0, pending: null, pendingCount: 0 });
+    const noiseProfileRef = useRef(0.004);
+    const sustainBridgeRef = useRef({ label: ',', freqSemi: null, frames: 0 });
 
     const activeTala = TALA_PRESETS.find(t => t.id === talaId) || TALA_PRESETS[0];
     const talaGroups = activeTala.groups;
@@ -3468,7 +3470,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         const grid = Array.from({ length: totalSlots }, () => []);
         const slotDurSec = slotMs / 1000;
         const onsetTolerance = slotDurSec * 0.35;
-        const minSegSec = Math.max(slotDurSec * 0.18, 0.02);
+        const minSegSec = Math.max(slotDurSec * 0.12, 0.015);
 
         // Smooth labels with local majority to suppress one-frame flips.
         const smoothed = frames.map((_, i) => {
@@ -3533,6 +3535,8 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         setIsPreviewingTempo(false);
         frameHistoryRef.current = [];
         octaveStateRef.current = { stable: 0, pending: null, pendingCount: 0 };
+        noiseProfileRef.current = 0.004;
+        sustainBridgeRef.current = { label: ',', freqSemi: null, frames: 0 };
         if (streamRef.current) {
             streamRef.current.getTracks().forEach(t => t.stop());
             streamRef.current = null;
@@ -3657,7 +3661,8 @@ function TalaSwaraTranscriber({ sa, setSa }) {
             const sampleRate = ctx.sampleRate;
             const source = ctx.createMediaStreamSource(stream);
             const analyser = ctx.createAnalyser();
-            analyser.fftSize = 2048;
+            analyser.fftSize = mobileMicMode ? 2048 : 4096;
+            analyser.smoothingTimeConstant = mobileMicMode ? 0.72 : 0.8;
             source.connect(analyser);
             sourceRef.current = source;
             analyserRef.current = analyser;
@@ -3666,6 +3671,8 @@ function TalaSwaraTranscriber({ sa, setSa }) {
             bucketsRef.current = Array.from({ length: totalSlots }, () => ({}));
             frameHistoryRef.current = [];
             octaveStateRef.current = { stable: 0, pending: null, pendingCount: 0 };
+            noiseProfileRef.current = 0.004;
+            sustainBridgeRef.current = { label: ',', freqSemi: null, frames: 0 };
 
             const beatMs = (60 / bpm) * 1000;
             const slotMs = beatMs / subdiv;
@@ -3702,8 +3709,20 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 analyserNode.getFloatTimeDomainData(buf);
                 const rms = Math.sqrt(buf.reduce((sum, v) => sum + v * v, 0) / buf.length);
                 const noiseFloor = (window.MIC_NOISE_FLOOR || 4) / 100;
-                const rmsGate = mobileMicMode ? Math.max(0.008, noiseFloor * 0.8) : Math.max(0.01, noiseFloor);
-                if (rms < rmsGate) {
+                const prev = frameHistoryRef.current[frameHistoryRef.current.length - 1];
+                const prevLabel = prev?.label || ',';
+                const recentNote = prevLabel !== ',';
+                noiseProfileRef.current = recentNote
+                    ? noiseProfileRef.current
+                    : (noiseProfileRef.current * 0.92) + (rms * 0.08);
+                const adaptiveFloor = noiseProfileRef.current;
+                const rmsGate = mobileMicMode
+                    ? Math.max(0.006, noiseFloor * 0.45, adaptiveFloor * 2.2)
+                    : Math.max(0.0075, noiseFloor * 0.55, adaptiveFloor * 2.6);
+                const sustainGate = recentNote ? rmsGate * 0.72 : rmsGate;
+
+                if (rms < sustainGate) {
+                    sustainBridgeRef.current = { label: ',', freqSemi: null, frames: 0 };
                     frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
                     return;
                 }
@@ -3718,24 +3737,43 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 else if (yin?.freq && yin.confidence >= minConfidence) chosenFreq = yin.freq;
 
                 if (!chosenFreq) {
+                    if (recentNote && sustainBridgeRef.current.label === prevLabel && sustainBridgeRef.current.frames < 3) {
+                        sustainBridgeRef.current = {
+                            label: prevLabel,
+                            freqSemi: prev?.freqSemi ?? sustainBridgeRef.current.freqSemi,
+                            frames: sustainBridgeRef.current.frames + 1,
+                        };
+                        frameHistoryRef.current.push({
+                            time: elapsed / 1000,
+                            label: prevLabel,
+                            glide: false,
+                            freqSemi: prev?.freqSemi ?? sustainBridgeRef.current.freqSemi,
+                        });
+                        const bucket = bucketsRef.current[slot];
+                        bucket[prevLabel] = (bucket[prevLabel] || 0) + 1;
+                        return;
+                    }
+
+                    sustainBridgeRef.current = { label: ',', freqSemi: null, frames: 0 };
                     frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
                     return;
                 }
 
                 const base = getSwaram(chosenFreq, sa);
                 if (!base) {
+                    sustainBridgeRef.current = { label: ',', freqSemi: null, frames: 0 };
                     frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
                     return;
                 }
                 const semitones = 12 * (Math.log(chosenFreq / sa) / Math.log(2));
                 const swara = resolveOctaveWithHysteresis(base, semitones);
 
-                const prev = frameHistoryRef.current[frameHistoryRef.current.length - 1];
                 const prevSemi = prev?.freqSemi;
                 const centsPerSec = prevSemi != null ? Math.abs((semitones - prevSemi) * 100) / Math.max(0.001, (elapsed / 1000) - prev.time) : 0;
                 const glide = centsPerSec > 450; // fast continuous motion likely gamaka glide
 
                 frameHistoryRef.current.push({ time: elapsed / 1000, label: swara, glide, freqSemi: semitones });
+                sustainBridgeRef.current = { label: swara, freqSemi: semitones, frames: 0 };
 
                 const bucket = bucketsRef.current[slot];
                 const bucketLabel = (anchorOnlyMode && glide && prev?.label && prev.label !== ',') ? prev.label : swara;

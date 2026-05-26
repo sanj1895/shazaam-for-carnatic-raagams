@@ -344,10 +344,19 @@ export const SadhanaIcon = ({ className = "w-5 h-5" }) => (
 );
 
 export const TranscribeIcon = ({ className = "w-5 h-5" }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-        <path d="M4 5h10a2 2 0 0 1 2 2v12H6a2 2 0 0 1-2-2V5z" />
-        <path d="M8 9h6M8 13h6M8 17h4" />
-        <path d="M18 6l2 2-5 5-2 .5.5-2L18 6z" />
+    <svg className={className} viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 10h24l8 8v34a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4z" fill="currentColor" fillOpacity="0.06" />
+        <path d="M40 10v10h10" opacity="0.7" />
+        <path d="M20 24h20" opacity="0.35" />
+        <path d="M20 31h24" opacity="0.35" />
+        <path d="M20 38h14" opacity="0.28" />
+        <path d="M20 44c3-3 6-3 9 0s6 3 9 0 6-3 9 0" strokeWidth="2.1" />
+        <circle cx="29" cy="44" r="1.9" fill="#C8941F" stroke="none" />
+        <circle cx="38" cy="44" r="1.9" fill="#C8941F" stroke="none" />
+        <path d="M48 20l2.5 2.5-11 11-5 1.5 1.5-5L47 19c.5-.5 1.2-.5 1.7 0z" fill="currentColor" fillOpacity="0.13" />
+        <path d="M45.5 21.5l4 4" strokeWidth="1.2" opacity="0.75" />
+        <path d="M33.5 36.5l3 3" strokeWidth="1.2" opacity="0.75" />
+        <path d="M22 52c6 1.5 14 1.5 20 0" opacity="0.25" strokeDasharray="3 3" />
     </svg>
 );
 

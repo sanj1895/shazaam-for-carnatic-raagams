@@ -5043,7 +5043,7 @@ function UnitView({ unit, progress, onSelectLesson, onBack, structuredMode = fal
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly = false, launchTarget = null, onLaunchHandled }) {
+export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly = false, launchTarget = null, onNavigationChange, onLaunchHandled }) {
     const [sa, setSa] = useState(() => {
         try {
             return Number(localStorage.getItem('tutor_base_sa') || saFrequency || 261.63);
@@ -5104,6 +5104,9 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
 
     const activeCourse = COURSES.find(c => c.id === selectedCourseId);
     const activeCurriculum = activeCourse?.curriculum || CURRICULUM;
+    const syncTutorRoute = useCallback((target = null, options = {}) => {
+        onNavigationChange?.(target, options);
+    }, [onNavigationChange]);
     const nextLesson = activeUnit && activeLesson
         ? (() => {
             const unitIdx = activeCurriculum.findIndex((unit) => unit.id === activeUnit.id);
@@ -5119,25 +5122,66 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
         : null;
 
     useEffect(() => {
-        if (transcribeOnly || !launchTarget?.courseId || !launchTarget?.unitId || !launchTarget?.lessonId) return;
+        if (transcribeOnly) return;
 
-        const course = COURSES.find((c) => c.id === launchTarget.courseId);
-        const curriculum = course?.curriculum || [];
-        const unit = curriculum.find((entry) => entry.id === launchTarget.unitId);
-        const lesson = unit?.lessons.find((entry) => entry.id === launchTarget.lessonId);
+        if (launchTarget?.tab && launchTarget.tab !== tab) {
+            setTab(launchTarget.tab);
+        }
 
-        if (!course || !unit || !lesson) {
+        if (!launchTarget?.courseId) {
+            setTab(launchTarget?.tab || 'curriculum');
+            setSelectedCourseId(null);
+            setActiveUnit(null);
+            setActiveLesson(null);
+            setScreen('home');
             onLaunchHandled?.();
             return;
         }
 
-        setTab('curriculum');
+        const course = COURSES.find((c) => c.id === launchTarget.courseId);
+        if (!course) {
+            onLaunchHandled?.();
+            return;
+        }
+
+        const curriculum = course.curriculum || [];
+        const unit = launchTarget.unitId ? curriculum.find((entry) => entry.id === launchTarget.unitId) : null;
+        const lesson = launchTarget.lessonId && unit
+            ? unit.lessons.find((entry) => entry.id === launchTarget.lessonId)
+            : null;
+
+        setTab(launchTarget.tab || 'curriculum');
         setSelectedCourseId(course.id);
+        if (!launchTarget.unitId) {
+            setActiveUnit(null);
+            setActiveLesson(null);
+            setScreen('home');
+            onLaunchHandled?.();
+            return;
+        }
+
+        if (!unit) {
+            onLaunchHandled?.();
+            return;
+        }
+
         setActiveUnit(unit);
+        if (!launchTarget.lessonId) {
+            setActiveLesson(null);
+            setScreen('unit');
+            onLaunchHandled?.();
+            return;
+        }
+
+        if (!lesson) {
+            onLaunchHandled?.();
+            return;
+        }
+
         setActiveLesson(lesson);
         setScreen('lesson');
         onLaunchHandled?.();
-    }, [launchTarget, onLaunchHandled, transcribeOnly]);
+    }, [launchTarget, onLaunchHandled, tab, transcribeOnly]);
 
     const isUnlocked = (unitIdx) => {
         if (!structuredMode || unitIdx === 0) return true;
@@ -5246,7 +5290,17 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
                                     </svg>
                                 )},
                             ].map(({ id, label, icon }) => (
-                                <button key={id} onClick={() => setTab(id)}
+                                <button key={id} onClick={() => {
+                                    setTab(id);
+                                    syncTutorRoute(id === 'curriculum'
+                                        ? {
+                                            tab: 'curriculum',
+                                            courseId: selectedCourseId || undefined,
+                                            unitId: screen !== 'home' ? activeUnit?.id : undefined,
+                                            lessonId: screen === 'lesson' ? activeLesson?.id : undefined,
+                                        }
+                                        : { tab: id });
+                                }}
                                         className={`px-2 sm:px-5 py-2 text-xs font-playfair tracking-wide transition-colors relative flex items-center gap-1 sm:gap-1.5 ${
                                             tab === id ? 'text-c-gold' : 'text-c-cream-dim hover:text-c-cream'
                                         }`}>
@@ -5262,15 +5316,32 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
                             selectedCourseId === null ? (
                                 <ProgramsCatalog
                                     progress={progress}
-                                    onSelectCourse={(courseId) => setSelectedCourseId(courseId)}
+                                    onSelectCourse={(courseId) => {
+                                        setSelectedCourseId(courseId);
+                                        setActiveUnit(null);
+                                        setActiveLesson(null);
+                                        setScreen('home');
+                                        syncTutorRoute({ tab: 'curriculum', courseId });
+                                    }}
                                 />
                             ) : (
                                 <CurriculumHome
                                     progress={progress}
                                     isUnlocked={isUnlocked}
-                                    onSelectUnit={(unit) => { setActiveUnit(unit); setScreen('unit'); }}
+                                    onSelectUnit={(unit) => {
+                                        setActiveUnit(unit);
+                                        setActiveLesson(null);
+                                        setScreen('unit');
+                                        syncTutorRoute({ tab: 'curriculum', courseId: selectedCourseId, unitId: unit.id });
+                                    }}
                                     onReset={resetProgress}
-                                    onBackToCatalog={() => setSelectedCourseId(null)}
+                                    onBackToCatalog={() => {
+                                        setSelectedCourseId(null);
+                                        setActiveUnit(null);
+                                        setActiveLesson(null);
+                                        setScreen('home');
+                                        syncTutorRoute({ tab: 'curriculum' });
+                                    }}
                                     activeCurriculum={activeCurriculum}
                                     structuredMode={structuredMode}
                                     onToggleStructuredMode={toggleStructuredMode}
@@ -5289,8 +5360,16 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
                 <UnitView
                     unit={activeUnit}
                     progress={progress}
-                    onSelectLesson={(lesson) => { setActiveLesson(lesson); setScreen('lesson'); }}
-                    onBack={() => setScreen('home')}
+                    onSelectLesson={(lesson) => {
+                        setActiveLesson(lesson);
+                        setScreen('lesson');
+                        syncTutorRoute({ tab: 'curriculum', courseId: selectedCourseId, unitId: activeUnit.id, lessonId: lesson.id });
+                    }}
+                    onBack={() => {
+                        setActiveLesson(null);
+                        setScreen('home');
+                        syncTutorRoute({ tab: 'curriculum', courseId: selectedCourseId });
+                    }}
                     structuredMode={structuredMode}
                 />
             )}
@@ -5302,9 +5381,15 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
                     setSa={updateSa}
                     onComplete={() => {
                         saveProgress(activeUnit.id, activeLesson.id);
+                        setActiveLesson(null);
                         setScreen('unit');
+                        syncTutorRoute({ tab: 'curriculum', courseId: selectedCourseId, unitId: activeUnit.id });
                     }}
-                    onBack={() => setScreen('unit')}
+                    onBack={() => {
+                        setActiveLesson(null);
+                        setScreen('unit');
+                        syncTutorRoute({ tab: 'curriculum', courseId: selectedCourseId, unitId: activeUnit.id });
+                    }}
                     onSadhanaComplete={onSadhanaComplete}
                     nextLesson={nextLesson?.lesson || null}
                     onNextLesson={nextLesson ? (() => {
@@ -5312,6 +5397,12 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
                         setActiveUnit(nextLesson.unit);
                         setActiveLesson(nextLesson.lesson);
                         setScreen('lesson');
+                        syncTutorRoute({
+                            tab: 'curriculum',
+                            courseId: selectedCourseId,
+                            unitId: nextLesson.unit.id,
+                            lessonId: nextLesson.lesson.id,
+                        });
                     }) : null}
                 />
             )}

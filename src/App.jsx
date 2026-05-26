@@ -52,6 +52,48 @@ const FEATURES = [
 
 const SADHANA_TABS = ['shruthi', 'tutor', 'keyboard', 'singback'];
 
+function parseHashRoute(hashValue = window.location.hash) {
+    const normalized = hashValue.replace(/^#\/?/, '').trim();
+    if (!normalized) return { view: 'home', segments: [] };
+    const segments = normalized.split('/').filter(Boolean).map((segment) => decodeURIComponent(segment));
+    return { view: segments[0] || 'home', segments };
+}
+
+function parseTutorHashTarget(segments = []) {
+    if (!segments.length || segments[0] !== 'tutor') return null;
+    const target = {};
+    for (let i = 1; i < segments.length; i += 2) {
+        const key = segments[i];
+        const value = segments[i + 1];
+        if (!value) break;
+        if (key === 'tab') target.tab = value;
+        if (key === 'course') target.courseId = value;
+        if (key === 'unit') target.unitId = value;
+        if (key === 'lesson') target.lessonId = value;
+    }
+    return Object.keys(target).length ? target : null;
+}
+
+function buildHashForView(view, tutorTarget = null) {
+    if (!view || view === 'home') return '#/home';
+    if (view !== 'tutor') return `#/${view}`;
+
+    const segments = ['tutor'];
+    if (tutorTarget?.tab && tutorTarget.tab !== 'curriculum') {
+        segments.push('tab', tutorTarget.tab);
+    }
+    if (tutorTarget?.courseId) {
+        segments.push('course', tutorTarget.courseId);
+    }
+    if (tutorTarget?.unitId) {
+        segments.push('unit', tutorTarget.unitId);
+    }
+    if (tutorTarget?.lessonId) {
+        segments.push('lesson', tutorTarget.lessonId);
+    }
+    return `#/${segments.map((segment) => encodeURIComponent(segment)).join('/')}`;
+}
+
 function getLocalDateString() {
     const d = new Date();
     const year = d.getFullYear();
@@ -93,15 +135,9 @@ function loadSadhanaState() {
 }
 
 function App() {
-    const [view, setView] = useState(() => {
-        const hash = window.location.hash.replace(/^#\/?/, '');
-        return hash || 'home';
-    });
+    const [view, setView] = useState(() => parseHashRoute().view);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [showFeatures, setShowFeatures] = useState(() => {
-        const hash = window.location.hash.replace(/^#\/?/, '');
-        return hash && hash !== 'home' ? true : false;
-    });
+    const [showFeatures, setShowFeatures] = useState(() => parseHashRoute().view !== 'home');
     const [saFrequency, setSaFrequency] = useState(null);
     const [detectedNotes, setDetectedNotes] = useState([]);
     const [possibleRagas, setPossibleRagas] = useState([]);
@@ -109,7 +145,10 @@ function App() {
     const [activeMode, setActiveMode] = useState('standard');
     const [tourActive, setTourActive] = useState(false);
     const [quizActive, setQuizActive] = useState(false);
-    const [tutorLaunchTarget, setTutorLaunchTarget] = useState(null);
+    const [tutorLaunchTarget, setTutorLaunchTarget] = useState(() => {
+        const route = parseHashRoute();
+        return route.view === 'tutor' ? parseTutorHashTarget(route.segments) : null;
+    });
     const [sadhana, setSadhana] = useState(loadSadhanaState);
     const [sadhanaToast, setSadhanaToast] = useState(null); // { title, stepName }
     const [selectedRaga, setSelectedRaga] = useState(null); // { raga, hasClearMatch, type: 'library' | 'identify' | 'melakarta' }
@@ -210,13 +249,14 @@ function App() {
     // Listen for hashchange events (back/forward navigation only — not goTo-triggered changes)
     useEffect(() => {
         const handleHashChange = () => {
-            const hash = window.location.hash.replace(/^#\/?/, '');
-            const targetView = hash || 'home';
+            const route = parseHashRoute();
+            const targetView = route.view || 'home';
             if (targetView !== viewRef.current) {
                 if (targetView !== 'listen') handleReset();
                 setView(targetView);
                 setShowFeatures(targetView !== 'home');
             }
+            setTutorLaunchTarget(targetView === 'tutor' ? parseTutorHashTarget(route.segments) : null);
         };
 
         window.addEventListener('hashchange', handleHashChange);
@@ -233,7 +273,23 @@ function App() {
         } else {
             setShowFeatures(true);
         }
-        window.location.hash = `#/${id}`;
+        const nextHash = buildHashForView(id, tutorTarget);
+        if (window.location.hash !== nextHash) {
+            window.location.hash = nextHash;
+        }
+    };
+
+    const handleTutorNavigation = (target = null, options = {}) => {
+        const { replace = false } = options;
+        const normalizedTarget = target && Object.keys(target).length ? target : null;
+        setTutorLaunchTarget(normalizedTarget);
+        const nextHash = buildHashForView('tutor', normalizedTarget);
+        if (window.location.hash === nextHash) return;
+        if (replace) {
+            window.history.replaceState(null, '', nextHash);
+        } else {
+            window.location.hash = nextHash;
+        }
     };
 
     return (
@@ -650,7 +706,8 @@ function App() {
                         saFrequency={saFrequency}
                         onSadhanaComplete={markSadhanaStep}
                         launchTarget={tutorLaunchTarget}
-                        onLaunchHandled={() => setTutorLaunchTarget(null)}
+                        onNavigationChange={handleTutorNavigation}
+                        onLaunchHandled={() => {}}
                     />
                 )}
                 {view === 'transcribe' && <Tutor saFrequency={saFrequency} transcribeOnly={true} />}

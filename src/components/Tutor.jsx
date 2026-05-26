@@ -4123,6 +4123,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         const slotDurSec = slotMs / 1000;
         const onsetTolerance = slotDurSec * 0.28;
         const minSegSec = Math.max(slotDurSec * 0.12, 0.02);
+        const slotMeta = Array.from({ length: totalSlots }, () => ({ voiced: 0, hold: 0, strong: 0 }));
 
         // Smooth labels lightly so we keep real fast note turns instead of ironing
         // them away during geetham/manodharma transcription.
@@ -4134,6 +4135,14 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 counts[k] = (counts[k] || 0) + 1;
             });
             return { ...frames[i], label: Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || ',' };
+        });
+
+        smoothed.forEach((frame) => {
+            const slot = Math.floor(frame.time / slotDurSec);
+            if (slot < 0 || slot >= totalSlots || frame.label === ',') return;
+            slotMeta[slot].voiced += 1;
+            if (frame.hold) slotMeta[slot].hold += 1;
+            if (frame.strong) slotMeta[slot].strong += 1;
         });
 
         // Segment contiguous labels.
@@ -4150,6 +4159,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                     count: 1,
                     strongCount: f.strong ? 1 : 0,
                     bridgedCount: f.bridged ? 1 : 0,
+                    holdCount: f.hold ? 1 : 0,
                 };
             } else {
                 cur.end = f.time;
@@ -4157,6 +4167,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 if (f.glide) cur.glideCount += 1;
                 if (f.strong) cur.strongCount += 1;
                 if (f.bridged) cur.bridgedCount += 1;
+                if (f.hold) cur.holdCount += 1;
             }
         });
         if (cur) segments.push(cur);
@@ -4168,8 +4179,10 @@ function TalaSwaraTranscriber({ sa, setSa }) {
             const glideRatio = seg.glideCount / Math.max(1, seg.count);
             const strongRatio = seg.strongCount / Math.max(1, seg.count);
             const bridgedRatio = seg.bridgedCount / Math.max(1, seg.count);
+            const holdRatio = seg.holdCount / Math.max(1, seg.count);
             if (anchorOnlyMode && glideRatio > 0.55 && segDurSec < slotDurSec * 1.1) return;
             if (strongRatio < 0.34 && bridgedRatio > 0.45) return;
+            if (holdRatio > 0.92 && strongRatio < 0.12 && segDurSec < slotDurSec * 0.9) return;
             if (strongRatio < 0.2 && segDurSec < slotDurSec * 0.9) return;
 
             const rawSlot = seg.start / slotDurSec;
@@ -4184,11 +4197,17 @@ function TalaSwaraTranscriber({ sa, setSa }) {
             }
         });
 
-        return grid.map(bucket => {
+        return grid.map((bucket, idx) => {
             if (!bucket.length) return ',';
             const counts = {};
             bucket.forEach(n => { counts[n] = (counts[n] || 0) + 1; });
-            return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+            const label = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+            const meta = slotMeta[idx];
+            const prevLabel = idx > 0 ? grid[idx - 1].find((n) => n !== ',') || null : null;
+            if (label === prevLabel && meta.voiced > 0 && meta.hold >= Math.max(1, Math.round(meta.voiced * 0.5)) && meta.strong === 0) {
+                return '-';
+            }
+            return label;
         });
     }, [anchorOnlyMode]);
 
@@ -4403,6 +4422,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                             freqSemi: prev?.freqSemi ?? sustainBridgeRef.current.freqSemi,
                             strong: false,
                             bridged: true,
+                            hold: true,
                         });
                         const bucket = bucketsRef.current[slot];
                         bucket[prevLabel] = (bucket[prevLabel] || 0) + 1;
@@ -4410,7 +4430,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                     }
 
                     sustainBridgeRef.current = { label: ',', freqSemi: null, frames: 0 };
-                    frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
+                    frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false, strong: false, bridged: false, hold: false });
                     return;
                 }
 
@@ -4451,6 +4471,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                             freqSemi: prev?.freqSemi ?? sustainBridgeRef.current.freqSemi,
                             strong: false,
                             bridged: true,
+                            hold: true,
                         });
                         const bucket = bucketsRef.current[slot];
                         bucket[prevLabel] = (bucket[prevLabel] || 0) + 1;
@@ -4458,14 +4479,14 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                     }
 
                     sustainBridgeRef.current = { label: ',', freqSemi: null, frames: 0 };
-                    frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
+                    frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false, strong: false, bridged: false, hold: false });
                     return;
                 }
 
                 const base = getSwaram(chosenFreq, sa);
                 if (!base) {
                     sustainBridgeRef.current = { label: ',', freqSemi: null, frames: 0 };
-                    frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false });
+                    frameHistoryRef.current.push({ time: elapsed / 1000, label: ',', glide: false, strong: false, bridged: false, hold: false });
                     return;
                 }
                 const semitones = 12 * (Math.log(chosenFreq / sa) / Math.log(2));
@@ -4474,6 +4495,10 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 const prevSemi = prev?.freqSemi;
                 const centsPerSec = prevSemi != null ? Math.abs((semitones - prevSemi) * 100) / Math.max(0.001, (elapsed / 1000) - prev.time) : 0;
                 const glide = centsPerSec > 450; // fast continuous motion likely gamaka glide
+                const isHeldContinuation = recentNote
+                    && prevLabel === swara
+                    && Math.abs((prevSemi ?? semitones) - semitones) < 0.18
+                    && (!strongDetection || rms < rmsGate * 1.45);
 
                 frameHistoryRef.current.push({
                     time: elapsed / 1000,
@@ -4482,6 +4507,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                     freqSemi: semitones,
                     strong: strongDetection,
                     bridged: false,
+                    hold: isHeldContinuation,
                 });
                 sustainBridgeRef.current = { label: swara, freqSemi: semitones, frames: 0 };
 

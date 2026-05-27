@@ -587,34 +587,8 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     }, [anchorOnlyMode]);
 
     const buildPlaybackEvents = useCallback((tokens, frames) => {
-        const noteSegments = [];
-        let currentSegment = null;
-        frames.forEach((frame) => {
-            const label = frame.label || ',';
-            if (label === ',' || label === '-') {
-                if (currentSegment) {
-                    noteSegments.push(currentSegment);
-                    currentSegment = null;
-                }
-                return;
-            }
-            if (!currentSegment || currentSegment.label !== label) {
-                if (currentSegment) noteSegments.push(currentSegment);
-                currentSegment = {
-                    label,
-                    start: frame.time,
-                    points: [{ at: 0, freq: sa * Math.pow(2, (frame.freqSemi ?? 0) / 12) }],
-                };
-                return;
-            }
-            currentSegment.points.push({
-                at: Math.max(0, frame.time - currentSegment.start),
-                freq: sa * Math.pow(2, (frame.freqSemi ?? 0) / 12),
-            });
-        });
-        if (currentSegment) noteSegments.push(currentSegment);
-
-        let segIdx = 0;
+        const unitSec = (60 / bpm);
+        const voicedFrames = frames.filter((frame) => frame.label && frame.label !== ',' && Number.isFinite(frame.freqSemi));
         let beatCursor = 0;
         let activeEvent = null;
         const events = [];
@@ -650,15 +624,25 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 return;
             }
 
-            const segment = noteSegments[segIdx] && noteSegments[segIdx].label === swara ? noteSegments[segIdx] : null;
-            if (segment) segIdx += 1;
+            const startSec = beatCursor * unitSec;
+            const endSec = (beatCursor + duration) * unitSec;
+            const tolerance = Math.min(0.08, unitSec * 0.2);
+            const contourFrames = voicedFrames.filter((frame) => (
+                frame.time >= startSec - tolerance && frame.time <= endSec + tolerance
+            ));
+            const contour = contourFrames.length
+                ? contourFrames.map((frame) => ({
+                    at: Math.max(0, Math.min(endSec - startSec, frame.time - startSec)),
+                    freq: sa * Math.pow(2, frame.freqSemi / 12),
+                }))
+                : [];
             activeEvent = {
                 type: 'note',
                 swara,
                 duration,
                 tokenIndex: idx,
                 startBeat: beatCursor,
-                contour: segment?.points || [],
+                contour,
             };
             events.push(activeEvent);
             beatCursor += duration;
@@ -667,7 +651,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         while (events.length && events[0].type === 'rest') events.shift();
         while (events.length && events[events.length - 1].type === 'rest') events.pop();
         return events;
-    }, [sa]);
+    }, [bpm, sa]);
 
     const cleanup = useCallback(() => {
         if (intervalRef.current) clearInterval(intervalRef.current);
@@ -694,8 +678,10 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     }, []);
 
     useEffect(() => () => cleanup(), [cleanup]);
-    useEffect(() => () => {
-        if (recordedAudioUrl) URL.revokeObjectURL(recordedAudioUrl);
+    useEffect(() => {
+        return () => {
+            if (recordedAudioUrl) URL.revokeObjectURL(recordedAudioUrl);
+        };
     }, [recordedAudioUrl]);
 
     const stopTranscriptionPlayback = useCallback(() => {
@@ -1095,7 +1081,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
 
                 const isBeatBoundary = Math.abs(beatAcc - Math.round(beatAcc)) < 0.01;
                 if (talaSpec && isBeatBoundary) {
-                    playTick(ctx, ctx.currentTime, 0.45);
+                    playTick(ctx, ctx.currentTime, 0.28);
                 }
 
                 if (event.type === 'rest') {
@@ -1116,8 +1102,8 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                     : [{ at: 0, freq: fallbackFreq }];
                 playContourTone(contour, extDur, {
                     fallbackFreq,
-                    peakGain: 0.46,
-                    sustainGain: 0.35,
+                    peakGain: 0.64,
+                    sustainGain: 0.46,
                 });
                 await new Promise((resolve) => setTimeout(resolve, event.duration * delayMs));
                 beatAcc += event.duration;

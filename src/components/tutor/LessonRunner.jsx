@@ -2096,7 +2096,7 @@ function ExerciseSing({ swara, sa, instruction, duration = 1.5, displayLabel, hu
 
 // ─── Shared: Sing Sequence exercise ──────────────────────────────────────────
 
-function playTick(ctx, time) {
+function playTick(ctx, time, volume = 1) {
     // 1. Warm woodbody resonant tone (sine wave for round, sweet organic sound)
     const oscBody = ctx.createOscillator();
     const gainBody = ctx.createGain();
@@ -2104,7 +2104,7 @@ function playTick(ctx, time) {
     oscBody.frequency.setValueAtTime(600, time);
     oscBody.frequency.exponentialRampToValueAtTime(300, time + 0.06);
     
-    gainBody.gain.setValueAtTime(0.5, time);
+    gainBody.gain.setValueAtTime(0.5 * volume, time);
     gainBody.gain.exponentialRampToValueAtTime(0.001, time + 0.06);
     
     oscBody.connect(gainBody);
@@ -2116,7 +2116,7 @@ function playTick(ctx, time) {
     oscClick.type = 'sine';
     oscClick.frequency.setValueAtTime(1600, time);
     
-    gainClick.gain.setValueAtTime(0.35, time);
+    gainClick.gain.setValueAtTime(0.35 * volume, time);
     gainClick.gain.exponentialRampToValueAtTime(0.001, time + 0.015);
     
     oscClick.connect(gainClick);

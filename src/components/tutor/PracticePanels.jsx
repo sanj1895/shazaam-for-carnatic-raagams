@@ -1095,7 +1095,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
 
                 const isBeatBoundary = Math.abs(beatAcc - Math.round(beatAcc)) < 0.01;
                 if (talaSpec && isBeatBoundary) {
-                    playTick(ctx, ctx.currentTime);
+                    playTick(ctx, ctx.currentTime, 0.45);
                 }
 
                 if (event.type === 'rest') {
@@ -1114,7 +1114,11 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                         freq: point.freq,
                     }))
                     : [{ at: 0, freq: fallbackFreq }];
-                playContourTone(contour, extDur, { fallbackFreq });
+                playContourTone(contour, extDur, {
+                    fallbackFreq,
+                    peakGain: 0.46,
+                    sustainGain: 0.35,
+                });
                 await new Promise((resolve) => setTimeout(resolve, event.duration * delayMs));
                 beatAcc += event.duration;
             }

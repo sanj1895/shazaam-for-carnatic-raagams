@@ -289,9 +289,9 @@ const playContourTone = (contour, duration = 0.7, options = {}) => {
         master.connect(ctx.destination);
 
         const oscillators = [
-            { type: 'triangle', gain: 0.18, detune: 0 },
-            { type: 'sine', gain: 0.07, detune: 4 },
-            { type: 'sine', gain: 0.04, detune: -6 },
+            { type: 'triangle', gain: 0.28, detune: 0 },
+            { type: 'sine', gain: 0.12, detune: 4 },
+            { type: 'sine', gain: 0.07, detune: -6 },
         ];
 
         oscillators.forEach(({ type, gain, detune }) => {
@@ -315,7 +315,7 @@ const playContourTone = (contour, duration = 0.7, options = {}) => {
         noise.buffer = buffer;
         const noiseGain = ctx.createGain();
         noiseGain.gain.setValueAtTime(0.0001, now);
-        noiseGain.gain.linearRampToValueAtTime(0.012, now + 0.03);
+        noiseGain.gain.linearRampToValueAtTime(0.018, now + 0.03);
         noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
         noise.connect(airFilter);
         airFilter.connect(noiseGain);
@@ -323,9 +323,11 @@ const playContourTone = (contour, duration = 0.7, options = {}) => {
         noise.start(now);
         noise.stop(now + duration + 0.03);
 
+        const peakGain = options.peakGain ?? 0.42;
+        const sustainGain = options.sustainGain ?? 0.32;
         master.gain.setValueAtTime(0.0001, now);
-        master.gain.linearRampToValueAtTime(0.24, now + 0.045);
-        master.gain.linearRampToValueAtTime(0.19, now + Math.max(0.08, duration * 0.7));
+        master.gain.linearRampToValueAtTime(peakGain, now + 0.045);
+        master.gain.linearRampToValueAtTime(sustainGain, now + Math.max(0.08, duration * 0.7));
         master.gain.exponentialRampToValueAtTime(0.0001, now + duration);
     } catch (err) {
         console.warn('Tutor contour playback failed:', err);

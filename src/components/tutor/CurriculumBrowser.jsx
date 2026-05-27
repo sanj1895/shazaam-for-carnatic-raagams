@@ -2,7 +2,7 @@ import React from 'react';
 import { CURRICULUM, COURSES } from '../../utils/tutorCurriculum';
 import { CuratedIcon, LockIcon, CheckIcon } from '../IconLibrary';
 
-function ProgramsCatalog({ progress, onSelectCourse }) {
+function ProgramsCatalog({ progress, onSelectCourse, appMode = 'musician' }) {
     const getCourseStats = (course) => {
         let total = 0;
         let completed = 0;
@@ -16,10 +16,33 @@ function ProgramsCatalog({ progress, onSelectCourse }) {
         return { total, completed };
     };
 
+    const orderedCourses = React.useMemo(() => {
+        const beginnerFirst = ['foundations', 'sarali_varisai', 'janta_varisai', 'daatu_varisai', 'melsthayi_mandrasthayi', 'alankarams'];
+        const musicianFirst = ['kritis', 'manodharma_basics', 'manodharma_advanced', 'varnams', 'geetams', 'swarajathis', 'alankarams', 'sarali_varisai', 'janta_varisai', 'daatu_varisai', 'melsthayi_mandrasthayi', 'foundations'];
+        const priority = appMode === 'musician' ? musicianFirst : beginnerFirst;
+        const rank = new Map(priority.map((id, index) => [id, index]));
+        return [...COURSES].sort((a, b) => {
+            const aRank = rank.has(a.id) ? rank.get(a.id) : priority.length + 1;
+            const bRank = rank.has(b.id) ? rank.get(b.id) : priority.length + 1;
+            if (aRank !== bRank) return aRank - bRank;
+            return a.title.localeCompare(b.title);
+        });
+    }, [appMode]);
+
     return (
         <div className="w-full max-w-4xl flex flex-col gap-6 animate-fade-in relative z-10">
+            <div className="rounded-xl border border-c-border bg-c-surface px-5 py-4">
+                <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-c-gold mb-1">
+                    {appMode === 'musician' ? 'Musician Mode' : 'Beginner Mode'}
+                </div>
+                <p className="text-sm text-c-cream-dim leading-relaxed">
+                    {appMode === 'musician'
+                        ? 'Advanced repertoire, geethams, varnams, kritis, and manodharma work are surfaced first. Foundations remain available when you want to review basics.'
+                        : 'Foundations and early training paths are surfaced first so new learners can move through shruti, swaras, tala, and early exercises without overload.'}
+                </p>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {COURSES.map(course => {
+                {orderedCourses.map(course => {
                     const isUpcoming = course.upcoming;
                     
                     if (!isUpcoming) {

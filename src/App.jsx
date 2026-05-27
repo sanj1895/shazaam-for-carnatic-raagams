@@ -50,6 +50,63 @@ const FEATURES = [
     { id: 'bhedam',    label: 'Graha Bhedam', desc: 'Discover modal shifts between ragas',    symbol: '↻',  mobileSymbol: '🔄', level: 'advanced' },
 ];
 
+const APP_MODES = {
+    beginner: {
+        id: 'beginner',
+        label: 'Beginner Mode',
+        shortLabel: 'Beginner',
+        title: 'Learn Step by Step',
+        subtitle: 'For people learning fundamentals through guided practice.',
+        eyebrow: 'Foundations First',
+        heroBody: 'Focus on shruti, swaras, tala, and a clear lesson path without the full musician workspace getting in the way.',
+        heroMeta: 'Guided lessons · fewer decisions · confidence-building practice',
+        primaryCta: 'Start Beginner Path',
+        secondaryCta: 'Browse beginner tools',
+    },
+    musician: {
+        id: 'musician',
+        label: 'Musician Mode',
+        shortLabel: 'Musician',
+        title: 'Practice as a Musician',
+        subtitle: 'For trained musicians who want a serious Carnatic practice workspace.',
+        eyebrow: 'Core Workspace',
+        heroBody: 'Focus on raga exploration, notation, compositions, manodharma support, transcription, recording, and fast access to reference tools.',
+        heroMeta: 'Raga tools · notation · recording · compositions · improvisation support',
+        primaryCta: 'Open Musician Workspace',
+        secondaryCta: 'Explore all musician tools',
+    },
+};
+
+const MODE_FEATURE_ORDER = {
+    beginner: ['tutor', 'sadhana', 'shruthi', 'talam', 'keyboard', 'singback'],
+    musician: ['listen', 'transcribe', 'library', 'tutor', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam'],
+};
+
+const MODE_HOME_GROUPS = {
+    beginner: [
+        { label: 'Start Here', ids: ['tutor', 'sadhana'] },
+        { label: 'Practice Basics', ids: ['shruthi', 'talam', 'keyboard', 'singback'] },
+    ],
+    musician: [
+        { label: 'Core Workspace', ids: ['listen', 'transcribe', 'library'] },
+        { label: 'Practice Tools', ids: ['tutor', 'keyboard', 'shruthi', 'talam'] },
+        { label: 'Advanced Reference', ids: ['melakarta', 'bhedam'] },
+    ],
+};
+
+const MODE_ALLOWED_VIEWS = {
+    beginner: new Set(['home', 'tutor', 'sadhana', 'shruthi', 'talam', 'keyboard', 'singback']),
+    musician: new Set(['home', 'tutor', 'listen', 'transcribe', 'library', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam']),
+};
+
+function loadAppMode() {
+    try {
+        return localStorage.getItem('alapana_app_mode') || 'musician';
+    } catch {
+        return 'musician';
+    }
+}
+
 const SADHANA_TABS = ['shruthi', 'tutor', 'keyboard', 'singback'];
 
 function parseHashRoute(hashValue = window.location.hash) {
@@ -136,6 +193,7 @@ function loadSadhanaState() {
 
 function App() {
     const [view, setView] = useState(() => parseHashRoute().view);
+    const [appMode, setAppMode] = useState(loadAppMode);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [showFeatures, setShowFeatures] = useState(() => parseHashRoute().view !== 'home');
     const [saFrequency, setSaFrequency] = useState(null);
@@ -153,6 +211,12 @@ function App() {
     const [sadhanaToast, setSadhanaToast] = useState(null); // { title, stepName }
     const [selectedRaga, setSelectedRaga] = useState(null); // { raga, hasClearMatch, type: 'library' | 'identify' | 'melakarta' }
     const [showGuide, setShowGuide] = useState(false);
+
+    const modeConfig = APP_MODES[appMode] || APP_MODES.musician;
+    const visibleFeatures = MODE_FEATURE_ORDER[appMode]
+        .map((id) => FEATURES.find((feature) => feature.id === id))
+        .filter(Boolean);
+    const homeGroups = MODE_HOME_GROUPS[appMode] || MODE_HOME_GROUPS.musician;
 
     const noteHistory = useRef([]);
     const sessionFreq = useRef({});
@@ -198,6 +262,12 @@ function App() {
         return () => clearInterval(interval);
     }, [detectedNotes]);
 
+    useEffect(() => {
+        try {
+            localStorage.setItem('alapana_app_mode', appMode);
+        } catch {}
+    }, [appMode]);
+
     const handleReset = () => {
         setDetectedNotes([]);
         setPossibleRagas([]);
@@ -214,6 +284,19 @@ function App() {
             else setPossibleRagas([]);
             return next;
         });
+    };
+
+    const switchAppMode = (nextMode, options = {}) => {
+        const { destination = 'home', reveal = true } = options;
+        setAppMode(nextMode);
+        setShowFeatures(reveal);
+        const allowedViews = MODE_ALLOWED_VIEWS[nextMode] || MODE_ALLOWED_VIEWS.musician;
+        const nextView = allowedViews.has(destination) ? destination : 'home';
+        if (nextView === 'home') {
+            goTo('home');
+        } else {
+            goTo(nextView);
+        }
     };
 
     const markSadhanaStep = (tab) => {
@@ -246,11 +329,23 @@ function App() {
     const viewRef = useRef(view);
     viewRef.current = view;
 
+    useEffect(() => {
+        const allowedViews = MODE_ALLOWED_VIEWS[appMode] || MODE_ALLOWED_VIEWS.musician;
+        if (!allowedViews.has(view)) {
+            goTo('home');
+        }
+    }, [appMode, view]);
+
     // Listen for hashchange events (back/forward navigation only — not goTo-triggered changes)
     useEffect(() => {
         const handleHashChange = () => {
             const route = parseHashRoute();
             const targetView = route.view || 'home';
+            const allowedViews = MODE_ALLOWED_VIEWS[appMode] || MODE_ALLOWED_VIEWS.musician;
+            if (!allowedViews.has(targetView)) {
+                window.location.hash = '#/home';
+                return;
+            }
             if (targetView !== viewRef.current) {
                 if (targetView !== 'listen') handleReset();
                 setView(targetView);
@@ -261,9 +356,13 @@ function App() {
 
         window.addEventListener('hashchange', handleHashChange);
         return () => window.removeEventListener('hashchange', handleHashChange);
-    }, []);
+    }, [appMode]);
 
     const goTo = (id, options = {}) => {
+        const allowedViews = MODE_ALLOWED_VIEWS[appMode] || MODE_ALLOWED_VIEWS.musician;
+        if (!allowedViews.has(id) && id !== 'home') {
+            id = 'home';
+        }
         const { tutorTarget = null } = options;
         if (id !== 'listen') handleReset();
         setTutorLaunchTarget(id === 'tutor' ? tutorTarget : null);
@@ -297,6 +396,7 @@ function App() {
             <OnboardingQuiz
                 active={quizActive}
                 onDismiss={() => setQuizActive(false)}
+                onModeSelected={(mode) => setAppMode(mode)}
                 onNavigate={(dest) => {
                     setQuizActive(false);
                     if (typeof dest === 'string') {
@@ -403,8 +503,26 @@ function App() {
                             <span className="font-playfair text-c-gold text-sm tracking-widest uppercase">Navigate</span>
                             <button onClick={() => setMobileMenuOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-c-border/20 text-c-cream-dim text-sm">✕</button>
                         </div>
+                        <div className="flex items-center gap-1 rounded-full border border-c-border bg-c-surface p-1 mb-4">
+                            {Object.values(APP_MODES).map((mode) => (
+                                <button
+                                    key={mode.id}
+                                    onClick={() => {
+                                        switchAppMode(mode.id, { destination: 'home', reveal: true });
+                                        setMobileMenuOpen(false);
+                                    }}
+                                    className={`flex-1 px-3 py-2 rounded-full text-[10px] font-playfair uppercase tracking-[0.18em] transition-all ${
+                                        appMode === mode.id
+                                            ? 'bg-c-gold text-c-bg'
+                                            : 'text-c-cream-dim'
+                                    }`}
+                                >
+                                    {mode.shortLabel}
+                                </button>
+                            ))}
+                        </div>
                         <div className="grid grid-cols-3 gap-2">
-                            {FEATURES.map(({ id, label, mobileSymbol }) => (
+                            {visibleFeatures.map(({ id, label, mobileSymbol }) => (
                                 <button
                                     key={id}
                                     onClick={() => { goTo(id); setMobileMenuOpen(false); }}
@@ -438,7 +556,7 @@ function App() {
 
                 {/* Desktop nav tabs */}
                 <div className="hidden md:flex items-center gap-1 overflow-x-auto scrollbar-hide">
-                    {FEATURES.map(({ id, label }) => (
+                    {visibleFeatures.map(({ id, label }) => (
                         <button
                             key={id}
                             onClick={() => goTo(id)}
@@ -457,20 +575,37 @@ function App() {
                 </div>
 
                 {/* Mobile hamburger */}
-                <button
-                    onClick={() => setMobileMenuOpen(true)}
-                    className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-c-surface transition-colors"
-                >
-                    <span className={`block w-5 h-0.5 bg-c-gold transition-all ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-                    <span className={`block w-5 h-0.5 bg-c-gold transition-all ${mobileMenuOpen ? 'opacity-0' : ''}`} />
-                    <span className={`block w-5 h-0.5 bg-c-gold transition-all ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
-                </button>
+                <div className="flex items-center gap-2">
+                    <div className="hidden md:flex items-center gap-1 rounded-full border border-c-border bg-c-surface px-1 py-1">
+                        {Object.values(APP_MODES).map((mode) => (
+                            <button
+                                key={mode.id}
+                                onClick={() => switchAppMode(mode.id, { destination: 'home', reveal: true })}
+                                className={`px-3 py-1 rounded-full text-[10px] font-playfair uppercase tracking-[0.18em] transition-all ${
+                                    appMode === mode.id
+                                        ? 'bg-c-gold text-c-bg'
+                                        : 'text-c-cream-dim hover:text-c-gold'
+                                }`}
+                            >
+                                {mode.shortLabel}
+                            </button>
+                        ))}
+                    </div>
+                    <button
+                        onClick={() => setMobileMenuOpen(true)}
+                        className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-c-surface transition-colors"
+                    >
+                        <span className={`block w-5 h-0.5 bg-c-gold transition-all ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+                        <span className={`block w-5 h-0.5 bg-c-gold transition-all ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+                        <span className={`block w-5 h-0.5 bg-c-gold transition-all ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+                    </button>
+                </div>
             </nav>
 
             {/* ── Mobile bottom tab bar ── */}
             {view !== 'home' && (
                 <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-c-card border-t border-c-border flex items-stretch overflow-x-auto scrollbar-hide shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
-                    {FEATURES.map(({ id, mobileSymbol, label }) => (
+                    {visibleFeatures.map(({ id, mobileSymbol, label }) => (
                         <button
                             key={id}
                             onClick={() => goTo(id)}
@@ -570,36 +705,76 @@ function App() {
                             >
                                 Ālāpana
                             </h1>
-                            <p className="text-white/70 text-sm sm:text-base md:text-xl max-w-[300px] sm:max-w-[400px] leading-snug font-light mb-3 mt-1">
-                                The modern way to learn Carnatic singing.
+                            <p className="text-c-gold/70 text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.28em] mb-3 mt-1">
+                                {modeConfig.eyebrow}
                             </p>
-                            <p className="text-white/40 text-[11px] sm:text-xs md:text-sm max-w-[260px] sm:max-w-[360px] leading-relaxed mb-8 md:mb-10 tracking-wide">
-                                Real-time pitch feedback · guided lessons · tala & shruti tools
+                            <p className="text-white/80 text-sm sm:text-base md:text-xl max-w-[560px] leading-snug font-light mb-2">
+                                {modeConfig.title}
                             </p>
+                            <p className="text-white/55 text-[11px] sm:text-xs md:text-sm max-w-[620px] leading-relaxed mb-3 tracking-wide">
+                                {modeConfig.heroBody}
+                            </p>
+                            <p className="text-white/35 text-[10px] sm:text-[11px] md:text-xs max-w-[500px] leading-relaxed mb-8 md:mb-10 tracking-[0.18em] uppercase">
+                                {modeConfig.heroMeta}
+                            </p>
+
+                            <div className="grid sm:grid-cols-2 gap-3 w-full max-w-3xl mb-7">
+                                {Object.values(APP_MODES).map((mode) => (
+                                    <button
+                                        key={mode.id}
+                                        onClick={() => {
+                                            setAppMode(mode.id);
+                                            setShowFeatures(false);
+                                        }}
+                                        className={`text-left rounded-2xl border px-5 py-5 transition-all duration-300 ${
+                                            appMode === mode.id
+                                                ? 'border-c-gold bg-c-gold/12 shadow-[0_0_30px_rgba(200,148,31,0.18)]'
+                                                : 'border-white/10 bg-black/15 hover:border-c-gold/45 hover:bg-c-gold/6'
+                                        }`}
+                                    >
+                                        <div className="flex items-center justify-between gap-3 mb-2">
+                                            <span className="font-playfair text-lg text-[#f7d686]">{mode.label}</span>
+                                            {mode.id === 'musician' && (
+                                                <span className="text-[9px] uppercase tracking-[0.2em] px-2 py-1 rounded-full border border-c-gold/30 text-c-gold/80">
+                                                    Core ICP
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-white/72 text-sm leading-relaxed">{mode.subtitle}</p>
+                                    </button>
+                                ))}
+                            </div>
 
                             {/* CTAs  ·  fade out once features are shown */}
                             <div
                                 className="transition-all duration-500 flex flex-col items-center gap-4 animate-fade-in"
                                 style={{ opacity: showFeatures ? 0 : 1, pointerEvents: showFeatures ? 'none' : 'auto', height: showFeatures ? 0 : 'auto', overflow: showFeatures ? 'hidden' : 'visible' }}
                             >
-                                {/* Primary: Start Learning */}
                                 <button
-                                    onClick={() => setQuizActive(true)}
+                                    onClick={() => {
+                                        if (appMode === 'beginner') {
+                                            setQuizActive(true);
+                                            return;
+                                        }
+                                        setShowFeatures(true);
+                                    }}
                                     className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-14 py-4 rounded-full text-sm md:text-base tracking-[0.2em] uppercase transition-all duration-500 transform hover:scale-105 shadow-[0_0_40px_rgba(200,148,31,0.35)] cursor-pointer"
                                 >
-                                    Start Learning
+                                    {modeConfig.primaryCta}
                                 </button>
-                                <p className="text-white/40 text-[11px] font-playfair italic">New to Carnatic music? Start here.</p>
+                                <p className="text-white/40 text-[11px] font-playfair italic">
+                                    {appMode === 'beginner'
+                                        ? 'New to Carnatic music? We will recommend the right starting lesson.'
+                                        : 'Built for trained musicians first, with beginner lessons still available inside Gurukul.'}
+                                </p>
 
-                                {/* Secondary: All tools */}
                                 <button
                                     onClick={() => setShowFeatures(true)}
                                     className="border border-c-gold/30 hover:border-c-gold/60 text-white/50 hover:text-[#f7d686] font-playfair px-8 py-2.5 rounded-full text-xs tracking-[0.2em] uppercase transition-all duration-500 cursor-pointer"
                                 >
-                                    I already know Carnatic music →
+                                    {modeConfig.secondaryCta} →
                                 </button>
 
-                                {/* Tour Trigger Option */}
                                 <button
                                     onClick={() => {
                                         if (window.innerWidth < 768) {
@@ -630,12 +805,8 @@ function App() {
                             }}
                         >
                             <div className="flex flex-col gap-8 w-full max-w-4xl mx-auto kolam-bg rounded-2xl px-4 py-6">
-                                {[
-                                    { label: 'Start Here', ids: ['sadhana', 'tutor'] },
-                                    { label: 'Practice', ids: ['shruthi', 'talam', 'keyboard', 'singback'] },
-                                    { label: 'Explore', ids: ['listen', 'transcribe', 'library', 'melakarta', 'bhedam'] },
-                                ].map(({ label, ids }, groupIdx) => {
-                                    const group = FEATURES.filter(f => ids.includes(f.id));
+                                {homeGroups.map(({ label, ids }, groupIdx) => {
+                                    const group = visibleFeatures.filter(f => ids.includes(f.id));
                                     return (
                                         <div key={label} className="flex flex-col gap-3">
                                             {/* Group label */}
@@ -647,8 +818,10 @@ function App() {
                                             <div className={`grid gap-3 ${
                                                 ids.length === 2
                                                     ? 'grid-cols-2 max-w-xs mx-auto w-full'
-                                                    : ids.length === 5
+                                                : ids.length === 5
                                                     ? 'grid-cols-2 sm:grid-cols-6 max-w-3xl mx-auto w-full'
+                                                : ids.length === 3
+                                                    ? 'grid-cols-1 sm:grid-cols-3 max-w-4xl mx-auto w-full'
                                                     : 'grid-cols-2 sm:grid-cols-4'
                                             }`}>
                                                 {group.map(({ id, label: fLabel, desc, highlight }, idx) => (
@@ -704,13 +877,14 @@ function App() {
                 {view === 'tutor' && (
                     <Tutor
                         saFrequency={saFrequency}
+                        appMode={appMode}
                         onSadhanaComplete={markSadhanaStep}
                         launchTarget={tutorLaunchTarget}
                         onNavigationChange={handleTutorNavigation}
                         onLaunchHandled={() => {}}
                     />
                 )}
-                {view === 'transcribe' && <Tutor saFrequency={saFrequency} transcribeOnly={true} />}
+                {view === 'transcribe' && <Tutor saFrequency={saFrequency} appMode={appMode} transcribeOnly={true} />}
 
                 {/* ══ LISTEN ══ */}
                 {view === 'listen' && (

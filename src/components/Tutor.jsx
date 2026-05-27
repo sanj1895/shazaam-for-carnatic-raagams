@@ -5,7 +5,7 @@ import LessonRunner, { ExerciseShrutiSetup } from './tutor/LessonRunner';
 import { TalaSwaraTranscriber, RagaPractice } from './tutor/PracticePanels';
 import { ProgramsCatalog, CurriculumHome, UnitView } from './tutor/CurriculumBrowser';
 
-export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly = false, launchTarget = null, onNavigationChange, onLaunchHandled }) {
+export default function Tutor({ saFrequency, appMode = 'musician', onSadhanaComplete, transcribeOnly = false, launchTarget = null, onNavigationChange, onLaunchHandled }) {
     const [sa, setSa] = useState(() => {
         try {
             return Number(localStorage.getItem('tutor_base_sa') || saFrequency || 261.63);
@@ -14,7 +14,7 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
         }
     });
     const [tunerOpen, setTunerOpen] = useState(false);
-    const [tab, setTab] = useState('curriculum');
+    const [tab, setTab] = useState(appMode === 'musician' ? 'practice' : 'curriculum');
     const [screen, setScreen] = useState('home');
     const [activeUnit, setActiveUnit] = useState(null);
     const [activeLesson, setActiveLesson] = useState(null);
@@ -63,6 +63,9 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
 
     const activeCourse = COURSES.find((course) => course.id === selectedCourseId);
     const activeCurriculum = activeCourse?.curriculum || CURRICULUM;
+    const tutorTabs = appMode === 'musician'
+        ? ['practice', 'transcribe', 'curriculum']
+        : ['curriculum', 'practice', 'transcribe'];
     const syncTutorRoute = useCallback((target = null, options = {}) => {
         onNavigationChange?.(target, options);
     }, [onNavigationChange]);
@@ -144,6 +147,11 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
         onLaunchHandled?.();
     }, [launchTarget, onLaunchHandled, tab, transcribeOnly]);
 
+    useEffect(() => {
+        if (transcribeOnly || launchTarget?.tab) return;
+        setTab(appMode === 'musician' ? 'practice' : 'curriculum');
+    }, [appMode, launchTarget, transcribeOnly]);
+
     const isUnlocked = (unitIdx) => {
         if (!structuredMode || unitIdx === 0) return true;
         const prev = activeCurriculum[unitIdx - 1];
@@ -179,10 +187,14 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
                             <div>
                                 <div className="flex items-center gap-2 mb-0.5">
                                     <h2 className="font-playfair text-2xl sm:text-3xl md:text-4xl font-bold text-c-gold tracking-tight uppercase">Svara Gurukul</h2>
-                                    <span className="px-2.5 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase bg-c-gold/15 border border-c-gold/30 text-c-gold self-center shadow-sm">Academy</span>
+                                    <span className="px-2.5 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase bg-c-gold/15 border border-c-gold/30 text-c-gold self-center shadow-sm">
+                                        {appMode === 'musician' ? 'Studio' : 'Academy'}
+                                    </span>
                                 </div>
                                 <p className="text-c-cream-dark text-xs leading-relaxed font-playfair opacity-80">
-                                    Structured, progressive vocal training curriculum from foundations to advanced improvisation.
+                                    {appMode === 'musician'
+                                        ? 'A musician-first practice space for raga work, notation, transcription, and advanced repertoire.'
+                                        : 'Structured, progressive vocal training from first shruti work to advanced improvisation.'}
                                 </p>
                             </div>
                         </div>
@@ -266,7 +278,7 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
                                         </svg>
                                     ),
                                 },
-                            ].map(({ id, label, icon }) => (
+                            ].filter(({ id }) => tutorTabs.includes(id)).sort((a, b) => tutorTabs.indexOf(a.id) - tutorTabs.indexOf(b.id)).map(({ id, label, icon }) => (
                                 <button
                                     key={id}
                                     onClick={() => {
@@ -294,6 +306,7 @@ export default function Tutor({ saFrequency, onSadhanaComplete, transcribeOnly =
                         {tab === 'curriculum' ? (
                             selectedCourseId === null ? (
                                 <ProgramsCatalog
+                                    appMode={appMode}
                                     progress={progress}
                                     onSelectCourse={(courseId) => {
                                         setSelectedCourseId(courseId);

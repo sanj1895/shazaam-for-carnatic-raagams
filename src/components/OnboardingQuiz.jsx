@@ -101,6 +101,7 @@ function getPath(totalScore, learner, age) {
             note: isOther ? 'Activities are designed to be accessible and joyful for very young learners.' : null,
             action: 'tutor',
             cta: 'Start Foundations',
+            mode: 'beginner',
             target: { courseId: 'foundations', unitId: 'stage1', lessonId: 'm1_1' },
         };
     }
@@ -114,6 +115,7 @@ function getPath(totalScore, learner, age) {
             note: isChild && isOther ? 'The exercises are designed to be accessible and engaging for young learners.' : null,
             action: 'tutor',
             cta: 'Start Foundations',
+            mode: 'beginner',
             target: { courseId: 'foundations', unitId: 'stage1', lessonId: 'm1_1' },
         };
     } else if (totalScore <= 5) {
@@ -125,6 +127,7 @@ function getPath(totalScore, learner, age) {
             note: isChild && isOther ? "Sarali Varisai is ideal for building a young learner's musical ear and muscle memory." : null,
             action: 'tutor',
             cta: 'Start Sarali Varisai',
+            mode: 'beginner',
             target: { courseId: 'sarali_varisai', unitId: 'sarali_stage1', lessonId: 's_1' },
         };
     } else {
@@ -136,11 +139,12 @@ function getPath(totalScore, learner, age) {
             note: null,
             action: 'sadhana',
             cta: 'Open Daily Sadhana',
+            mode: 'musician',
         };
     }
 }
 
-export default function OnboardingQuiz({ active, onDismiss, onNavigate }) {
+export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSelected }) {
     const [qIdx, setQIdx] = useState(0);
     const [answers, setAnswers] = useState({});
     const [selected, setSelected] = useState(null);
@@ -193,6 +197,7 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate }) {
     };
 
     const handleBegin = () => {
+        onModeSelected?.(path.mode || 'beginner');
         const dest = path.target
             ? { view: path.action, target: path.target }
             : path.action;

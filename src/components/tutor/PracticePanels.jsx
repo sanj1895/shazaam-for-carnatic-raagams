@@ -7,6 +7,7 @@ import {
     getTokenSwara,
     getTokenDuration,
     playSingleTone,
+    playContourTone,
 } from './shared';
 import {
     ExerciseListenSequence,
@@ -378,6 +379,8 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     const [progressPct, setProgressPct] = useState(0);
     const [transcribed, setTranscribed] = useState([]);
     const [transcribedText, setTranscribedText] = useState('');
+    const [playbackEvents, setPlaybackEvents] = useState([]);
+    const [recordedAudioUrl, setRecordedAudioUrl] = useState('');
     const [playIdx, setPlayIdx] = useState(-1);
     const [isPlayingTranscription, setIsPlayingTranscription] = useState(false);
     const [isPreviewingTempo, setIsPreviewingTempo] = useState(false);
@@ -393,6 +396,8 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     const beatTimerRef = useRef(null);
     const previewTimerRef = useRef(null);
     const playAbortRef = useRef(null);
+    const mediaRecorderRef = useRef(null);
+    const audioChunksRef = useRef([]);
     const frameHistoryRef = useRef([]);
     const octaveStateRef = useRef({ stable: 0, pending: null, pendingCount: 0 });
     const noiseProfileRef = useRef(0.004);
@@ -581,6 +586,89 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         });
     }, [anchorOnlyMode]);
 
+    const buildPlaybackEvents = useCallback((tokens, frames) => {
+        const noteSegments = [];
+        let currentSegment = null;
+        frames.forEach((frame) => {
+            const label = frame.label || ',';
+            if (label === ',' || label === '-') {
+                if (currentSegment) {
+                    noteSegments.push(currentSegment);
+                    currentSegment = null;
+                }
+                return;
+            }
+            if (!currentSegment || currentSegment.label !== label) {
+                if (currentSegment) noteSegments.push(currentSegment);
+                currentSegment = {
+                    label,
+                    start: frame.time,
+                    points: [{ at: 0, freq: sa * Math.pow(2, (frame.freqSemi ?? 0) / 12) }],
+                };
+                return;
+            }
+            currentSegment.points.push({
+                at: Math.max(0, frame.time - currentSegment.start),
+                freq: sa * Math.pow(2, (frame.freqSemi ?? 0) / 12),
+            });
+        });
+        if (currentSegment) noteSegments.push(currentSegment);
+
+        let segIdx = 0;
+        let beatCursor = 0;
+        let activeEvent = null;
+        const events = [];
+
+        tokens.forEach((token, idx) => {
+            const swara = getTokenSwara(token);
+            if (swara === '|' || swara === '||') return;
+            const duration = getTokenDuration(token);
+
+            if (swara === '-') {
+                if (activeEvent?.type === 'note') {
+                    activeEvent.duration += duration;
+                } else if (events.length > 0 && events[events.length - 1].type === 'rest') {
+                    events[events.length - 1].duration += duration;
+                    activeEvent = events[events.length - 1];
+                } else {
+                    activeEvent = { type: 'rest', duration, tokenIndex: idx, startBeat: beatCursor };
+                    events.push(activeEvent);
+                }
+                beatCursor += duration;
+                return;
+            }
+
+            if (swara === ',') {
+                if (events.length > 0 && events[events.length - 1].type === 'rest') {
+                    events[events.length - 1].duration += duration;
+                    activeEvent = events[events.length - 1];
+                } else {
+                    activeEvent = { type: 'rest', duration, tokenIndex: idx, startBeat: beatCursor };
+                    events.push(activeEvent);
+                }
+                beatCursor += duration;
+                return;
+            }
+
+            const segment = noteSegments[segIdx] && noteSegments[segIdx].label === swara ? noteSegments[segIdx] : null;
+            if (segment) segIdx += 1;
+            activeEvent = {
+                type: 'note',
+                swara,
+                duration,
+                tokenIndex: idx,
+                startBeat: beatCursor,
+                contour: segment?.points || [],
+            };
+            events.push(activeEvent);
+            beatCursor += duration;
+        });
+
+        while (events.length && events[0].type === 'rest') events.shift();
+        while (events.length && events[events.length - 1].type === 'rest') events.pop();
+        return events;
+    }, [sa]);
+
     const cleanup = useCallback(() => {
         if (intervalRef.current) clearInterval(intervalRef.current);
         if (beatTimerRef.current) clearInterval(beatTimerRef.current);
@@ -593,6 +681,10 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         octaveStateRef.current = { stable: 0, pending: null, pendingCount: 0 };
         noiseProfileRef.current = 0.004;
         sustainBridgeRef.current = { label: ',', freqSemi: null, frames: 0 };
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+            mediaRecorderRef.current.stop();
+        }
+        mediaRecorderRef.current = null;
         if (streamRef.current) {
             streamRef.current.getTracks().forEach(t => t.stop());
             streamRef.current = null;
@@ -602,6 +694,9 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     }, []);
 
     useEffect(() => () => cleanup(), [cleanup]);
+    useEffect(() => () => {
+        if (recordedAudioUrl) URL.revokeObjectURL(recordedAudioUrl);
+    }, [recordedAudioUrl]);
 
     const stopTranscriptionPlayback = useCallback(() => {
         playAbortRef.current?.abort();
@@ -691,14 +786,20 @@ function TalaSwaraTranscriber({ sa, setSa }) {
 
         setTranscribed(tokens);
         setTranscribedText(tokensToReadableText(tokens));
+        setPlaybackEvents(buildPlaybackEvents(tokens, frameHistoryRef.current));
         cleanup();
         setPhase('done');
-    }, [BEATS_PER_AVARTANA, avartanas, bpm, bucketsToTokens, cleanup, hasDetectedNotes, subdiv, tokensToReadableText, transcribeFramesToSlots]);
+    }, [BEATS_PER_AVARTANA, avartanas, bpm, bucketsToTokens, buildPlaybackEvents, cleanup, hasDetectedNotes, subdiv, tokensToReadableText, transcribeFramesToSlots]);
 
     const startRecording = useCallback(async () => {
         setMicError('');
         setTranscribed([]);
         setTranscribedText('');
+        setPlaybackEvents([]);
+        if (recordedAudioUrl) {
+            URL.revokeObjectURL(recordedAudioUrl);
+            setRecordedAudioUrl('');
+        }
         try {
             const stream = await navigator.mediaDevices.getUserMedia(
                 mobileMicMode
@@ -712,6 +813,29 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                     : { audio: true }
             );
             streamRef.current = stream;
+            if (typeof MediaRecorder !== 'undefined') {
+                try {
+                    const recorder = new MediaRecorder(stream);
+                    audioChunksRef.current = [];
+                    recorder.ondataavailable = (event) => {
+                        if (event.data?.size) audioChunksRef.current.push(event.data);
+                    };
+                    recorder.onstop = () => {
+                        if (!audioChunksRef.current.length) return;
+                        const nextUrl = URL.createObjectURL(new Blob(audioChunksRef.current, { type: recorder.mimeType || 'audio/webm' }));
+                        setRecordedAudioUrl((prevUrl) => {
+                            if (prevUrl) URL.revokeObjectURL(prevUrl);
+                            return nextUrl;
+                        });
+                        audioChunksRef.current = [];
+                        mediaRecorderRef.current = null;
+                    };
+                    recorder.start();
+                    mediaRecorderRef.current = recorder;
+                } catch {
+                    mediaRecorderRef.current = null;
+                }
+            }
 
             const ctx = getAudioCtx();
             const sampleRate = ctx.sampleRate;
@@ -890,7 +1014,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
             setPhase('error');
             setMicError('Mic access is required for transcription.');
         }
-    }, [BEATS_PER_AVARTANA, avartanas, bpm, cleanup, finishRecording, mobileMicMode, resolveOctaveWithHysteresis, sa, subdiv]);
+    }, [BEATS_PER_AVARTANA, avartanas, bpm, cleanup, finishRecording, mobileMicMode, recordedAudioUrl, resolveOctaveWithHysteresis, sa, subdiv]);
 
     const stopTempoPreview = useCallback(() => {
         if (previewTimerRef.current) clearInterval(previewTimerRef.current);
@@ -946,45 +1070,8 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     }, [cleanup]);
 
     const playTranscribed = useCallback(() => {
-        if (!transcribed.length || isPlayingTranscription) return;
-        const events = [];
-        let beatCursor = 0;
-        let activeEvent = null;
-
-        transcribed.forEach((token, idx) => {
-            const swara = getTokenSwara(token);
-            if (swara === '|' || swara === '||') return;
-            const duration = getTokenDuration(token);
-
-            if (swara === '-') {
-                if (activeEvent?.type === 'note') {
-                    activeEvent.duration += duration;
-                } else if (events.length > 0 && events[events.length - 1].type === 'rest') {
-                    events[events.length - 1].duration += duration;
-                    activeEvent = events[events.length - 1];
-                } else {
-                    activeEvent = { type: 'rest', duration, tokenIndex: idx, startBeat: beatCursor };
-                    events.push(activeEvent);
-                }
-            } else if (swara === ',') {
-                if (events.length > 0 && events[events.length - 1].type === 'rest') {
-                    events[events.length - 1].duration += duration;
-                    activeEvent = events[events.length - 1];
-                } else {
-                    activeEvent = { type: 'rest', duration, tokenIndex: idx, startBeat: beatCursor };
-                    events.push(activeEvent);
-                }
-            } else {
-                activeEvent = { type: 'note', swara, duration, tokenIndex: idx, startBeat: beatCursor };
-                events.push(activeEvent);
-            }
-
-            beatCursor += duration;
-        });
-
-        while (events.length && events[0].type === 'rest') events.shift();
-        while (events.length && events[events.length - 1].type === 'rest') events.pop();
-
+        if (!playbackEvents.length || isPlayingTranscription) return;
+        const events = [...playbackEvents];
         if (!events.some((event) => event.type === 'note')) {
             setMicError('The transcription only contains rests or held space, so there is nothing playable yet.');
             return;
@@ -1000,7 +1087,6 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         setIsPlayingTranscription(true);
         const delayMs = Math.round((60 / bpm) * 1000);
         const unitSec = delayMs / 1000;
-        let prevFreq = null;
         let beatAcc = events[0]?.startBeat || 0;
 
         (async () => {
@@ -1020,10 +1106,15 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 }
 
                 setPlayIdx(event.tokenIndex);
-                const freq = swaraFreq(event.swara, sa);
-                const extDur = Math.max(0.09, Math.min(event.duration * unitSec * 0.92, 8));
-                playSingleTone(freq, extDur, prevFreq);
-                prevFreq = freq;
+                const fallbackFreq = swaraFreq(event.swara, sa);
+                const extDur = Math.max(0.09, Math.min(event.duration * unitSec * 0.94, 8));
+                const contour = event.contour?.length
+                    ? event.contour.map((point) => ({
+                        at: Math.min(extDur, Math.max(0, point.at)),
+                        freq: point.freq,
+                    }))
+                    : [{ at: 0, freq: fallbackFreq }];
+                playContourTone(contour, extDur, { fallbackFreq });
                 await new Promise((resolve) => setTimeout(resolve, event.duration * delayMs));
                 beatAcc += event.duration;
             }
@@ -1033,7 +1124,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 setPlayIdx(-1);
             }
         });
-    }, [bpm, isPlayingTranscription, sa, stopTranscriptionPlayback, talaSpec, transcribed]);
+    }, [bpm, isPlayingTranscription, playbackEvents, sa, stopTranscriptionPlayback, talaSpec]);
 
     return (
         <div className="w-full max-w-4xl rounded-xl border border-c-border bg-c-surface p-5 flex flex-col gap-4">
@@ -1130,6 +1221,13 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 <div className="bg-c-card border border-c-border rounded-lg p-3 flex flex-col gap-2">
                     <div className="text-[10px] uppercase tracking-wider text-c-cream-dark font-mono">Transcribed Notation</div>
                     <div className="font-mono text-sm text-c-cream break-words">{transcribedText}</div>
+                    {recordedAudioUrl && (
+                        <div className="flex flex-col gap-1 pt-1">
+                            <div className="text-[10px] uppercase tracking-wider text-c-cream-dark font-mono">Original Take</div>
+                            <audio controls src={recordedAudioUrl} className="w-full max-w-md" />
+                            <div className="text-[11px] text-c-cream-dim">Use this to compare your raw singing against the swara playback.</div>
+                        </div>
+                    )}
                     <div className="flex flex-wrap gap-1.5 mt-1">
                         {transcribed.map((t, i) => {
                             const s = getTokenSwara(t);

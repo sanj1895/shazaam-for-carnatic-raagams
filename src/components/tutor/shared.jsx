@@ -243,6 +243,95 @@ const playSingleTone = (freq, duration = 0.7, prevFreq = null) => {
     }
 };
 
+const scheduleContour = (param, contour, now, duration, fallbackFreq) => {
+    const usable = Array.isArray(contour) && contour.length
+        ? contour
+            .filter((point) => Number.isFinite(point?.freq) && Number.isFinite(point?.at))
+            .sort((a, b) => a.at - b.at)
+        : [];
+    const initialFreq = usable[0]?.freq || fallbackFreq;
+    param.setValueAtTime(initialFreq, now);
+    usable.forEach((point) => {
+        const clampedAt = Math.max(0, Math.min(duration, point.at));
+        param.linearRampToValueAtTime(point.freq, now + clampedAt);
+    });
+    if (!usable.length) {
+        param.setValueAtTime(fallbackFreq, now);
+    } else if (usable[usable.length - 1].at < duration) {
+        param.linearRampToValueAtTime(usable[usable.length - 1].freq, now + duration);
+    }
+};
+
+const playContourTone = (contour, duration = 0.7, options = {}) => {
+    try {
+        const ctx = getAudioCtx();
+        if (ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+        }
+        const baseFreq = contour?.[0]?.freq || options.fallbackFreq || 220;
+        const now = ctx.currentTime;
+
+        const master = ctx.createGain();
+        const toneBus = ctx.createGain();
+        const toneFilter = ctx.createBiquadFilter();
+        const airFilter = ctx.createBiquadFilter();
+
+        toneFilter.type = 'lowpass';
+        toneFilter.frequency.setValueAtTime(2200, now);
+        toneFilter.Q.setValueAtTime(0.5, now);
+
+        airFilter.type = 'bandpass';
+        airFilter.frequency.setValueAtTime(1900, now);
+        airFilter.Q.setValueAtTime(1.8, now);
+
+        toneBus.connect(toneFilter);
+        toneFilter.connect(master);
+        master.connect(ctx.destination);
+
+        const oscillators = [
+            { type: 'triangle', gain: 0.18, detune: 0 },
+            { type: 'sine', gain: 0.07, detune: 4 },
+            { type: 'sine', gain: 0.04, detune: -6 },
+        ];
+
+        oscillators.forEach(({ type, gain, detune }) => {
+            const osc = ctx.createOscillator();
+            const oscGain = ctx.createGain();
+            osc.type = type;
+            osc.detune.setValueAtTime(detune, now);
+            scheduleContour(osc.frequency, contour, now, duration, baseFreq);
+            oscGain.gain.setValueAtTime(gain, now);
+            osc.connect(oscGain);
+            oscGain.connect(toneBus);
+            osc.start(now);
+            osc.stop(now + duration + 0.04);
+        });
+
+        const noise = ctx.createBufferSource();
+        const bufferSize = Math.max(1, Math.floor(ctx.sampleRate * (duration + 0.05)));
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.35;
+        noise.buffer = buffer;
+        const noiseGain = ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.0001, now);
+        noiseGain.gain.linearRampToValueAtTime(0.012, now + 0.03);
+        noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+        noise.connect(airFilter);
+        airFilter.connect(noiseGain);
+        noiseGain.connect(master);
+        noise.start(now);
+        noise.stop(now + duration + 0.03);
+
+        master.gain.setValueAtTime(0.0001, now);
+        master.gain.linearRampToValueAtTime(0.24, now + 0.045);
+        master.gain.linearRampToValueAtTime(0.19, now + Math.max(0.08, duration * 0.7));
+        master.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    } catch (err) {
+        console.warn('Tutor contour playback failed:', err);
+    }
+};
+
 const waitRhythmicUnits = async (units, delayMs, signal, tala) => {
     if (signal?.aborted) return;
     // Sub-beat notes (duration < 1): sleep without firing intermediate ticks —
@@ -334,6 +423,7 @@ export {
     SahityaBeatMap,
     TalaBadge,
     playSingleTone,
+    playContourTone,
     waitRhythmicUnits,
     playSequenceAsync,
     getAudioCtx,

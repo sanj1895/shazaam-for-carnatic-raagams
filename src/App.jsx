@@ -845,7 +845,7 @@ function App() {
             {/* ══ UNIFIED MODAL (PORTAL) ══ */}
             {selectedRaga && createPortal(
                 <div 
-                    className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-c-bg/95 backdrop-blur-md animate-fade-in" 
+                    className="fixed inset-0 z-[10000] flex items-center justify-center p-2 sm:p-4 bg-c-bg/95 backdrop-blur-md animate-fade-in" 
                     onClick={() => setSelectedRaga(null)}
                 >
                     <div 
@@ -853,7 +853,7 @@ function App() {
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Sticky Header - Solid background forced */}
-                        <div className="sticky top-0 bg-[#F3EAD6] border-b border-c-border/20 px-6 py-4 flex justify-between items-center z-30">
+                        <div className="sticky top-0 bg-[#F3EAD6] border-b border-c-border/20 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center z-30">
                             <div className="flex flex-col">
                                 <h3 className="font-playfair text-c-gold text-sm italic tracking-widest uppercase">
                                     {selectedRaga.type === 'melakarta' ? `Melakarta ${selectedRaga.raga.number}` : 'Raagam Profile'}
@@ -871,10 +871,10 @@ function App() {
                         </div>
 
                         {/* Modal Body */}
-                        <div className="p-6 md:p-8">
+                        <div className="p-4 sm:p-6 md:p-8">
                             {selectedRaga.type === 'melakarta' && !RAGAS[selectedRaga.raga.ragaKey] ? (
                                 <div className="text-center py-6">
-                                    <h2 className="font-playfair text-4xl md:text-5xl text-c-gold mb-8">{selectedRaga.raga.name}</h2>
+                                    <h2 className="font-playfair text-3xl sm:text-4xl md:text-5xl text-c-gold mb-6 sm:mb-8">{selectedRaga.raga.name}</h2>
                                     <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-3">
                                         {selectedRaga.raga.notes.map((note, i) => (
                                             <React.Fragment key={i}>
@@ -1103,7 +1103,7 @@ function App() {
                                 <img
                                     src="/workspace-border-full.png"
                                     alt=""
-                                    className="absolute inset-y-0 left-1/2 h-full w-auto max-w-none -translate-x-1/2 scale-x-[1.035]"
+                                    className="absolute inset-y-0 left-1/2 h-full w-auto max-w-none -translate-x-1/2 scale-x-[1.01] sm:scale-x-[1.035]"
                                     style={{ filter: 'brightness(0.72) saturate(0.9)' }}
                                 />
                                 <div className="absolute inset-0 bg-[rgba(16,6,2,0.24)]" />
@@ -1118,7 +1118,7 @@ function App() {
                         <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay z-[2] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
 
                         {/* Glow */}
-                        <div className="absolute left-1/2 top-[30%] -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-c-gold/10 blur-[160px] pointer-events-none rounded-full z-0" />
+                        <div className="absolute left-1/2 top-[30%] -translate-x-1/2 -translate-y-1/2 h-[420px] w-[420px] sm:h-[620px] sm:w-[620px] md:h-[800px] md:w-[800px] bg-c-gold/10 blur-[100px] sm:blur-[140px] md:blur-[160px] pointer-events-none rounded-full z-0" />
 
                         {/* Hero mandala — fades out when features panel opens */}
                         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[110vw] h-[110vw] z-0"
@@ -1165,10 +1165,10 @@ function App() {
 
 
                             <div
-                                className="relative z-10 w-full max-w-6xl px-5 sm:px-7 flex flex-col items-center transition-all duration-700"
-                                style={{ minHeight: 'calc(100vh - 73px)', justifyContent: 'center', paddingTop: '2rem', paddingBottom: '2.5rem' }}
+                                className="relative z-10 flex w-full max-w-6xl flex-col items-center px-4 sm:px-7 transition-all duration-700"
+                                style={{ minHeight: 'calc(100vh - 73px)', justifyContent: 'center', paddingTop: '1.25rem', paddingBottom: '2rem' }}
                             >
-                                <div className="flex items-center gap-6 w-full max-w-sm opacity-90">
+                                <div className="flex items-center gap-4 sm:gap-6 w-full max-w-xs sm:max-w-sm opacity-90">
                                     <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-c-gold/50 to-transparent" />
                                     <div className="drop-shadow-[0_0_12px_rgba(200,148,31,0.6)] scale-110"><VeenaIcon /></div>
                                     <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-c-gold/50 to-transparent" />
@@ -1189,12 +1189,12 @@ function App() {
                                 >
                                     <h1
                                         id="tour-logo"
-                                        className="font-playfair text-5xl sm:text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-br from-c-gold-light via-[#f7d686] to-[#b88014] tracking-wider uppercase leading-none mb-4 drop-shadow-xl"
+                                        className="font-playfair text-4xl sm:text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-br from-c-gold-light via-[#f7d686] to-[#b88014] tracking-wider uppercase leading-none mb-4 drop-shadow-xl"
                                         style={{ textShadow: '0 4px 30px rgba(227,168,33,0.4)' }}
                                     >
                                         Ālāpana
                                     </h1>
-                                    <p className="text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.22em] mb-4" style={{ color: 'rgba(247, 214, 134, 0.76)' }}>
+                                    <p className="mb-4 max-w-[18rem] text-[9px] sm:max-w-none sm:text-[11px] md:text-xs uppercase tracking-[0.18em] sm:tracking-[0.22em]" style={{ color: 'rgba(247, 214, 134, 0.76)' }}>
                                         Designed for dedicated Carnatic learners and musicians
                                     </p>
                                     <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
@@ -1203,7 +1203,7 @@ function App() {
                                                 setShowFeatures(true);
                                                 setShowWorkspaceSections(false);
                                             }}
-                                            className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-10 py-3 rounded-full text-sm tracking-[0.16em] uppercase transition-all duration-500 shadow-[0_0_36px_rgba(200,148,31,0.26)] cursor-pointer"
+                                            className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 shadow-[0_0_36px_rgba(200,148,31,0.26)] cursor-pointer"
                                         >
                                             Enter Alapana
                                         </button>
@@ -1211,10 +1211,10 @@ function App() {
                                 </div>
 
                                 {isPreviewOpen && (
-                                    <div className="fixed inset-0 z-30 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6">
+                                    <div className="fixed inset-0 z-30 flex items-center justify-center px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
                                         <div className="absolute inset-0 bg-[rgba(8,3,1,0.54)] backdrop-blur-[4px]" />
                                         <div
-                                            className="relative w-full max-w-[1440px] rounded-[34px] overflow-hidden shadow-[0_40px_120px_rgba(0,0,0,0.5)] border border-c-gold/10 animate-fade-in"
+                                            className="relative w-full max-w-[1440px] rounded-[24px] sm:rounded-[34px] overflow-hidden shadow-[0_40px_120px_rgba(0,0,0,0.5)] border border-c-gold/10 animate-fade-in"
                                             style={{
                                                 background: 'radial-gradient(circle at 60% 38%, rgba(142,62,28,0.42), transparent 23%), radial-gradient(circle at 44% 58%, rgba(95,35,16,0.28), transparent 27%), linear-gradient(180deg, #140603 0%, #0b0301 100%)',
                                             }}
@@ -1244,13 +1244,13 @@ function App() {
                                                 <div className="absolute inset-0 bg-gradient-to-t from-[#0b0301]/80 via-transparent to-transparent" />
                                             </div>
 
-                                            <div className="relative z-10 mx-auto grid max-w-[1440px] lg:grid-cols-[42%_58%] min-h-[820px] px-8 pt-10 md:px-12 lg:px-10 xl:px-12">
+                                            <div className="relative z-10 mx-auto grid max-w-[1440px] lg:grid-cols-[42%_58%] min-h-0 lg:min-h-[820px] px-4 pt-6 sm:px-6 sm:pt-8 md:px-12 lg:px-10 xl:px-12">
                                                 <div className="flex items-center">
-                                                    <div className="max-w-[420px] pb-12 lg:pb-0">
-                                                        <h2 className="font-playfair text-c-gold-light text-[4.8rem] md:text-[5.5rem] xl:text-[6rem] leading-[0.92] tracking-[-0.04em] font-medium">
+                                                    <div className="max-w-[420px] pb-8 sm:pb-12 lg:pb-0">
+                                                        <h2 className="font-playfair text-c-gold-light text-[2.8rem] sm:text-[3.8rem] md:text-[5.5rem] xl:text-[6rem] leading-[0.92] tracking-[-0.04em] font-medium">
                                                             Your Carnatic practice room, online.
                                                         </h2>
-                                                        <p className="mt-8 text-[1.05rem] md:text-[1.18rem] leading-[1.75] max-w-[420px]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                        <p className="mt-5 sm:mt-8 text-[0.96rem] sm:text-[1.05rem] md:text-[1.18rem] leading-[1.7] sm:leading-[1.75] max-w-[420px]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                             Practice with focus. Explore with depth. Create with freedom. Everything you need in one dedicated space.
                                                         </p>
                                                         <button
@@ -1258,7 +1258,7 @@ function App() {
                                                                 try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
                                                                 enterWorkspace(appMode);
                                                             }}
-                                                            className="mt-8 inline-flex items-center gap-3 rounded-[16px] bg-c-gold px-8 py-4 text-c-bg text-[12px] font-bold uppercase tracking-[0.16em] shadow-[0_10px_28px_rgba(199,139,34,0.14)] transition-all hover:bg-[#f0c664] hover:shadow-[0_12px_34px_rgba(199,139,34,0.2)]"
+                                                            className="mt-6 sm:mt-8 inline-flex items-center gap-3 rounded-[16px] bg-c-gold px-6 sm:px-8 py-3.5 sm:py-4 text-c-bg text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.14em] sm:tracking-[0.16em] shadow-[0_10px_28px_rgba(199,139,34,0.14)] transition-all hover:bg-[#f0c664] hover:shadow-[0_12px_34px_rgba(199,139,34,0.2)]"
                                                         >
                                                             Enter Practice Room
                                                             <ArrowRightMini className="w-4 h-4" />
@@ -1268,7 +1268,7 @@ function App() {
                                                                 setAppMode('beginner');
                                                                 setQuizActive(true);
                                                             }}
-                                                            className="mt-7 inline-flex items-center gap-2 text-c-gold text-[12px] uppercase tracking-[0.16em] hover:text-c-gold-light transition-colors"
+                                                            className="mt-5 sm:mt-7 inline-flex items-center gap-2 text-c-gold text-[11px] sm:text-[12px] uppercase tracking-[0.14em] sm:tracking-[0.16em] hover:text-c-gold-light transition-colors"
                                                         >
                                                             New to Carnatic? Start with Basics
                                                             <ArrowRightMini className="w-3.5 h-3.5" />
@@ -1297,30 +1297,30 @@ function App() {
                                 >
                                     <div className="pb-16">
 
-                                        <section className="mt-6 px-2 md:px-3">
-                                            <div className="rounded-[34px] border border-c-gold/10 bg-[linear-gradient(180deg,rgba(17,8,4,0.9),rgba(9,4,2,0.95))] shadow-[0_28px_64px_rgba(0,0,0,0.34)] overflow-hidden">
-                                                <div className="relative z-10 px-8 pt-5 pb-3 sm:px-10">
+                                        <section className="mt-4 sm:mt-6 px-1.5 sm:px-2 md:px-3">
+                                            <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/10 bg-[linear-gradient(180deg,rgba(17,8,4,0.9),rgba(9,4,2,0.95))] shadow-[0_28px_64px_rgba(0,0,0,0.34)] overflow-hidden">
+                                                <div className="relative z-10 px-4 pt-4 pb-3 sm:px-10">
                                                     <div className="flex items-center justify-center gap-4">
                                                         <div className="h-px flex-1 bg-gradient-to-r from-transparent via-c-gold/15 to-c-gold/5" />
-                                                        <p className="text-[11px] uppercase tracking-[0.28em] text-c-gold/90">
+                                                        <p className="text-[9px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.28em] text-c-gold/90 text-center">
                                                             Everything Your Practice Session Needs
                                                         </p>
                                                         <div className="h-px flex-1 bg-gradient-to-l from-transparent via-c-gold/15 to-c-gold/5" />
                                                     </div>
                                                 </div>
 
-                                                <div className="relative z-10 grid lg:grid-cols-[31%_69%] gap-0 px-5 pb-5 sm:px-6 sm:pb-6">
-                                                    <div className="rounded-[28px] bg-[linear-gradient(180deg,rgba(24,10,5,0.42),rgba(12,5,2,0.16))] px-6 py-5 sm:px-7 sm:py-6 backdrop-blur-sm">
+                                                <div className="relative z-10 grid lg:grid-cols-[31%_69%] gap-0 px-3 pb-3 sm:px-6 sm:pb-6">
+                                                    <div className="rounded-[20px] sm:rounded-[28px] bg-[linear-gradient(180deg,rgba(24,10,5,0.42),rgba(12,5,2,0.16))] px-4 py-4 sm:px-7 sm:py-6 backdrop-blur-sm">
                                                         <div className="flex items-center gap-4">
-                                                            <div className="w-14 h-14 rounded-full border border-c-gold/16 bg-[rgba(199,139,34,0.03)] flex items-center justify-center text-c-gold/90">
+                                                            <div className="h-12 w-12 sm:w-14 sm:h-14 rounded-full border border-c-gold/16 bg-[rgba(199,139,34,0.03)] flex items-center justify-center text-c-gold/90">
                                                                 <VeenaIcon />
                                                             </div>
-                                                            <h3 className="font-playfair text-c-gold-light text-[2.7rem] leading-none">
+                                                            <h3 className="font-playfair text-c-gold-light text-[2.15rem] sm:text-[2.7rem] leading-none">
                                                                 Practice
                                                             </h3>
                                                         </div>
 
-                                                        <p className="mt-4 max-w-[260px] text-[1.02rem] leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                        <p className="mt-3 sm:mt-4 max-w-none sm:max-w-[260px] text-[0.95rem] sm:text-[1.02rem] leading-[1.65] sm:leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                             Stay in tune, keep the rhythm, and train your ear — all in one focused practice flow.
                                                         </p>
 
@@ -1348,8 +1348,8 @@ function App() {
                                                         </div>
                                                     </div>
 
-                                                    <div className="mt-5 lg:mt-0 lg:pl-4">
-                                                        <div className="rounded-[28px] border border-c-gold/10 bg-[radial-gradient(circle_at_50%_24%,rgba(125,56,24,0.14),transparent_30%),linear-gradient(180deg,rgba(23,9,4,0.76),rgba(13,6,3,0.86))] overflow-hidden">
+                                                    <div className="mt-4 lg:mt-0 lg:pl-4">
+                                                        <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/10 bg-[radial-gradient(circle_at_50%_24%,rgba(125,56,24,0.14),transparent_30%),linear-gradient(180deg,rgba(23,9,4,0.76),rgba(13,6,3,0.86))] overflow-hidden">
                                                             <div className="grid md:grid-cols-4">
                                                                 <div
                                                                     className="workspace-preview-panel group min-h-[200px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
@@ -1505,13 +1505,13 @@ function App() {
                                                                                 Mayamalavagowla
                                                                             </div>
                                                                         </div>
-                                                                        <div className="mt-4 grid grid-cols-8 gap-1.5">
+                                                                        <div className="mt-4 grid grid-cols-8 gap-1 sm:gap-1.5">
                                                                             {PRACTICE_DEMO_SWARA_LABELS.map((swara, index) => {
                                                                                 const active = keyboardPreviewActive && practiceDemoKeyIndex === index;
                                                                                 return (
                                                                                     <div
                                                                                         key={`${swara}-${index}`}
-                                                                                        className="rounded-[9px] py-2 text-[9px] font-semibold transition-all duration-300"
+                                                                                        className="rounded-[7px] sm:rounded-[9px] py-1.5 sm:py-2 text-[8px] sm:text-[9px] font-semibold transition-all duration-300"
                                                                                         style={{
                                                                                             color: active ? '#1a0804' : 'rgba(243, 234, 214, 0.92)',
                                                                                             background: active
@@ -1589,20 +1589,20 @@ function App() {
                                             </div>
                                         </section>
 
-                                        <section className="mt-4 px-2 md:px-3">
-                                            <div className="rounded-[34px] border border-c-gold/10 bg-[linear-gradient(180deg,rgba(17,8,4,0.9),rgba(9,4,2,0.95))] shadow-[0_28px_64px_rgba(0,0,0,0.34)] overflow-hidden">
-                                                <div className="relative z-10 grid lg:grid-cols-[31%_69%] gap-0 px-5 py-5 sm:px-6 sm:py-6">
-                                                    <div className="rounded-[28px] bg-[linear-gradient(180deg,rgba(24,10,5,0.42),rgba(12,5,2,0.16))] px-6 py-5 sm:px-7 sm:py-6 backdrop-blur-sm">
+                                        <section className="mt-4 px-1.5 sm:px-2 md:px-3">
+                                            <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/10 bg-[linear-gradient(180deg,rgba(17,8,4,0.9),rgba(9,4,2,0.95))] shadow-[0_28px_64px_rgba(0,0,0,0.34)] overflow-hidden">
+                                                <div className="relative z-10 grid lg:grid-cols-[31%_69%] gap-0 px-3 py-3 sm:px-6 sm:py-6">
+                                                    <div className="rounded-[20px] sm:rounded-[28px] bg-[linear-gradient(180deg,rgba(24,10,5,0.42),rgba(12,5,2,0.16))] px-4 py-4 sm:px-7 sm:py-6 backdrop-blur-sm">
                                                         <div className="flex items-center gap-4">
-                                                            <div className="w-14 h-14 rounded-full border border-c-gold/16 bg-[rgba(199,139,34,0.03)] flex items-center justify-center text-c-gold/90">
+                                                            <div className="h-12 w-12 sm:w-14 sm:h-14 rounded-full border border-c-gold/16 bg-[rgba(199,139,34,0.03)] flex items-center justify-center text-c-gold/90">
                                                                 {renderTabIcon('library', 'w-8 h-8')}
                                                             </div>
-                                                            <h3 className="font-playfair text-c-gold-light text-[2.7rem] leading-none">
+                                                            <h3 className="font-playfair text-c-gold-light text-[2.15rem] sm:text-[2.7rem] leading-none">
                                                                 Explore
                                                             </h3>
                                                         </div>
 
-                                                        <p className="mt-4 max-w-[270px] text-[1.02rem] leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                        <p className="mt-3 sm:mt-4 max-w-none sm:max-w-[270px] text-[0.95rem] sm:text-[1.02rem] leading-[1.65] sm:leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                             Understand ragas from the ground up. Explore structures, relationships, and transformations.
                                                         </p>
 
@@ -1629,8 +1629,8 @@ function App() {
                                                         </div>
                                                     </div>
 
-                                                    <div className="mt-5 lg:mt-0 lg:pl-4">
-                                                        <div className="rounded-[28px] border border-c-gold/10 bg-[radial-gradient(circle_at_50%_22%,rgba(120,53,24,0.12),transparent_32%),linear-gradient(180deg,rgba(22,9,4,0.76),rgba(12,5,2,0.88))] overflow-hidden">
+                                                    <div className="mt-4 lg:mt-0 lg:pl-4">
+                                                        <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/10 bg-[radial-gradient(circle_at_50%_22%,rgba(120,53,24,0.12),transparent_32%),linear-gradient(180deg,rgba(22,9,4,0.76),rgba(12,5,2,0.88))] overflow-hidden">
                                                             <div className="grid md:grid-cols-3">
                                                                 <div
                                                                     className="workspace-preview-panel group min-h-[200px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
@@ -1712,7 +1712,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[286px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[240px] sm:min-h-[286px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('melakarta')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'melakarta' ? null : current)}
                                                                 >
@@ -1727,7 +1727,7 @@ function App() {
                                                                             {selectedExploreRaga.number} / 72
                                                                         </div>
                                                                         <div
-                                                                            className="workspace-preview-float relative mx-auto mt-3 h-[188px] w-[188px] rounded-full transition-transform duration-700"
+                                                                            className="workspace-preview-float relative mx-auto mt-3 h-[160px] w-[160px] sm:h-[188px] sm:w-[188px] rounded-full transition-transform duration-700"
                                                                             style={{ transform: melakartaPreviewActive ? 'scale(1.03)' : 'scale(1)' }}
                                                                         >
                                                                             <div
@@ -1780,8 +1780,8 @@ function App() {
                                                                                         <span
                                                                                             className="absolute text-[12px] transition-all duration-500"
                                                                                             style={{
-                                                                                                left: `calc(50% + ${Math.cos(angle) * 68}px)`,
-                                                                                                top: `calc(50% + ${Math.sin(angle) * 68}px)`,
+                                                                                                left: `calc(50% + ${Math.cos(angle) * 58}px)`,
+                                                                                                top: `calc(50% + ${Math.sin(angle) * 58}px)`,
                                                                                                 transform: 'translate(-50%, -50%)',
                                                                                                 color: 'rgba(243, 234, 214, 0.94)',
                                                                                                 opacity: melakartaPreviewActive ? 1 : 0.42,
@@ -1793,9 +1793,9 @@ function App() {
                                                                                         <span
                                                                                             className="absolute left-1/2 top-1/2 w-px bg-c-gold/12 transition-opacity duration-500"
                                                                                             style={{
-                                                                                                height: '74px',
+                                                                                                height: '64px',
                                                                                                 transform: `translate(-50%, -100%) rotate(${(index / 12) * 360}deg)`,
-                                                                                                transformOrigin: 'center 74px',
+                                                                                                transformOrigin: 'center 64px',
                                                                                                 opacity: melakartaPreviewActive ? 1 : 0.2,
                                                                                             }}
                                                                                         />
@@ -1804,7 +1804,7 @@ function App() {
                                                                             })}
                                                                             </div>
                                                                             <div
-                                                                                className="absolute left-1/2 top-1/2 flex h-[46px] w-[46px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-c-gold/14 bg-[radial-gradient(circle_at_center,rgba(199,139,34,0.22),rgba(32,14,7,0.95))] text-2xl font-playfair text-c-gold-light transition-all duration-700"
+                                                                                className="absolute left-1/2 top-1/2 flex h-[40px] w-[40px] sm:h-[46px] sm:w-[46px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-c-gold/14 bg-[radial-gradient(circle_at_center,rgba(199,139,34,0.22),rgba(32,14,7,0.95))] text-xl sm:text-2xl font-playfair text-c-gold-light transition-all duration-700"
                                                                                 style={{
                                                                                     boxShadow: melakartaPreviewActive ? '0 0 24px rgba(214,156,68,0.18)' : '0 0 0 rgba(214,156,68,0)',
                                                                                     transform: `translate(-50%, -50%) scale(${melakartaPreviewActive ? 1 : 0.85})`,
@@ -1815,7 +1815,7 @@ function App() {
                                                                         </div>
                                                                         <div
                                                                             key={`melakarta-name-${selectedExploreRaga.name}`}
-                                                                            className="workspace-preview-float mt-4 text-[1.05rem] transition-all duration-700"
+                                                                            className="workspace-preview-float mt-4 text-[0.95rem] sm:text-[1.05rem] transition-all duration-700"
                                                                             style={{
                                                                                 color: 'rgba(243, 234, 214, 0.94)',
                                                                                 opacity: melakartaPreviewActive ? 1 : 0.92,
@@ -1846,7 +1846,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[286px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[240px] sm:min-h-[286px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('bhedam')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'bhedam' ? null : current)}
                                                                 >
@@ -1961,24 +1961,24 @@ function App() {
                                             </div>
                                         </section>
 
-                                        <section className="mt-4 px-2 md:px-3">
-                                            <div className="rounded-[34px] border border-c-gold/10 bg-[linear-gradient(180deg,rgba(17,8,4,0.9),rgba(9,4,2,0.95))] shadow-[0_28px_64px_rgba(0,0,0,0.34)] overflow-hidden">
-                                                <div className="grid lg:grid-cols-[31%_69%] gap-0 px-5 py-5 sm:px-6 sm:py-6">
-                                                    <div className="rounded-[28px] bg-[linear-gradient(180deg,rgba(24,10,5,0.42),rgba(12,5,2,0.16))] px-6 py-7 sm:px-7 sm:py-8">
+                                        <section className="mt-4 px-1.5 sm:px-2 md:px-3">
+                                            <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/10 bg-[linear-gradient(180deg,rgba(17,8,4,0.9),rgba(9,4,2,0.95))] shadow-[0_28px_64px_rgba(0,0,0,0.34)] overflow-hidden">
+                                                <div className="grid lg:grid-cols-[31%_69%] gap-0 px-3 py-3 sm:px-6 sm:py-6">
+                                                    <div className="rounded-[20px] sm:rounded-[28px] bg-[linear-gradient(180deg,rgba(24,10,5,0.42),rgba(12,5,2,0.16))] px-4 py-4 sm:px-7 sm:py-8">
                                                         <div className="flex items-center gap-4">
-                                                            <div className="w-14 h-14 rounded-full border border-c-gold/16 bg-[rgba(199,139,34,0.03)] flex items-center justify-center text-c-gold/90">
+                                                            <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-full border border-c-gold/16 bg-[rgba(199,139,34,0.03)] flex items-center justify-center text-c-gold/90">
                                                                 {renderTabIcon('transcribe', 'w-8 h-8')}
                                                             </div>
-                                                            <h3 className="font-playfair text-c-gold-light text-[2.7rem] leading-none">
+                                                            <h3 className="font-playfair text-c-gold-light text-[2.15rem] sm:text-[2.7rem] leading-none">
                                                                 Create
                                                             </h3>
                                                         </div>
 
-                                                        <p className="mt-6 max-w-[270px] text-[1.02rem] leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                        <p className="mt-4 sm:mt-6 max-w-none sm:max-w-[270px] text-[0.95rem] sm:text-[1.02rem] leading-[1.65] sm:leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                             Capture your ideas. Transcribe with ease. Build, organize, and elevate your repertoire.
                                                         </p>
 
-                                                        <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-5 max-w-[220px] text-c-gold">
+                                                        <div className="mt-6 sm:mt-10 grid grid-cols-2 gap-x-4 gap-y-5 max-w-[220px] text-c-gold">
                                                             {[
                                                                 { id: 'transcribe', label: 'Transcribe' },
                                                                 { id: 'tutor', label: 'Gurukul' },
@@ -2000,8 +2000,8 @@ function App() {
                                                         </div>
                                                     </div>
 
-                                                    <div className="mt-5 lg:mt-0 lg:pl-4">
-                                                        <div className="rounded-[28px] border border-c-gold/10 bg-[radial-gradient(circle_at_54%_18%,rgba(122,54,23,0.12),transparent_28%),linear-gradient(180deg,rgba(22,9,4,0.76),rgba(12,5,2,0.88))] overflow-hidden">
+                                                    <div className="mt-4 lg:mt-0 lg:pl-4">
+                                                        <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/10 bg-[radial-gradient(circle_at_54%_18%,rgba(122,54,23,0.12),transparent_28%),linear-gradient(180deg,rgba(22,9,4,0.76),rgba(12,5,2,0.88))] overflow-hidden">
                                                             <div className="grid md:grid-cols-[1.05fr_0.95fr]">
                                                                 <div
                                                                     className="workspace-preview-panel group min-h-[286px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
@@ -2030,14 +2030,14 @@ function App() {
                                                                             ))}
                                                                         </div>
 
-                                                                        <div className="mt-6 flex items-center justify-between">
-                                                                            <div className="relative flex-1 mr-4">
+                                                                        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                                                            <div className="relative flex-1 sm:mr-4">
                                                                                 <div className="h-[74px] rounded-[12px] bg-[rgba(9,4,2,0.36)] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.06)] px-3 py-3 group-hover:shadow-[inset_0_0_0_1px_rgba(199,139,34,0.12)] transition-shadow duration-500">
                                                                                     <div className="absolute left-3 right-3 top-[18px] h-px bg-c-gold/16" />
                                                                                     <div className="absolute left-3 right-3 top-[31px] h-px bg-c-gold/16" />
                                                                                     <div className="absolute left-3 right-3 top-[44px] h-px bg-c-gold/16" />
                                                                                     <div className="absolute left-3 right-3 top-[57px] h-px bg-c-gold/16" />
-                                                                                    <div className="absolute left-[18px] top-[24px] right-[16px] flex flex-wrap items-start gap-x-3 gap-y-1 text-[12px]">
+                                                                                    <div className="absolute left-[14px] right-[12px] top-[20px] sm:left-[18px] sm:right-[16px] sm:top-[24px] flex flex-wrap items-start gap-x-2 sm:gap-x-3 gap-y-1 text-[11px] sm:text-[12px]">
                                                                                         {currentTranscribePhrase.map((token, index) => {
                                                                                             const revealed = index <= transcribePreviewTokenIndex || transcribePreviewMode === 'processing';
                                                                                             const active = transcribePreviewMode === 'recording' && index === transcribePreviewTokenIndex;
@@ -2061,7 +2061,7 @@ function App() {
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                            <div className="flex flex-col items-center gap-2">
+                                                                            <div className="flex flex-row items-center justify-between sm:flex-col gap-3 sm:gap-2">
                                                                                 <div
                                                                                     className={`relative flex h-12 w-12 items-center justify-center rounded-full bg-[radial-gradient(circle_at_35%_35%,#d66e51,#9e3722_68%,#752313)] transition-all duration-300 ${transcribePreviewMode === 'recording' ? 'workspace-recording-pulse' : ''}`}
                                                                                     style={{
@@ -2102,7 +2102,7 @@ function App() {
                                                                             </span>
                                                                         </span>
                                                                     </div>
-                                                                    <div className="workspace-preview-float mt-5 grid grid-cols-[120px_1fr] gap-4 rounded-[16px] bg-[rgba(255,245,225,0.02)] px-3 py-4 shadow-[inset_0_0_0_1px_rgba(199,139,34,0.08)]">
+                                                                    <div className="workspace-preview-float mt-5 grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-4 rounded-[16px] bg-[rgba(255,245,225,0.02)] px-3 py-4 shadow-[inset_0_0_0_1px_rgba(199,139,34,0.08)]">
                                                                         <div className="space-y-2">
                                                                             {GURUKUL_PREVIEW_CATEGORIES.map(({ name, meta }, index) => {
                                                                                 const active = gurukulPreviewCategoryIndex === index;
@@ -2181,7 +2181,7 @@ function App() {
                                                                                                 ))}
                                                                                             </svg>
                                                                                         </div>
-                                                                                        <div className="absolute left-[16px] bottom-[8px] right-[16px] flex items-center gap-3 text-[10px] transition-all duration-300" style={{ color: 'rgba(243, 234, 214, 0.94)', transform: activeSnippet ? 'translateY(-1px)' : 'translateY(0)' }}>
+                                                                                        <div className="absolute left-[12px] right-[12px] bottom-[8px] sm:left-[16px] sm:right-[16px] flex flex-wrap items-center gap-x-2 sm:gap-3 gap-y-0.5 text-[9px] sm:text-[10px] transition-all duration-300" style={{ color: 'rgba(243, 234, 214, 0.94)', transform: activeSnippet ? 'translateY(-1px)' : 'translateY(0)' }}>
                                                                                             {snippet.map((token, index) => (
                                                                                                 <span key={`${selectedGurukulCategory.name}-${row}-${token}-${index}`}>{token}</span>
                                                                                             ))}

@@ -492,8 +492,8 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     const transcribeFramesToSlots = useCallback((frames, totalSlots, slotMs) => {
         const grid = Array.from({ length: totalSlots }, () => []);
         const slotDurSec = slotMs / 1000;
-        const onsetTolerance = slotDurSec * 0.28;
-        const minSegSec = Math.max(slotDurSec * 0.12, 0.02);
+        const onsetTolerance = slotDurSec * 0.32;
+        const minSegSec = Math.max(slotDurSec * 0.1, 0.016);
         const slotMeta = Array.from({ length: totalSlots }, () => ({ voiced: 0, hold: 0, strong: 0 }));
 
         // Smooth labels lightly so we keep real fast note turns instead of ironing
@@ -551,10 +551,10 @@ function TalaSwaraTranscriber({ sa, setSa }) {
             const strongRatio = seg.strongCount / Math.max(1, seg.count);
             const bridgedRatio = seg.bridgedCount / Math.max(1, seg.count);
             const holdRatio = seg.holdCount / Math.max(1, seg.count);
-            if (anchorOnlyMode && glideRatio > 0.55 && segDurSec < slotDurSec * 1.1) return;
-            if (strongRatio < 0.34 && bridgedRatio > 0.45) return;
-            if (holdRatio > 0.92 && strongRatio < 0.12 && segDurSec < slotDurSec * 0.9) return;
-            if (strongRatio < 0.2 && segDurSec < slotDurSec * 0.9) return;
+            if (anchorOnlyMode && glideRatio > 0.62 && segDurSec < slotDurSec * 1.05) return;
+            if (strongRatio < 0.24 && bridgedRatio > 0.62 && segDurSec < slotDurSec * 1.25) return;
+            if (holdRatio > 0.95 && strongRatio < 0.08 && segDurSec < slotDurSec * 0.75) return;
+            if (strongRatio < 0.12 && segDurSec < slotDurSec * 0.72) return;
 
             const rawSlot = seg.start / slotDurSec;
             const snappedSlot = Math.round(rawSlot);
@@ -775,12 +775,12 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                     : (noiseProfileRef.current * 0.92) + (rms * 0.08);
                 const adaptiveFloor = noiseProfileRef.current;
                 const rmsGate = mobileMicMode
-                    ? Math.max(0.0052, noiseFloor * 0.3, adaptiveFloor * 1.8)
-                    : Math.max(0.0058, noiseFloor * 0.34, adaptiveFloor * 2.05);
-                const sustainGate = recentNote ? rmsGate * 0.68 : rmsGate;
+                    ? Math.max(0.0048, noiseFloor * 0.27, adaptiveFloor * 1.65)
+                    : Math.max(0.0052, noiseFloor * 0.3, adaptiveFloor * 1.9);
+                const sustainGate = recentNote ? rmsGate * 0.64 : rmsGate;
 
                 if (rms < sustainGate) {
-                    if (recentNote && prevWasStrong && sustainBridgeRef.current.label === prevLabel && sustainBridgeRef.current.frames < 3 && rms >= sustainGate * 0.58) {
+                    if (recentNote && prevWasStrong && sustainBridgeRef.current.label === prevLabel && sustainBridgeRef.current.frames < 4 && rms >= sustainGate * 0.5) {
                         sustainBridgeRef.current = {
                             label: prevLabel,
                             freqSemi: prev?.freqSemi ?? sustainBridgeRef.current.freqSemi,
@@ -807,12 +807,12 @@ function TalaSwaraTranscriber({ sa, setSa }) {
 
                 const yin = yinEstimate(buf, sampleRate);
                 const acfFreq = detectPitchAudio(analyserNode, sampleRate);
-                const yinPriorityThreshold = mobileMicMode ? 0.39 : 0.43;
-                const minConfidence = mobileMicMode ? 0.27 : 0.3;
+                const yinPriorityThreshold = mobileMicMode ? 0.34 : 0.38;
+                const minConfidence = mobileMicMode ? 0.22 : 0.25;
                 const agreementCents = (yin?.freq && acfFreq)
                     ? Math.abs(1200 * Math.log2(yin.freq / acfFreq))
                     : null;
-                const detectorsAgree = agreementCents == null ? false : agreementCents <= 55;
+                const detectorsAgree = agreementCents == null ? false : agreementCents <= 70;
                 let chosenFreq = null;
                 let strongDetection = false;
                 if (yin?.freq && yin.confidence >= yinPriorityThreshold && (detectorsAgree || !acfFreq)) {
@@ -821,15 +821,15 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 } else if (acfFreq && yin?.freq && yin.confidence >= minConfidence && detectorsAgree) {
                     chosenFreq = (acfFreq + yin.freq) / 2;
                     strongDetection = true;
-                } else if (acfFreq && rms >= rmsGate * 1.18) {
+                } else if (acfFreq && rms >= rmsGate * 1.08) {
                     chosenFreq = acfFreq;
                     strongDetection = true;
-                } else if (yin?.freq && yin.confidence >= minConfidence && rms >= rmsGate * 1.35) {
+                } else if (yin?.freq && yin.confidence >= minConfidence && rms >= rmsGate * 1.18) {
                     chosenFreq = yin.freq;
                 }
 
                 if (!chosenFreq) {
-                    if (recentNote && prevWasStrong && sustainBridgeRef.current.label === prevLabel && sustainBridgeRef.current.frames < 3) {
+                    if (recentNote && prevWasStrong && sustainBridgeRef.current.label === prevLabel && sustainBridgeRef.current.frames < 4) {
                         sustainBridgeRef.current = {
                             label: prevLabel,
                             freqSemi: prev?.freqSemi ?? sustainBridgeRef.current.freqSemi,

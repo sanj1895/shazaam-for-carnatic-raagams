@@ -948,12 +948,28 @@ function TalaSwaraTranscriber({ sa, setSa }) {
 
     const playTranscribed = useCallback(() => {
         if (!transcribed.length || isPlayingTranscription) return;
+        const trimmed = [...transcribed];
+        while (trimmed.length && [',', '-', '|', '||'].includes(getTokenSwara(trimmed[0]))) {
+            trimmed.shift();
+        }
+        while (trimmed.length && [',', '-', '|', '||'].includes(getTokenSwara(trimmed[trimmed.length - 1]))) {
+            trimmed.pop();
+        }
+        if (!trimmed.length) {
+            setMicError('The transcription only contains rests or held space, so there is nothing playable yet.');
+            return;
+        }
+
         stopTranscriptionPlayback();
+        const ctx = getAudioCtx();
+        if (ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+        }
         const ctrl = new AbortController();
         playAbortRef.current = ctrl;
         setIsPlayingTranscription(true);
         const delayMs = Math.round((60 / bpm) * 1000);
-        playSequenceAsync(transcribed, sa, setPlayIdx, ctrl.signal, delayMs, false, talaSpec, 'strict')
+        playSequenceAsync(trimmed, sa, setPlayIdx, ctrl.signal, delayMs, false, talaSpec, 'strict')
             .then(() => {
                 if (!ctrl.signal.aborted) {
                     setIsPlayingTranscription(false);

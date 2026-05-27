@@ -199,8 +199,8 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSe
     const handleBegin = () => {
         onModeSelected?.(path.mode || 'beginner');
         const dest = path.target
-            ? { view: path.action, target: path.target }
-            : path.action;
+            ? { view: path.action, target: path.target, mode: path.mode || 'beginner' }
+            : { view: path.action, mode: path.mode || 'beginner' };
         dismiss();
         onNavigate?.(dest);
     };

@@ -32,6 +32,14 @@ const VeenaIcon = () => (
     </svg>
 );
 
+const ArrowRightMini = ({ className = "w-4 h-4", ...props }) => (
+    <svg viewBox="0 0 20 20" fill="none" className={className} {...props}>
+        <path d="M4 10H15.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M11.5 5.5L16 10L11.5 14.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
+
 const renderTabIcon = (id, className = "w-5 h-5") => {
     return <CuratedIcon icon={id} className={className} />;
 };
@@ -72,18 +80,6 @@ const MODE_FEATURE_ORDER = {
     musician: ['listen', 'transcribe', 'library', 'tutor', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam'],
 };
 
-const MODE_HOME_GROUPS = {
-    beginner: [
-        { label: 'Start Here', ids: ['tutor', 'sadhana'] },
-        { label: 'Practice Basics', ids: ['shruthi', 'talam', 'keyboard', 'singback'] },
-    ],
-    musician: [
-        { label: 'Core Workspace', ids: ['listen', 'transcribe', 'library'] },
-        { label: 'Practice Tools', ids: ['tutor', 'keyboard', 'shruthi', 'talam'] },
-        { label: 'Advanced Reference', ids: ['melakarta', 'bhedam'] },
-    ],
-};
-
 const MODE_ALLOWED_VIEWS = {
     beginner: new Set(['home', 'tutor', 'sadhana', 'shruthi', 'talam', 'keyboard', 'singback']),
     musician: new Set(['home', 'tutor', 'listen', 'transcribe', 'library', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam']),
@@ -98,12 +94,162 @@ function loadAppMode() {
 }
 
 const SADHANA_TABS = ['shruthi', 'tutor', 'keyboard', 'singback'];
+const PRACTICE_DEMO_SWARAS = ['Sa', 'Ri1', 'Ga3', 'Ma1', 'Pa', 'Da1', 'Ni3', 'Sa'];
+const PRACTICE_DEMO_SWARA_LABELS = ['S', 'R1', 'G3', 'M1', 'P', 'D1', 'N3', 'S'];
+const EXPLORE_DEMO_RAGAS = [
+    {
+        name: 'Mayamalavagowla',
+        meta: '15th Melakarta',
+        number: 15,
+        scale: 'S R1 G3 M1 P D1 N3 S',
+        grahaBase: 'Mayamalavagowla',
+        grahaResults: ['Mohanam', 'Harikambhoji', 'Charukesi', 'Kalyani', 'Vakulabharanam', 'Todi'],
+    },
+    {
+        name: 'Harikambhoji',
+        meta: '28th Melakarta',
+        number: 28,
+        scale: 'S R2 G3 M1 P D2 N2 S',
+        grahaBase: 'Harikambhoji',
+        grahaResults: ['Kambhoji', 'Kedaragaula', 'Mohanam', 'Kalyani', 'Bilahari', 'Sankarabharanam'],
+    },
+    {
+        name: 'Kalyani',
+        meta: '65th Melakarta',
+        number: 65,
+        scale: 'S R2 G3 M2 P D2 N3 S',
+        grahaBase: 'Kalyani',
+        grahaResults: ['Mohanam', 'Sankarabharanam', 'Harikambhoji', 'Hamsadhwani', 'Vasanta', 'Charukesi'],
+    },
+    {
+        name: 'Charukesi',
+        meta: '26th Melakarta',
+        number: 26,
+        scale: 'S R2 G3 M1 P D1 N2 S',
+        grahaBase: 'Charukesi',
+        grahaResults: ['Abheri', 'Kharaharapriya', 'Natabhairavi', 'Madhyamavati', 'Sriranjani', 'Kapi'],
+    },
+];
+const GRAHA_BHEDAM_SWARAS = ['Ri', 'Ga', 'Ma', 'Pa', 'Dha', 'Ni'];
+const LIBRARY_PREVIEW_ENTRIES = [
+    {
+        name: 'Mayamalavagowla',
+        meta: '15th Melakarta',
+        family: 'Melakarta',
+        accent: 'Parent scale',
+    },
+    {
+        name: 'Abheri',
+        meta: 'Janya of Kharaharapriya',
+        family: 'Janya',
+        accent: 'Derived raga',
+    },
+    {
+        name: 'Kalyani',
+        meta: '65th Melakarta',
+        family: 'Melakarta',
+        accent: 'Prati madhyama',
+    },
+    {
+        name: 'Hamsadhwani',
+        meta: 'Janya of Sankarabharanam',
+        family: 'Janya',
+        accent: 'Audava raga',
+    },
+];
+const GRAHA_PREVIEW_ENTRIES = [
+    {
+        base: 'Sankarabharanam',
+        results: ['Harikambhoji', 'Kalyani', 'Natabhairavi', 'Kharaharapriya', 'Hanumatodi', 'Kambhoji'],
+    },
+    {
+        base: 'Mayamalavagowla',
+        results: ['Mohanam', 'Harikambhoji', 'Charukesi', 'Kalyani', 'Vakulabharanam', 'Todi'],
+    },
+    {
+        base: 'Kharaharapriya',
+        results: ['Abheri', 'Sriranjani', 'Madhyamavati', 'Sudha Dhanyasi', 'Kapi', 'Bilahari'],
+    },
+];
+const TRANSCRIBE_PREVIEW_PHRASES = [
+    ['sa', 'ri', 'ga', 'ma', '|', 'pa,', 'ma', 'ga', 'ri', '|', 'sa'],
+    ['sa', 'ma', 'ga', 'ri', '|', 'pa', 'dha', 'ni', '|', 'sa'],
+];
+const GURUKUL_PREVIEW_CATEGORIES = [
+    {
+        name: 'Varisais',
+        meta: '12 items',
+        detailTitle: 'Mayamalavagowla · Varisais',
+        detailMeta: 'Raga: Mayamalavagowla | Tala: Adi',
+        snippets: [
+            ['sa', 'ri', 'ga', 'ma', '|', 'ga', 'ri', 'sa'],
+            ['sa', 'sa', 'ri', 'ga', '|', 'ma,', 'ga', 'ri'],
+        ],
+    },
+    {
+        name: 'Kritis',
+        meta: '36 items',
+        detailTitle: 'Vasanta · Kritis',
+        detailMeta: 'Raga: Vasanta | Tala: Adi',
+        snippets: [
+            ['ni', 'sa', 'ri', 'ga', '|', 'ma,', 'ga', 'ri', 'sa', '|'],
+            ['ni', 'sa', 'ri', 'ga', '|', 'ma,', 'ga', 'ri', 'sa', '|'],
+        ],
+    },
+    {
+        name: 'Alapanas',
+        meta: '8 items',
+        detailTitle: 'Kalyani · Alapanas',
+        detailMeta: 'Raga: Kalyani | Free Flow',
+        snippets: [
+            ['sa', 'ri', 'ga', 'ma', '|', 'pa', 'ma', 'ga'],
+            ['ni,', 'sa', 'ri', 'ga', '|', 'ma', 'pa', 'dha'],
+        ],
+    },
+    {
+        name: 'Notes',
+        meta: '23 items',
+        detailTitle: 'Concert Notes · Notebook',
+        detailMeta: 'Topic: Sangati Ideas | Tala: Mixed',
+        snippets: [
+            ['sa', 'ri', 'ga', '|', 'note', 'phrase', '1'],
+            ['ma', 'pa', 'dha', '|', 'resolve', 'to', 'sa'],
+        ],
+    },
+    {
+        name: 'Recordings',
+        meta: '19 items',
+        detailTitle: 'Practice Takes · Recordings',
+        detailMeta: 'Session: Evening Riyaz | 19 clips',
+        snippets: [
+            ['take', '1', '|', 'sa', 'ri', 'ga', 'ma'],
+            ['take', '2', '|', 'pa', 'ma', 'ga', 'ri'],
+        ],
+    },
+];
 
 function parseHashRoute(hashValue = window.location.hash) {
     const normalized = hashValue.replace(/^#\/?/, '').trim();
-    if (!normalized) return { view: 'home', segments: [] };
+    if (!normalized) return { view: 'home', segments: [], mode: null, workspace: false };
     const segments = normalized.split('/').filter(Boolean).map((segment) => decodeURIComponent(segment));
-    return { view: segments[0] || 'home', segments };
+    const first = segments[0] || 'home';
+    const validModes = new Set(['beginner', 'musician']);
+
+    if (first === 'home') {
+        return { view: 'home', segments: ['home'], mode: null, workspace: false };
+    }
+
+    if (first === 'workspace') {
+        const mode = validModes.has(segments[1]) ? segments[1] : null;
+        return { view: 'home', segments: ['home'], mode, workspace: true };
+    }
+
+    if (validModes.has(first)) {
+        const view = segments[1] || 'home';
+        return { view, segments: [view, ...segments.slice(2)], mode: first, workspace: false };
+    }
+
+    return { view: first, segments, mode: null, workspace: false };
 }
 
 function parseTutorHashTarget(segments = []) {
@@ -121,11 +267,17 @@ function parseTutorHashTarget(segments = []) {
     return Object.keys(target).length ? target : null;
 }
 
-function buildHashForView(view, tutorTarget = null) {
+function buildHashForView(view, tutorTarget = null, mode = null, options = {}) {
+    const { workspace = false } = options;
+    if (workspace && mode) return `#/workspace/${encodeURIComponent(mode)}`;
     if (!view || view === 'home') return '#/home';
-    if (view !== 'tutor') return `#/${view}`;
+    if (view !== 'tutor') {
+        return mode
+            ? `#/${encodeURIComponent(mode)}/${encodeURIComponent(view)}`
+            : `#/${view}`;
+    }
 
-    const segments = ['tutor'];
+    const segments = mode ? [mode, 'tutor'] : ['tutor'];
     if (tutorTarget?.tab && tutorTarget.tab !== 'curriculum') {
         segments.push('tab', tutorTarget.tab);
     }
@@ -182,10 +334,15 @@ function loadSadhanaState() {
 }
 
 function App() {
-    const [view, setView] = useState(() => parseHashRoute().view);
+    const initialRoute = parseHashRoute();
+    const [view, setView] = useState(() => initialRoute.view);
     const [appMode, setAppMode] = useState(loadAppMode);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [showFeatures, setShowFeatures] = useState(() => parseHashRoute().view !== 'home');
+    const [showFeatures, setShowFeatures] = useState(() => initialRoute.workspace ? true : initialRoute.view !== 'home');
+    const [showWorkspaceSections, setShowWorkspaceSections] = useState(() => {
+        if (initialRoute.workspace) return true;
+        return false;
+    });
     const [saFrequency, setSaFrequency] = useState(null);
     const [detectedNotes, setDetectedNotes] = useState([]);
     const [possibleRagas, setPossibleRagas] = useState([]);
@@ -194,23 +351,236 @@ function App() {
     const [tourActive, setTourActive] = useState(false);
     const [quizActive, setQuizActive] = useState(false);
     const [tutorLaunchTarget, setTutorLaunchTarget] = useState(() => {
-        const route = parseHashRoute();
+        const route = initialRoute;
         return route.view === 'tutor' ? parseTutorHashTarget(route.segments) : null;
     });
     const [sadhana, setSadhana] = useState(loadSadhanaState);
     const [sadhanaToast, setSadhanaToast] = useState(null); // { title, stepName }
     const [selectedRaga, setSelectedRaga] = useState(null); // { raga, hasClearMatch, type: 'library' | 'identify' | 'melakarta' }
     const [showGuide, setShowGuide] = useState(false);
+    const [practiceDemoBeat, setPracticeDemoBeat] = useState(0);
+    const [practiceDemoSlider, setPracticeDemoSlider] = useState(4);
+    const [practiceDemoKeyIndex, setPracticeDemoKeyIndex] = useState(0);
+    const [practiceDemoDetectedIndex, setPracticeDemoDetectedIndex] = useState(0);
+    const [practiceDemoPitchState, setPracticeDemoPitchState] = useState('match');
+    const [hoveredWorkspacePreview, setHoveredWorkspacePreview] = useState(null);
+    const [libraryPreviewIndex, setLibraryPreviewIndex] = useState(0);
+    const [explorePreviewIndex, setExplorePreviewIndex] = useState(0);
+    const [explorePreviewDisplayNumber, setExplorePreviewDisplayNumber] = useState(EXPLORE_DEMO_RAGAS[0].number);
+    const [explorePreviewWheelRotation, setExplorePreviewWheelRotation] = useState(0);
+    const [grahaPreviewIndex, setGrahaPreviewIndex] = useState(0);
+    const [explorePreviewShiftIndex, setExplorePreviewShiftIndex] = useState(0);
+    const [transcribePreviewMode, setTranscribePreviewMode] = useState('idle');
+    const [transcribePreviewTokenIndex, setTranscribePreviewTokenIndex] = useState(0);
+    const [transcribePreviewPhraseIndex, setTranscribePreviewPhraseIndex] = useState(0);
+    const [transcribePreviewSeconds, setTranscribePreviewSeconds] = useState(37);
+    const [gurukulPreviewCategoryIndex, setGurukulPreviewCategoryIndex] = useState(1);
+    const [gurukulPreviewMenuOpen, setGurukulPreviewMenuOpen] = useState(false);
+    const [gurukulPreviewSnippetIndex, setGurukulPreviewSnippetIndex] = useState(0);
 
-    const modeConfig = APP_MODES[appMode] || APP_MODES.musician;
     const visibleFeatures = MODE_FEATURE_ORDER[appMode]
         .map((id) => FEATURES.find((feature) => feature.id === id))
         .filter(Boolean);
-    const homeGroups = MODE_HOME_GROUPS[appMode] || MODE_HOME_GROUPS.musician;
 
     const noteHistory = useRef([]);
     const sessionFreq = useRef({});
+    const transcribeWaveBarRefs = useRef([]);
+    const transcribeWaveFrameRef = useRef(null);
     const step = !isListening ? 1 : !saFrequency ? 2 : 3;
+    const isPreviewOpen = view === 'home' && showFeatures && !showWorkspaceSections;
+    const isWorkspaceExpanded = view === 'home' && showFeatures && showWorkspaceSections;
+    const practiceDemoDetectedSwara = PRACTICE_DEMO_SWARAS[practiceDemoDetectedIndex % PRACTICE_DEMO_SWARAS.length];
+    const shruthiPreviewActive = hoveredWorkspacePreview === 'shruthi';
+    const talamPreviewActive = hoveredWorkspacePreview === 'talam';
+    const keyboardPreviewActive = hoveredWorkspacePreview === 'keyboard';
+    const dhwaniPreviewActive = hoveredWorkspacePreview === 'listen';
+    const libraryPreviewActive = hoveredWorkspacePreview === 'library';
+    const melakartaPreviewActive = hoveredWorkspacePreview === 'melakarta';
+    const bhedamPreviewActive = hoveredWorkspacePreview === 'bhedam';
+    const transcribePreviewActive = hoveredWorkspacePreview === 'transcribe';
+    const gurukulPreviewActive = hoveredWorkspacePreview === 'gurukul';
+    const selectedLibraryEntry = LIBRARY_PREVIEW_ENTRIES[libraryPreviewIndex % LIBRARY_PREVIEW_ENTRIES.length];
+    const selectedExploreRaga = EXPLORE_DEMO_RAGAS[explorePreviewIndex % EXPLORE_DEMO_RAGAS.length];
+    const selectedGrahaEntry = GRAHA_PREVIEW_ENTRIES[grahaPreviewIndex % GRAHA_PREVIEW_ENTRIES.length];
+    const selectedGrahaResult = selectedGrahaEntry.results[explorePreviewShiftIndex % selectedGrahaEntry.results.length];
+    const selectedGrahaSwara = GRAHA_BHEDAM_SWARAS[explorePreviewShiftIndex % GRAHA_BHEDAM_SWARAS.length];
+    const currentTranscribePhrase = TRANSCRIBE_PREVIEW_PHRASES[transcribePreviewPhraseIndex % TRANSCRIBE_PREVIEW_PHRASES.length];
+    const selectedGurukulCategory = GURUKUL_PREVIEW_CATEGORIES[gurukulPreviewCategoryIndex % GURUKUL_PREVIEW_CATEGORIES.length];
+
+    useEffect(() => {
+        const beatTimer = setInterval(() => {
+            setPracticeDemoBeat((prev) => (prev + 1) % 8);
+        }, 720);
+
+        const sliderTimer = setInterval(() => {
+            setPracticeDemoSlider((prev) => {
+                const sequence = [2, 3, 4, 5, 4, 3];
+                const currentIndex = sequence.indexOf(prev);
+                return sequence[(currentIndex + 1) % sequence.length];
+            });
+        }, 2200);
+
+        const keyTimer = setInterval(() => {
+            setPracticeDemoKeyIndex((prev) => (prev + 1) % PRACTICE_DEMO_SWARA_LABELS.length);
+        }, 1250);
+
+        const listeningTimer = setInterval(() => {
+            setPracticeDemoDetectedIndex((prev) => (prev + 1) % PRACTICE_DEMO_SWARAS.length);
+            setPracticeDemoPitchState((prev) => (prev === 'match' ? 'off' : 'match'));
+        }, 1800);
+
+        return () => {
+            clearInterval(beatTimer);
+            clearInterval(sliderTimer);
+            clearInterval(keyTimer);
+            clearInterval(listeningTimer);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (hoveredWorkspacePreview !== 'library') return undefined;
+        const libraryTimer = setInterval(() => {
+            setLibraryPreviewIndex((prev) => (prev + 1) % LIBRARY_PREVIEW_ENTRIES.length);
+        }, 2400);
+        return () => clearInterval(libraryTimer);
+    }, [hoveredWorkspacePreview]);
+
+    useEffect(() => {
+        if (hoveredWorkspacePreview !== 'melakarta') return undefined;
+        const ragaTimer = setInterval(() => {
+            setExplorePreviewIndex((prev) => (prev + 1) % EXPLORE_DEMO_RAGAS.length);
+        }, 2600);
+        return () => clearInterval(ragaTimer);
+    }, [hoveredWorkspacePreview]);
+
+    useEffect(() => {
+        if (hoveredWorkspacePreview !== 'bhedam') return undefined;
+        const baseTimer = setInterval(() => {
+            setGrahaPreviewIndex((prev) => (prev + 1) % GRAHA_PREVIEW_ENTRIES.length);
+        }, 3000);
+        const shiftTimer = setInterval(() => {
+            setExplorePreviewShiftIndex((prev) => (prev + 1) % GRAHA_BHEDAM_SWARAS.length);
+        }, 1700);
+        return () => {
+            clearInterval(baseTimer);
+            clearInterval(shiftTimer);
+        };
+    }, [hoveredWorkspacePreview]);
+
+    useEffect(() => {
+        const targetNumber = selectedExploreRaga.number;
+        const counterTimer = setInterval(() => {
+            setExplorePreviewDisplayNumber((prev) => {
+                if (prev === targetNumber) return prev;
+                const delta = targetNumber - prev;
+                const step = Math.abs(delta) > 18 ? Math.ceil(Math.abs(delta) / 8) : 1;
+                const next = prev + (delta > 0 ? step : -step);
+                if (delta > 0) return Math.min(next, targetNumber);
+                return Math.max(next, targetNumber);
+            });
+        }, 42);
+        return () => clearInterval(counterTimer);
+    }, [selectedExploreRaga.number]);
+
+    useEffect(() => {
+        const targetAngle = ((selectedExploreRaga.number - 1) / 72) * 360;
+        setExplorePreviewWheelRotation((prev) => {
+            const normalizedPrev = ((prev % 360) + 360) % 360;
+            const clockwiseDelta = ((targetAngle - normalizedPrev) + 360) % 360;
+            return prev + (clockwiseDelta < 36 ? clockwiseDelta + 90 : clockwiseDelta);
+        });
+    }, [selectedExploreRaga.number]);
+
+    useEffect(() => {
+        if (!transcribePreviewActive) {
+            setTranscribePreviewMode('idle');
+            setTranscribePreviewTokenIndex(0);
+            setTranscribePreviewPhraseIndex(0);
+            setTranscribePreviewSeconds(37);
+            return undefined;
+        }
+
+        setTranscribePreviewMode('recording');
+        const processingTimeout = setTimeout(() => setTranscribePreviewMode('processing'), 4400);
+        const restartTimeout = setTimeout(() => {
+            setTranscribePreviewPhraseIndex((prev) => (prev + 1) % TRANSCRIBE_PREVIEW_PHRASES.length);
+            setTranscribePreviewTokenIndex(0);
+            setTranscribePreviewSeconds(37);
+            setTranscribePreviewMode('recording');
+        }, 5600);
+
+        return () => {
+            clearTimeout(processingTimeout);
+            clearTimeout(restartTimeout);
+        };
+    }, [transcribePreviewActive, transcribePreviewPhraseIndex]);
+
+    useEffect(() => {
+        if (!transcribePreviewActive || transcribePreviewMode !== 'recording') return undefined;
+        const syllableTimer = setInterval(() => {
+            setTranscribePreviewTokenIndex((prev) => Math.min(prev + 1, currentTranscribePhrase.length - 1));
+        }, 340);
+        const timeTimer = setInterval(() => {
+            setTranscribePreviewSeconds((prev) => prev + 1);
+        }, 1000);
+        return () => {
+            clearInterval(syllableTimer);
+            clearInterval(timeTimer);
+        };
+    }, [transcribePreviewActive, transcribePreviewMode, currentTranscribePhrase.length]);
+
+    useEffect(() => {
+        const bars = transcribeWaveBarRefs.current.filter(Boolean);
+        if (!bars.length) return undefined;
+
+        let start = performance.now();
+        const animate = (now) => {
+            const elapsed = now - start;
+            bars.forEach((bar, index) => {
+                const centerWeight = 1 - Math.abs(index - (bars.length - 1) / 2) / ((bars.length - 1) / 2);
+                let scale = 0.9 + (Math.sin(elapsed / 680 + index * 0.42) * 0.05);
+                let opacity = 0.28 + (centerWeight * 0.2);
+
+                if (transcribePreviewMode === 'recording') {
+                    const reactive = (Math.sin(elapsed / 160 + index * 0.55) + Math.sin(elapsed / 240 + index * 0.24)) / 2;
+                    scale = 0.72 + ((reactive + 1) / 2) * (0.42 + centerWeight * 0.46);
+                    opacity = 0.34 + centerWeight * 0.4;
+                } else if (transcribePreviewMode === 'processing') {
+                    scale = 0.82 + centerWeight * 0.1;
+                    opacity = 0.26 + centerWeight * 0.18;
+                }
+
+                bar.style.transform = `scaleY(${scale.toFixed(3)})`;
+                bar.style.opacity = opacity.toFixed(3);
+            });
+            transcribeWaveFrameRef.current = requestAnimationFrame(animate);
+        };
+
+        transcribeWaveFrameRef.current = requestAnimationFrame(animate);
+        return () => {
+            if (transcribeWaveFrameRef.current) cancelAnimationFrame(transcribeWaveFrameRef.current);
+        };
+    }, [transcribePreviewMode]);
+
+    useEffect(() => {
+        if (!gurukulPreviewActive) {
+            setGurukulPreviewMenuOpen(false);
+            setGurukulPreviewSnippetIndex(0);
+            return undefined;
+        }
+        const menuTimer = setTimeout(() => setGurukulPreviewMenuOpen(true), 220);
+        const categoryTimer = setInterval(() => {
+            setGurukulPreviewCategoryIndex((prev) => (prev + 1) % GURUKUL_PREVIEW_CATEGORIES.length);
+        }, 3000);
+        const snippetTimer = setInterval(() => {
+            setGurukulPreviewSnippetIndex((prev) => (prev + 1) % 2);
+        }, 1800);
+        return () => {
+            clearTimeout(menuTimer);
+            clearInterval(categoryTimer);
+            clearInterval(snippetTimer);
+        };
+    }, [gurukulPreviewActive]);
 
     // Body scroll lock
     useEffect(() => {
@@ -253,6 +623,14 @@ function App() {
     }, [detectedNotes]);
 
     useEffect(() => {
+        if (initialRoute.mode && initialRoute.mode !== appMode) {
+            setAppMode(initialRoute.mode);
+        }
+        // only needs to run once on mount for the parsed initial route
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
         try {
             localStorage.setItem('alapana_app_mode', appMode);
         } catch {}
@@ -280,6 +658,7 @@ function App() {
         const { destination = 'home', reveal = true } = options;
         setAppMode(nextMode);
         setShowFeatures(reveal);
+        setShowWorkspaceSections(false);
         const allowedViews = MODE_ALLOWED_VIEWS[nextMode] || MODE_ALLOWED_VIEWS.musician;
         const nextView = allowedViews.has(destination) ? destination : 'home';
         if (nextView === 'home') {
@@ -330,16 +709,24 @@ function App() {
     useEffect(() => {
         const handleHashChange = () => {
             const route = parseHashRoute();
+            const targetMode = route.mode || appMode;
             const targetView = route.view || 'home';
-            const allowedViews = MODE_ALLOWED_VIEWS[appMode] || MODE_ALLOWED_VIEWS.musician;
+            const allowedViews = MODE_ALLOWED_VIEWS[targetMode] || MODE_ALLOWED_VIEWS.musician;
             if (!allowedViews.has(targetView)) {
                 window.location.hash = '#/home';
                 return;
             }
+            if (route.mode && route.mode !== appMode) {
+                setAppMode(route.mode);
+            }
             if (targetView !== viewRef.current) {
                 if (targetView !== 'listen') handleReset();
                 setView(targetView);
-                setShowFeatures(targetView !== 'home');
+                setShowFeatures(route.workspace ? true : targetView !== 'home');
+                setShowWorkspaceSections(route.workspace);
+            } else if (targetView === 'home') {
+                setShowFeatures(route.workspace ? true : false);
+                setShowWorkspaceSections(route.workspace);
             }
             setTutorLaunchTarget(targetView === 'tutor' ? parseTutorHashTarget(route.segments) : null);
         };
@@ -349,30 +736,39 @@ function App() {
     }, [appMode]);
 
     const goTo = (id, options = {}) => {
-        const allowedViews = MODE_ALLOWED_VIEWS[appMode] || MODE_ALLOWED_VIEWS.musician;
+        const { tutorTarget = null, modeOverride = null, workspace = false } = options;
+        const effectiveMode = modeOverride || appMode;
+        const allowedViews = MODE_ALLOWED_VIEWS[effectiveMode] || MODE_ALLOWED_VIEWS.musician;
         if (!allowedViews.has(id) && id !== 'home') {
             id = 'home';
         }
-        const { tutorTarget = null } = options;
+        if (modeOverride && modeOverride !== appMode) {
+            setAppMode(modeOverride);
+        }
         if (id !== 'listen') handleReset();
         setTutorLaunchTarget(id === 'tutor' ? tutorTarget : null);
         setView(id);
         if (id === 'home') {
-            setShowFeatures(false);
+            setShowFeatures(workspace);
+            setShowWorkspaceSections(workspace);
         } else {
             setShowFeatures(true);
+            setShowWorkspaceSections(false);
         }
-        const nextHash = buildHashForView(id, tutorTarget);
+        const nextHash = buildHashForView(id, tutorTarget, id === 'home' ? effectiveMode : effectiveMode, { workspace });
         if (window.location.hash !== nextHash) {
             window.location.hash = nextHash;
         }
     };
 
+    const goToAdvanced = (id, options = {}) => goTo(id, { ...options, modeOverride: 'musician' });
+    const enterWorkspace = (modeOverride = appMode) => goTo('home', { modeOverride, workspace: true });
+
     const handleTutorNavigation = (target = null, options = {}) => {
         const { replace = false } = options;
         const normalizedTarget = target && Object.keys(target).length ? target : null;
         setTutorLaunchTarget(normalizedTarget);
-        const nextHash = buildHashForView('tutor', normalizedTarget);
+        const nextHash = buildHashForView('tutor', normalizedTarget, appMode);
         if (window.location.hash === nextHash) return;
         if (replace) {
             window.history.replaceState(null, '', nextHash);
@@ -380,6 +776,40 @@ function App() {
             window.location.hash = nextHash;
         }
     };
+
+    const homeNavItems = [
+        {
+            id: 'practice',
+            label: 'Practice',
+            action: () => goTo('tutor', { tutorTarget: { tab: 'practice' } }),
+        },
+        {
+            id: 'explore',
+            label: 'Explore',
+            action: () => goTo('library'),
+        },
+        {
+            id: 'create',
+            label: 'Create',
+            action: () => goTo('transcribe'),
+        },
+        {
+            id: 'basics',
+            label: 'Basics',
+            action: () => {
+                setAppMode('beginner');
+                setQuizActive(true);
+            },
+        },
+        {
+            id: 'about',
+            label: 'About',
+            action: () => {
+                const el = document.getElementById('home-about');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            },
+        },
+    ];
 
     return (
         <>
@@ -393,7 +823,10 @@ function App() {
                         goTo(dest);
                         return;
                     }
-                    goTo(dest.view, { tutorTarget: dest.target || null });
+                    goTo(dest.view, {
+                        tutorTarget: dest.target || null,
+                        modeOverride: dest.mode || null,
+                    });
                 }}
             />
             <OnboardingTour
@@ -532,32 +965,46 @@ function App() {
             )}
 
             {/* ── Top Nav ── */}
-            <nav className="bg-c-card border-b border-c-border px-4 md:px-6 py-3 md:py-4 flex items-center justify-between sticky top-0 z-40 shadow-md backdrop-blur-md">
+            {view !== 'home' && (
+            <nav className={`border-b px-4 md:px-6 py-3 md:py-4 flex items-center justify-between sticky top-0 z-40 shadow-md backdrop-blur-md ${
+                view === 'home' && showFeatures
+                    ? 'bg-[rgba(12,5,2,0.92)] border-c-gold/10'
+                    : 'bg-c-card border-c-border'
+            }`}>
                 <button
                     onClick={() => goTo('home')}
                     className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity"
                 >
-                    <VeenaIcon />
+                    <div className={view === 'home' && showFeatures ? 'text-c-gold' : ''}>
+                        <VeenaIcon />
+                    </div>
                     <div>
                         <div className="font-playfair text-c-gold text-base md:text-lg leading-none">Ālāpana</div>
-                        <div className="text-c-cream-dark text-[8px] md:text-[9px] tracking-widest uppercase">Carnatic Music</div>
+                        <div className={`text-[8px] md:text-[9px] tracking-widest uppercase ${
+                            view === 'home' && showFeatures ? 'text-c-gold/70' : 'text-c-cream-dark'
+                        }`}>Carnatic Music</div>
                     </div>
                 </button>
 
                 {/* Desktop nav tabs */}
                 <div className="hidden md:flex items-center gap-1 overflow-x-auto scrollbar-hide">
-                    {visibleFeatures.map(({ id, label }) => (
+                    {(view === 'home'
+                        ? homeNavItems
+                        : visibleFeatures.map(({ id, label }) => ({ id, label, action: () => goTo(id) }))
+                    ).map(({ id, label, action }) => (
                         <button
                             key={id}
-                            onClick={() => goTo(id)}
+                            onClick={action}
                             className={`px-4 py-2 text-[11px] font-playfair font-bold tracking-[0.1em] uppercase transition-all duration-300 relative flex-shrink-0 ${
-                                view === id
+                                view !== 'home' && view === id
                                     ? 'text-c-gold'
-                                    : 'text-c-cream-dim hover:text-c-gold/60'
+                                    : view === 'home' && showFeatures
+                                        ? 'text-c-gold/90 hover:text-c-gold-light'
+                                        : 'text-c-cream-dim hover:text-c-gold/60'
                             }`}
                         >
                             {label}
-                            {view === id && (
+                            {view !== 'home' && view === id && (
                                 <span className="absolute bottom-1 left-4 right-4 h-[2px] bg-gradient-to-r from-transparent via-c-gold to-transparent" />
                             )}
                         </button>
@@ -566,21 +1013,35 @@ function App() {
 
                 {/* Mobile hamburger */}
                 <div className="flex items-center gap-2">
-                    <div className="hidden md:flex items-center gap-1 rounded-full border border-c-border bg-c-surface px-1 py-1">
-                        {Object.values(APP_MODES).map((mode) => (
-                            <button
-                                key={mode.id}
-                                onClick={() => switchAppMode(mode.id, { destination: 'home', reveal: true })}
-                                className={`px-3 py-1 rounded-full text-[10px] font-playfair uppercase tracking-[0.18em] transition-all ${
-                                    appMode === mode.id
-                                        ? 'bg-c-gold text-c-bg'
-                                        : 'text-c-cream-dim hover:text-c-gold'
-                                }`}
-                            >
-                                {mode.shortLabel}
-                            </button>
-                        ))}
-                    </div>
+                    {view === 'home' && showFeatures && (
+                        <button
+                            onClick={() => {
+                                try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
+                                setShowWorkspaceSections(true);
+                            }}
+                            className="hidden md:inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-c-gold text-c-bg text-[11px] font-playfair font-bold uppercase tracking-[0.14em] hover:bg-[#f7d686] transition-colors"
+                        >
+                            Enter Practice Room
+                            <span>→</span>
+                        </button>
+                    )}
+                    {view !== 'home' && (
+                        <div className="hidden md:flex items-center gap-1 rounded-full border border-c-border bg-c-surface px-1 py-1">
+                            {Object.values(APP_MODES).map((mode) => (
+                                <button
+                                    key={mode.id}
+                                    onClick={() => switchAppMode(mode.id, { destination: 'home', reveal: true })}
+                                    className={`px-3 py-1 rounded-full text-[10px] font-playfair uppercase tracking-[0.18em] transition-all ${
+                                        appMode === mode.id
+                                            ? 'bg-c-gold text-c-bg'
+                                            : 'text-c-cream-dim hover:text-c-gold'
+                                    }`}
+                                >
+                                    {mode.shortLabel}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                     <button
                         onClick={() => setMobileMenuOpen(true)}
                         className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-c-surface transition-colors"
@@ -591,6 +1052,7 @@ function App() {
                     </button>
                 </div>
             </nav>
+            )}
 
             {/* ── Mobile bottom tab bar ── */}
             {view !== 'home' && (
@@ -618,12 +1080,37 @@ function App() {
                 {/* ══ HOME ══ */}
                 {view === 'home' && (
                         <div
-                            className="w-full flex flex-col items-center relative overflow-y-auto scrollbar-hide transition-all duration-1000 animate-fade-in"
+                            className="w-full flex flex-col items-center relative overflow-hidden scrollbar-hide transition-all duration-1000 animate-fade-in bg-[#1a0804]"
                             style={{
-                                minHeight: 'calc(100vh - 73px)',
-                                background: 'radial-gradient(circle at center, #7a2a10 0%, #3a1208 50%, #1a0804 100%)',
+                                minHeight: '100vh',
                             }}
                         >
+                        {/* Immersive Background Images (Crossfade based on state) */}
+                        <div className="absolute inset-0 z-0 pointer-events-none">
+                            {/* Main Home Background */}
+                            <img 
+                                src="/home.png" 
+                                alt="" 
+                                className="absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000"
+                                style={{ opacity: isWorkspaceExpanded ? 0 : 0.8 }}
+                            />
+                            {/* Workspace portrait background */}
+                            <div
+                                className="absolute inset-0 transition-opacity duration-1000"
+                                style={{ opacity: isWorkspaceExpanded ? 0.96 : 0 }}
+                            >
+                                <div className="absolute inset-0 bg-[#1a0804]" />
+                                <img
+                                    src="/workspace-border-full.png"
+                                    alt=""
+                                    className="absolute inset-y-0 left-1/2 h-full w-auto max-w-none -translate-x-1/2 scale-x-[1.035]"
+                                    style={{ filter: 'brightness(0.72) saturate(0.9)' }}
+                                />
+                                <div className="absolute inset-0 bg-[rgba(16,6,2,0.24)]" />
+                                <div className="absolute inset-x-0 top-0 h-[14%] bg-gradient-to-b from-[#120502]/42 to-transparent" />
+                                <div className="absolute inset-x-0 bottom-0 h-[12%] bg-gradient-to-t from-[#0f0402]/52 to-transparent" />
+                            </div>
+                        </div>
                         {/* Vignette Overlay */}
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] pointer-events-none z-[1]" />
                         
@@ -634,7 +1121,7 @@ function App() {
                         <div className="absolute left-1/2 top-[30%] -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-c-gold/10 blur-[160px] pointer-events-none rounded-full z-0" />
 
                         {/* Hero mandala — fades out when features panel opens */}
-                        <div className="absolute left-1/2 top-[28%] -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[110vw] h-[110vw] z-0"
+                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[110vw] h-[110vw] z-0"
                             style={{
                                 maskImage: 'radial-gradient(ellipse 48% 48% at 50% 50%, black 40%, transparent 80%)',
                                 WebkitMaskImage: 'radial-gradient(ellipse 48% 48% at 50% 50%, black 40%, transparent 80%)',
@@ -654,12 +1141,12 @@ function App() {
                             />
                         </div>
 
-                        {/* New mandala — fades in when features panel opens, spins counter-clockwise */}
+                        {/* New mandala — fades in when features panel opens, spins counter-clockwise. Fades out when workspace expands */}
                         <div className="absolute left-1/2 top-[52%] -translate-x-1/2 -translate-y-1/2 pointer-events-none w-[160vw] h-[160vw] z-0"
                             style={{
                                 maskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)',
                                 WebkitMaskImage: 'radial-gradient(ellipse 45% 45% at 50% 50%, black 30%, transparent 75%)',
-                                opacity: showFeatures ? 0.15 : 0,
+                                opacity: showFeatures ? (isWorkspaceExpanded ? 0 : 0.15) : 0,
                                 transition: 'opacity 1.4s ease-in-out',
                             }}
                         >
@@ -675,186 +1162,1045 @@ function App() {
                             />
                         </div>
 
+
+
                             <div
-                                className="relative z-10 flex flex-col items-center text-center px-6 transition-all duration-700 overflow-hidden"
-                                style={!showFeatures
-                                    ? { minHeight: 'calc(100vh - 73px)', justifyContent: 'center', paddingBottom: '2.5rem', opacity: 1 }
-                                    : { height: 0, padding: 0, opacity: 0, margin: 0 }
-                                }
+                                className="relative z-10 w-full max-w-6xl px-5 sm:px-7 flex flex-col items-center transition-all duration-700"
+                                style={{ minHeight: 'calc(100vh - 73px)', justifyContent: 'center', paddingTop: '2rem', paddingBottom: '2.5rem' }}
                             >
-                            <div className="flex items-center gap-6 mb-6 w-full max-w-sm opacity-90">
-                                <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-c-gold/50 to-transparent" />
-                                <div className="drop-shadow-[0_0_12px_rgba(200,148,31,0.6)] scale-110"><VeenaIcon /></div>
-                                <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-c-gold/50 to-transparent" />
-                            </div>
-
-                            <h1
-                                id="tour-logo"
-                                className="font-playfair text-5xl sm:text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-br from-c-gold-light via-[#f7d686] to-[#b88014] tracking-wider uppercase leading-none mb-3 drop-shadow-xl"
-                                style={{ textShadow: '0 4px 30px rgba(227,168,33,0.4)' }}
-                            >
-                                Ālāpana
-                            </h1>
-                            <p className="text-c-gold/70 text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.24em] mb-3 mt-1">
-                                A modern Carnatic practice workspace for trained musicians
-                            </p>
-                            <p className="text-white/82 text-base sm:text-lg md:text-2xl max-w-[720px] leading-snug font-light mb-3">
-                                Your Carnatic practice room, online.
-                            </p>
-                            <p className="text-white/58 text-[11px] sm:text-xs md:text-sm max-w-[700px] leading-relaxed mb-3 tracking-wide">
-                                Build your repertoire, practice with shruti and tala, review lessons, track progress, and keep everything in one workspace.
-                            </p>
-                            <p className="text-white/36 text-[10px] sm:text-[11px] md:text-xs max-w-[620px] leading-relaxed mb-6 tracking-wide">
-                                Built for students who know the basics, performers, teachers, and serious learners.
-                            </p>
-
-                            <div className="flex flex-wrap items-center justify-center gap-2 mb-8 text-[10px] sm:text-[11px]">
-                                <span className="text-white/42">Workspace focus:</span>
-                                <div className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-black/15 p-1">
-                                    {Object.values(APP_MODES).map((mode) => (
-                                        <button
-                                            key={mode.id}
-                                            onClick={() => {
-                                                setAppMode(mode.id);
-                                                setShowFeatures(false);
-                                            }}
-                                            className={`px-3 py-1 rounded-full font-playfair transition-all ${
-                                                appMode === mode.id
-                                                    ? 'bg-c-gold/90 text-c-bg'
-                                                    : 'text-white/60 hover:text-[#f7d686]'
-                                            }`}
-                                        >
-                                            {mode.label}
-                                        </button>
-                                    ))}
+                                <div className="flex items-center gap-6 w-full max-w-sm opacity-90">
+                                    <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-c-gold/50 to-transparent" />
+                                    <div className="drop-shadow-[0_0_12px_rgba(200,148,31,0.6)] scale-110"><VeenaIcon /></div>
+                                    <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-c-gold/50 to-transparent" />
                                 </div>
-                            </div>
 
-                            {/* CTAs  ·  fade out once features are shown */}
-                            <div
-                                className="transition-all duration-500 flex flex-col items-center gap-4 animate-fade-in"
-                                style={{ opacity: showFeatures ? 0 : 1, pointerEvents: showFeatures ? 'none' : 'auto', height: showFeatures ? 0 : 'auto', overflow: showFeatures ? 'hidden' : 'visible' }}
-                            >
-                                <button
-                                    onClick={() => {
-                                        if (appMode === 'beginner') {
-                                            setQuizActive(true);
-                                            return;
-                                        }
-                                        setShowFeatures(true);
+                                <div
+                                    className="flex flex-col items-center text-center max-w-3xl transition-all duration-700"
+                                    style={{
+                                        opacity: isWorkspaceExpanded ? 0 : isPreviewOpen ? 0.12 : 1,
+                                        transform: isWorkspaceExpanded ? 'translateY(-16px) scale(0.985)' : isPreviewOpen ? 'scale(0.985)' : 'translateY(0) scale(1)',
+                                        pointerEvents: showFeatures ? 'none' : 'auto',
+                                        maxHeight: isWorkspaceExpanded ? '0px' : '700px',
+                                        overflow: 'hidden',
+                                        marginTop: isWorkspaceExpanded ? '0' : '2.25rem',
+                                        marginBottom: showFeatures ? '0' : '0',
+                                        filter: isPreviewOpen ? 'blur(2px)' : 'none',
                                     }}
-                                    className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-14 py-4 rounded-full text-sm md:text-base tracking-[0.2em] uppercase transition-all duration-500 transform hover:scale-105 shadow-[0_0_40px_rgba(200,148,31,0.35)] cursor-pointer"
                                 >
-                                    {modeConfig.primaryCta}
-                                </button>
-                                <p className="text-white/42 text-[11px] font-playfair italic max-w-[540px]">
-                                    {appMode === 'beginner'
-                                        ? 'New to Carnatic? Start with a guided path through shruti, swaras, tala, and first lessons.'
-                                        : 'New to Carnatic? Guided basics are still available inside Gurukul as a softer entry path.'}
-                                </p>
+                                    <h1
+                                        id="tour-logo"
+                                        className="font-playfair text-5xl sm:text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-br from-c-gold-light via-[#f7d686] to-[#b88014] tracking-wider uppercase leading-none mb-4 drop-shadow-xl"
+                                        style={{ textShadow: '0 4px 30px rgba(227,168,33,0.4)' }}
+                                    >
+                                        Ālāpana
+                                    </h1>
+                                    <p className="text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.22em] mb-4" style={{ color: 'rgba(247, 214, 134, 0.76)' }}>
+                                        Designed for dedicated Carnatic learners and musicians
+                                    </p>
+                                    <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
+                                        <button
+                                            onClick={() => {
+                                                setShowFeatures(true);
+                                                setShowWorkspaceSections(false);
+                                            }}
+                                            className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-10 py-3 rounded-full text-sm tracking-[0.16em] uppercase transition-all duration-500 shadow-[0_0_36px_rgba(200,148,31,0.26)] cursor-pointer"
+                                        >
+                                            Enter Alapana
+                                        </button>
+                                    </div>
+                                </div>
 
-                                <button
-                                    onClick={() => setShowFeatures(true)}
-                                    className="border border-c-gold/25 hover:border-c-gold/50 text-white/46 hover:text-[#f7d686] font-playfair px-7 py-2 rounded-full text-[11px] tracking-[0.16em] uppercase transition-all duration-500 cursor-pointer"
-                                >
-                                    Enter the workspace →
-                                </button>
-
-                                <button
-                                    onClick={() => {
-                                        if (window.innerWidth < 768) {
-                                            const confirmTour = window.confirm(
-                                                "💻 Laptop Recommended!\n\nFor the best experience, we highly recommend taking the Guided Tour on a laptop or desktop computer, as it can cause performance issues or lag on some mobile devices.\n\nWould you like to try it on mobile anyway?"
-                                            );
-                                            if (!confirmTour) return;
-                                        }
-                                        setTourActive(true);
-                                    }}
-                                    className="text-c-gold/80 hover:text-c-gold font-playfair px-6 py-2 text-xs tracking-[0.15em] uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer mt-1 hover:scale-105 active:scale-95"
-                                >
-                                    <span className="text-c-gold opacity-80">{renderTabIcon('tutor', "w-3.5 h-3.5")}</span> Take a Guided Tour
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Feature grid  ·  revelation transition */}
-                        <div
-                            className="relative z-10 w-full max-w-6xl px-3 sm:px-5 flex flex-col items-center justify-center transition-all duration-1000 ease-out"
-                            style={{
-                                opacity: showFeatures ? 1 : 0,
-                                transform: showFeatures ? 'translateY(0) scale(1)' : 'translateY(40px) scale(0.98)',
-                                pointerEvents: showFeatures ? 'auto' : 'none',
-                                flexGrow: showFeatures ? 1 : 0,
-                                minHeight: showFeatures ? '50vh' : 0,
-                                paddingBottom: showFeatures ? '1rem' : 0,
-                            }}
-                        >
-                            <div className="flex flex-col gap-8 w-full max-w-4xl mx-auto kolam-bg rounded-2xl px-4 py-6">
-                                {homeGroups.map(({ label, ids }, groupIdx) => {
-                                    const group = visibleFeatures.filter(f => ids.includes(f.id));
-                                    return (
-                                        <div key={label} className="flex flex-col gap-3">
-                                            {/* Group label */}
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex-1 h-px bg-c-gold/20" />
-                                                <span className="bg-c-gold/15 border border-c-gold/45 rounded-full px-4 py-1 text-[9px] font-mono uppercase tracking-[0.25em] text-c-gold font-bold flex-shrink-0">{label}</span>
-                                                <div className="flex-1 h-px bg-c-gold/20" />
+                                {isPreviewOpen && (
+                                    <div className="fixed inset-0 z-30 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6">
+                                        <div className="absolute inset-0 bg-[rgba(8,3,1,0.54)] backdrop-blur-[4px]" />
+                                        <div
+                                            className="relative w-full max-w-[1440px] rounded-[34px] overflow-hidden shadow-[0_40px_120px_rgba(0,0,0,0.5)] border border-c-gold/10 animate-fade-in"
+                                            style={{
+                                                background: 'radial-gradient(circle at 60% 38%, rgba(142,62,28,0.42), transparent 23%), radial-gradient(circle at 44% 58%, rgba(95,35,16,0.28), transparent 27%), linear-gradient(180deg, #140603 0%, #0b0301 100%)',
+                                            }}
+                                        >
+                                            <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
+                                            <div className="absolute left-[17%] top-[44%] -translate-x-1/2 -translate-y-1/2 w-[48vw] h-[48vw] max-w-[760px] max-h-[760px] opacity-[0.06]">
+                                                <img
+                                                    src="/newmandala.png"
+                                                    alt=""
+                                                    className="w-full h-full object-contain"
+                                                    style={{
+                                                        filter: 'invert(1) sepia(1) saturate(500%) hue-rotate(-20deg) brightness(0.78)',
+                                                        mixBlendMode: 'screen',
+                                                    }}
+                                                />
                                             </div>
-                                            <div className={`grid gap-3 ${
-                                                ids.length === 2
-                                                    ? 'grid-cols-2 max-w-xs mx-auto w-full'
-                                                : ids.length === 5
-                                                    ? 'grid-cols-2 sm:grid-cols-6 max-w-3xl mx-auto w-full'
-                                                : ids.length === 3
-                                                    ? 'grid-cols-1 sm:grid-cols-3 max-w-4xl mx-auto w-full'
-                                                    : 'grid-cols-2 sm:grid-cols-4'
-                                            }`}>
-                                                {group.map(({ id, label: fLabel, desc, highlight }, idx) => (
-                                                    <button
-                                                        key={id}
-                                                        onClick={() => goTo(id)}
-                                                        className={`group relative flex flex-col items-center justify-center p-3.5 sm:p-4 text-center transition-all duration-500 hover:-translate-y-1.5 h-full w-full ${
-                                                            ids.length === 5
-                                                                ? 'sm:col-span-2'
-                                                                : ''
-                                                        } ${
-                                                            ids.length === 5 && idx === 4
-                                                                ? 'col-span-2 justify-self-center max-w-[calc(50%-0.375rem)] sm:max-w-none'
-                                                                : ''
-                                                        } ${
-                                                            ids.length === 5 && idx === 3
-                                                                ? 'sm:col-start-2'
-                                                                : ids.length === 5 && idx === 4
-                                                                ? 'sm:col-start-4'
-                                                                : ''
-                                                        }`}
-                                                        style={{
-                                                            transitionDelay: showFeatures ? `${(groupIdx * 4 + idx) * 55}ms` : '0ms',
-                                                            opacity: showFeatures ? 1 : 0,
-                                                            transform: showFeatures ? 'translateY(0)' : 'translateY(20px)',
-                                                        }}
-                                                    >
-                                                        <div className={`absolute inset-0 rounded-lg shadow-xl transition-all duration-300 ${highlight ? 'bg-gradient-to-b from-[#2b1206] to-[#140602] border-2 border-c-gold shadow-[0_0_20px_rgba(200,148,31,0.22)] group-hover:shadow-[0_0_30px_rgba(200,148,31,0.35)] group-hover:border-[#f7d686]' : 'bg-[#1e0c04] border border-c-gold/30 group-hover:border-c-gold/70'}`} />
-                                                        <div className="absolute inset-1.5 border border-c-gold/10 rounded-md pointer-events-none" />
-                                                        <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-c-gold/40 rounded-tl-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
-                                                        <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-c-gold/40 rounded-tr-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
-                                                        <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-c-gold/40 rounded-bl-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
-                                                        <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-c-gold/40 rounded-br-lg group-hover:w-5 group-hover:h-5 transition-all duration-500" />
-                                                        {highlight && <div className="absolute top-1.5 right-1.5 text-[8px] text-c-gold/80 animate-pulse pointer-events-none font-mono">✦</div>}
-                                                        <div className={`relative z-10 mb-1.5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-all duration-500 flex items-center justify-center ${highlight ? 'text-[#f7d686]' : 'text-c-gold group-hover:text-[#f7d686]'}`}>
-                                                            {renderTabIcon(id, "w-8 h-8 sm:w-10 sm:h-10")}
-                                                        </div>
-                                                        <h3 className="relative z-10 font-playfair text-[#f7d686] text-xs sm:text-sm font-bold tracking-[0.1em] uppercase mb-1 group-hover:text-white transition-colors duration-300">{fLabel}</h3>
-                                                        <p className="relative z-10 text-white/50 text-[9px] sm:text-[10px] leading-relaxed italic max-w-[120px] opacity-70 group-hover:opacity-100 transition-opacity hidden sm:block">{desc}</p>
-                                                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-lg pointer-events-none" />
-                                                    </button>
-                                                ))}
+
+                                            {/* Full-bleed background image for the right side */}
+                                            <div className="absolute inset-y-0 right-0 w-full lg:w-[85%] z-0 pointer-events-none hidden lg:block">
+                                                <img 
+                                                    src="/diya-and-veena.png" 
+                                                    alt="" 
+                                                    className="w-full h-full object-cover object-center animate-fade-in"
+                                                />
+                                                {/* Dark gradient to seamlessly blend the image into the background on the left */}
+                                                <div className="absolute inset-y-0 left-0 w-[55%] bg-gradient-to-r from-[#140603] via-[#140603]/90 to-transparent" />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-[#0b0301]/80 via-transparent to-transparent" />
+                                            </div>
+
+                                            <div className="relative z-10 mx-auto grid max-w-[1440px] lg:grid-cols-[42%_58%] min-h-[820px] px-8 pt-10 md:px-12 lg:px-10 xl:px-12">
+                                                <div className="flex items-center">
+                                                    <div className="max-w-[420px] pb-12 lg:pb-0">
+                                                        <h2 className="font-playfair text-c-gold-light text-[4.8rem] md:text-[5.5rem] xl:text-[6rem] leading-[0.92] tracking-[-0.04em] font-medium">
+                                                            Your Carnatic practice room, online.
+                                                        </h2>
+                                                        <p className="mt-8 text-[1.05rem] md:text-[1.18rem] leading-[1.75] max-w-[420px]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                            Practice with focus. Explore with depth. Create with freedom. Everything you need in one dedicated space.
+                                                        </p>
+                                                        <button
+                                                            onClick={() => {
+                                                                try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
+                                                                enterWorkspace(appMode);
+                                                            }}
+                                                            className="mt-8 inline-flex items-center gap-3 rounded-[16px] bg-c-gold px-8 py-4 text-c-bg text-[12px] font-bold uppercase tracking-[0.16em] shadow-[0_10px_28px_rgba(199,139,34,0.14)] transition-all hover:bg-[#f0c664] hover:shadow-[0_12px_34px_rgba(199,139,34,0.2)]"
+                                                        >
+                                                            Enter Practice Room
+                                                            <ArrowRightMini className="w-4 h-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                setAppMode('beginner');
+                                                                setQuizActive(true);
+                                                            }}
+                                                            className="mt-7 inline-flex items-center gap-2 text-c-gold text-[12px] uppercase tracking-[0.16em] hover:text-c-gold-light transition-colors"
+                                                        >
+                                                            New to Carnatic? Start with Basics
+                                                            <ArrowRightMini className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="relative hidden lg:block h-full w-full">
+                                                    {/* Spacer column - image is now rendered as a full-bleed background behind the grid */}
+                                                </div>
                                             </div>
                                         </div>
-                                    );
-                                })}
+                                    </div>
+                                )}
+
+                                <div
+                                    className="w-full max-w-6xl transition-all duration-700"
+                                    style={{
+                                        opacity: isWorkspaceExpanded ? 1 : 0,
+                                        transform: isWorkspaceExpanded ? 'translateY(0)' : 'translateY(18px)',
+                                        pointerEvents: isWorkspaceExpanded ? 'auto' : 'none',
+                                        maxHeight: isWorkspaceExpanded ? '8000px' : '0px',
+                                        overflow: 'hidden',
+                                        marginTop: isWorkspaceExpanded ? '0.25rem' : '0',
+                                    }}
+                                >
+                                    <div className="pb-16">
+
+                                        <section className="mt-6 px-2 md:px-3">
+                                            <div className="rounded-[34px] border border-c-gold/10 bg-[linear-gradient(180deg,rgba(17,8,4,0.9),rgba(9,4,2,0.95))] shadow-[0_28px_64px_rgba(0,0,0,0.34)] overflow-hidden">
+                                                <div className="relative z-10 px-8 pt-5 pb-3 sm:px-10">
+                                                    <div className="flex items-center justify-center gap-4">
+                                                        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-c-gold/15 to-c-gold/5" />
+                                                        <p className="text-[11px] uppercase tracking-[0.28em] text-c-gold/90">
+                                                            Everything Your Practice Session Needs
+                                                        </p>
+                                                        <div className="h-px flex-1 bg-gradient-to-l from-transparent via-c-gold/15 to-c-gold/5" />
+                                                    </div>
+                                                </div>
+
+                                                <div className="relative z-10 grid lg:grid-cols-[31%_69%] gap-0 px-5 pb-5 sm:px-6 sm:pb-6">
+                                                    <div className="rounded-[28px] bg-[linear-gradient(180deg,rgba(24,10,5,0.42),rgba(12,5,2,0.16))] px-6 py-5 sm:px-7 sm:py-6 backdrop-blur-sm">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="w-14 h-14 rounded-full border border-c-gold/16 bg-[rgba(199,139,34,0.03)] flex items-center justify-center text-c-gold/90">
+                                                                <VeenaIcon />
+                                                            </div>
+                                                            <h3 className="font-playfair text-c-gold-light text-[2.7rem] leading-none">
+                                                                Practice
+                                                            </h3>
+                                                        </div>
+
+                                                        <p className="mt-4 max-w-[260px] text-[1.02rem] leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                            Stay in tune, keep the rhythm, and train your ear — all in one focused practice flow.
+                                                        </p>
+
+                                                        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 max-w-[260px] text-c-gold">
+                                                            {[
+                                                                { id: 'shruthi', label: 'Shruthi' },
+                                                                { id: 'talam', label: 'Talam' },
+                                                                { id: 'keyboard', label: 'Keyboard' },
+                                                                { id: 'listen', label: 'Dhwani' },
+                                                            ].map(({ id, label }) => (
+                                                                <button
+                                                                    key={id}
+                                                                    type="button"
+                                                                    onClick={() => goToAdvanced(id)}
+                                                                    className="flex flex-col items-start gap-2 rounded-[14px] px-2 py-2 -mx-2 text-left transition-all hover:bg-[rgba(255,214,134,0.04)] hover:text-c-gold-light"
+                                                                >
+                                                                    <div className="text-c-gold/92">
+                                                                        {renderTabIcon(id, 'w-7 h-7')}
+                                                                    </div>
+                                                                    <span className="text-[13px] text-c-gold/92 tracking-[0.02em]">
+                                                                        {label}
+                                                                    </span>
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mt-5 lg:mt-0 lg:pl-4">
+                                                        <div className="rounded-[28px] border border-c-gold/10 bg-[radial-gradient(circle_at_50%_24%,rgba(125,56,24,0.14),transparent_30%),linear-gradient(180deg,rgba(23,9,4,0.76),rgba(13,6,3,0.86))] overflow-hidden">
+                                                            <div className="grid md:grid-cols-4">
+                                                                <div
+                                                                    className="workspace-preview-panel group min-h-[200px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    onMouseEnter={() => setHoveredWorkspacePreview('shruthi')}
+                                                                    onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'shruthi' ? null : current)}
+                                                                >
+                                                                    <div
+                                                                        className="workspace-hover-reveal workspace-hover-anim absolute left-1/2 top-[56%] h-[124px] w-[124px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                                                                        style={{
+                                                                            background: 'radial-gradient(circle, rgba(214,156,68,0.1), transparent 72%)',
+                                                                            animation: 'shruthiRipple 3.8s ease-out infinite',
+                                                                        }}
+                                                                    />
+                                                                    <div className="absolute right-0 top-[18px] bottom-[18px] w-px bg-c-gold/10 hidden md:block" />
+                                                                    <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                        <span>Shruthi</span>
+                                                                        <span>~</span>
+                                                                    </div>
+                                                                    <div className="relative mt-4 h-[108px]">
+                                                                        <div className="absolute left-1/2 top-1/2 h-[84px] w-[84px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,232,188,0.05),rgba(255,232,188,0.01)_62%,transparent_74%)]" />
+                                                                        <div className="absolute left-1/2 top-1/2 h-[58px] w-[58px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/8" />
+                                                                        {[
+                                                                            { angle: -90, label: 'Sa' },
+                                                                            { angle: -18, label: 'Pa' },
+                                                                            { angle: 54, label: 'Sa' },
+                                                                            { angle: 126, label: 'Pa' },
+                                                                        ].map(({ angle, label }) => (
+                                                                            <React.Fragment key={`${label}-${angle}`}>
+                                                                                <span
+                                                                                    className="absolute left-1/2 top-1/2 h-[2px] w-[22px] rounded-full bg-c-gold/14"
+                                                                                    style={{
+                                                                                        transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(26px)`,
+                                                                                        transformOrigin: 'center center',
+                                                                                    }}
+                                                                                />
+                                                                                <span
+                                                                                    className="absolute left-1/2 top-1/2 text-[8px] uppercase tracking-[0.16em]"
+                                                                                    style={{
+                                                                                        color: 'rgba(243, 234, 214, 0.72)',
+                                                                                        transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(40px) rotate(${-angle}deg)`,
+                                                                                        transformOrigin: 'center center',
+                                                                                    }}
+                                                                                >
+                                                                                    {label}
+                                                                                </span>
+                                                                            </React.Fragment>
+                                                                        ))}
+                                                                        <div
+                                                                            className="workspace-hover-anim absolute left-1/2 top-1/2 h-[66px] w-[66px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/16"
+                                                                            style={{
+                                                                                boxShadow: shruthiPreviewActive ? '0 0 18px rgba(214,156,68,0.12)' : '0 0 4px rgba(214,156,68,0.04)',
+                                                                                transition: 'box-shadow 320ms ease, opacity 320ms ease, transform 320ms ease',
+                                                                                animation: 'shruthiBreath 3.8s ease-in-out infinite',
+                                                                            }}
+                                                                        />
+                                                                        <div
+                                                                            className="workspace-hover-anim absolute left-1/2 top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                                                                            style={{
+                                                                                background: 'radial-gradient(circle at 35% 35%, rgba(246,219,164,0.98), rgba(205,144,48,0.88) 42%, rgba(99,44,18,0.95) 72%)',
+                                                                                boxShadow: shruthiPreviewActive ? '0 0 22px rgba(214,156,68,0.3)' : '0 0 8px rgba(214,156,68,0.08)',
+                                                                                transition: 'box-shadow 320ms ease, transform 320ms ease',
+                                                                                animation: 'shruthiPulse 2.8s ease-in-out infinite',
+                                                                            }}
+                                                                        />
+                                                                        <div
+                                                                            className="workspace-hover-anim absolute left-1/2 top-1/2 h-[86px] w-[86px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                                                                            style={{
+                                                                                background: 'conic-gradient(from 0deg, rgba(214,156,68,0.12), rgba(214,156,68,0.02), rgba(214,156,68,0.12))',
+                                                                                maskImage: 'radial-gradient(circle, transparent 58%, black 60%, black 70%, transparent 72%)',
+                                                                                WebkitMaskImage: 'radial-gradient(circle, transparent 58%, black 60%, black 70%, transparent 72%)',
+                                                                                animation: 'shruthiDrift 7.6s linear infinite',
+                                                                            }}
+                                                                        />
+                                                                        <div
+                                                                            className="workspace-hover-reveal workspace-hover-anim absolute left-1/2 top-1/2 h-[98px] w-[98px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/10"
+                                                                            style={{ animation: 'shruthiRipple 3.1s ease-out infinite' }}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="mt-2 space-y-1 text-xs" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                        <div className="flex justify-between">
+                                                                            <span className="text-[9px] uppercase tracking-[0.16em]">Sa</span>
+                                                                            <span>Tune Bloom</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    className="workspace-preview-panel group min-h-[200px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    onMouseEnter={() => setHoveredWorkspacePreview('talam')}
+                                                                    onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'talam' ? null : current)}
+                                                                >
+                                                                    <div className="absolute right-0 top-[18px] bottom-[18px] w-px bg-c-gold/10 hidden md:block" />
+                                                                    <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                        <span>Talam</span>
+                                                                        <span>~</span>
+                                                                    </div>
+                                                                    <div className="mt-5 flex flex-col items-center">
+                                                                        <p className="text-sm" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>Adi Talam</p>
+                                                                        <div className="mt-3 relative h-[92px] w-[92px] transition-transform duration-500 group-hover:scale-[1.03]">
+                                                                            <div
+                                                                                className="workspace-hover-reveal workspace-hover-anim absolute left-1/2 top-1/2 h-[98px] w-[98px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/10"
+                                                                                style={{ animation: 'talaBeatPulse 0.72s ease-out infinite' }}
+                                                                            />
+                                                                            <div
+                                                                                className="absolute left-1/2 top-1/2 h-[84px] w-[84px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                                                                                style={{
+                                                                                    border: '1px solid rgba(199,139,34,0.18)',
+                                                                                    boxShadow: 'inset 0 0 0 1px rgba(199,139,34,0.02)',
+                                                                                }}
+                                                                            />
+                                                                            {Array.from({ length: 8 }).map((_, index) => {
+                                                                                const angle = ((index / 8) * Math.PI * 2) - Math.PI / 2;
+                                                                                const active = talamPreviewActive && practiceDemoBeat === index;
+                                                                                return (
+                                                                                    <span
+                                                                                        key={index}
+                                                                                        className="absolute h-[8px] w-[8px] rounded-full"
+                                                                                        style={{
+                                                                                            left: `calc(50% + ${Math.cos(angle) * 38}px)`,
+                                                                                            top: `calc(50% + ${Math.sin(angle) * 38}px)`,
+                                                                                            transform: 'translate(-50%, -50%)',
+                                                                                            background: active ? '#d7a448' : 'rgba(199,139,34,0.2)',
+                                                                                            boxShadow: active ? '0 0 16px rgba(215,164,72,0.58)' : 'none',
+                                                                                            transition: 'all 180ms ease',
+                                                                                        }}
+                                                                                    />
+                                                                                );
+                                                                            })}
+                                                                            <div className="absolute inset-[14px] rounded-full border border-c-gold/10 transition-all duration-300 group-hover:border-c-gold/20" />
+                                                                            <div className="absolute left-1/2 top-1/2 h-[24px] w-[24px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(110,56,23,0.92))]" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    className="workspace-preview-panel group min-h-[200px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    onMouseEnter={() => setHoveredWorkspacePreview('keyboard')}
+                                                                    onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'keyboard' ? null : current)}
+                                                                >
+                                                                    <div className="absolute right-0 top-[18px] bottom-[18px] w-px bg-c-gold/10 hidden md:block" />
+                                                                    <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                        <span>Keyboard</span>
+                                                                        <span>~</span>
+                                                                    </div>
+                                                                    <div className="mt-5 text-center">
+                                                                        <div className="text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>Scale</div>
+                                                                        <div className="relative mx-auto mt-2 w-fit overflow-hidden">
+                                                                            <div
+                                                                                className="workspace-hover-reveal workspace-hover-anim absolute inset-y-0 -left-12 w-10 bg-[linear-gradient(90deg,transparent,rgba(247,214,134,0.28),transparent)]"
+                                                                                style={{ animation: 'keyboardShimmer 4.8s ease-in-out infinite' }}
+                                                                            />
+                                                                            <div className="text-sm transition-all duration-500 group-hover:tracking-[0.05em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                                Mayamalavagowla
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="mt-4 grid grid-cols-8 gap-1.5">
+                                                                            {PRACTICE_DEMO_SWARA_LABELS.map((swara, index) => {
+                                                                                const active = keyboardPreviewActive && practiceDemoKeyIndex === index;
+                                                                                return (
+                                                                                    <div
+                                                                                        key={`${swara}-${index}`}
+                                                                                        className="rounded-[9px] py-2 text-[9px] font-semibold transition-all duration-300"
+                                                                                        style={{
+                                                                                            color: active ? '#1a0804' : 'rgba(243, 234, 214, 0.92)',
+                                                                                            background: active
+                                                                                                ? 'linear-gradient(180deg, #f2ce7a, #c98f33)'
+                                                                                                : 'rgba(255,245,225,0.05)',
+                                                                                            boxShadow: active ? '0 8px 18px rgba(201,143,51,0.28)' : 'inset 0 0 0 1px rgba(199,139,34,0.06)',
+                                                                                            transform: active ? 'translateY(-3px)' : 'translateY(0)',
+                                                                                        }}
+                                                                                    >
+                                                                                        {swara}
+                                                                                    </div>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    className="workspace-preview-panel group min-h-[200px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    onMouseEnter={() => setHoveredWorkspacePreview('listen')}
+                                                                    onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'listen' ? null : current)}
+                                                                >
+                                                                    <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                        <span>Dhwani</span>
+                                                                        <span>~</span>
+                                                                    </div>
+                                                                    <div className="mt-5 flex flex-col items-center">
+                                                                        <div className="relative h-[108px] w-[108px] transition-transform duration-500 group-hover:scale-[1.03]">
+                                                                            <div className="absolute inset-0 rounded-full border border-c-gold/10" />
+                                                                            <div
+                                                                                className="absolute inset-[10px] rounded-full border"
+                                                                                style={{
+                                                                                    borderColor: practiceDemoPitchState === 'match' ? 'rgba(199,139,34,0.42)' : 'rgba(196,129,84,0.34)',
+                                                                                    boxShadow: practiceDemoPitchState === 'match'
+                                                                                        ? '0 0 18px rgba(199,139,34,0.18)'
+                                                                                        : '0 0 18px rgba(196,129,84,0.12)',
+                                                                                    transition: 'all 320ms ease',
+                                                                                }}
+                                                                            />
+                                                                            <div
+                                                                                className="workspace-hover-reveal workspace-hover-anim absolute left-1/2 top-1/2 h-[104px] w-[104px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/10"
+                                                                                style={{ animation: 'talaBeatPulse 2s ease-out infinite' }}
+                                                                            />
+                                                                            <div className="absolute left-1/2 top-1/2 h-[34px] w-[34px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(93,43,18,0.96))] flex items-center justify-center">
+                                                                                <div className="h-[12px] w-[12px] rounded-full bg-[#160603]" />
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="mt-3 flex h-[22px] items-end gap-[3px]">
+                                                                            {Array.from({ length: 12 }).map((_, index) => (
+                                                                                <span
+                                                                                    key={index}
+                                                                                    className={`w-[3px] origin-bottom rounded-full ${dhwaniPreviewActive ? 'workspace-hover-anim bg-c-gold/70' : 'bg-c-gold/25'}`}
+                                                                                    style={{
+                                                                                        height: `${8 + ((index % 4) * 3)}px`,
+                                                                                        animation: `listeningWave ${0.85 + ((index % 3) * 0.12)}s ease-in-out ${index * 0.05}s infinite`,
+                                                                                    }}
+                                                                                />
+                                                                            ))}
+                                                                        </div>
+                                                                        <div className="mt-2 text-xs" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>{dhwaniPreviewActive ? 'Listening...' : 'Ready to listen'}</div>
+                                                                        <div
+                                                                            className="mt-1 text-[10px] uppercase tracking-[0.16em]"
+                                                                            style={{ color: !dhwaniPreviewActive ? 'rgba(243, 234, 214, 0.45)' : practiceDemoPitchState === 'match' ? '#d7a448' : '#c48154', transition: 'color 320ms ease' }}
+                                                                        >
+                                                                            {dhwaniPreviewActive
+                                                                                ? (practiceDemoPitchState === 'match' ? `Detected: ${practiceDemoDetectedSwara}` : `Pitch: ${practiceDemoDetectedSwara}`)
+                                                                                : 'Mic inactive'}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+
+                                        <section className="mt-4 px-2 md:px-3">
+                                            <div className="rounded-[34px] border border-c-gold/10 bg-[linear-gradient(180deg,rgba(17,8,4,0.9),rgba(9,4,2,0.95))] shadow-[0_28px_64px_rgba(0,0,0,0.34)] overflow-hidden">
+                                                <div className="relative z-10 grid lg:grid-cols-[31%_69%] gap-0 px-5 py-5 sm:px-6 sm:py-6">
+                                                    <div className="rounded-[28px] bg-[linear-gradient(180deg,rgba(24,10,5,0.42),rgba(12,5,2,0.16))] px-6 py-5 sm:px-7 sm:py-6 backdrop-blur-sm">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="w-14 h-14 rounded-full border border-c-gold/16 bg-[rgba(199,139,34,0.03)] flex items-center justify-center text-c-gold/90">
+                                                                {renderTabIcon('library', 'w-8 h-8')}
+                                                            </div>
+                                                            <h3 className="font-playfair text-c-gold-light text-[2.7rem] leading-none">
+                                                                Explore
+                                                            </h3>
+                                                        </div>
+
+                                                        <p className="mt-4 max-w-[270px] text-[1.02rem] leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                            Understand ragas from the ground up. Explore structures, relationships, and transformations.
+                                                        </p>
+
+                                                        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 max-w-[270px] text-c-gold">
+                                                            {[
+                                                                { id: 'library', label: 'Raga Kosha' },
+                                                                { id: 'melakarta', label: 'Melakarta' },
+                                                                { id: 'bhedam', label: 'Graha Bhedam' },
+                                                            ].map(({ id, label }) => (
+                                                                <button
+                                                                    key={id}
+                                                                    type="button"
+                                                                    onClick={() => goToAdvanced(id)}
+                                                                    className="flex flex-col items-start gap-2 rounded-[14px] px-2 py-2 -mx-2 text-left transition-all hover:bg-[rgba(255,214,134,0.04)] hover:text-c-gold-light"
+                                                                >
+                                                                    <div className="text-c-gold/92">
+                                                                        {renderTabIcon(id, 'w-7 h-7')}
+                                                                    </div>
+                                                                    <span className="text-[13px] text-c-gold/92 tracking-[0.02em]">
+                                                                        {label}
+                                                                    </span>
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mt-5 lg:mt-0 lg:pl-4">
+                                                        <div className="rounded-[28px] border border-c-gold/10 bg-[radial-gradient(circle_at_50%_22%,rgba(120,53,24,0.12),transparent_32%),linear-gradient(180deg,rgba(22,9,4,0.76),rgba(12,5,2,0.88))] overflow-hidden">
+                                                            <div className="grid md:grid-cols-3">
+                                                                <div
+                                                                    className="workspace-preview-panel group min-h-[200px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    onMouseEnter={() => setHoveredWorkspacePreview('library')}
+                                                                    onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'library' ? null : current)}
+                                                                >
+                                                                    <div className="workspace-preview-soft-glow absolute inset-x-[10%] top-[14%] h-[52%] rounded-[28px] bg-[radial-gradient(circle,rgba(214,156,68,0.14),transparent_72%)] opacity-0 scale-95" />
+                                                                    <div className="absolute right-0 top-[18px] bottom-[18px] w-px bg-c-gold/10 hidden md:block" />
+                                                                    <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                        <span>Raga Kosha</span>
+                                                                        <span>~</span>
+                                                                    </div>
+                                                                    <div className="workspace-preview-float mt-5 rounded-[15px] bg-[rgba(255,245,225,0.02)] px-3 py-3 shadow-[inset_0_0_0_1px_rgba(199,139,34,0.08)]">
+                                                                        <div
+                                                                            className="flex items-center gap-2 rounded-full px-3 py-2 text-[11px] transition-all duration-500"
+                                                                            style={{
+                                                                                color: 'rgba(243, 234, 214, 0.94)',
+                                                                                background: libraryPreviewActive ? 'rgba(10,4,2,0.62)' : 'rgba(10,4,2,0.46)',
+                                                                                border: libraryPreviewActive ? '1px solid rgba(214,156,68,0.22)' : '1px solid rgba(199,139,34,0.06)',
+                                                                                boxShadow: libraryPreviewActive ? '0 0 0 1px rgba(214,156,68,0.08), 0 0 24px rgba(214,156,68,0.12)' : 'none',
+                                                                                transform: libraryPreviewActive ? 'scale(1.01)' : 'scale(1)',
+                                                                            }}
+                                                                        >
+                                                                            <span className="text-c-gold/70 transition-all duration-500" style={{ opacity: libraryPreviewActive ? 1 : 0.68, transform: libraryPreviewActive ? 'scale(1.08)' : 'scale(1)' }}>⌕</span>
+                                                                            <span className="transition-opacity duration-300" style={{ opacity: libraryPreviewActive ? 0.72 : 0.94 }}>Search ragas</span>
+                                                                        </div>
+                                                                        <div className="relative mt-4 h-[164px] perspective-[1200px]">
+                                                                            <div
+                                                                                className="absolute inset-[6px] rounded-[14px] border border-c-gold/10 bg-[rgba(255,245,225,0.02)] transition-all duration-500"
+                                                                                style={{
+                                                                                    transform: libraryPreviewActive ? 'translateX(-4px) rotateY(10deg)' : 'translateX(-1px) rotateY(3deg)',
+                                                                                    opacity: 0.52,
+                                                                                }}
+                                                                            />
+                                                                            <div
+                                                                                key={`${selectedLibraryEntry.name}-${selectedLibraryEntry.family}`}
+                                                                                className="absolute inset-[12px] origin-left overflow-hidden rounded-[14px] border border-c-gold/14 bg-[linear-gradient(180deg,rgba(40,18,9,0.92),rgba(25,11,6,0.98))] px-4 py-4 transition-all duration-500"
+                                                                                style={{
+                                                                                    boxShadow: 'inset 0 0 0 1px rgba(199,139,34,0.06), 0 16px 30px rgba(0,0,0,0.16)',
+                                                                                    transform: libraryPreviewActive ? 'rotateY(-10deg) translateX(2px)' : 'rotateY(-1deg) translateX(0)',
+                                                                                    animation: libraryPreviewActive ? 'libraryPageTurn 820ms cubic-bezier(0.22, 1, 0.36, 1)' : 'none',
+                                                                                }}
+                                                                            >
+                                                                                <div
+                                                                                    className="absolute inset-y-0 left-0 w-[18px]"
+                                                                                    style={{
+                                                                                        background: 'linear-gradient(90deg, rgba(7,3,2,0.36), rgba(255,220,163,0.08), transparent)',
+                                                                                        opacity: libraryPreviewActive ? 1 : 0.45,
+                                                                                    }}
+                                                                                />
+                                                                                <div className="flex items-center justify-between">
+                                                                                    <span className="rounded-full border border-c-gold/14 px-2 py-1 text-[9px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.88)' }}>
+                                                                                        {selectedLibraryEntry.family}
+                                                                                    </span>
+                                                                                    <span className="text-c-gold/76">›</span>
+                                                                                </div>
+                                                                                <div className="mt-5">
+                                                                                    <div className="text-[1rem] transition-all duration-500" style={{ color: 'rgba(243, 234, 214, 0.94)', transform: libraryPreviewActive ? 'translateY(0)' : 'translateY(4px)', opacity: libraryPreviewActive ? 1 : 0.94 }}>
+                                                                                        {selectedLibraryEntry.name}
+                                                                                    </div>
+                                                                                    <div className="mt-2 text-[10px] uppercase tracking-[0.16em] transition-all duration-500" style={{ color: 'rgba(243, 234, 214, 0.8)', transform: libraryPreviewActive ? 'translateY(0)' : 'translateY(6px)', opacity: libraryPreviewActive ? 1 : 0.76 }}>
+                                                                                        {selectedLibraryEntry.meta}
+                                                                                    </div>
+                                                                                    <div className="mt-6 h-px w-14 bg-c-gold/20 transition-all duration-500" style={{ transform: libraryPreviewActive ? 'scaleX(1)' : 'scaleX(0.72)', transformOrigin: 'left center' }} />
+                                                                                    <div className="mt-5 text-[10px] uppercase tracking-[0.18em] transition-all duration-500" style={{ color: '#c7941f', letterSpacing: libraryPreviewActive ? '0.2em' : '0.16em' }}>
+                                                                                        {selectedLibraryEntry.accent}
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div
+                                                                                    className="absolute inset-y-0 right-0 w-10 bg-[linear-gradient(270deg,rgba(255,225,172,0.08),transparent)] transition-all duration-500"
+                                                                                    style={{
+                                                                                        opacity: libraryPreviewActive ? 1 : 0.32,
+                                                                                        transform: libraryPreviewActive ? 'translateX(0) skewY(-12deg)' : 'translateX(4px)',
+                                                                                    }}
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    className="workspace-preview-panel group min-h-[286px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    onMouseEnter={() => setHoveredWorkspacePreview('melakarta')}
+                                                                    onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'melakarta' ? null : current)}
+                                                                >
+                                                                    <div className="workspace-preview-soft-glow absolute left-1/2 top-[22%] h-[220px] w-[220px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(214,156,68,0.16),transparent_68%)] opacity-0 scale-90" />
+                                                                    <div className="absolute right-0 top-[18px] bottom-[18px] w-px bg-c-gold/10 hidden md:block" />
+                                                                    <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                        <span>Melakarta</span>
+                                                                        <span>~</span>
+                                                                    </div>
+                                                                    <div className="mt-4 text-center">
+                                                                        <div className="workspace-preview-float text-[10px] uppercase tracking-[0.16em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                            {selectedExploreRaga.number} / 72
+                                                                        </div>
+                                                                        <div
+                                                                            className="workspace-preview-float relative mx-auto mt-3 h-[188px] w-[188px] rounded-full transition-transform duration-700"
+                                                                            style={{ transform: melakartaPreviewActive ? 'scale(1.03)' : 'scale(1)' }}
+                                                                        >
+                                                                            <div
+                                                                                className="absolute inset-0 rounded-full"
+                                                                                style={{
+                                                                                    transform: `rotate(${explorePreviewWheelRotation}deg)`,
+                                                                                    transition: melakartaPreviewActive ? 'transform 1500ms cubic-bezier(0.22, 1, 0.36, 1)' : 'transform 900ms cubic-bezier(0.22, 1, 0.36, 1)',
+                                                                                }}
+                                                                            >
+                                                                                <div style={{ animation: melakartaPreviewActive ? 'workspaceOrbit 80s linear infinite' : 'none' }}>
+                                                                                    <svg className="absolute inset-0 h-full w-full" viewBox="0 0 188 188" fill="none" aria-hidden="true">
+                                                                                        <circle
+                                                                                            cx="94"
+                                                                                            cy="94"
+                                                                                            r="93"
+                                                                                            stroke="rgba(199,139,34,0.18)"
+                                                                                            strokeWidth="1.4"
+                                                                                            strokeDasharray="584"
+                                                                                            strokeDashoffset={melakartaPreviewActive ? 0 : 584}
+                                                                                            style={{ transition: 'stroke-dashoffset 1400ms cubic-bezier(0.22, 1, 0.36, 1)' }}
+                                                                                        />
+                                                                                        <circle
+                                                                                            cx="94"
+                                                                                            cy="94"
+                                                                                            r="75"
+                                                                                            stroke="rgba(199,139,34,0.14)"
+                                                                                            strokeWidth="1.1"
+                                                                                            opacity={melakartaPreviewActive ? 1 : 0.35}
+                                                                                            style={{ transition: 'opacity 900ms ease 220ms' }}
+                                                                                        />
+                                                                                        <circle
+                                                                                            cx="94"
+                                                                                            cy="94"
+                                                                                            r="46"
+                                                                                            stroke="rgba(199,139,34,0.22)"
+                                                                                            strokeWidth="1.2"
+                                                                                            opacity={melakartaPreviewActive ? 1 : 0.5}
+                                                                                            transform={melakartaPreviewActive ? 'scale(1)' : 'scale(0.85)'}
+                                                                                            style={{
+                                                                                                transformOrigin: '94px 94px',
+                                                                                                transition: 'opacity 900ms ease 280ms, transform 900ms cubic-bezier(0.22, 1, 0.36, 1) 280ms',
+                                                                                            }}
+                                                                                        />
+                                                                                    </svg>
+                                                                                </div>
+                                                                                {['Sa', 'Ri', 'Ga', 'Ma', 'Pa', 'Dha', 'Ni', 'Ni', 'Dha', 'Pa', 'Ma', 'Ga'].map((note, index) => {
+                                                                                const angle = (index / 12) * Math.PI * 2 - Math.PI / 2;
+                                                                                return (
+                                                                                    <React.Fragment key={`${note}-${index}`}>
+                                                                                        <span
+                                                                                            className="absolute text-[12px] transition-all duration-500"
+                                                                                            style={{
+                                                                                                left: `calc(50% + ${Math.cos(angle) * 68}px)`,
+                                                                                                top: `calc(50% + ${Math.sin(angle) * 68}px)`,
+                                                                                                transform: 'translate(-50%, -50%)',
+                                                                                                color: 'rgba(243, 234, 214, 0.94)',
+                                                                                                opacity: melakartaPreviewActive ? 1 : 0.42,
+                                                                                                transitionDelay: melakartaPreviewActive ? `${index * 45}ms` : '0ms',
+                                                                                            }}
+                                                                                        >
+                                                                                            {note}
+                                                                                        </span>
+                                                                                        <span
+                                                                                            className="absolute left-1/2 top-1/2 w-px bg-c-gold/12 transition-opacity duration-500"
+                                                                                            style={{
+                                                                                                height: '74px',
+                                                                                                transform: `translate(-50%, -100%) rotate(${(index / 12) * 360}deg)`,
+                                                                                                transformOrigin: 'center 74px',
+                                                                                                opacity: melakartaPreviewActive ? 1 : 0.2,
+                                                                                            }}
+                                                                                        />
+                                                                                    </React.Fragment>
+                                                                                );
+                                                                            })}
+                                                                            </div>
+                                                                            <div
+                                                                                className="absolute left-1/2 top-1/2 flex h-[46px] w-[46px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-c-gold/14 bg-[radial-gradient(circle_at_center,rgba(199,139,34,0.22),rgba(32,14,7,0.95))] text-2xl font-playfair text-c-gold-light transition-all duration-700"
+                                                                                style={{
+                                                                                    boxShadow: melakartaPreviewActive ? '0 0 24px rgba(214,156,68,0.18)' : '0 0 0 rgba(214,156,68,0)',
+                                                                                    transform: `translate(-50%, -50%) scale(${melakartaPreviewActive ? 1 : 0.85})`,
+                                                                                }}
+                                                                            >
+                                                                                {explorePreviewDisplayNumber}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div
+                                                                            key={`melakarta-name-${selectedExploreRaga.name}`}
+                                                                            className="workspace-preview-float mt-4 text-[1.05rem] transition-all duration-700"
+                                                                            style={{
+                                                                                color: 'rgba(243, 234, 214, 0.94)',
+                                                                                opacity: melakartaPreviewActive ? 1 : 0.92,
+                                                                                transform: melakartaPreviewActive ? 'translateY(0)' : 'translateY(2px)',
+                                                                                textShadow: melakartaPreviewActive ? '0 0 16px rgba(214,156,68,0.12)' : 'none',
+                                                                            }}
+                                                                        >
+                                                                            {selectedExploreRaga.name}
+                                                                        </div>
+                                                                        <div className="workspace-preview-hoverline mx-auto mt-1 h-px w-20 origin-center scale-x-0 bg-c-gold/30 opacity-0" />
+                                                                        <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
+                                                                            {selectedExploreRaga.scale.split(' ').map((swara, index) => (
+                                                                                <span
+                                                                                    key={`${selectedExploreRaga.name}-${swara}-${index}`}
+                                                                                    className="workspace-preview-float rounded-full px-1.5 py-0.5 text-[10px] uppercase tracking-[0.15em] transition-all duration-500"
+                                                                                    style={{
+                                                                                        color: 'rgba(243, 234, 214, 0.94)',
+                                                                                        opacity: melakartaPreviewActive ? 1 : 0.52,
+                                                                                        transform: melakartaPreviewActive ? 'translateY(0)' : 'translateY(4px)',
+                                                                                        transitionDelay: melakartaPreviewActive ? `${index * 60}ms` : '0ms',
+                                                                                    }}
+                                                                                >
+                                                                                    {swara}
+                                                                                </span>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    className="workspace-preview-panel group min-h-[286px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    onMouseEnter={() => setHoveredWorkspacePreview('bhedam')}
+                                                                    onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'bhedam' ? null : current)}
+                                                                >
+                                                                    <div className="workspace-preview-soft-glow absolute right-[12%] top-[22%] h-[180px] w-[180px] rounded-full bg-[radial-gradient(circle,rgba(214,156,68,0.14),transparent_70%)] opacity-0 scale-90" />
+                                                                    <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                        <span>Graha Bhedam</span>
+                                                                        <span>↗</span>
+                                                                    </div>
+                                                                    <div className="workspace-preview-float mt-5 space-y-4">
+                                                                        <div>
+                                                                            <div className="text-[10px] uppercase tracking-[0.16em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>Base Raga</div>
+                                                                            <div
+                                                                                key={`graha-base-${selectedGrahaEntry.base}`}
+                                                                                className="mt-2 text-[1.08rem] transition-all duration-500"
+                                                                                style={{
+                                                                                    color: 'rgba(243, 234, 214, 0.94)',
+                                                                                    opacity: bhedamPreviewActive ? 1 : 0.92,
+                                                                                    transform: bhedamPreviewActive ? 'translateY(0)' : 'translateY(4px)',
+                                                                                }}
+                                                                            >
+                                                                                {selectedGrahaEntry.base}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div>
+                                                                            <div className="text-[10px] uppercase tracking-[0.16em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>Shift Sa to</div>
+                                                                            <div className="mt-3 flex flex-wrap items-center gap-2">
+                                                                                {GRAHA_BHEDAM_SWARAS.map((swara, index) => {
+                                                                                    const active = explorePreviewShiftIndex === index;
+                                                                                    return (
+                                                                                        <span
+                                                                                            key={swara}
+                                                                                            className="relative inline-flex min-w-[36px] justify-center rounded-full px-2 py-1 text-[11px] transition-all duration-300"
+                                                                                            style={{
+                                                                                                color: active ? '#d7a448' : 'rgba(243, 234, 214, 0.8)',
+                                                                                                opacity: active ? 1 : bhedamPreviewActive ? 0.72 : 0.9,
+                                                                                                transform: active ? 'translateY(-1px)' : 'translateY(0)',
+                                                                                                transitionDelay: `${index * 35}ms`,
+                                                                                            }}
+                                                                                        >
+                                                                                            <span
+                                                                                                className="absolute inset-0 rounded-full transition-all duration-300"
+                                                                                                style={{
+                                                                                                    background: active ? 'radial-gradient(circle, rgba(214,156,68,0.18), transparent 72%)' : 'transparent',
+                                                                                                    transform: active ? 'scale(1)' : 'scale(0.7)',
+                                                                                                    opacity: active ? 1 : 0,
+                                                                                                }}
+                                                                                            />
+                                                                                            <span className="relative z-[1]">{swara}</span>
+                                                                                            <span
+                                                                                                className="absolute bottom-[1px] left-[18%] h-px bg-c-gold transition-all duration-300"
+                                                                                                style={{
+                                                                                                    width: active ? '64%' : '0%',
+                                                                                                    opacity: active ? 1 : 0,
+                                                                                                }}
+                                                                                            />
+                                                                                        </span>
+                                                                                    );
+                                                                                })}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="relative pt-4">
+                                                                            <div
+                                                                                className="absolute left-[22px] top-0 h-[1px] bg-[linear-gradient(90deg,rgba(214,156,68,0.75),rgba(214,156,68,0.08))] transition-all duration-500"
+                                                                                style={{
+                                                                                    width: bhedamPreviewActive ? '96px' : '0px',
+                                                                                    opacity: bhedamPreviewActive ? 1 : 0,
+                                                                                }}
+                                                                            />
+                                                                            <div className="text-[10px] uppercase tracking-[0.16em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>Becomes</div>
+                                                                            <div
+                                                                                key={`graha-result-${selectedGrahaSwara}-${selectedGrahaResult}`}
+                                                                                className="mt-2 text-[1.08rem] transition-all duration-500"
+                                                                                style={{
+                                                                                    color: 'rgba(243, 234, 214, 0.94)',
+                                                                                    opacity: bhedamPreviewActive ? 1 : 0.92,
+                                                                                    transform: bhedamPreviewActive ? 'translateY(0)' : 'translateY(4px)',
+                                                                                    textShadow: bhedamPreviewActive ? '0 0 16px rgba(214,156,68,0.12)' : 'none',
+                                                                                }}
+                                                                            >
+                                                                                {selectedGrahaResult}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="pt-4">
+                                                                            <span
+                                                                                className="workspace-preview-float inline-flex items-center gap-2 rounded-full border border-c-gold/10 px-4 py-2 text-[10px] uppercase tracking-[0.16em] transition-all duration-300"
+                                                                                style={{
+                                                                                    color: 'rgba(243, 234, 214, 0.94)',
+                                                                                    background: bhedamPreviewActive ? 'rgba(255,214,134,0.06)' : 'rgba(255,214,134,0.02)',
+                                                                                    borderColor: bhedamPreviewActive ? 'rgba(214,156,68,0.28)' : 'rgba(199,139,34,0.1)',
+                                                                                    boxShadow: bhedamPreviewActive ? '0 10px 24px rgba(199,139,34,0.12)' : 'none',
+                                                                                    transform: bhedamPreviewActive ? 'translateY(0) scale(1.01)' : 'translateY(0) scale(1)',
+                                                                                }}
+                                                                            >
+                                                                                <span style={{ transform: bhedamPreviewActive ? 'translateX(3px)' : 'translateX(0)', transition: 'transform 300ms ease' }}>
+                                                                                    Explore Transformations
+                                                                                </span>
+                                                                                <ArrowRightMini
+                                                                                    className="h-3.5 w-3.5 text-c-gold transition-all duration-300"
+                                                                                    style={{
+                                                                                        opacity: bhedamPreviewActive ? 1 : 0,
+                                                                                        transform: bhedamPreviewActive ? 'translateX(4px)' : 'translateX(0)',
+                                                                                    }}
+                                                                                />
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+
+                                        <section className="mt-4 px-2 md:px-3">
+                                            <div className="rounded-[34px] border border-c-gold/10 bg-[linear-gradient(180deg,rgba(17,8,4,0.9),rgba(9,4,2,0.95))] shadow-[0_28px_64px_rgba(0,0,0,0.34)] overflow-hidden">
+                                                <div className="grid lg:grid-cols-[31%_69%] gap-0 px-5 py-5 sm:px-6 sm:py-6">
+                                                    <div className="rounded-[28px] bg-[linear-gradient(180deg,rgba(24,10,5,0.42),rgba(12,5,2,0.16))] px-6 py-7 sm:px-7 sm:py-8">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="w-14 h-14 rounded-full border border-c-gold/16 bg-[rgba(199,139,34,0.03)] flex items-center justify-center text-c-gold/90">
+                                                                {renderTabIcon('transcribe', 'w-8 h-8')}
+                                                            </div>
+                                                            <h3 className="font-playfair text-c-gold-light text-[2.7rem] leading-none">
+                                                                Create
+                                                            </h3>
+                                                        </div>
+
+                                                        <p className="mt-6 max-w-[270px] text-[1.02rem] leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                            Capture your ideas. Transcribe with ease. Build, organize, and elevate your repertoire.
+                                                        </p>
+
+                                                        <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-5 max-w-[220px] text-c-gold">
+                                                            {[
+                                                                { id: 'transcribe', label: 'Transcribe' },
+                                                                { id: 'tutor', label: 'Gurukul' },
+                                                            ].map(({ id, label }) => (
+                                                                <button
+                                                                    key={id}
+                                                                    type="button"
+                                                                    onClick={() => goToAdvanced(id, id === 'tutor' ? { tutorTarget: { tab: 'practice' } } : {})}
+                                                                    className="flex flex-col items-start gap-2 rounded-[14px] px-2 py-2 -mx-2 text-left transition-all hover:bg-[rgba(255,214,134,0.04)] hover:text-c-gold-light"
+                                                                >
+                                                                    <div className="text-c-gold/92">
+                                                                        {renderTabIcon(id, 'w-7 h-7')}
+                                                                    </div>
+                                                                    <span className="text-[13px] text-c-gold/92 tracking-[0.02em]">
+                                                                        {label}
+                                                                    </span>
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mt-5 lg:mt-0 lg:pl-4">
+                                                        <div className="rounded-[28px] border border-c-gold/10 bg-[radial-gradient(circle_at_54%_18%,rgba(122,54,23,0.12),transparent_28%),linear-gradient(180deg,rgba(22,9,4,0.76),rgba(12,5,2,0.88))] overflow-hidden">
+                                                            <div className="grid md:grid-cols-[1.05fr_0.95fr]">
+                                                                <div
+                                                                    className="workspace-preview-panel group min-h-[286px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    onMouseEnter={() => setHoveredWorkspacePreview('transcribe')}
+                                                                    onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'transcribe' ? null : current)}
+                                                                >
+                                                                    <div className="workspace-preview-soft-glow absolute inset-x-[10%] top-[16%] h-[45%] rounded-[30px] bg-[radial-gradient(circle,rgba(214,156,68,0.14),transparent_72%)] opacity-0 scale-95" />
+                                                                    <div className="absolute right-0 top-[18px] bottom-[18px] w-px bg-c-gold/10 hidden md:block" />
+                                                                    <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                        <span>Transcribe</span>
+                                                                        <span>~</span>
+                                                                    </div>
+                                                                    <div className="workspace-preview-float mt-5 rounded-[16px] bg-[rgba(255,245,225,0.02)] px-3 py-4 shadow-[inset_0_0_0_1px_rgba(199,139,34,0.08)]">
+                                                                        <div className="flex h-[54px] items-center gap-[2px]">
+                                                                            {Array.from({ length: 56 }).map((_, i) => (
+                                                                                <span
+                                                                                    key={i}
+                                                                                    ref={(node) => { transcribeWaveBarRefs.current[i] = node; }}
+                                                                                    className="flex-1 origin-center rounded-full bg-[linear-gradient(180deg,rgba(244,214,142,0.95),rgba(164,103,36,0.22))] will-change-transform"
+                                                                                    style={{
+                                                                                        height: `${10 + (Math.abs(Math.sin(i * 0.42)) * 34)}px`,
+                                                                                        transform: 'scaleY(0.92)',
+                                                                                        opacity: 0.26 + ((i % 7) * 0.05),
+                                                                                    }}
+                                                                                />
+                                                                            ))}
+                                                                        </div>
+
+                                                                        <div className="mt-6 flex items-center justify-between">
+                                                                            <div className="relative flex-1 mr-4">
+                                                                                <div className="h-[74px] rounded-[12px] bg-[rgba(9,4,2,0.36)] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.06)] px-3 py-3 group-hover:shadow-[inset_0_0_0_1px_rgba(199,139,34,0.12)] transition-shadow duration-500">
+                                                                                    <div className="absolute left-3 right-3 top-[18px] h-px bg-c-gold/16" />
+                                                                                    <div className="absolute left-3 right-3 top-[31px] h-px bg-c-gold/16" />
+                                                                                    <div className="absolute left-3 right-3 top-[44px] h-px bg-c-gold/16" />
+                                                                                    <div className="absolute left-3 right-3 top-[57px] h-px bg-c-gold/16" />
+                                                                                    <div className="absolute left-[18px] top-[24px] right-[16px] flex flex-wrap items-start gap-x-3 gap-y-1 text-[12px]">
+                                                                                        {currentTranscribePhrase.map((token, index) => {
+                                                                                            const revealed = index <= transcribePreviewTokenIndex || transcribePreviewMode === 'processing';
+                                                                                            const active = transcribePreviewMode === 'recording' && index === transcribePreviewTokenIndex;
+                                                                                            const separator = token === '|';
+                                                                                            return (
+                                                                                                <span
+                                                                                                    key={`${transcribePreviewPhraseIndex}-${token}-${index}`}
+                                                                                                    className="transition-all duration-300"
+                                                                                                    style={{
+                                                                                                        color: active ? '#d7a448' : 'rgba(243, 234, 214, 0.94)',
+                                                                                                        opacity: revealed ? 1 : 0,
+                                                                                                        transform: revealed ? 'translateY(0)' : 'translateY(8px)',
+                                                                                                        textShadow: active ? '0 0 14px rgba(214,156,68,0.24)' : 'none',
+                                                                                                        transitionDelay: separator ? '40ms' : `${index * 24}ms`,
+                                                                                                    }}
+                                                                                                >
+                                                                                                    {token}
+                                                                                                </span>
+                                                                                            );
+                                                                                        })}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="flex flex-col items-center gap-2">
+                                                                                <div
+                                                                                    className={`relative flex h-12 w-12 items-center justify-center rounded-full bg-[radial-gradient(circle_at_35%_35%,#d66e51,#9e3722_68%,#752313)] transition-all duration-300 ${transcribePreviewMode === 'recording' ? 'workspace-recording-pulse' : ''}`}
+                                                                                    style={{
+                                                                                        boxShadow: transcribePreviewMode === 'recording'
+                                                                                            ? '0 0 28px rgba(218,92,58,0.42)'
+                                                                                            : '0 0 18px rgba(185,67,42,0.2)',
+                                                                                        transform: transcribePreviewMode === 'processing' ? 'scale(0.96)' : 'scale(1)',
+                                                                                    }}
+                                                                                >
+                                                                                    <div className="w-3 h-3 rounded-sm bg-[#f6dcb2]" />
+                                                                                </div>
+                                                                                <span
+                                                                                    className="text-[11px] transition-all duration-300"
+                                                                                    style={{
+                                                                                        color: 'rgba(243, 234, 214, 0.94)',
+                                                                                        opacity: transcribePreviewMode === 'idle' ? 0.72 : 1,
+                                                                                        textShadow: transcribePreviewMode === 'recording' ? '0 0 18px rgba(184,134,46,0.25)' : 'none',
+                                                                                    }}
+                                                                                >
+                                                                                    {`00:${String(transcribePreviewSeconds % 60).padStart(2, '0')}`}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    className="workspace-preview-panel group min-h-[286px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    onMouseEnter={() => setHoveredWorkspacePreview('gurukul')}
+                                                                    onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'gurukul' ? null : current)}
+                                                                >
+                                                                    <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                        <span>Gurukul</span>
+                                                                        <span className="relative" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                            <span className="inline-flex items-center gap-1 rounded-full px-2 py-1 transition-all duration-300" style={{ background: gurukulPreviewMenuOpen ? 'rgba(255,214,134,0.05)' : 'transparent' }}>
+                                                                                <span>My Repertoire</span>
+                                                                                <span style={{ display: 'inline-block', transform: gurukulPreviewMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 200ms ease' }}>▾</span>
+                                                                            </span>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="workspace-preview-float mt-5 grid grid-cols-[120px_1fr] gap-4 rounded-[16px] bg-[rgba(255,245,225,0.02)] px-3 py-4 shadow-[inset_0_0_0_1px_rgba(199,139,34,0.08)]">
+                                                                        <div className="space-y-2">
+                                                                            {GURUKUL_PREVIEW_CATEGORIES.map(({ name, meta }, index) => {
+                                                                                const active = gurukulPreviewCategoryIndex === index;
+                                                                                return (
+                                                                                <div
+                                                                                    key={name}
+                                                                                    className="rounded-[12px] px-3 py-2 transition-all duration-300"
+                                                                                    style={{
+                                                                                        transform: active ? 'translateX(4px) scale(1.01)' : gurukulPreviewActive ? 'translateX(1px)' : 'translateX(0)',
+                                                                                        background: active ? 'linear-gradient(90deg,rgba(146,96,33,0.42),rgba(88,45,17,0.2))' : 'rgba(255,245,225,0.012)',
+                                                                                        boxShadow: active
+                                                                                            ? 'inset 0 0 0 1px rgba(199,139,34,0.16), 0 0 18px rgba(199,139,34,0.12)'
+                                                                                            : 'inset 0 0 0 1px rgba(199,139,34,0.05)',
+                                                                                        transitionDelay: `${index * 38}ms`,
+                                                                                    }}
+                                                                                >
+                                                                                    <div className="text-[12px] transition-transform duration-300" style={{ color: 'rgba(243, 234, 214, 0.94)', transform: active ? 'translateX(2px)' : 'translateX(0)' }}>{name}</div>
+                                                                                    <div className="mt-1 text-[9px] uppercase tracking-[0.14em] transition-transform duration-300" style={{ color: 'rgba(243, 234, 214, 0.94)', transform: active ? 'translateX(3px)' : 'translateX(0)' }}>{meta}</div>
+                                                                                </div>
+                                                                            )})}
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <div className="flex items-center justify-between">
+                                                                                <div>
+                                                                                    <div
+                                                                                        key={`gurukul-title-${selectedGurukulCategory.detailTitle}`}
+                                                                                        className="text-sm transition-all duration-300"
+                                                                                        style={{
+                                                                                            color: 'rgba(243, 234, 214, 0.94)',
+                                                                                            opacity: gurukulPreviewActive ? 1 : 0.94,
+                                                                                            transform: gurukulPreviewActive ? 'translateY(0)' : 'translateY(6px)',
+                                                                                        }}
+                                                                                    >
+                                                                                        {selectedGurukulCategory.detailTitle}
+                                                                                    </div>
+                                                                                    <div
+                                                                                        key={`gurukul-meta-${selectedGurukulCategory.detailMeta}`}
+                                                                                        className="mt-1 text-[10px] uppercase tracking-[0.14em] transition-all duration-300"
+                                                                                        style={{
+                                                                                            color: 'rgba(243, 234, 214, 0.94)',
+                                                                                            opacity: gurukulPreviewActive ? 1 : 0.72,
+                                                                                            transform: gurukulPreviewActive ? 'translateY(0)' : 'translateY(8px)',
+                                                                                            transitionDelay: '60ms',
+                                                                                        }}
+                                                                                    >
+                                                                                        {selectedGurukulCategory.detailMeta}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="mt-4 space-y-4">
+                                                                                {selectedGurukulCategory.snippets.map((snippet, row) => {
+                                                                                    const activeSnippet = gurukulPreviewSnippetIndex === row;
+                                                                                    return (
+                                                                                    <div
+                                                                                        key={`${selectedGurukulCategory.name}-${row}`}
+                                                                                        className="relative h-[62px] overflow-hidden rounded-[12px] bg-[rgba(9,4,2,0.28)] transition-all duration-300"
+                                                                                        style={{
+                                                                                            boxShadow: activeSnippet
+                                                                                                ? 'inset 0 0 0 1px rgba(199,139,34,0.12), 0 10px 22px rgba(0,0,0,0.12)'
+                                                                                                : 'inset 0 0 0 1px rgba(199,139,34,0.06)',
+                                                                                            transform: activeSnippet ? 'translateX(4px)' : gurukulPreviewActive ? 'translateX(1px)' : 'translateX(0)',
+                                                                                            transitionDelay: `${row * 55}ms`,
+                                                                                        }}
+                                                                                    >
+                                                                                        {[13, 26, 39, 52].map((line) => (
+                                                                                            <div key={line} className="absolute left-3 right-3 h-px bg-c-gold/10" style={{ top: `${line}px` }} />
+                                                                                        ))}
+                                                                                        <div className="absolute left-[16px] top-[18px] right-[18px] h-[20px]">
+                                                                                            <svg viewBox="0 0 280 40" className="w-full h-full text-c-gold/78" fill="none">
+                                                                                                <path d="M10 24C22 10 36 9 48 22C58 33 69 33 82 16C95 0 108 4 123 18C137 31 149 31 161 17C174 3 188 5 201 21C214 36 228 35 241 17" className="workspace-mini-wave" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                                                                                                {[
+                                                                                                    [18, 24], [62, 18], [102, 13], [143, 24], [182, 17], [222, 22],
+                                                                                                ].map(([cx, cy], i) => (
+                                                                                                    <circle key={i} cx={cx} cy={cy} r="2.2" fill="currentColor" />
+                                                                                                ))}
+                                                                                            </svg>
+                                                                                        </div>
+                                                                                        <div className="absolute left-[16px] bottom-[8px] right-[16px] flex items-center gap-3 text-[10px] transition-all duration-300" style={{ color: 'rgba(243, 234, 214, 0.94)', transform: activeSnippet ? 'translateY(-1px)' : 'translateY(0)' }}>
+                                                                                            {snippet.map((token, index) => (
+                                                                                                <span key={`${selectedGurukulCategory.name}-${row}-${token}-${index}`}>{token}</span>
+                                                                                            ))}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                )})}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
                     </div>
             )}
 
@@ -1186,9 +2532,11 @@ function App() {
                 })()}
             </div>
 
-            <footer className="py-6 text-center text-c-cream-dark text-xs font-playfair italic border-t border-c-border">
-                Ālāpana · Carnatic Music
-            </footer>
+            {!(view === 'home' && !showFeatures) && (
+                <footer className="py-6 text-center text-c-cream-dark text-xs font-playfair italic border-t border-c-border">
+                    Ālāpana · Carnatic Music
+                </footer>
+            )}
         </div>
 
         {/* ── GORGEOUS GOLDEN SADHANA TOAST ── */}

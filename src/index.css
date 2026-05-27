@@ -19,6 +19,101 @@ body {
   50%       { height: 18px; }
 }
 
+@keyframes workspacePulse {
+  0%, 100% { transform: scale(1); opacity: 0.42; }
+  50% { transform: scale(1.06); opacity: 0.78; }
+}
+
+@keyframes workspaceOrbit {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes shruthiBreath {
+  0%, 100% { opacity: 0.38; transform: scaleY(0.98); }
+  50% { opacity: 0.72; transform: scaleY(1.02); }
+}
+
+@keyframes shruthiRipple {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.72); }
+  20% { opacity: 0.2; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.18); }
+}
+
+@keyframes shruthiShimmer {
+  0% { background-position: 50% 0%; }
+  100% { background-position: 50% 100%; }
+}
+
+@keyframes shruthiPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.96); }
+  50% { transform: translate(-50%, -50%) scale(1.06); }
+}
+
+@keyframes shruthiDrift {
+  0% { transform: translate(-50%, -50%) rotate(0deg); opacity: 0.3; }
+  50% { opacity: 0.55; }
+  100% { transform: translate(-50%, -50%) rotate(360deg); opacity: 0.3; }
+}
+
+@keyframes talaBeatPulse {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.78); }
+  28% { opacity: 0.34; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.18); }
+}
+
+@keyframes keyboardShimmer {
+  0% { transform: translateX(-115%); opacity: 0; }
+  12% { opacity: 0.34; }
+  60% { opacity: 0.14; }
+  100% { transform: translateX(115%); opacity: 0; }
+}
+
+@keyframes listeningWave {
+  0%, 100% { transform: scaleY(0.28); opacity: 0.25; }
+  50% { transform: scaleY(1); opacity: 0.88; }
+}
+
+@keyframes recordPulse {
+  from {
+    transform: scale(0.9);
+    opacity: 0.65;
+  }
+  to {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+@keyframes miniWaveBreath {
+  0%, 100% {
+    opacity: 0.18;
+    transform: scaleX(0.96);
+  }
+  50% {
+    opacity: 0.42;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes libraryPageTurn {
+  0% {
+    opacity: 0;
+    transform: rotateY(-34deg) translateX(10px);
+    filter: brightness(0.92);
+  }
+  55% {
+    opacity: 1;
+    transform: rotateY(-8deg) translateX(2px);
+    filter: brightness(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateY(-10deg) translateX(2px);
+    filter: brightness(1);
+  }
+}
+
 .wave-bar {
   width: 3px;
   border-radius: 2px;
@@ -71,6 +166,172 @@ body {
   z-index: 50;
   mix-blend-mode: multiply;
   background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
+}
+
+.workspace-preview-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  cursor: default;
+  transition:
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 420ms ease,
+    border-color 420ms ease;
+}
+
+.workspace-preview-panel::before {
+  content: "";
+  position: absolute;
+  inset: -18% -8% auto;
+  height: 58%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(214, 156, 68, 0.18), rgba(214, 156, 68, 0) 72%);
+  opacity: 0;
+  transform: translateY(12px) scale(0.96);
+  transition:
+    opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.workspace-preview-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px rgba(199, 139, 34, 0),
+    inset 0 24px 48px rgba(255, 214, 134, 0);
+  transition: box-shadow 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.workspace-preview-panel:hover {
+  transform: translateY(-4px) scale(1.008);
+  box-shadow:
+    0 26px 48px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(199, 139, 34, 0.1);
+}
+
+.workspace-preview-panel:hover::before {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.workspace-preview-panel:hover::after {
+  box-shadow:
+    inset 0 0 0 1px rgba(199, 139, 34, 0.12),
+    inset 0 24px 48px rgba(255, 214, 134, 0.02);
+}
+
+.workspace-preview-hoverline {
+  transition:
+    opacity 420ms ease,
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 420ms ease;
+}
+
+.workspace-preview-panel:hover .workspace-preview-hoverline {
+  opacity: 1;
+  transform: scaleX(1);
+  box-shadow: 0 0 18px rgba(214, 156, 68, 0.18);
+}
+
+.workspace-preview-float {
+  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms ease, box-shadow 420ms ease;
+}
+
+.workspace-preview-panel:hover .workspace-preview-float {
+  transform: translateY(-6px);
+}
+
+.workspace-preview-soft-glow {
+  transition:
+    opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.workspace-preview-panel:hover .workspace-preview-soft-glow {
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+.workspace-preview-pulse {
+  animation: workspacePulse 2.8s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.workspace-preview-orbit {
+  animation: workspaceOrbit 20s linear infinite;
+  animation-play-state: paused;
+}
+
+.workspace-preview-panel:hover .workspace-preview-pulse,
+.workspace-preview-panel:hover .workspace-preview-orbit {
+  animation-play-state: running;
+}
+
+.workspace-hover-anim {
+  animation-play-state: paused !important;
+}
+
+.workspace-preview-panel:hover .workspace-hover-anim {
+  animation-play-state: running !important;
+}
+
+.workspace-hover-reveal {
+  opacity: 0;
+  transition: opacity 320ms ease, transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.workspace-preview-panel:hover .workspace-hover-reveal {
+  opacity: 1;
+}
+
+.workspace-recording-pulse::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 999px;
+  background: rgba(180, 70, 45, 0.22);
+  animation: recordPulse 1.2s ease-out infinite;
+}
+
+.workspace-mini-wave {
+  opacity: 0.25;
+  transform-origin: center;
+  animation: miniWaveBreath 2.8s ease-in-out infinite;
+  transition: opacity 300ms ease;
+}
+
+.workspace-preview-panel:hover .workspace-mini-wave {
+  opacity: 0.44;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-preview-panel,
+  .workspace-preview-panel::before,
+  .workspace-preview-panel::after,
+  .workspace-preview-hoverline,
+  .workspace-preview-float,
+  .workspace-preview-soft-glow {
+    transition: none;
+  }
+
+  .workspace-preview-panel:hover {
+    transform: none;
+  }
+
+  .workspace-preview-pulse,
+  .workspace-preview-orbit {
+    animation: none;
+  }
+
+  .workspace-recording-pulse::after,
+  .workspace-mini-wave {
+    animation: none;
+  }
 }
 
 /* Scrollbar hide utility */

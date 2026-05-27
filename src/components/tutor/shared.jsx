@@ -203,6 +203,9 @@ function TalaBadge({ tala, swaras }) {
 const playSingleTone = (freq, duration = 0.7, prevFreq = null) => {
     try {
         const ctx = getAudioCtx();
+        if (ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+        }
         // Use raw oscillator approach for the tutor's simpler sound
         const master = ctx.createGain();
         master.connect(ctx.destination);
@@ -257,6 +260,14 @@ const waitRhythmicUnits = async (units, delayMs, signal, tala) => {
 };
 
 const playSequenceAsync = async (swaras, sa, onIdx, signal, delayMs = 750, gamakam = false, tala = null, octaveMode = 'auto') => {
+    const ctx = getAudioCtx();
+    if (ctx.state === 'suspended') {
+        try {
+            await ctx.resume();
+        } catch {
+            // If resume is blocked, the caller's user gesture can retry on next interaction.
+        }
+    }
     const plainSwaras = getPlainSwaras(swaras);
     const octaves = getOctaveSequence(plainSwaras, octaveMode);
     const unitSec = delayMs / 1000;

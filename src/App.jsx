@@ -53,27 +53,17 @@ const FEATURES = [
 const APP_MODES = {
     beginner: {
         id: 'beginner',
-        label: 'Beginner Mode',
-        shortLabel: 'Beginner',
-        title: 'Learn Step by Step',
-        subtitle: 'For people learning fundamentals through guided practice.',
-        eyebrow: 'Foundations First',
-        heroBody: 'Focus on shruti, swaras, tala, and a clear lesson path without the full musician workspace getting in the way.',
-        heroMeta: 'Guided lessons · fewer decisions · confidence-building practice',
-        primaryCta: 'Start Beginner Path',
-        secondaryCta: 'Browse beginner tools',
+        label: 'Guided Basics',
+        shortLabel: 'Basics',
+        subtitle: 'A quieter, guided path for shruti, swaras, tala, and early lessons.',
+        primaryCta: 'Start Guided Basics',
     },
     musician: {
         id: 'musician',
-        label: 'Musician Mode',
-        shortLabel: 'Musician',
-        title: 'Practice as a Musician',
-        subtitle: 'For trained musicians who want a serious Carnatic practice workspace.',
-        eyebrow: 'Core Workspace',
-        heroBody: 'Focus on raga exploration, notation, compositions, manodharma support, transcription, recording, and fast access to reference tools.',
-        heroMeta: 'Raga tools · notation · recording · compositions · improvisation support',
-        primaryCta: 'Open Musician Workspace',
-        secondaryCta: 'Explore all musician tools',
+        label: 'Practice Workspace',
+        shortLabel: 'Workspace',
+        subtitle: 'A modern Carnatic practice workspace for trained musicians.',
+        primaryCta: 'Open Workspace',
     },
 };
 
@@ -705,44 +695,39 @@ function App() {
                             >
                                 Ālāpana
                             </h1>
-                            <p className="text-c-gold/70 text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.28em] mb-3 mt-1">
-                                {modeConfig.eyebrow}
+                            <p className="text-c-gold/70 text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[0.24em] mb-3 mt-1">
+                                A modern Carnatic practice workspace for trained musicians
                             </p>
-                            <p className="text-white/80 text-sm sm:text-base md:text-xl max-w-[560px] leading-snug font-light mb-2">
-                                {modeConfig.title}
+                            <p className="text-white/82 text-base sm:text-lg md:text-2xl max-w-[720px] leading-snug font-light mb-3">
+                                Your Carnatic practice room, online.
                             </p>
-                            <p className="text-white/55 text-[11px] sm:text-xs md:text-sm max-w-[620px] leading-relaxed mb-3 tracking-wide">
-                                {modeConfig.heroBody}
+                            <p className="text-white/58 text-[11px] sm:text-xs md:text-sm max-w-[700px] leading-relaxed mb-3 tracking-wide">
+                                Build your repertoire, practice with shruti and tala, review lessons, track progress, and keep everything in one workspace.
                             </p>
-                            <p className="text-white/35 text-[10px] sm:text-[11px] md:text-xs max-w-[500px] leading-relaxed mb-8 md:mb-10 tracking-[0.18em] uppercase">
-                                {modeConfig.heroMeta}
+                            <p className="text-white/36 text-[10px] sm:text-[11px] md:text-xs max-w-[620px] leading-relaxed mb-6 tracking-wide">
+                                Built for students who know the basics, performers, teachers, and serious learners.
                             </p>
 
-                            <div className="grid sm:grid-cols-2 gap-3 w-full max-w-3xl mb-7">
-                                {Object.values(APP_MODES).map((mode) => (
-                                    <button
-                                        key={mode.id}
-                                        onClick={() => {
-                                            setAppMode(mode.id);
-                                            setShowFeatures(false);
-                                        }}
-                                        className={`text-left rounded-2xl border px-5 py-5 transition-all duration-300 ${
-                                            appMode === mode.id
-                                                ? 'border-c-gold bg-c-gold/12 shadow-[0_0_30px_rgba(200,148,31,0.18)]'
-                                                : 'border-white/10 bg-black/15 hover:border-c-gold/45 hover:bg-c-gold/6'
-                                        }`}
-                                    >
-                                        <div className="flex items-center justify-between gap-3 mb-2">
-                                            <span className="font-playfair text-lg text-[#f7d686]">{mode.label}</span>
-                                            {mode.id === 'musician' && (
-                                                <span className="text-[9px] uppercase tracking-[0.2em] px-2 py-1 rounded-full border border-c-gold/30 text-c-gold/80">
-                                                    Core ICP
-                                                </span>
-                                            )}
-                                        </div>
-                                        <p className="text-white/72 text-sm leading-relaxed">{mode.subtitle}</p>
-                                    </button>
-                                ))}
+                            <div className="flex flex-wrap items-center justify-center gap-2 mb-8 text-[10px] sm:text-[11px]">
+                                <span className="text-white/42">Workspace focus:</span>
+                                <div className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-black/15 p-1">
+                                    {Object.values(APP_MODES).map((mode) => (
+                                        <button
+                                            key={mode.id}
+                                            onClick={() => {
+                                                setAppMode(mode.id);
+                                                setShowFeatures(false);
+                                            }}
+                                            className={`px-3 py-1 rounded-full font-playfair transition-all ${
+                                                appMode === mode.id
+                                                    ? 'bg-c-gold/90 text-c-bg'
+                                                    : 'text-white/60 hover:text-[#f7d686]'
+                                            }`}
+                                        >
+                                            {mode.label}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
                             {/* CTAs  ·  fade out once features are shown */}
@@ -762,17 +747,17 @@ function App() {
                                 >
                                     {modeConfig.primaryCta}
                                 </button>
-                                <p className="text-white/40 text-[11px] font-playfair italic">
+                                <p className="text-white/42 text-[11px] font-playfair italic max-w-[540px]">
                                     {appMode === 'beginner'
-                                        ? 'New to Carnatic music? We will recommend the right starting lesson.'
-                                        : 'Built for trained musicians first, with beginner lessons still available inside Gurukul.'}
+                                        ? 'New to Carnatic? Start with a guided path through shruti, swaras, tala, and first lessons.'
+                                        : 'New to Carnatic? Guided basics are still available inside Gurukul as a softer entry path.'}
                                 </p>
 
                                 <button
                                     onClick={() => setShowFeatures(true)}
-                                    className="border border-c-gold/30 hover:border-c-gold/60 text-white/50 hover:text-[#f7d686] font-playfair px-8 py-2.5 rounded-full text-xs tracking-[0.2em] uppercase transition-all duration-500 cursor-pointer"
+                                    className="border border-c-gold/25 hover:border-c-gold/50 text-white/46 hover:text-[#f7d686] font-playfair px-7 py-2 rounded-full text-[11px] tracking-[0.16em] uppercase transition-all duration-500 cursor-pointer"
                                 >
-                                    {modeConfig.secondaryCta} →
+                                    Enter the workspace →
                                 </button>
 
                                 <button

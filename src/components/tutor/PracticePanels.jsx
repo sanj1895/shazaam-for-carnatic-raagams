@@ -7,7 +7,6 @@ import {
     getTokenSwara,
     getTokenDuration,
     playSingleTone,
-    playSequenceAsync,
 } from './shared';
 import {
     ExerciseListenSequence,
@@ -948,14 +947,45 @@ function TalaSwaraTranscriber({ sa, setSa }) {
 
     const playTranscribed = useCallback(() => {
         if (!transcribed.length || isPlayingTranscription) return;
-        const trimmed = [...transcribed];
-        while (trimmed.length && [',', '-', '|', '||'].includes(getTokenSwara(trimmed[0]))) {
-            trimmed.shift();
-        }
-        while (trimmed.length && [',', '-', '|', '||'].includes(getTokenSwara(trimmed[trimmed.length - 1]))) {
-            trimmed.pop();
-        }
-        if (!trimmed.length) {
+        const events = [];
+        let beatCursor = 0;
+        let activeEvent = null;
+
+        transcribed.forEach((token, idx) => {
+            const swara = getTokenSwara(token);
+            if (swara === '|' || swara === '||') return;
+            const duration = getTokenDuration(token);
+
+            if (swara === '-') {
+                if (activeEvent?.type === 'note') {
+                    activeEvent.duration += duration;
+                } else if (events.length > 0 && events[events.length - 1].type === 'rest') {
+                    events[events.length - 1].duration += duration;
+                    activeEvent = events[events.length - 1];
+                } else {
+                    activeEvent = { type: 'rest', duration, tokenIndex: idx, startBeat: beatCursor };
+                    events.push(activeEvent);
+                }
+            } else if (swara === ',') {
+                if (events.length > 0 && events[events.length - 1].type === 'rest') {
+                    events[events.length - 1].duration += duration;
+                    activeEvent = events[events.length - 1];
+                } else {
+                    activeEvent = { type: 'rest', duration, tokenIndex: idx, startBeat: beatCursor };
+                    events.push(activeEvent);
+                }
+            } else {
+                activeEvent = { type: 'note', swara, duration, tokenIndex: idx, startBeat: beatCursor };
+                events.push(activeEvent);
+            }
+
+            beatCursor += duration;
+        });
+
+        while (events.length && events[0].type === 'rest') events.shift();
+        while (events.length && events[events.length - 1].type === 'rest') events.pop();
+
+        if (!events.some((event) => event.type === 'note')) {
             setMicError('The transcription only contains rests or held space, so there is nothing playable yet.');
             return;
         }
@@ -969,13 +999,40 @@ function TalaSwaraTranscriber({ sa, setSa }) {
         playAbortRef.current = ctrl;
         setIsPlayingTranscription(true);
         const delayMs = Math.round((60 / bpm) * 1000);
-        playSequenceAsync(trimmed, sa, setPlayIdx, ctrl.signal, delayMs, false, talaSpec, 'strict')
-            .then(() => {
-                if (!ctrl.signal.aborted) {
-                    setIsPlayingTranscription(false);
-                    setPlayIdx(-1);
+        const unitSec = delayMs / 1000;
+        let prevFreq = null;
+        let beatAcc = events[0]?.startBeat || 0;
+
+        (async () => {
+            for (const event of events) {
+                if (ctrl.signal.aborted) return;
+
+                const isBeatBoundary = Math.abs(beatAcc - Math.round(beatAcc)) < 0.01;
+                if (talaSpec && isBeatBoundary) {
+                    playTick(ctx, ctx.currentTime);
                 }
-            });
+
+                if (event.type === 'rest') {
+                    setPlayIdx(-1);
+                    await new Promise((resolve) => setTimeout(resolve, event.duration * delayMs));
+                    beatAcc += event.duration;
+                    continue;
+                }
+
+                setPlayIdx(event.tokenIndex);
+                const freq = swaraFreq(event.swara, sa);
+                const extDur = Math.max(0.09, Math.min(event.duration * unitSec * 0.92, 8));
+                playSingleTone(freq, extDur, prevFreq);
+                prevFreq = freq;
+                await new Promise((resolve) => setTimeout(resolve, event.duration * delayMs));
+                beatAcc += event.duration;
+            }
+        })().finally(() => {
+            if (!ctrl.signal.aborted) {
+                setIsPlayingTranscription(false);
+                setPlayIdx(-1);
+            }
+        });
     }, [bpm, isPlayingTranscription, sa, stopTranscriptionPlayback, talaSpec, transcribed]);
 
     return (

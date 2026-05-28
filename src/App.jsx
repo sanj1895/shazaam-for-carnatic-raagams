@@ -1005,18 +1005,6 @@ function App() {
 
                 {/* Mobile hamburger */}
                 <div className="flex items-center gap-2">
-                    {view === 'home' && showFeatures && (
-                        <button
-                            onClick={() => {
-                                try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
-                                setShowWorkspaceSections(true);
-                            }}
-                            className="hidden md:inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-c-gold text-c-bg text-[11px] font-playfair font-bold uppercase tracking-[0.14em] hover:bg-[#f7d686] transition-colors"
-                        >
-                            Enter Practice Room
-                            <span>→</span>
-                        </button>
-                    )}
                     <button
                         onClick={() => setMobileMenuOpen(true)}
                         className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-c-surface transition-colors"
@@ -1196,8 +1184,8 @@ function App() {
                                             </button>
                                             <button
                                                 onClick={() => {
-                                                    setShowFeatures(true);
-                                                    setShowWorkspaceSections(false);
+                                                    try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
+                                                    enterWorkspace(appMode);
                                                 }}
                                                 className="group border border-c-gold/55 hover:border-c-gold text-c-gold hover:text-c-gold-light font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 cursor-pointer"
                                             >
@@ -1207,88 +1195,6 @@ function App() {
                                     </div>
                                 </div>
 
-                                {showFeatures && (
-                                    <div
-                                        className="fixed inset-0 z-30 flex items-center justify-center px-3 sm:px-6 lg:px-8 py-3 sm:py-6"
-                                        style={{
-                                            opacity: isPreviewOpen ? 1 : 0,
-                                            pointerEvents: isPreviewOpen ? 'auto' : 'none',
-                                            transition: 'opacity 280ms ease',
-                                        }}
-                                    >
-                                        <div className="absolute inset-0 bg-[rgba(8,3,1,0.54)] backdrop-blur-[4px]" />
-                                        <div
-                                            className="relative w-full max-w-[1440px] rounded-[24px] sm:rounded-[34px] overflow-hidden shadow-[0_40px_120px_rgba(0,0,0,0.5)] border border-c-gold/10 animate-fade-in"
-                                            style={{
-                                                background: 'radial-gradient(circle at 60% 38%, rgba(142,62,28,0.42), transparent 23%), radial-gradient(circle at 44% 58%, rgba(95,35,16,0.28), transparent 27%), linear-gradient(180deg, #140603 0%, #0b0301 100%)',
-                                            }}
-                                        >
-                                            <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
-                                            <div className="absolute left-[17%] top-[44%] -translate-x-1/2 -translate-y-1/2 w-[48vw] h-[48vw] max-w-[760px] max-h-[760px] opacity-[0.06]">
-                                                <img
-                                                    src="/newmandala.png"
-                                                    alt=""
-                                                    className="w-full h-full object-contain"
-                                                    style={{
-                                                        filter: 'invert(1) sepia(1) saturate(500%) hue-rotate(-20deg) brightness(0.78)',
-                                                        mixBlendMode: 'screen',
-                                                    }}
-                                                />
-                                            </div>
-
-                                            {/* Full-bleed background image for the right side */}
-                                            <div className="absolute inset-y-0 right-0 w-full lg:w-[85%] z-0 pointer-events-none hidden lg:block">
-                                                <img 
-                                                    src="/diya-and-veena.png" 
-                                                    alt="" 
-                                                    className="w-full h-full object-cover object-center animate-fade-in"
-                                                />
-                                                {/* Dark gradient to seamlessly blend the image into the background on the left */}
-                                                <div className="absolute inset-y-0 left-0 w-[55%] bg-gradient-to-r from-[#140603] via-[#140603]/90 to-transparent" />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-[#0b0301]/80 via-transparent to-transparent" />
-                                            </div>
-
-                                            <div className="relative z-10 mx-auto grid max-w-[1440px] lg:grid-cols-[42%_58%] min-h-0 lg:min-h-[820px] px-4 pt-6 sm:px-6 sm:pt-8 md:px-12 lg:px-10 xl:px-12">
-                                                <div className="flex items-center">
-                                                    <div className="max-w-[420px] pb-8 sm:pb-12 lg:pb-0">
-                                                        <h2 className="font-playfair text-c-gold-light text-[2.8rem] sm:text-[3.8rem] md:text-[5.5rem] xl:text-[6rem] leading-[0.92] tracking-[-0.04em] font-medium">
-                                                            One place to learn, practice, and explore.
-                                                        </h2>
-                                                        <p className="mt-5 sm:mt-8 text-[0.96rem] sm:text-[1.05rem] md:text-[1.18rem] leading-[1.7] sm:leading-[1.75] max-w-[420px]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
-                                                            Start from your first swara, or enter a full practice workspace for daily sadhana, transcription, and raga exploration.
-                                                        </p>
-                                                        <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3">
-                                                            <button
-                                                                onClick={() => {
-                                                                    try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
-                                                                    enterWorkspace(appMode);
-                                                                }}
-                                                                className="inline-flex items-center gap-3 rounded-[16px] bg-c-gold px-6 sm:px-8 py-3.5 sm:py-4 text-c-bg text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.14em] sm:tracking-[0.16em] shadow-[0_10px_28px_rgba(199,139,34,0.14)] transition-all hover:bg-[#f0c664] hover:shadow-[0_12px_34px_rgba(199,139,34,0.2)]"
-                                                            >
-                                                                Enter Practice Room
-                                                                <ArrowRightMini className="w-4 h-4" />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => {
-                                                                    setAppMode('beginner');
-                                                                    setQuizActive(true);
-                                                                }}
-                                                                className="inline-flex items-center gap-3 rounded-[16px] border border-c-gold/50 px-6 sm:px-8 py-3.5 sm:py-4 text-c-gold text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.14em] sm:tracking-[0.16em] transition-all hover:border-c-gold hover:text-c-gold-light"
-                                                            >
-                                                                Start Learning
-                                                                <ArrowRightMini className="w-4 h-4" />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="relative hidden lg:block h-full w-full">
-                                                    {/* Spacer column - image is now rendered as a full-bleed background behind the grid */}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
 
                                 <div
                                     className="w-full max-w-6xl"
@@ -2151,6 +2057,62 @@ function App() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* ── ABOUT SECTION ── */}
+                            <section
+                                id="home-about"
+                                className="relative w-full"
+                                style={{ minHeight: '100vh' }}
+                            >
+                                {/* Full-bleed image */}
+                                <div className="absolute inset-0">
+                                    <img
+                                        src="/diya-and-veena.png"
+                                        alt=""
+                                        className="w-full h-full object-cover object-center"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-[#0c0301] via-[#0c0301]/88 to-[#0c0301]/20 lg:to-transparent" />
+                                    <div className="absolute inset-0 bg-gradient-to-b from-[#0c0301]/75 via-transparent to-[#0c0301]/70" />
+                                </div>
+
+                                {/* Content */}
+                                <div className="relative z-10 flex items-center" style={{ minHeight: '100vh', padding: '6rem 2rem 6rem clamp(2rem, 10vw, 7rem)' }}>
+                                    <div style={{ maxWidth: '520px' }}>
+                                        <p className="text-[9px] sm:text-[11px] uppercase tracking-[0.3em] mb-5" style={{ color: 'rgba(247,214,134,0.6)' }}>
+                                            About Ālāpana
+                                        </p>
+                                        <h2 className="font-playfair text-c-gold-light text-[2.2rem] sm:text-[3rem] md:text-[3.8rem] leading-[1.06] tracking-[-0.02em] font-medium mb-6">
+                                            Carnatic music, made accessible.
+                                        </h2>
+                                        <p className="text-[1rem] sm:text-[1.08rem] leading-[1.82] mb-4" style={{ color: 'rgba(243,234,214,0.88)', maxWidth: '440px' }}>
+                                            Ālāpana brings together every tool a Carnatic student or musician needs — a shruti drone, tala keeper, raga encyclopedia, pitch transcription, and a full structured curriculum — in one focused space.
+                                        </p>
+                                        <p className="text-[1rem] sm:text-[1.08rem] leading-[1.82]" style={{ color: 'rgba(243,234,214,0.56)', maxWidth: '440px' }}>
+                                            Whether you are finding your Sa for the first time or refining a kriti, Ālāpana meets you where you are.
+                                        </p>
+                                        <div className="mt-9 flex flex-col sm:flex-row gap-3">
+                                            <button
+                                                onClick={() => { setAppMode('beginner'); setQuizActive(true); }}
+                                                className="inline-flex items-center gap-3 rounded-[16px] bg-c-gold px-7 sm:px-8 py-3.5 sm:py-4 text-c-bg text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.15em] shadow-[0_10px_28px_rgba(199,139,34,0.18)] transition-all hover:bg-[#f0c664] hover:shadow-[0_12px_34px_rgba(199,139,34,0.26)]"
+                                            >
+                                                Start Learning
+                                                <ArrowRightMini className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
+                                                    enterWorkspace(appMode);
+                                                }}
+                                                className="inline-flex items-center gap-3 rounded-[16px] border border-c-gold/50 px-7 sm:px-8 py-3.5 sm:py-4 text-c-gold text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.15em] transition-all hover:border-c-gold hover:text-c-gold-light"
+                                            >
+                                                Enter Practice Room
+                                                <ArrowRightMini className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
                     </div>
             )}
 

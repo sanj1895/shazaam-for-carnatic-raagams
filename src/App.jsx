@@ -1622,13 +1622,12 @@ function App() {
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('library')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'library' ? null : current)}
                                                                 >
-                                                                    <div className="workspace-preview-soft-glow absolute inset-x-[10%] top-[14%] h-[52%] rounded-[28px] bg-[radial-gradient(circle,rgba(214,156,68,0.14),transparent_72%)] opacity-0 scale-95" />
                                                                     <div className="absolute right-0 top-[18px] bottom-[18px] w-px bg-c-gold/10 hidden md:block" />
                                                                     <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                                         <span>Raga Kosha</span>
                                                                         <span>~</span>
                                                                     </div>
-                                                                    <div className="workspace-preview-float mt-5 rounded-[15px] bg-[rgba(255,245,225,0.02)] px-3 py-3 shadow-[inset_0_0_0_1px_rgba(199,139,34,0.08)]">
+                                                                    <div className="workspace-preview-shell workspace-preview-float mt-5 rounded-[15px] px-3 py-3">
                                                                         <div
                                                                             className="flex items-center gap-2 rounded-full px-3 py-2 text-[11px] transition-all duration-500"
                                                                             style={{
@@ -1701,7 +1700,6 @@ function App() {
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('melakarta')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'melakarta' ? null : current)}
                                                                 >
-                                                                    <div className="workspace-preview-soft-glow absolute left-1/2 top-[22%] h-[220px] w-[220px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(214,156,68,0.16),transparent_68%)] opacity-0 scale-90" />
                                                                     <div className="absolute right-0 top-[18px] bottom-[18px] w-px bg-c-gold/10 hidden md:block" />
                                                                     <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                                         <span>Melakarta</span>
@@ -1810,7 +1808,6 @@ function App() {
                                                                         >
                                                                             {selectedExploreRaga.name}
                                                                         </div>
-                                                                        <div className="workspace-preview-hoverline mx-auto mt-1 h-px w-20 origin-center scale-x-0 bg-c-gold/30 opacity-0" />
                                                                         <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
                                                                             {selectedExploreRaga.scale.split(' ').map((swara, index) => (
                                                                                 <span
@@ -1835,7 +1832,6 @@ function App() {
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('bhedam')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'bhedam' ? null : current)}
                                                                 >
-                                                                    <div className="workspace-preview-soft-glow absolute right-[12%] top-[22%] h-[180px] w-[180px] rounded-full bg-[radial-gradient(circle,rgba(214,156,68,0.14),transparent_70%)] opacity-0 scale-90" />
                                                                     <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                                         <span>Graha Bhedam</span>
                                                                         <span>↗</span>
@@ -1993,13 +1989,12 @@ function App() {
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('transcribe')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'transcribe' ? null : current)}
                                                                 >
-                                                                    <div className="workspace-preview-soft-glow absolute inset-x-[10%] top-[16%] h-[45%] rounded-[30px] bg-[radial-gradient(circle,rgba(214,156,68,0.14),transparent_72%)] opacity-0 scale-95" />
                                                                     <div className="absolute right-0 top-[18px] bottom-[18px] w-px bg-c-gold/10 hidden md:block" />
                                                                     <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                                         <span>Transcribe</span>
                                                                         <span>~</span>
                                                                     </div>
-                                                                    <div className="workspace-preview-float mt-5 rounded-[16px] bg-[rgba(255,245,225,0.02)] px-3 py-4 shadow-[inset_0_0_0_1px_rgba(199,139,34,0.08)]">
+                                                                    <div className="workspace-preview-shell workspace-preview-float mt-5 rounded-[16px] px-3 py-4">
                                                                         <div className="flex h-[54px] items-center gap-[2px]">
                                                                             {Array.from({ length: 56 }).map((_, i) => (
                                                                                 <span
@@ -2087,7 +2082,7 @@ function App() {
                                                                             </span>
                                                                         </span>
                                                                     </div>
-                                                                    <div className="workspace-preview-float mt-5 grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-4 rounded-[16px] bg-[rgba(255,245,225,0.02)] px-3 py-4 shadow-[inset_0_0_0_1px_rgba(199,139,34,0.08)]">
+                                                                    <div className="workspace-preview-shell workspace-preview-float mt-5 grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-4 rounded-[16px] px-3 py-4">
                                                                         <div className="space-y-2">
                                                                             {GURUKUL_PREVIEW_CATEGORIES.map(({ name, meta }, index) => {
                                                                                 const active = gurukulPreviewCategoryIndex === index;

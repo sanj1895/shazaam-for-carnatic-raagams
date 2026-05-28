@@ -19,7 +19,7 @@ import { CuratedIcon, FireIcon, DhwaniIcon, SadhanaIcon } from './components/Ico
 import SketchyRule from './components/SketchyRule';
 
 const VeenaIcon = () => (
-    <svg width="22" height="68" viewBox="0 0 22 68" fill="none" className="text-c-gold-dim">
+    <svg width="16" height="50" viewBox="0 0 22 68" fill="none" className="text-c-gold-dim">
         <ellipse cx="11" cy="57" rx="10" ry="9" stroke="currentColor" strokeWidth="1.2"/>
         <rect x="9.5" y="10" width="3" height="47" rx="1.5" fill="currentColor" opacity="0.35"/>
         <line x1="10.5" y1="10" x2="10.5" y2="48" stroke="currentColor" strokeWidth="0.7" opacity="0.5"/>
@@ -1298,7 +1298,7 @@ function App() {
                                     <div className="pb-16">
 
                                         <section className="mt-4 sm:mt-6 px-1.5 sm:px-2 md:px-3">
-                                            <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/10 bg-[linear-gradient(180deg,rgba(17,8,4,0.9),rgba(9,4,2,0.95))] shadow-[0_28px_64px_rgba(0,0,0,0.34)] overflow-hidden">
+                                            <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/18 bg-[linear-gradient(180deg,rgba(14,6,3,0.96),rgba(7,3,2,0.98))] shadow-[0_30px_80px_rgba(0,0,0,0.42),0_0_0_1px_rgba(199,139,34,0.08)] overflow-hidden backdrop-blur-md">
                                                 <div className="relative z-10 px-4 pt-4 pb-3 sm:px-10">
                                                     <div className="flex items-center justify-center gap-4">
                                                         <div className="h-px flex-1 bg-gradient-to-r from-transparent via-c-gold/15 to-c-gold/5" />
@@ -1310,7 +1310,7 @@ function App() {
                                                 </div>
 
                                                 <div className="relative z-10 grid lg:grid-cols-[31%_69%] gap-0 px-3 pb-3 sm:px-6 sm:pb-6">
-                                                    <div className="rounded-[20px] sm:rounded-[28px] bg-[linear-gradient(180deg,rgba(24,10,5,0.42),rgba(12,5,2,0.16))] px-4 py-4 sm:px-7 sm:py-6 backdrop-blur-sm">
+                                                    <div className="rounded-[20px] sm:rounded-[28px] bg-[linear-gradient(180deg,rgba(29,12,6,0.62),rgba(12,5,2,0.34))] px-4 py-4 sm:px-7 sm:py-6 backdrop-blur-sm">
                                                         <div className="flex items-center gap-4">
                                                             <div className="h-12 w-12 sm:w-14 sm:h-14 rounded-full border border-c-gold/16 bg-[rgba(199,139,34,0.03)] flex items-center justify-center text-c-gold/90">
                                                                 <VeenaIcon />
@@ -1349,56 +1349,41 @@ function App() {
                                                     </div>
 
                                                     <div className="mt-4 lg:mt-0 lg:pl-4">
-                                                        <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/10 bg-[radial-gradient(circle_at_50%_24%,rgba(125,56,24,0.14),transparent_30%),linear-gradient(180deg,rgba(23,9,4,0.76),rgba(13,6,3,0.86))] overflow-hidden">
+                                                        <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/14 bg-[radial-gradient(circle_at_50%_24%,rgba(125,56,24,0.18),transparent_28%),linear-gradient(180deg,rgba(22,8,4,0.9),rgba(10,4,2,0.96))] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.04)] overflow-hidden">
                                                             <div className="grid md:grid-cols-4">
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[200px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('shruthi')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'shruthi' ? null : current)}
                                                                 >
-                                                                    <div
-                                                                        className="workspace-hover-reveal workspace-hover-anim absolute left-1/2 top-[56%] h-[124px] w-[124px] -translate-x-1/2 -translate-y-1/2 rounded-full"
-                                                                        style={{
-                                                                            background: 'radial-gradient(circle, rgba(214,156,68,0.1), transparent 72%)',
-                                                                            animation: 'shruthiRipple 3.8s ease-out infinite',
-                                                                        }}
-                                                                    />
                                                                     <div className="absolute right-0 top-[18px] bottom-[18px] w-px bg-c-gold/10 hidden md:block" />
                                                                     <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                                         <span>Shruthi</span>
                                                                         <span>~</span>
                                                                     </div>
                                                                     <div className="relative mt-4 h-[108px]">
-                                                                        <div className="absolute left-1/2 top-1/2 h-[84px] w-[84px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,232,188,0.05),rgba(255,232,188,0.01)_62%,transparent_74%)]" />
-                                                                        <div className="absolute left-1/2 top-1/2 h-[58px] w-[58px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/8" />
+                                                                        <div className="absolute left-1/2 top-1/2 h-[92px] w-[92px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,232,188,0.06),rgba(255,232,188,0.02)_58%,transparent_74%)]" />
                                                                         {[
-                                                                            { angle: -90, label: 'Sa' },
-                                                                            { angle: -18, label: 'Pa' },
-                                                                            { angle: 54, label: 'Sa' },
-                                                                            { angle: 126, label: 'Pa' },
-                                                                        ].map(({ angle, label }) => (
-                                                                            <React.Fragment key={`${label}-${angle}`}>
-                                                                                <span
-                                                                                    className="absolute left-1/2 top-1/2 h-[2px] w-[22px] rounded-full bg-c-gold/14"
-                                                                                    style={{
-                                                                                        transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(26px)`,
-                                                                                        transformOrigin: 'center center',
-                                                                                    }}
-                                                                                />
-                                                                                <span
-                                                                                    className="absolute left-1/2 top-1/2 text-[8px] uppercase tracking-[0.16em]"
-                                                                                    style={{
-                                                                                        color: 'rgba(243, 234, 214, 0.72)',
-                                                                                        transform: `translate(-50%, -50%) rotate(${angle}deg) translateX(40px) rotate(${-angle}deg)`,
-                                                                                        transformOrigin: 'center center',
-                                                                                    }}
-                                                                                >
-                                                                                    {label}
-                                                                                </span>
-                                                                            </React.Fragment>
+                                                                            { left: '50%', top: '8px', label: 'Sa' },
+                                                                            { left: 'calc(50% + 34px)', top: '40px', label: 'Pa' },
+                                                                            { left: '50%', top: '78px', label: 'Sa' },
+                                                                            { left: 'calc(50% - 34px)', top: '40px', label: 'Pa' },
+                                                                        ].map(({ left, top, label }, index) => (
+                                                                            <span
+                                                                                key={`${label}-${index}`}
+                                                                                className="absolute text-[8px] uppercase tracking-[0.16em]"
+                                                                                style={{
+                                                                                    left,
+                                                                                    top,
+                                                                                    color: 'rgba(243, 234, 214, 0.68)',
+                                                                                    transform: 'translate(-50%, -50%)',
+                                                                                }}
+                                                                            >
+                                                                                {label}
+                                                                            </span>
                                                                         ))}
                                                                         <div
-                                                                            className="workspace-hover-anim absolute left-1/2 top-1/2 h-[66px] w-[66px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/16"
+                                                                            className="absolute left-1/2 top-1/2 h-[68px] w-[68px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/16"
                                                                             style={{
                                                                                 boxShadow: shruthiPreviewActive ? '0 0 18px rgba(214,156,68,0.12)' : '0 0 4px rgba(214,156,68,0.04)',
                                                                                 transition: 'box-shadow 320ms ease, opacity 320ms ease, transform 320ms ease',
@@ -1406,7 +1391,7 @@ function App() {
                                                                             }}
                                                                         />
                                                                         <div
-                                                                            className="workspace-hover-anim absolute left-1/2 top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                                                                            className="absolute left-1/2 top-1/2 h-[20px] w-[20px] -translate-x-1/2 -translate-y-1/2 rounded-full"
                                                                             style={{
                                                                                 background: 'radial-gradient(circle at 35% 35%, rgba(246,219,164,0.98), rgba(205,144,48,0.88) 42%, rgba(99,44,18,0.95) 72%)',
                                                                                 boxShadow: shruthiPreviewActive ? '0 0 22px rgba(214,156,68,0.3)' : '0 0 8px rgba(214,156,68,0.08)',
@@ -1415,7 +1400,7 @@ function App() {
                                                                             }}
                                                                         />
                                                                         <div
-                                                                            className="workspace-hover-anim absolute left-1/2 top-1/2 h-[86px] w-[86px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                                                                            className="absolute left-1/2 top-1/2 h-[86px] w-[86px] -translate-x-1/2 -translate-y-1/2 rounded-full"
                                                                             style={{
                                                                                 background: 'conic-gradient(from 0deg, rgba(214,156,68,0.12), rgba(214,156,68,0.02), rgba(214,156,68,0.12))',
                                                                                 maskImage: 'radial-gradient(circle, transparent 58%, black 60%, black 70%, transparent 72%)',
@@ -1424,7 +1409,7 @@ function App() {
                                                                             }}
                                                                         />
                                                                         <div
-                                                                            className="workspace-hover-reveal workspace-hover-anim absolute left-1/2 top-1/2 h-[98px] w-[98px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/10"
+                                                                            className={`absolute left-1/2 top-1/2 h-[96px] w-[96px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/10 transition-opacity duration-300 ${shruthiPreviewActive ? 'opacity-100' : 'opacity-35'}`}
                                                                             style={{ animation: 'shruthiRipple 3.1s ease-out infinite' }}
                                                                         />
                                                                     </div>
@@ -1437,7 +1422,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[200px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('talam')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'talam' ? null : current)}
                                                                 >
@@ -1485,7 +1470,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[200px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('keyboard')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'keyboard' ? null : current)}
                                                                 >
@@ -1530,7 +1515,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[200px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('listen')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'listen' ? null : current)}
                                                                 >
@@ -1590,9 +1575,9 @@ function App() {
                                         </section>
 
                                         <section className="mt-4 px-1.5 sm:px-2 md:px-3">
-                                            <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/10 bg-[linear-gradient(180deg,rgba(17,8,4,0.9),rgba(9,4,2,0.95))] shadow-[0_28px_64px_rgba(0,0,0,0.34)] overflow-hidden">
+                                            <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/18 bg-[linear-gradient(180deg,rgba(14,6,3,0.96),rgba(7,3,2,0.98))] shadow-[0_30px_80px_rgba(0,0,0,0.42),0_0_0_1px_rgba(199,139,34,0.08)] overflow-hidden backdrop-blur-md">
                                                 <div className="relative z-10 grid lg:grid-cols-[31%_69%] gap-0 px-3 py-3 sm:px-6 sm:py-6">
-                                                    <div className="rounded-[20px] sm:rounded-[28px] bg-[linear-gradient(180deg,rgba(24,10,5,0.42),rgba(12,5,2,0.16))] px-4 py-4 sm:px-7 sm:py-6 backdrop-blur-sm">
+                                                    <div className="rounded-[20px] sm:rounded-[28px] bg-[linear-gradient(180deg,rgba(29,12,6,0.62),rgba(12,5,2,0.34))] px-4 py-4 sm:px-7 sm:py-6 backdrop-blur-sm">
                                                         <div className="flex items-center gap-4">
                                                             <div className="h-12 w-12 sm:w-14 sm:h-14 rounded-full border border-c-gold/16 bg-[rgba(199,139,34,0.03)] flex items-center justify-center text-c-gold/90">
                                                                 {renderTabIcon('library', 'w-8 h-8')}
@@ -1630,10 +1615,10 @@ function App() {
                                                     </div>
 
                                                     <div className="mt-4 lg:mt-0 lg:pl-4">
-                                                        <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/10 bg-[radial-gradient(circle_at_50%_22%,rgba(120,53,24,0.12),transparent_32%),linear-gradient(180deg,rgba(22,9,4,0.76),rgba(12,5,2,0.88))] overflow-hidden">
+                                                        <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/14 bg-[radial-gradient(circle_at_50%_22%,rgba(120,53,24,0.18),transparent_30%),linear-gradient(180deg,rgba(20,8,4,0.9),rgba(10,4,2,0.96))] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.04)] overflow-hidden">
                                                             <div className="grid md:grid-cols-3">
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[200px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[172px] sm:min-h-[200px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('library')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'library' ? null : current)}
                                                                 >
@@ -1712,7 +1697,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[240px] sm:min-h-[286px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[204px] sm:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('melakarta')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'melakarta' ? null : current)}
                                                                 >
@@ -1846,7 +1831,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[240px] sm:min-h-[286px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[204px] sm:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('bhedam')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'bhedam' ? null : current)}
                                                                 >
@@ -1962,9 +1947,9 @@ function App() {
                                         </section>
 
                                         <section className="mt-4 px-1.5 sm:px-2 md:px-3">
-                                            <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/10 bg-[linear-gradient(180deg,rgba(17,8,4,0.9),rgba(9,4,2,0.95))] shadow-[0_28px_64px_rgba(0,0,0,0.34)] overflow-hidden">
+                                            <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/18 bg-[linear-gradient(180deg,rgba(14,6,3,0.96),rgba(7,3,2,0.98))] shadow-[0_30px_80px_rgba(0,0,0,0.42),0_0_0_1px_rgba(199,139,34,0.08)] overflow-hidden backdrop-blur-md">
                                                 <div className="grid lg:grid-cols-[31%_69%] gap-0 px-3 py-3 sm:px-6 sm:py-6">
-                                                    <div className="rounded-[20px] sm:rounded-[28px] bg-[linear-gradient(180deg,rgba(24,10,5,0.42),rgba(12,5,2,0.16))] px-4 py-4 sm:px-7 sm:py-8">
+                                                    <div className="rounded-[20px] sm:rounded-[28px] bg-[linear-gradient(180deg,rgba(29,12,6,0.62),rgba(12,5,2,0.34))] px-4 py-4 sm:px-7 sm:py-8">
                                                         <div className="flex items-center gap-4">
                                                             <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-full border border-c-gold/16 bg-[rgba(199,139,34,0.03)] flex items-center justify-center text-c-gold/90">
                                                                 {renderTabIcon('transcribe', 'w-8 h-8')}
@@ -2001,10 +1986,10 @@ function App() {
                                                     </div>
 
                                                     <div className="mt-4 lg:mt-0 lg:pl-4">
-                                                        <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/10 bg-[radial-gradient(circle_at_54%_18%,rgba(122,54,23,0.12),transparent_28%),linear-gradient(180deg,rgba(22,9,4,0.76),rgba(12,5,2,0.88))] overflow-hidden">
+                                                        <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/14 bg-[radial-gradient(circle_at_54%_18%,rgba(122,54,23,0.18),transparent_26%),linear-gradient(180deg,rgba(20,8,4,0.9),rgba(10,4,2,0.96))] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.04)] overflow-hidden">
                                                             <div className="grid md:grid-cols-[1.05fr_0.95fr]">
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[286px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[212px] sm:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('transcribe')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'transcribe' ? null : current)}
                                                                 >
@@ -2089,7 +2074,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[286px] px-4 py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[212px] sm:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('gurukul')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'gurukul' ? null : current)}
                                                                 >

@@ -30,8 +30,8 @@ body {
 }
 
 @keyframes shruthiBreath {
-  0%, 100% { opacity: 0.38; transform: scaleY(0.98); }
-  50% { opacity: 0.72; transform: scaleY(1.02); }
+  0%, 100% { opacity: 0.42; transform: translate(-50%, -50%) scale(0.96); }
+  50% { opacity: 0.76; transform: translate(-50%, -50%) scale(1.03); }
 }
 
 @keyframes shruthiRipple {

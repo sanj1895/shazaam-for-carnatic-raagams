@@ -1946,7 +1946,7 @@ function App() {
                                                         </div>
                                                     </div>
 
-                                                    <div className="mt-4 lg:mt-0 lg:pl-4">
+                                                    <div className="hidden md:block mt-4 lg:mt-0 lg:pl-4">
                                                         <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/14 bg-[radial-gradient(circle_at_54%_18%,rgba(122,54,23,0.18),transparent_26%),linear-gradient(180deg,rgba(20,8,4,0.9),rgba(10,4,2,0.96))] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.04)] overflow-hidden">
                                                             <div className="grid md:grid-cols-[1.05fr_0.95fr]">
                                                                 <div

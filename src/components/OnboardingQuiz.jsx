@@ -139,7 +139,7 @@ function getPath(totalScore, learner, age) {
             note: null,
             action: 'sadhana',
             cta: 'Open Daily Sadhana',
-            mode: 'musician',
+            mode: 'beginner',
         };
     }
 }

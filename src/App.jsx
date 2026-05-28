@@ -885,8 +885,8 @@ function App() {
                                 alt=""
                                 className="w-full h-full object-cover object-center"
                             />
-                            {/* Mobile: heavy dark overlay so text is readable */}
-                            <div className="absolute inset-0 bg-[#070201]/82 lg:hidden" />
+                            {/* Mobile: near-opaque overlay so image is barely visible */}
+                            <div className="absolute inset-0 bg-[#070201]/95 lg:hidden" />
                             {/* Desktop: left=solid dark, right=transparent so image shows cleanly */}
                             <div
                                 className="absolute inset-0 hidden lg:block"
@@ -904,12 +904,13 @@ function App() {
                             ✕
                         </button>
 
-                        {/* Content — text on LEFT, image visible on RIGHT */}
+                        {/* Scrollable content wrapper — prevents clipping on short mobile screens */}
+                        <div className="relative z-10 overflow-y-auto max-h-[92vh]" style={{ WebkitOverflowScrolling: 'touch' }}>
                         <div
-                            className="relative z-10 grid min-h-[min(680px,92vh)] lg:grid-cols-[54%_46%]"
+                            className="grid min-h-[min(680px,92vh)] lg:grid-cols-[54%_46%]"
                             style={{ minHeight: 'min(680px, 92vh)' }}
                         >
-                            <div className="flex items-center px-5 py-8 sm:px-8 sm:py-10 md:px-12 lg:px-14 xl:px-16">
+                            <div className="flex items-start lg:items-center pt-14 pb-8 px-5 sm:pt-10 sm:pb-10 sm:px-8 md:px-12 lg:pt-0 lg:pb-0 lg:px-14 xl:px-16">
                                 <div className="w-full max-w-[560px]">
                                     <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.3em] mb-4" style={{ color: 'rgba(247,214,134,0.6)' }}>
                                         About Ālāpana
@@ -966,6 +967,7 @@ function App() {
                             {/* Empty right col — image shows through the gradient */}
                             <div className="hidden lg:block" />
                         </div>
+                        </div>{/* end scrollable wrapper */}
                     </div>
                 </div>,
                 document.body

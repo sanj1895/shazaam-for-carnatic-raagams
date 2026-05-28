@@ -361,6 +361,60 @@ body {
   opacity: 0.44;
 }
 
+@media (max-width: 767px), (hover: none) and (pointer: coarse) {
+  .workspace-preview-panel,
+  .workspace-preview-panel::before,
+  .workspace-preview-panel::after,
+  .workspace-preview-shell,
+  .workspace-preview-shell::before,
+  .workspace-preview-hoverline,
+  .workspace-preview-float,
+  .workspace-preview-soft-glow,
+  .workspace-hover-reveal {
+    transition: none !important;
+  }
+
+  .workspace-preview-panel,
+  .workspace-preview-shell {
+    transform: none !important;
+  }
+
+  .workspace-preview-panel::before,
+  .workspace-preview-shell::before,
+  .workspace-preview-soft-glow,
+  .workspace-preview-hoverline {
+    opacity: 0 !important;
+  }
+
+  .workspace-preview-panel:hover,
+  .workspace-preview-panel:hover::before,
+  .workspace-preview-panel:hover::after,
+  .workspace-preview-panel:hover .workspace-preview-float,
+  .workspace-preview-panel:hover .workspace-preview-soft-glow,
+  .workspace-preview-panel:hover .workspace-preview-shell,
+  .workspace-preview-panel:hover .workspace-preview-shell::before,
+  .workspace-preview-panel:hover .workspace-preview-hoverline,
+  .workspace-preview-panel:hover .workspace-hover-reveal {
+    transform: none !important;
+    opacity: inherit;
+    box-shadow: none !important;
+  }
+
+  .workspace-preview-panel:hover::after {
+    box-shadow:
+      inset 0 0 0 1px rgba(199, 139, 34, 0.05),
+      inset 0 12px 24px rgba(255, 214, 134, 0.012) !important;
+  }
+
+  .workspace-preview-pulse,
+  .workspace-preview-orbit,
+  .workspace-hover-anim,
+  .workspace-recording-pulse::after,
+  .workspace-mini-wave {
+    animation: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .workspace-preview-panel,
   .workspace-preview-panel::before,

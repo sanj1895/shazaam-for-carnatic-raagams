@@ -1358,7 +1358,7 @@ function App() {
                                                                 <VeenaIcon />
                                                             </div>
                                                             <h3 className="font-playfair text-c-gold-light text-[2.15rem] sm:text-[2.7rem] leading-none">
-                                                                Practice
+                                                                Learn
                                                             </h3>
                                                         </div>
 
@@ -1627,7 +1627,7 @@ function App() {
                                                                 {renderTabIcon('library', 'w-8 h-8')}
                                                             </div>
                                                             <h3 className="font-playfair text-c-gold-light text-[2.15rem] sm:text-[2.7rem] leading-none">
-                                                                Explore
+                                                                Practice
                                                             </h3>
                                                         </div>
 
@@ -1990,7 +1990,7 @@ function App() {
                                                                 {renderTabIcon('transcribe', 'w-8 h-8')}
                                                             </div>
                                                             <h3 className="font-playfair text-c-gold-light text-[2.15rem] sm:text-[2.7rem] leading-none">
-                                                                Create
+                                                                Explore
                                                             </h3>
                                                         </div>
 

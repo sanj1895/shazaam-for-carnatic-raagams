@@ -232,6 +232,12 @@ const GURUKUL_PREVIEW_CATEGORIES = [
     },
 ];
 
+const GURUKUL_PRACTICE_LOG = [
+    { name: 'Mayamalavagowla', type: 'Varnam', tala: 'Adi', progress: 82, days: 14 },
+    { name: 'Hamsadhwani', type: 'Gitam', tala: 'Rupaka', progress: 57, days: 7 },
+    { name: 'Kalyani', type: 'Kriti', tala: 'Adi', progress: 38, days: 3 },
+];
+
 function parseHashRoute(hashValue = window.location.hash) {
     const normalized = hashValue.replace(/^#\/?/, '').trim();
     if (!normalized) return { view: 'home', segments: [], mode: null, workspace: false };
@@ -1343,7 +1349,7 @@ function App() {
                                                         <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/14 bg-[radial-gradient(circle_at_50%_24%,rgba(125,56,24,0.18),transparent_28%),linear-gradient(180deg,rgba(22,8,4,0.9),rgba(10,4,2,0.96))] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.04)] overflow-hidden">
                                                             <div className="grid md:grid-cols-4">
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] md:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group sm:min-h-[340px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('shruthi')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'shruthi' ? null : current)}
                                                                 >
@@ -1352,11 +1358,11 @@ function App() {
                                                                         <span>Shruthi</span>
                                                                         <span>~</span>
                                                                     </div>
-                                                                    <div className="relative mt-4 h-[108px]">
+                                                                    <div className="relative mt-4 h-[156px]">
                                                                         {[0, 0.4].map((delay, i) => (
                                                                             <div
                                                                                 key={`sa-${i}`}
-                                                                                className="absolute left-1/2 top-1/2 h-[58px] w-[58px] rounded-full border workspace-hover-anim"
+                                                                                className="absolute left-1/2 top-1/2 h-[88px] w-[88px] rounded-full border workspace-hover-anim"
                                                                                 style={{
                                                                                     borderColor: shruthiPreviewActive ? 'rgba(214,156,68,0.65)' : 'rgba(214,156,68,0.32)',
                                                                                     animation: `shruthiWave 2.88s ease-out ${delay}s backwards infinite`,
@@ -1367,7 +1373,7 @@ function App() {
                                                                         {[1.44, 1.84].map((delay, i) => (
                                                                             <div
                                                                                 key={`pa-${i}`}
-                                                                                className="absolute left-1/2 top-1/2 h-[58px] w-[58px] rounded-full border workspace-hover-anim"
+                                                                                className="absolute left-1/2 top-1/2 h-[88px] w-[88px] rounded-full border workspace-hover-anim"
                                                                                 style={{
                                                                                     borderColor: shruthiPreviewActive ? 'rgba(195,138,68,0.65)' : 'rgba(195,138,68,0.32)',
                                                                                     animation: `shruthiWave 2.88s ease-out ${delay}s backwards infinite`,
@@ -1415,7 +1421,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] md:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group sm:min-h-[340px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('talam')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'talam' ? null : current)}
                                                                 >
@@ -1426,13 +1432,13 @@ function App() {
                                                                     </div>
                                                                     <div className="mt-5 flex flex-col items-center">
                                                                         <p className="text-sm" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>Adi Talam</p>
-                                                                        <div className="mt-3 relative h-[92px] w-[92px] transition-transform duration-500 group-hover:scale-[1.03]">
+                                                                        <div className="mt-3 relative h-[128px] w-[128px] transition-transform duration-500 group-hover:scale-[1.03]">
                                                                             <div
-                                                                                className="workspace-hover-reveal workspace-hover-anim absolute left-1/2 top-1/2 h-[98px] w-[98px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/10"
+                                                                                className="workspace-hover-reveal workspace-hover-anim absolute left-1/2 top-1/2 h-[136px] w-[136px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/10"
                                                                                 style={{ animation: 'talaBeatPulse 0.72s ease-out infinite' }}
                                                                             />
                                                                             <div
-                                                                                className="absolute left-1/2 top-1/2 h-[84px] w-[84px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                                                                                className="absolute left-1/2 top-1/2 h-[116px] w-[116px] -translate-x-1/2 -translate-y-1/2 rounded-full"
                                                                                 style={{
                                                                                     border: '1px solid rgba(199,139,34,0.18)',
                                                                                     boxShadow: 'inset 0 0 0 1px rgba(199,139,34,0.02)',
@@ -1444,10 +1450,10 @@ function App() {
                                                                                 return (
                                                                                     <span
                                                                                         key={index}
-                                                                                        className="absolute h-[8px] w-[8px] rounded-full"
+                                                                                        className="absolute h-[10px] w-[10px] rounded-full"
                                                                                         style={{
-                                                                                            left: `calc(50% + ${Math.cos(angle) * 38}px)`,
-                                                                                            top: `calc(50% + ${Math.sin(angle) * 38}px)`,
+                                                                                            left: `calc(50% + ${Math.cos(angle) * 52}px)`,
+                                                                                            top: `calc(50% + ${Math.sin(angle) * 52}px)`,
                                                                                             transform: active ? 'translate(-50%, -50%) scale(1.5)' : 'translate(-50%, -50%)',
                                                                                             background: active ? '#d7a448' : 'rgba(199,139,34,0.2)',
                                                                                             boxShadow: active ? '0 0 20px 3px rgba(215,164,72,0.75)' : 'none',
@@ -1456,14 +1462,14 @@ function App() {
                                                                                     />
                                                                                 );
                                                                             })}
-                                                                            <div className="absolute inset-[14px] rounded-full border border-c-gold/10 transition-all duration-300 group-hover:border-c-gold/20" />
-                                                                            <div className="absolute left-1/2 top-1/2 h-[24px] w-[24px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(110,56,23,0.92))]" />
+                                                                            <div className="absolute inset-[20px] rounded-full border border-c-gold/10 transition-all duration-300 group-hover:border-c-gold/20" />
+                                                                            <div className="absolute left-1/2 top-1/2 h-[30px] w-[30px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(110,56,23,0.92))]" />
                                                                         </div>
                                                                     </div>
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] md:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group sm:min-h-[340px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('keyboard')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'keyboard' ? null : current)}
                                                                 >
@@ -1483,13 +1489,13 @@ function App() {
                                                                                 Mayamalavagowla
                                                                             </div>
                                                                         </div>
-                                                                        <div className="mt-4 grid grid-cols-8 gap-1 sm:gap-1.5">
+                                                                        <div className="mt-5 grid grid-cols-8 gap-1 sm:gap-1.5">
                                                                             {PRACTICE_DEMO_SWARA_LABELS.map((swara, index) => {
                                                                                 const active = keyboardPreviewActive && practiceDemoKeyIndex === index;
                                                                                 return (
                                                                                     <div
                                                                                         key={`${swara}-${index}`}
-                                                                                        className="rounded-[7px] sm:rounded-[9px] py-1.5 sm:py-2 text-[8px] sm:text-[9px] font-semibold transition-all duration-300"
+                                                                                        className="rounded-[7px] sm:rounded-[9px] py-3 sm:py-4 text-[9px] sm:text-[10px] font-semibold transition-all duration-300"
                                                                                         style={{
                                                                                             color: active ? '#1a0804' : 'rgba(243, 234, 214, 0.92)',
                                                                                             background: active
@@ -1508,7 +1514,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] md:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group sm:min-h-[340px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('listen')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'listen' ? null : current)}
                                                                 >
@@ -1517,10 +1523,10 @@ function App() {
                                                                         <span>~</span>
                                                                     </div>
                                                                     <div className="mt-5 flex flex-col items-center">
-                                                                        <div className="relative h-[108px] w-[108px] transition-transform duration-500 group-hover:scale-[1.03]">
+                                                                        <div className="relative h-[148px] w-[148px] transition-transform duration-500 group-hover:scale-[1.03]">
                                                                             <div className="absolute inset-0 rounded-full border border-c-gold/10" />
                                                                             <div
-                                                                                className="absolute inset-[10px] rounded-full border"
+                                                                                className="absolute inset-[14px] rounded-full border"
                                                                                 style={{
                                                                                     borderColor: practiceDemoPitchState === 'match' ? 'rgba(199,139,34,0.42)' : 'rgba(196,129,84,0.34)',
                                                                                     boxShadow: practiceDemoPitchState === 'match'
@@ -1530,20 +1536,20 @@ function App() {
                                                                                 }}
                                                                             />
                                                                             <div
-                                                                                className="workspace-hover-reveal workspace-hover-anim absolute left-1/2 top-1/2 h-[104px] w-[104px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/10"
+                                                                                className="workspace-hover-reveal workspace-hover-anim absolute left-1/2 top-1/2 h-[144px] w-[144px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/10"
                                                                                 style={{ animation: 'talaBeatPulse 2s ease-out infinite' }}
                                                                             />
                                                                             <div className="absolute left-1/2 top-1/2 h-[34px] w-[34px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(93,43,18,0.96))] flex items-center justify-center">
                                                                                 <div className="h-[12px] w-[12px] rounded-full bg-[#160603]" />
                                                                             </div>
                                                                         </div>
-                                                                        <div className="mt-3 flex h-[22px] items-end gap-[3px]">
+                                                                        <div className="mt-3 flex h-[30px] items-end gap-[3px]">
                                                                             {Array.from({ length: 12 }).map((_, index) => (
                                                                                 <span
                                                                                     key={index}
                                                                                     className="w-[3px] origin-bottom rounded-full workspace-hover-anim bg-c-gold/70"
                                                                                     style={{
-                                                                                        height: `${8 + ((index % 4) * 3)}px`,
+                                                                                        height: `${12 + ((index % 4) * 5)}px`,
                                                                                         animation: `listeningWave ${0.44 + ((index % 5) * 0.06)}s ease-in-out ${index * 0.03}s infinite`,
                                                                                     }}
                                                                                 />
@@ -1983,14 +1989,14 @@ function App() {
                                                                         <span>~</span>
                                                                     </div>
                                                                     <div className="workspace-preview-shell workspace-preview-float mt-5 rounded-[16px] px-3 py-4">
-                                                                        <div className="flex h-[54px] items-center gap-[2px]">
+                                                                        <div className="flex h-[78px] items-center gap-[2px]">
                                                                             {Array.from({ length: 56 }).map((_, i) => (
                                                                                 <span
                                                                                     key={i}
                                                                                     ref={(node) => { transcribeWaveBarRefs.current[i] = node; }}
                                                                                     className="flex-1 origin-center rounded-full bg-[linear-gradient(180deg,rgba(244,214,142,0.95),rgba(164,103,36,0.22))] will-change-transform"
                                                                                     style={{
-                                                                                        height: `${10 + (Math.abs(Math.sin(i * 0.42)) * 34)}px`,
+                                                                                        height: `${14 + (Math.abs(Math.sin(i * 0.42)) * 48)}px`,
                                                                                         transform: 'scaleY(0.92)',
                                                                                         opacity: 0.26 + ((i % 7) * 0.05),
                                                                                     }}
@@ -2000,11 +2006,12 @@ function App() {
 
                                                                         <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                                                             <div className="relative flex-1 sm:mr-4">
-                                                                                <div className="h-[74px] rounded-[12px] bg-[rgba(9,4,2,0.36)] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.06)] px-3 py-3 group-hover:shadow-[inset_0_0_0_1px_rgba(199,139,34,0.12)] transition-shadow duration-500">
+                                                                                <div className="h-[100px] rounded-[12px] bg-[rgba(9,4,2,0.36)] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.06)] px-3 py-3 group-hover:shadow-[inset_0_0_0_1px_rgba(199,139,34,0.12)] transition-shadow duration-500">
                                                                                     <div className="absolute left-3 right-3 top-[18px] h-px bg-c-gold/16" />
-                                                                                    <div className="absolute left-3 right-3 top-[31px] h-px bg-c-gold/16" />
-                                                                                    <div className="absolute left-3 right-3 top-[44px] h-px bg-c-gold/16" />
-                                                                                    <div className="absolute left-3 right-3 top-[57px] h-px bg-c-gold/16" />
+                                                                                    <div className="absolute left-3 right-3 top-[33px] h-px bg-c-gold/16" />
+                                                                                    <div className="absolute left-3 right-3 top-[48px] h-px bg-c-gold/16" />
+                                                                                    <div className="absolute left-3 right-3 top-[63px] h-px bg-c-gold/16" />
+                                                                                    <div className="absolute left-3 right-3 top-[78px] h-px bg-c-gold/16" />
                                                                                     <div className="absolute left-[14px] right-[12px] top-[20px] sm:left-[18px] sm:right-[16px] sm:top-[24px] flex flex-wrap items-start gap-x-2 sm:gap-x-3 gap-y-1 text-[11px] sm:text-[12px]">
                                                                                         {currentTranscribePhrase.map((token, index) => {
                                                                                             const revealed = index <= transcribePreviewTokenIndex || transcribePreviewMode === 'processing';
@@ -2070,92 +2077,56 @@ function App() {
                                                                             </span>
                                                                         </span>
                                                                     </div>
-                                                                    <div className="workspace-preview-shell workspace-preview-float mt-5 grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-4 rounded-[16px] px-3 py-4">
-                                                                        <div className="space-y-2">
-                                                                            {GURUKUL_PREVIEW_CATEGORIES.map(({ name, meta }, index) => {
-                                                                                const active = gurukulPreviewCategoryIndex === index;
+                                                                    <div className="workspace-preview-shell workspace-preview-float mt-5 rounded-[16px] px-3 py-3">
+                                                                        <div className="flex items-center justify-between">
+                                                                            <span className="text-[9px] uppercase tracking-[0.18em]" style={{ color: 'rgba(214,156,68,0.55)' }}>This Week</span>
+                                                                            <span className="text-[9px]" style={{ color: 'rgba(214,156,68,0.35)' }}>3 pieces</span>
+                                                                        </div>
+                                                                        <div className="mt-3 space-y-2">
+                                                                            {GURUKUL_PRACTICE_LOG.map(({ name, type, tala, progress, days }, i) => {
+                                                                                const active = gurukulPreviewCategoryIndex % 3 === i;
                                                                                 return (
                                                                                 <div
                                                                                     key={name}
-                                                                                    className="rounded-[12px] px-3 py-2 transition-all duration-300"
+                                                                                    className="rounded-[12px] px-3 py-2.5 transition-all duration-300"
                                                                                     style={{
-                                                                                        transform: active ? 'translateX(4px) scale(1.01)' : gurukulPreviewActive ? 'translateX(1px)' : 'translateX(0)',
-                                                                                        background: active ? 'linear-gradient(90deg,rgba(146,96,33,0.42),rgba(88,45,17,0.2))' : 'rgba(255,245,225,0.012)',
-                                                                                        boxShadow: active
-                                                                                            ? 'inset 0 0 0 1px rgba(199,139,34,0.16), 0 0 18px rgba(199,139,34,0.12)'
-                                                                                            : 'inset 0 0 0 1px rgba(199,139,34,0.05)',
-                                                                                        transitionDelay: `${index * 38}ms`,
+                                                                                        background: active ? 'rgba(146,96,33,0.16)' : 'rgba(255,245,225,0.02)',
+                                                                                        border: active ? '1px solid rgba(199,139,34,0.18)' : '1px solid rgba(199,139,34,0.06)',
+                                                                                        boxShadow: active ? '0 0 18px rgba(199,139,34,0.07)' : 'none',
+                                                                                        transitionDelay: `${i * 45}ms`,
                                                                                     }}
                                                                                 >
-                                                                                    <div className="text-[12px] transition-transform duration-300" style={{ color: 'rgba(243, 234, 214, 0.94)', transform: active ? 'translateX(2px)' : 'translateX(0)' }}>{name}</div>
-                                                                                    <div className="mt-1 text-[9px] uppercase tracking-[0.14em] transition-transform duration-300" style={{ color: 'rgba(243, 234, 214, 0.94)', transform: active ? 'translateX(3px)' : 'translateX(0)' }}>{meta}</div>
+                                                                                    <div className="flex items-center justify-between gap-2">
+                                                                                        <div className="min-w-0">
+                                                                                            <div className="truncate text-[11px]" style={{ color: 'rgba(243,234,214,0.92)' }}>{name}</div>
+                                                                                            <div className="mt-0.5 text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.52)' }}>{type} · {tala}</div>
+                                                                                        </div>
+                                                                                        <div className="shrink-0 text-right">
+                                                                                            <div className="text-[10px]" style={{ color: active ? 'rgba(214,156,68,0.88)' : 'rgba(243,234,214,0.45)', transition: 'color 300ms ease' }}>{progress}%</div>
+                                                                                            <div className="text-[8px] uppercase tracking-[0.12em]" style={{ color: 'rgba(214,156,68,0.32)' }}>{days}d</div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div className="mt-2 h-[2px] overflow-hidden rounded-full" style={{ background: 'rgba(199,139,34,0.1)' }}>
+                                                                                        <div
+                                                                                            className="h-full rounded-full transition-all"
+                                                                                            style={{
+                                                                                                width: gurukulPreviewActive ? `${progress}%` : '8%',
+                                                                                                background: active ? 'linear-gradient(90deg,rgba(214,156,68,0.88),rgba(214,156,68,0.44))' : 'rgba(214,156,68,0.36)',
+                                                                                                transitionDuration: '700ms',
+                                                                                                transitionDelay: `${i * 120 + 80}ms`,
+                                                                                            }}
+                                                                                        />
+                                                                                    </div>
                                                                                 </div>
-                                                                            )})}
+                                                                                );
+                                                                            })}
                                                                         </div>
-
-                                                                        <div>
-                                                                            <div className="flex items-center justify-between">
-                                                                                <div>
-                                                                                    <div
-                                                                                        key={`gurukul-title-${selectedGurukulCategory.detailTitle}`}
-                                                                                        className="text-sm transition-all duration-300"
-                                                                                        style={{
-                                                                                            color: 'rgba(243, 234, 214, 0.94)',
-                                                                                            opacity: gurukulPreviewActive ? 1 : 0.94,
-                                                                                            transform: gurukulPreviewActive ? 'translateY(0)' : 'translateY(6px)',
-                                                                                        }}
-                                                                                    >
-                                                                                        {selectedGurukulCategory.detailTitle}
-                                                                                    </div>
-                                                                                    <div
-                                                                                        key={`gurukul-meta-${selectedGurukulCategory.detailMeta}`}
-                                                                                        className="mt-1 text-[10px] uppercase tracking-[0.14em] transition-all duration-300"
-                                                                                        style={{
-                                                                                            color: 'rgba(243, 234, 214, 0.94)',
-                                                                                            opacity: gurukulPreviewActive ? 1 : 0.72,
-                                                                                            transform: gurukulPreviewActive ? 'translateY(0)' : 'translateY(8px)',
-                                                                                            transitionDelay: '60ms',
-                                                                                        }}
-                                                                                    >
-                                                                                        {selectedGurukulCategory.detailMeta}
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div className="mt-4 space-y-4">
-                                                                                {selectedGurukulCategory.snippets.map((snippet, row) => {
-                                                                                    const activeSnippet = gurukulPreviewSnippetIndex === row;
-                                                                                    return (
-                                                                                    <div
-                                                                                        key={`${selectedGurukulCategory.name}-${row}`}
-                                                                                        className="relative h-[62px] overflow-hidden rounded-[12px] bg-[rgba(9,4,2,0.28)] transition-all duration-300"
-                                                                                        style={{
-                                                                                            boxShadow: activeSnippet
-                                                                                                ? 'inset 0 0 0 1px rgba(199,139,34,0.12), 0 10px 22px rgba(0,0,0,0.12)'
-                                                                                                : 'inset 0 0 0 1px rgba(199,139,34,0.06)',
-                                                                                            transform: activeSnippet ? 'translateX(4px)' : gurukulPreviewActive ? 'translateX(1px)' : 'translateX(0)',
-                                                                                            transitionDelay: `${row * 55}ms`,
-                                                                                        }}
-                                                                                    >
-                                                                                        {[13, 26, 39, 52].map((line) => (
-                                                                                            <div key={line} className="absolute left-3 right-3 h-px bg-c-gold/10" style={{ top: `${line}px` }} />
-                                                                                        ))}
-                                                                                        <div className="absolute left-[16px] top-[18px] right-[18px] h-[20px]">
-                                                                                            <svg viewBox="0 0 280 40" className="w-full h-full text-c-gold/78" fill="none">
-                                                                                                <path d="M10 24C22 10 36 9 48 22C58 33 69 33 82 16C95 0 108 4 123 18C137 31 149 31 161 17C174 3 188 5 201 21C214 36 228 35 241 17" className="workspace-mini-wave" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-                                                                                                {[
-                                                                                                    [18, 24], [62, 18], [102, 13], [143, 24], [182, 17], [222, 22],
-                                                                                                ].map(([cx, cy], i) => (
-                                                                                                    <circle key={i} cx={cx} cy={cy} r="2.2" fill="currentColor" />
-                                                                                                ))}
-                                                                                            </svg>
-                                                                                        </div>
-                                                                                        <div className="absolute left-[12px] right-[12px] bottom-[8px] sm:left-[16px] sm:right-[16px] flex flex-wrap items-center gap-x-2 sm:gap-3 gap-y-0.5 text-[9px] sm:text-[10px] transition-all duration-300" style={{ color: 'rgba(243, 234, 214, 0.94)', transform: activeSnippet ? 'translateY(-1px)' : 'translateY(0)' }}>
-                                                                                            {snippet.map((token, index) => (
-                                                                                                <span key={`${selectedGurukulCategory.name}-${row}-${token}-${index}`}>{token}</span>
-                                                                                            ))}
-                                                                                        </div>
-                                                                                    </div>
-                                                                                )})}
+                                                                        <div className="mt-3 flex items-center justify-between">
+                                                                            <span className="text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.28)' }}>Active streaks</span>
+                                                                            <div className="flex gap-1">
+                                                                                {[14, 7, 3].map((d) => (
+                                                                                    <div key={d} className="h-1.5 w-1.5 rounded-full" style={{ background: 'rgba(214,156,68,0.32)' }} />
+                                                                                ))}
                                                                             </div>
                                                                         </div>
                                                                     </div>

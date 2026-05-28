@@ -862,7 +862,8 @@ function App() {
                 onStartLearning={() => {
                     setTourActive(false);
                     goTo('tutor');
-                }} 
+                }}
+                onOpenWorkspace={() => enterWorkspace('musician')}
                 onGoTo={goTo}
             />
 
@@ -1306,7 +1307,7 @@ function App() {
                                             <button
                                                 onClick={() => {
                                                     try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
-                                                    enterWorkspace(appMode);
+                                                    enterWorkspace('musician');
                                                 }}
                                                 className="group border border-c-gold/55 hover:border-c-gold text-c-gold hover:text-c-gold-light font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 cursor-pointer"
                                             >

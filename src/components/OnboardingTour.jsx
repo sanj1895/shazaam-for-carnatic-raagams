@@ -97,7 +97,7 @@ const STEPS = [
   },
 ];
 
-export default function OnboardingTour({ active, onDismiss, onStartLearning, onGoTo }) {
+export default function OnboardingTour({ active, onDismiss, onStartLearning, onOpenWorkspace, onGoTo }) {
   const [step, setStep]       = useState(0);
   const [exiting, setExiting] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -233,7 +233,7 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
                   Start Learning →
                 </button>
                 <button
-                  onClick={handleDismiss}
+                  onClick={() => { handleDismiss(); onOpenWorkspace?.(); }}
                   className="w-full py-3 border border-[#f7d686]/35 hover:border-[#f7d686]/65 text-[#f7d686] font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all"
                 >
                   Open Practice Room →

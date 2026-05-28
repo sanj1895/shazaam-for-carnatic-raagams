@@ -926,24 +926,6 @@ function App() {
                             <span className="font-playfair text-c-gold text-sm tracking-widest uppercase">Navigate</span>
                             <button onClick={() => setMobileMenuOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-c-border/20 text-c-cream-dim text-sm">✕</button>
                         </div>
-                        <div className="flex items-center gap-1 rounded-full border border-c-border bg-c-surface p-1 mb-4">
-                            {Object.values(APP_MODES).map((mode) => (
-                                <button
-                                    key={mode.id}
-                                    onClick={() => {
-                                        switchAppMode(mode.id, { destination: 'home', reveal: true });
-                                        setMobileMenuOpen(false);
-                                    }}
-                                    className={`flex-1 px-3 py-2 rounded-full text-[10px] font-playfair uppercase tracking-[0.18em] transition-all ${
-                                        appMode === mode.id
-                                            ? 'bg-c-gold text-c-bg'
-                                            : 'text-c-cream-dim'
-                                    }`}
-                                >
-                                    {mode.shortLabel}
-                                </button>
-                            ))}
-                        </div>
                         <div className="grid grid-cols-3 gap-2">
                             {visibleFeatures.map(({ id, label, mobileSymbol }) => (
                                 <button
@@ -1024,23 +1006,6 @@ function App() {
                             Enter Practice Room
                             <span>→</span>
                         </button>
-                    )}
-                    {view !== 'home' && (
-                        <div className="hidden md:flex items-center gap-1 rounded-full border border-c-border bg-c-surface px-1 py-1">
-                            {Object.values(APP_MODES).map((mode) => (
-                                <button
-                                    key={mode.id}
-                                    onClick={() => switchAppMode(mode.id, { destination: 'home', reveal: true })}
-                                    className={`px-3 py-1 rounded-full text-[10px] font-playfair uppercase tracking-[0.18em] transition-all ${
-                                        appMode === mode.id
-                                            ? 'bg-c-gold text-c-bg'
-                                            : 'text-c-cream-dim hover:text-c-gold'
-                                    }`}
-                                >
-                                    {mode.shortLabel}
-                                </button>
-                            ))}
-                        </div>
                     )}
                     <button
                         onClick={() => setMobileMenuOpen(true)}

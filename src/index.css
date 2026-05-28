@@ -367,6 +367,9 @@ body {
   .workspace-preview-panel::after,
   .workspace-preview-shell,
   .workspace-preview-shell::before,
+  .workspace-preview-panel *,
+  .workspace-preview-panel *::before,
+  .workspace-preview-panel *::after,
   .workspace-preview-hoverline,
   .workspace-preview-float,
   .workspace-preview-soft-glow,
@@ -412,6 +415,18 @@ body {
   .workspace-recording-pulse::after,
   .workspace-mini-wave {
     animation: none !important;
+  }
+
+  .workspace-preview-panel *,
+  .workspace-preview-panel *::before,
+  .workspace-preview-panel *::after {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .workspace-preview-panel .workspace-hover-reveal {
+    opacity: 0 !important;
   }
 }
 

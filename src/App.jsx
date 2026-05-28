@@ -1040,7 +1040,7 @@ function App() {
             )}
 
             {/* ── Page content ── */}
-            <div className="flex-1 flex flex-col items-center w-full pb-16 md:pb-0">
+            <div className={`flex-1 flex flex-col items-center w-full md:pb-0${view !== 'home' ? ' pb-16' : ''}`}>
 
                 {/* ══ HOME ══ */}
                 {view === 'home' && (

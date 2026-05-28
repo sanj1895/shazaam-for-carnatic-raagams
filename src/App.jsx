@@ -1143,7 +1143,7 @@ function App() {
                                     style={{
                                         display: 'grid',
                                         gridTemplateRows: isWorkspaceExpanded ? '0fr' : '1fr',
-                                        transition: 'grid-template-rows 420ms ease',
+                                        transition: 'grid-template-rows 200ms ease',
                                         marginTop: isWorkspaceExpanded ? '0' : '2.25rem',
                                         marginBottom: showFeatures ? '0' : '0',
                                     }}
@@ -1154,8 +1154,7 @@ function App() {
                                         minHeight: 0,
                                         overflow: 'hidden',
                                         opacity: isWorkspaceExpanded ? 0 : isPreviewOpen ? 0.12 : 1,
-                                        transform: isWorkspaceExpanded ? 'translateY(-12px) scale(0.988)' : isPreviewOpen ? 'scale(0.985)' : 'translateY(0) scale(1)',
-                                        transition: 'opacity 350ms ease, transform 350ms ease, filter 350ms ease',
+                                        transition: 'opacity 200ms ease, filter 200ms ease',
                                         pointerEvents: showFeatures ? 'none' : 'auto',
                                         filter: isPreviewOpen ? 'blur(2px)' : 'none',
                                     }}
@@ -1264,8 +1263,7 @@ function App() {
                                         display: 'grid',
                                         gridTemplateRows: isWorkspaceExpanded ? '1fr' : '0fr',
                                         opacity: isWorkspaceExpanded ? 1 : 0,
-                                        transform: isWorkspaceExpanded ? 'translateY(0)' : 'translateY(16px)',
-                                        transition: 'grid-template-rows 520ms ease, opacity 420ms ease 80ms, transform 420ms ease 80ms',
+                                        transition: 'grid-template-rows 220ms ease, opacity 280ms ease 60ms',
                                         pointerEvents: isWorkspaceExpanded ? 'auto' : 'none',
                                         marginTop: isWorkspaceExpanded ? '0.25rem' : '0',
                                     }}

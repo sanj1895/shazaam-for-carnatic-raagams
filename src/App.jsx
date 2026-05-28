@@ -137,24 +137,28 @@ const LIBRARY_PREVIEW_ENTRIES = [
         meta: '15th Melakarta',
         family: 'Melakarta',
         accent: 'Parent scale',
+        swaras: ['S', 'R₁', 'G₃', 'M₁', 'P', 'D₁', 'N₃'],
     },
     {
         name: 'Abheri',
         meta: 'Janya of Kharaharapriya',
         family: 'Janya',
         accent: 'Derived raga',
+        swaras: ['S', 'G₂', 'M₁', 'P', 'N₂'],
     },
     {
         name: 'Kalyani',
         meta: '65th Melakarta',
         family: 'Melakarta',
         accent: 'Prati madhyama',
+        swaras: ['S', 'R₂', 'G₃', 'M₂', 'P', 'D₂', 'N₃'],
     },
     {
         name: 'Hamsadhwani',
         meta: 'Janya of Sankarabharanam',
         family: 'Janya',
         accent: 'Audava raga',
+        swaras: ['S', 'R₂', 'G₃', 'P', 'N₃'],
     },
 ];
 const GRAHA_PREVIEW_ENTRIES = [
@@ -1349,31 +1353,63 @@ function App() {
                                                                         <span>~</span>
                                                                     </div>
                                                                     <div className="relative mt-4 h-[108px]">
-                                                                        {[0, 0.48, 0.96].map((delay, i) => (
+                                                                        {[0, 0.4].map((delay, i) => (
                                                                             <div
-                                                                                key={i}
-                                                                                className="absolute left-1/2 top-1/2 h-[58px] w-[58px] rounded-full border"
+                                                                                key={`sa-${i}`}
+                                                                                className="absolute left-1/2 top-1/2 h-[58px] w-[58px] rounded-full border workspace-hover-anim"
                                                                                 style={{
-                                                                                    borderColor: shruthiPreviewActive ? 'rgba(214,156,68,0.6)' : 'rgba(214,156,68,0.3)',
-                                                                                    animation: `shruthiWave 1.44s ease-out ${delay}s infinite`,
+                                                                                    borderColor: shruthiPreviewActive ? 'rgba(214,156,68,0.65)' : 'rgba(214,156,68,0.32)',
+                                                                                    animation: `shruthiWave 2.88s ease-out ${delay}s backwards infinite`,
+                                                                                    transition: 'border-color 240ms ease',
+                                                                                }}
+                                                                            />
+                                                                        ))}
+                                                                        {[1.44, 1.84].map((delay, i) => (
+                                                                            <div
+                                                                                key={`pa-${i}`}
+                                                                                className="absolute left-1/2 top-1/2 h-[58px] w-[58px] rounded-full border workspace-hover-anim"
+                                                                                style={{
+                                                                                    borderColor: shruthiPreviewActive ? 'rgba(195,138,68,0.65)' : 'rgba(195,138,68,0.32)',
+                                                                                    animation: `shruthiWave 2.88s ease-out ${delay}s backwards infinite`,
                                                                                     transition: 'border-color 240ms ease',
                                                                                 }}
                                                                             />
                                                                         ))}
                                                                         <div
-                                                                            className="absolute left-1/2 top-1/2 h-[20px] w-[20px] rounded-full"
+                                                                            className="absolute left-1/2 top-1/2 h-[20px] w-[20px] rounded-full workspace-hover-anim"
                                                                             style={{
                                                                                 background: 'radial-gradient(circle at 35% 35%, rgba(246,219,164,0.98), rgba(205,144,48,0.88) 42%, rgba(99,44,18,0.95) 72%)',
                                                                                 boxShadow: shruthiPreviewActive ? '0 0 24px rgba(214,156,68,0.5)' : '0 0 8px rgba(214,156,68,0.12)',
                                                                                 transition: 'box-shadow 240ms ease',
-                                                                                animation: 'shruthiPulse 1.44s ease-in-out infinite',
+                                                                                animation: 'shruthiPulse 1.44s ease-in-out backwards infinite',
                                                                             }}
                                                                         />
+                                                                        <span
+                                                                            className="absolute text-[9px] uppercase tracking-[0.18em]"
+                                                                            style={{
+                                                                                color: 'rgba(214,156,68,0.8)',
+                                                                                left: 'calc(50% - 22px)',
+                                                                                bottom: '4px',
+                                                                                transform: 'translateX(-50%)',
+                                                                                animation: 'shruthiSaLabel 2.88s ease-in-out infinite',
+                                                                                animationPlayState: shruthiPreviewActive ? 'running' : 'paused',
+                                                                            }}
+                                                                        >Sa</span>
+                                                                        <span
+                                                                            className="absolute text-[9px] uppercase tracking-[0.18em]"
+                                                                            style={{
+                                                                                color: 'rgba(214,156,68,0.4)',
+                                                                                left: 'calc(50% + 16px)',
+                                                                                bottom: '4px',
+                                                                                animation: 'shruthiPaLabel 2.88s ease-in-out infinite',
+                                                                                animationPlayState: shruthiPreviewActive ? 'running' : 'paused',
+                                                                            }}
+                                                                        >Pa</span>
                                                                     </div>
                                                                     <div className="mt-2 space-y-1 text-xs" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                                         <div className="flex justify-between">
-                                                                            <span className="text-[9px] uppercase tracking-[0.16em]">Sa</span>
-                                                                            <span>Tune Bloom</span>
+                                                                            <span className="text-[9px] uppercase tracking-[0.16em]">Sa · Pa</span>
+                                                                            <span>Drone</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -1505,7 +1541,7 @@ function App() {
                                                                             {Array.from({ length: 12 }).map((_, index) => (
                                                                                 <span
                                                                                     key={index}
-                                                                                    className={`w-[3px] origin-bottom rounded-full ${dhwaniPreviewActive ? 'workspace-hover-anim bg-c-gold/70' : 'bg-c-gold/25'}`}
+                                                                                    className="w-[3px] origin-bottom rounded-full workspace-hover-anim bg-c-gold/70"
                                                                                     style={{
                                                                                         height: `${8 + ((index % 4) * 3)}px`,
                                                                                         animation: `listeningWave ${0.44 + ((index % 5) * 0.06)}s ease-in-out ${index * 0.03}s infinite`,
@@ -1584,70 +1620,65 @@ function App() {
                                                                         <span>Raga Kosha</span>
                                                                         <span>~</span>
                                                                     </div>
-                                                                    <div className="workspace-preview-shell workspace-preview-float mt-5 rounded-[15px] px-3 py-3">
+                                                                    <div className="workspace-preview-shell workspace-preview-float mt-4 rounded-[15px] px-3 py-3">
                                                                         <div
-                                                                            className="flex items-center gap-2 rounded-full px-3 py-2 text-[11px] transition-all duration-500"
+                                                                            className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[10px] transition-all duration-300"
                                                                             style={{
                                                                                 color: 'rgba(243, 234, 214, 0.94)',
                                                                                 background: libraryPreviewActive ? 'rgba(10,4,2,0.62)' : 'rgba(10,4,2,0.46)',
                                                                                 border: libraryPreviewActive ? '1px solid rgba(214,156,68,0.22)' : '1px solid rgba(199,139,34,0.06)',
-                                                                                boxShadow: libraryPreviewActive ? '0 0 0 1px rgba(214,156,68,0.08), 0 0 24px rgba(214,156,68,0.12)' : 'none',
-                                                                                transform: libraryPreviewActive ? 'scale(1.01)' : 'scale(1)',
+                                                                                boxShadow: libraryPreviewActive ? '0 0 0 1px rgba(214,156,68,0.08), 0 0 18px rgba(214,156,68,0.1)' : 'none',
                                                                             }}
                                                                         >
-                                                                            <span className="text-c-gold/70 transition-all duration-500" style={{ opacity: libraryPreviewActive ? 1 : 0.68, transform: libraryPreviewActive ? 'scale(1.08)' : 'scale(1)' }}>⌕</span>
-                                                                            <span className="transition-opacity duration-300" style={{ opacity: libraryPreviewActive ? 0.72 : 0.94 }}>Search ragas</span>
+                                                                            <span className="text-c-gold/70">⌕</span>
+                                                                            <span className="flex-1 truncate" style={{ opacity: libraryPreviewActive ? 0.9 : 0.72 }}>{selectedLibraryEntry.name}</span>
+                                                                            <span className="text-[12px] text-c-gold/40 transition-opacity duration-300" style={{ opacity: libraryPreviewActive ? 1 : 0 }}>|</span>
                                                                         </div>
-                                                                        <div className="relative mt-4 h-[164px] perspective-[1200px]">
-                                                                            <div
-                                                                                className="absolute inset-[6px] rounded-[14px] border border-c-gold/10 bg-[rgba(255,245,225,0.02)] transition-all duration-500"
-                                                                                style={{
-                                                                                    transform: libraryPreviewActive ? 'translateX(-4px) rotateY(10deg)' : 'translateX(-1px) rotateY(3deg)',
-                                                                                    opacity: 0.52,
-                                                                                }}
-                                                                            />
-                                                                            <div
-                                                                                key={`${selectedLibraryEntry.name}-${selectedLibraryEntry.family}`}
-                                                                                className="absolute inset-[12px] origin-left overflow-hidden rounded-[14px] border border-c-gold/14 bg-[linear-gradient(180deg,rgba(40,18,9,0.92),rgba(25,11,6,0.98))] px-4 py-4 transition-all duration-500"
-                                                                                style={{
-                                                                                    boxShadow: 'inset 0 0 0 1px rgba(199,139,34,0.06), 0 16px 30px rgba(0,0,0,0.16)',
-                                                                                    transform: libraryPreviewActive ? 'rotateY(-10deg) translateX(2px)' : 'rotateY(-1deg) translateX(0)',
-                                                                                    animation: libraryPreviewActive ? 'libraryPageTurn 820ms cubic-bezier(0.22, 1, 0.36, 1)' : 'none',
-                                                                                }}
-                                                                            >
-                                                                                <div
-                                                                                    className="absolute inset-y-0 left-0 w-[18px]"
+                                                                        <div
+                                                                            className="mt-2.5 rounded-[10px] px-2.5 py-2.5 transition-all duration-300"
+                                                                            style={{
+                                                                                background: libraryPreviewActive ? 'rgba(255,245,225,0.04)' : 'rgba(255,245,225,0.02)',
+                                                                                border: libraryPreviewActive ? '1px solid rgba(214,156,68,0.16)' : '1px solid rgba(199,139,34,0.07)',
+                                                                            }}
+                                                                        >
+                                                                            <div className="flex items-center justify-between gap-1.5">
+                                                                                <span className="truncate text-[11px]" style={{ color: 'rgba(243,234,214,0.92)' }}>
+                                                                                    {selectedLibraryEntry.name}
+                                                                                </span>
+                                                                                <span
+                                                                                    className="shrink-0 rounded-full px-1.5 py-0.5 text-[8px] uppercase tracking-[0.12em]"
                                                                                     style={{
-                                                                                        background: 'linear-gradient(90deg, rgba(7,3,2,0.36), rgba(255,220,163,0.08), transparent)',
-                                                                                        opacity: libraryPreviewActive ? 1 : 0.45,
+                                                                                        color: 'rgba(214,156,68,0.78)',
+                                                                                        border: '1px solid rgba(214,156,68,0.18)',
+                                                                                        background: 'rgba(214,156,68,0.04)',
                                                                                     }}
-                                                                                />
-                                                                                <div className="flex items-center justify-between">
-                                                                                    <span className="rounded-full border border-c-gold/14 px-2 py-1 text-[9px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.88)' }}>
-                                                                                        {selectedLibraryEntry.family}
-                                                                                    </span>
-                                                                                    <span className="text-c-gold/76">›</span>
-                                                                                </div>
-                                                                                <div className="mt-5">
-                                                                                    <div className="text-[1rem] transition-all duration-500" style={{ color: 'rgba(243, 234, 214, 0.94)', transform: libraryPreviewActive ? 'translateY(0)' : 'translateY(4px)', opacity: libraryPreviewActive ? 1 : 0.94 }}>
-                                                                                        {selectedLibraryEntry.name}
-                                                                                    </div>
-                                                                                    <div className="mt-2 text-[10px] uppercase tracking-[0.16em] transition-all duration-500" style={{ color: 'rgba(243, 234, 214, 0.8)', transform: libraryPreviewActive ? 'translateY(0)' : 'translateY(6px)', opacity: libraryPreviewActive ? 1 : 0.76 }}>
-                                                                                        {selectedLibraryEntry.meta}
-                                                                                    </div>
-                                                                                    <div className="mt-6 h-px w-14 bg-c-gold/20 transition-all duration-500" style={{ transform: libraryPreviewActive ? 'scaleX(1)' : 'scaleX(0.72)', transformOrigin: 'left center' }} />
-                                                                                    <div className="mt-5 text-[10px] uppercase tracking-[0.18em] transition-all duration-500" style={{ color: '#c7941f', letterSpacing: libraryPreviewActive ? '0.2em' : '0.16em' }}>
-                                                                                        {selectedLibraryEntry.accent}
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div
-                                                                                    className="absolute inset-y-0 right-0 w-10 bg-[linear-gradient(270deg,rgba(255,225,172,0.08),transparent)] transition-all duration-500"
-                                                                                    style={{
-                                                                                        opacity: libraryPreviewActive ? 1 : 0.32,
-                                                                                        transform: libraryPreviewActive ? 'translateX(0) skewY(-12deg)' : 'translateX(4px)',
-                                                                                    }}
-                                                                                />
+                                                                                >
+                                                                                    {selectedLibraryEntry.family}
+                                                                                </span>
                                                                             </div>
+                                                                            <div className="mt-1 text-[9px] uppercase tracking-[0.12em]" style={{ color: 'rgba(214,156,68,0.52)' }}>
+                                                                                {selectedLibraryEntry.meta}
+                                                                            </div>
+                                                                            <div className="mt-2.5 flex flex-wrap gap-1">
+                                                                                {selectedLibraryEntry.swaras.map((s, i) => (
+                                                                                    <span
+                                                                                        key={i}
+                                                                                        className="rounded-full px-1.5 py-0.5 text-[9px]"
+                                                                                        style={{
+                                                                                            color: libraryPreviewActive ? 'rgba(243,234,214,0.9)' : 'rgba(243,234,214,0.52)',
+                                                                                            background: libraryPreviewActive ? 'rgba(214,156,68,0.1)' : 'rgba(255,245,225,0.03)',
+                                                                                            border: libraryPreviewActive ? '1px solid rgba(214,156,68,0.22)' : '1px solid rgba(199,139,34,0.09)',
+                                                                                            transition: `all 260ms ease ${i * 35}ms`,
+                                                                                            transform: libraryPreviewActive ? 'translateY(0)' : 'translateY(2px)',
+                                                                                        }}
+                                                                                    >
+                                                                                        {s}
+                                                                                    </span>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="mt-2 text-center text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.32)' }}>
+                                                                            485 ragas searchable
                                                                         </div>
                                                                     </div>
                                                                 </div>

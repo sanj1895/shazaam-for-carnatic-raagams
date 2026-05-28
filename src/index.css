@@ -40,6 +40,22 @@ body {
   50%       { transform: translate(-50%, -50%) scale(1.10); }
 }
 
+@keyframes shruthiSaLabel {
+  0%   { opacity: 0.88; }
+  40%  { opacity: 0.88; }
+  50%  { opacity: 0.26; }
+  90%  { opacity: 0.26; }
+  100% { opacity: 0.88; }
+}
+
+@keyframes shruthiPaLabel {
+  0%   { opacity: 0.26; }
+  40%  { opacity: 0.26; }
+  50%  { opacity: 0.88; }
+  90%  { opacity: 0.88; }
+  100% { opacity: 0.26; }
+}
+
 @keyframes talaBeatPulse {
   0% { opacity: 0; transform: translate(-50%, -50%) scale(0.78); }
   28% { opacity: 0.34; }

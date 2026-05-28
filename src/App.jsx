@@ -1349,55 +1349,25 @@ function App() {
                                                                         <span>~</span>
                                                                     </div>
                                                                     <div className="relative mt-4 h-[108px]">
-                                                                        <div className="absolute left-1/2 top-1/2 h-[92px] w-[92px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,232,188,0.06),rgba(255,232,188,0.02)_58%,transparent_74%)]" />
-                                                                        {[
-                                                                            { left: '50%', top: '8px', label: 'Sa' },
-                                                                            { left: 'calc(50% + 34px)', top: '40px', label: 'Pa' },
-                                                                            { left: '50%', top: '78px', label: 'Sa' },
-                                                                            { left: 'calc(50% - 34px)', top: '40px', label: 'Pa' },
-                                                                        ].map(({ left, top, label }, index) => (
-                                                                            <span
-                                                                                key={`${label}-${index}`}
-                                                                                className="absolute text-[8px] uppercase tracking-[0.16em]"
+                                                                        {[0, 0.48, 0.96].map((delay, i) => (
+                                                                            <div
+                                                                                key={i}
+                                                                                className="absolute left-1/2 top-1/2 h-[58px] w-[58px] rounded-full border"
                                                                                 style={{
-                                                                                    left,
-                                                                                    top,
-                                                                                    color: 'rgba(243, 234, 214, 0.68)',
-                                                                                    transform: 'translate(-50%, -50%)',
+                                                                                    borderColor: shruthiPreviewActive ? 'rgba(214,156,68,0.6)' : 'rgba(214,156,68,0.3)',
+                                                                                    animation: `shruthiWave 1.44s ease-out ${delay}s infinite`,
+                                                                                    transition: 'border-color 240ms ease',
                                                                                 }}
-                                                                            >
-                                                                                {label}
-                                                                            </span>
+                                                                            />
                                                                         ))}
                                                                         <div
-                                                                            className="absolute left-1/2 top-1/2 h-[68px] w-[68px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/16"
-                                                                            style={{
-                                                                                boxShadow: shruthiPreviewActive ? '0 0 18px rgba(214,156,68,0.12)' : '0 0 4px rgba(214,156,68,0.04)',
-                                                                                transition: 'box-shadow 320ms ease, opacity 320ms ease, transform 320ms ease',
-                                                                                animation: 'shruthiBreath 3.8s ease-in-out infinite',
-                                                                            }}
-                                                                        />
-                                                                        <div
-                                                                            className="absolute left-1/2 top-1/2 h-[20px] w-[20px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                                                                            className="absolute left-1/2 top-1/2 h-[20px] w-[20px] rounded-full"
                                                                             style={{
                                                                                 background: 'radial-gradient(circle at 35% 35%, rgba(246,219,164,0.98), rgba(205,144,48,0.88) 42%, rgba(99,44,18,0.95) 72%)',
-                                                                                boxShadow: shruthiPreviewActive ? '0 0 22px rgba(214,156,68,0.3)' : '0 0 8px rgba(214,156,68,0.08)',
-                                                                                transition: 'box-shadow 320ms ease, transform 320ms ease',
-                                                                                animation: 'shruthiPulse 2.8s ease-in-out infinite',
+                                                                                boxShadow: shruthiPreviewActive ? '0 0 24px rgba(214,156,68,0.5)' : '0 0 8px rgba(214,156,68,0.12)',
+                                                                                transition: 'box-shadow 240ms ease',
+                                                                                animation: 'shruthiPulse 1.44s ease-in-out infinite',
                                                                             }}
-                                                                        />
-                                                                        <div
-                                                                            className="absolute left-1/2 top-1/2 h-[86px] w-[86px] -translate-x-1/2 -translate-y-1/2 rounded-full"
-                                                                            style={{
-                                                                                background: 'conic-gradient(from 0deg, rgba(214,156,68,0.12), rgba(214,156,68,0.02), rgba(214,156,68,0.12))',
-                                                                                maskImage: 'radial-gradient(circle, transparent 58%, black 60%, black 70%, transparent 72%)',
-                                                                                WebkitMaskImage: 'radial-gradient(circle, transparent 58%, black 60%, black 70%, transparent 72%)',
-                                                                                animation: 'shruthiDrift 7.6s linear infinite',
-                                                                            }}
-                                                                        />
-                                                                        <div
-                                                                            className={`absolute left-1/2 top-1/2 h-[96px] w-[96px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/10 transition-opacity duration-300 ${shruthiPreviewActive ? 'opacity-100' : 'opacity-35'}`}
-                                                                            style={{ animation: 'shruthiRipple 3.1s ease-out infinite' }}
                                                                         />
                                                                     </div>
                                                                     <div className="mt-2 space-y-1 text-xs" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
@@ -1442,10 +1412,10 @@ function App() {
                                                                                         style={{
                                                                                             left: `calc(50% + ${Math.cos(angle) * 38}px)`,
                                                                                             top: `calc(50% + ${Math.sin(angle) * 38}px)`,
-                                                                                            transform: 'translate(-50%, -50%)',
+                                                                                            transform: active ? 'translate(-50%, -50%) scale(1.5)' : 'translate(-50%, -50%)',
                                                                                             background: active ? '#d7a448' : 'rgba(199,139,34,0.2)',
-                                                                                            boxShadow: active ? '0 0 16px rgba(215,164,72,0.58)' : 'none',
-                                                                                            transition: 'all 180ms ease',
+                                                                                            boxShadow: active ? '0 0 20px 3px rgba(215,164,72,0.75)' : 'none',
+                                                                                            transition: 'all 110ms ease',
                                                                                         }}
                                                                                     />
                                                                                 );
@@ -1471,7 +1441,7 @@ function App() {
                                                                         <div className="relative mx-auto mt-2 w-fit overflow-hidden">
                                                                             <div
                                                                                 className="workspace-hover-reveal workspace-hover-anim absolute inset-y-0 -left-12 w-10 bg-[linear-gradient(90deg,transparent,rgba(247,214,134,0.28),transparent)]"
-                                                                                style={{ animation: 'keyboardShimmer 4.8s ease-in-out infinite' }}
+                                                                                style={{ animation: 'keyboardShimmer 2.2s ease-in-out infinite' }}
                                                                             />
                                                                             <div className="text-sm transition-all duration-500 group-hover:tracking-[0.05em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                                                 Mayamalavagowla
@@ -1538,7 +1508,7 @@ function App() {
                                                                                     className={`w-[3px] origin-bottom rounded-full ${dhwaniPreviewActive ? 'workspace-hover-anim bg-c-gold/70' : 'bg-c-gold/25'}`}
                                                                                     style={{
                                                                                         height: `${8 + ((index % 4) * 3)}px`,
-                                                                                        animation: `listeningWave ${0.85 + ((index % 3) * 0.12)}s ease-in-out ${index * 0.05}s infinite`,
+                                                                                        animation: `listeningWave ${0.44 + ((index % 5) * 0.06)}s ease-in-out ${index * 0.03}s infinite`,
                                                                                     }}
                                                                                 />
                                                                             ))}

@@ -29,31 +29,15 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-@keyframes shruthiBreath {
-  0%, 100% { opacity: 0.42; transform: translate(-50%, -50%) scale(0.96); }
-  50% { opacity: 0.76; transform: translate(-50%, -50%) scale(1.03); }
-}
-
-@keyframes shruthiRipple {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.72); }
-  20% { opacity: 0.2; }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.18); }
-}
-
-@keyframes shruthiShimmer {
-  0% { background-position: 50% 0%; }
-  100% { background-position: 50% 100%; }
+@keyframes shruthiWave {
+  0%   { opacity: 0;    transform: translate(-50%, -50%) scale(0.18); }
+  8%   { opacity: 0.68; }
+  100% { opacity: 0;    transform: translate(-50%, -50%) scale(1.86); }
 }
 
 @keyframes shruthiPulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(0.96); }
-  50% { transform: translate(-50%, -50%) scale(1.06); }
-}
-
-@keyframes shruthiDrift {
-  0% { transform: translate(-50%, -50%) rotate(0deg); opacity: 0.3; }
-  50% { opacity: 0.55; }
-  100% { transform: translate(-50%, -50%) rotate(360deg); opacity: 0.3; }
+  0%, 100% { transform: translate(-50%, -50%) scale(0.92); }
+  50%       { transform: translate(-50%, -50%) scale(1.10); }
 }
 
 @keyframes talaBeatPulse {
@@ -180,10 +164,10 @@ body {
     inset 0 0 0 1px rgba(199, 139, 34, 0.03),
     inset 0 18px 42px rgba(255, 214, 134, 0.015);
   transition:
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    background-color 420ms ease,
-    border-color 420ms ease;
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 160ms ease,
+    border-color 160ms ease;
 }
 
 .workspace-preview-panel::before {
@@ -197,8 +181,8 @@ body {
   opacity: 0;
   transform: translateY(12px) scale(0.96);
   transition:
-    opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
 }
 
@@ -211,7 +195,7 @@ body {
     inset 0 0 0 1px rgba(199, 139, 34, 0),
     inset 0 22px 54px rgba(255, 214, 134, 0),
     inset 0 -20px 36px rgba(0, 0, 0, 0);
-  transition: box-shadow 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: box-shadow 200ms cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
 }
 
@@ -237,9 +221,9 @@ body {
 
 .workspace-preview-hoverline {
   transition:
-    opacity 420ms ease,
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 420ms ease;
+    opacity 180ms ease,
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 180ms ease;
 }
 
 .workspace-preview-panel:hover .workspace-preview-hoverline {
@@ -249,7 +233,7 @@ body {
 }
 
 .workspace-preview-float {
-  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms ease, box-shadow 420ms ease;
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), opacity 180ms ease, box-shadow 180ms ease;
 }
 
 .workspace-preview-panel:hover .workspace-preview-float {
@@ -258,8 +242,8 @@ body {
 
 .workspace-preview-soft-glow {
   transition:
-    opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .workspace-preview-panel:hover .workspace-preview-soft-glow {
@@ -310,7 +294,7 @@ body {
 }
 
 .workspace-preview-pulse {
-  animation: workspacePulse 2.8s ease-in-out infinite;
+  animation: workspacePulse 1.5s ease-in-out infinite;
   animation-play-state: paused;
 }
 
@@ -353,8 +337,8 @@ body {
 .workspace-mini-wave {
   opacity: 0.25;
   transform-origin: center;
-  animation: miniWaveBreath 2.8s ease-in-out infinite;
-  transition: opacity 300ms ease;
+  animation: miniWaveBreath 1.5s ease-in-out infinite;
+  transition: opacity 200ms ease;
 }
 
 .workspace-preview-panel:hover .workspace-mini-wave {

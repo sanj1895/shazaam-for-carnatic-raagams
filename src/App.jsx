@@ -1317,7 +1317,7 @@ function App() {
                                                         <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/14 bg-[radial-gradient(circle_at_50%_24%,rgba(125,56,24,0.18),transparent_28%),linear-gradient(180deg,rgba(22,8,4,0.9),rgba(10,4,2,0.96))] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.04)] overflow-hidden">
                                                             <div className="grid md:grid-cols-4">
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] md:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('shruthi')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'shruthi' ? null : current)}
                                                                 >
@@ -1387,7 +1387,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] md:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('talam')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'talam' ? null : current)}
                                                                 >
@@ -1435,7 +1435,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] md:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('keyboard')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'keyboard' ? null : current)}
                                                                 >
@@ -1480,7 +1480,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel group min-h-[164px] sm:min-h-[200px] md:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('listen')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'listen' ? null : current)}
                                                                 >

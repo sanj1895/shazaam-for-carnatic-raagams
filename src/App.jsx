@@ -785,7 +785,7 @@ function App() {
         if (window.location.hash !== '#/about') window.location.hash = '#/about';
     };
     const closeAbout = () => {
-        closeAbout();
+        setAboutOpen(false);
         if (window.location.hash === '#/about') window.location.hash = '#/home';
     };
 
@@ -874,8 +874,8 @@ function App() {
                     onClick={() => closeAbout()}
                 >
                     <div
-                        className="relative w-full max-w-[1100px] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-[0_40px_120px_rgba(0,0,0,0.7)] border border-c-gold/10 animate-fade-in"
-                        style={{ minHeight: 'min(560px, 90vh)' }}
+                        className="relative w-full max-w-[1320px] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-[0_40px_120px_rgba(0,0,0,0.7)] border border-c-gold/10 animate-fade-in"
+                        style={{ minHeight: 'min(680px, 92vh)' }}
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Full-bleed image */}
@@ -885,7 +885,7 @@ function App() {
                                 alt=""
                                 className="w-full h-full object-cover object-center"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#0c0301] via-[#0c0301]/90 to-[#0c0301]/30 lg:to-transparent" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-[#070201]/18 via-[#0c0301]/44 to-[#0c0301]/96 lg:from-transparent lg:via-[#0c0301]/34 lg:to-[#0c0301]" />
                             <div className="absolute inset-0 bg-gradient-to-b from-[#0c0301]/60 via-transparent to-[#0c0301]/80" />
                         </div>
 
@@ -898,35 +898,67 @@ function App() {
                         </button>
 
                         {/* Content */}
-                        <div className="relative z-10 flex items-center px-8 sm:px-12 md:px-16 lg:px-20 py-12 sm:py-16" style={{ minHeight: 'min(560px, 90vh)' }}>
-                            <div className="max-w-[460px]">
-                                <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.3em] mb-4" style={{ color: 'rgba(247,214,134,0.6)' }}>
-                                    About Ālāpana
-                                </p>
-                                <h2 className="font-playfair text-c-gold-light text-[1.9rem] sm:text-[2.6rem] md:text-[3.2rem] leading-[1.06] tracking-[-0.02em] font-medium mb-5">
-                                    Carnatic music, made accessible.
-                                </h2>
-                                <p className="text-[0.95rem] sm:text-[1.02rem] leading-[1.8] mb-4" style={{ color: 'rgba(243,234,214,0.86)' }}>
-                                    Ālāpana brings together every tool a Carnatic student or musician needs — a shruti drone, tala keeper, raga encyclopedia, pitch transcription, and a full structured curriculum — in one focused space.
-                                </p>
-                                <p className="text-[0.95rem] sm:text-[1.02rem] leading-[1.8]" style={{ color: 'rgba(243,234,214,0.52)' }}>
-                                    Whether you are finding your Sa for the first time or refining a kriti, Ālāpana meets you where you are.
-                                </p>
-                                <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                                    <button
-                                        onClick={() => { closeAbout(); setAppMode('beginner'); setQuizActive(true); }}
-                                        className="inline-flex items-center gap-3 rounded-[14px] bg-c-gold px-6 sm:px-7 py-3 sm:py-3.5 text-c-bg text-[11px] font-bold uppercase tracking-[0.15em] shadow-[0_8px_24px_rgba(199,139,34,0.18)] transition-all hover:bg-[#f0c664]"
-                                    >
-                                        Start Learning
-                                        <ArrowRightMini className="w-4 h-4" />
-                                    </button>
-                                    <button
-                                        onClick={() => { closeAbout(); try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {} enterWorkspace(appMode); }}
-                                        className="inline-flex items-center gap-3 rounded-[14px] border border-c-gold/50 px-6 sm:px-7 py-3 sm:py-3.5 text-c-gold text-[11px] font-bold uppercase tracking-[0.15em] transition-all hover:border-c-gold hover:text-c-gold-light"
-                                    >
-                                        Enter Practice Room
-                                        <ArrowRightMini className="w-4 h-4" />
-                                    </button>
+                        <div
+                            className="relative z-10 grid min-h-[min(680px,92vh)] lg:grid-cols-[48%_52%]"
+                            style={{ minHeight: 'min(680px, 92vh)' }}
+                        >
+                            <div className="hidden lg:block" />
+
+                            <div className="flex items-center justify-end px-7 py-10 sm:px-10 sm:py-12 md:px-14 lg:px-16 xl:px-20">
+                                <div className="w-full max-w-[560px]">
+                                    <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.3em] mb-4" style={{ color: 'rgba(247,214,134,0.6)' }}>
+                                        About Ālāpana
+                                    </p>
+                                    <h2 className="font-playfair text-c-gold-light text-[2rem] sm:text-[2.7rem] md:text-[3.4rem] leading-[1.04] tracking-[-0.025em] font-medium mb-5">
+                                        A dedicated space for learning, practicing, and exploring Carnatic music.
+                                    </h2>
+                                    <p className="text-[0.98rem] sm:text-[1.04rem] leading-[1.82] mb-4" style={{ color: 'rgba(243,234,214,0.88)' }}>
+                                        Carnatic learning is often split across many disconnected experiences: lessons in one place, practice in another, notation somewhere else, and raga study somewhere else again. Ālāpana brings those pieces together so your musical growth can happen inside one coherent environment.
+                                    </p>
+                                    <p className="text-[0.95rem] sm:text-[1.01rem] leading-[1.82]" style={{ color: 'rgba(243,234,214,0.62)' }}>
+                                        Whether you are finding your Sa for the first time or refining a kriti, the goal is the same: give you a space where guidance, discipline, and exploration naturally support each other.
+                                    </p>
+
+                                    <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                                        {[
+                                            {
+                                                title: 'Learn',
+                                                body: 'Build foundations with structured lessons, placement, and guided progression.',
+                                            },
+                                            {
+                                                title: 'Practice',
+                                                body: 'Stay anchored with shruti, tala, sadhana, and tools that support daily work.',
+                                            },
+                                            {
+                                                title: 'Explore',
+                                                body: 'Study ragas, relationships, transcription, and musical ideas in more depth.',
+                                            },
+                                        ].map(({ title, body }) => (
+                                            <div
+                                                key={title}
+                                                className="rounded-[18px] border border-c-gold/12 bg-[rgba(14,5,2,0.52)] px-4 py-4 backdrop-blur-[2px]"
+                                            >
+                                                <div className="text-[10px] uppercase tracking-[0.22em] text-c-gold/80 font-bold">
+                                                    {title}
+                                                </div>
+                                                <p className="mt-2 text-[12px] sm:text-[12.5px] leading-[1.7]" style={{ color: 'rgba(243,234,214,0.78)' }}>
+                                                    {body}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
+                                        <button
+                                            onClick={() => closeAbout()}
+                                            className="inline-flex items-center justify-center gap-3 rounded-[14px] bg-c-gold px-6 sm:px-7 py-3 sm:py-3.5 text-c-bg text-[11px] font-bold uppercase tracking-[0.15em] shadow-[0_8px_24px_rgba(199,139,34,0.18)] transition-all hover:bg-[#f0c664]"
+                                        >
+                                            Back to Home
+                                        </button>
+                                        <p className="max-w-[300px] text-[11px] uppercase tracking-[0.16em]" style={{ color: 'rgba(247,214,134,0.56)' }}>
+                                            Use the home page to choose between guided learning and the practice workspace.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

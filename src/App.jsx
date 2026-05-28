@@ -909,7 +909,7 @@ function App() {
                             className="relative z-10 grid min-h-[min(680px,92vh)] lg:grid-cols-[54%_46%]"
                             style={{ minHeight: 'min(680px, 92vh)' }}
                         >
-                            <div className="flex items-center px-7 py-10 sm:px-10 sm:py-12 md:px-14 lg:px-14 xl:px-16">
+                            <div className="flex items-center px-5 py-8 sm:px-8 sm:py-10 md:px-12 lg:px-14 xl:px-16">
                                 <div className="w-full max-w-[560px]">
                                     <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.3em] mb-4" style={{ color: 'rgba(247,214,134,0.6)' }}>
                                         About Ālāpana
@@ -1149,7 +1149,7 @@ function App() {
                                     : 'text-c-cream-dark border-t-2 border-transparent -mt-0.5'
                             }`}
                         >
-                            {renderTabIcon(id, "w-4 h-4")}
+                            {renderTabIcon(id, "w-5 h-5")}
                             <span className="text-[8px] font-bold uppercase tracking-tight leading-none">{label}</span>
                         </button>
                     ))}

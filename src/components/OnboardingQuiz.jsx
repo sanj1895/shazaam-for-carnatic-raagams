@@ -361,7 +361,7 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSe
 
     return createPortal(
         <div
-            className={`fixed inset-0 z-[9990] flex items-center justify-center p-4 transition-opacity duration-200 ${exiting ? 'opacity-0' : 'opacity-100'}`}
+            className={`fixed inset-0 z-[9990] flex items-center justify-center p-3 sm:p-4 transition-opacity duration-200 ${exiting ? 'opacity-0' : 'opacity-100'}`}
             style={{ background: 'rgba(10,4,2,0.82)', backdropFilter: 'blur(4px)' }}
         >
             <div
@@ -373,12 +373,12 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSe
                     <div className="h-full bg-[#f7d686] transition-all duration-500 ease-out" style={{ width: `${progress * 100}%` }} />
                 </div>
 
-                <div className="p-6 sm:p-8">
+                <div className="p-5 sm:p-8">
                     {/* Header row */}
                     <div className="flex items-center justify-between mb-7">
                         <button
                             onClick={handleBack}
-                            className={`text-[11px] font-mono text-white/30 hover:text-white/60 transition-colors flex items-center gap-1 ${!canGoBack ? 'invisible' : ''}`}
+                            className={`text-[11px] font-mono text-white/30 hover:text-white/60 transition-colors flex items-center gap-1 py-2 pr-2 -ml-1 ${!canGoBack ? 'invisible' : ''}`}
                         >
                             <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M8 2L4 6l4 4"/></svg>
                             Back
@@ -396,7 +396,7 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSe
 
                         <button
                             onClick={dismiss}
-                            className="w-6 h-6 flex items-center justify-center rounded-full text-white/25 hover:text-white/60 hover:bg-white/8 transition-all text-xs"
+                            className="w-9 h-9 flex items-center justify-center rounded-full text-white/25 hover:text-white/60 hover:bg-white/8 transition-all text-xs -mr-1.5"
                         >
                             ✕
                         </button>
@@ -429,7 +429,7 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSe
                             )}
 
                             <div className="mb-6">
-                                <h2 className="font-playfair text-[22px] text-white font-bold leading-snug mb-2">{questionText}</h2>
+                                <h2 className="font-playfair text-[19px] sm:text-[22px] text-white font-bold leading-snug mb-2">{questionText}</h2>
                                 {currentQ.sub && (
                                     <p className="text-[#f7d686]/50 text-[11px] font-mono tracking-widest">{currentQ.sub}</p>
                                 )}

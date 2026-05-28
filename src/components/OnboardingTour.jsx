@@ -144,16 +144,18 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
   };
 
   const progressDots = (
-    <div className="flex gap-1.5 items-center flex-wrap">
+    <div className="flex gap-0.5 items-center flex-wrap">
       {STEPS.map((_, i) => (
         <button
           key={i}
           onClick={() => goToStep(i)}
-          className={`rounded-full transition-all duration-150 ${
-            i === step ? 'w-5 h-1.5 bg-[#f7d686]' : 'w-1.5 h-1.5 bg-white/25 hover:bg-white/50'
-          }`}
+          className="flex items-center justify-center w-6 h-6"
           aria-label={`Go to step ${i + 1}`}
-        />
+        >
+          <span className={`block rounded-full transition-all duration-150 ${
+            i === step ? 'w-5 h-1.5 bg-[#f7d686]' : 'w-1.5 h-1.5 bg-white/25 hover:bg-white/50'
+          }`} />
+        </button>
       ))}
     </div>
   );
@@ -187,7 +189,7 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
             </span>
             <button
               onClick={handleDismiss}
-              className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 text-white/50 hover:text-white transition-all text-xs"
+              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 text-white/50 hover:text-white transition-all text-xs -mr-1.5"
               aria-label="Close tour"
             >
               ✕
@@ -226,13 +228,13 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
               <div className="flex flex-col gap-2">
                 <button
                   onClick={() => { handleDismiss(); onStartLearning?.(); }}
-                  className="w-full py-2.5 bg-[#f7d686] hover:bg-white text-[#1e0c04] font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all"
+                  className="w-full py-3 bg-[#f7d686] hover:bg-white text-[#1e0c04] font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all"
                 >
                   Start Learning →
                 </button>
                 <button
                   onClick={handleDismiss}
-                  className="w-full py-2.5 border border-[#f7d686]/35 hover:border-[#f7d686]/65 text-[#f7d686] font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all"
+                  className="w-full py-3 border border-[#f7d686]/35 hover:border-[#f7d686]/65 text-[#f7d686] font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all"
                 >
                   Open Practice Room →
                 </button>
@@ -243,21 +245,21 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
               <button
                 onClick={() => goToStep(step - 1)}
                 disabled={isFirst}
-                className="text-xs text-white/50 hover:text-white disabled:opacity-0 transition-all font-playfair py-1 px-2"
+                className="text-xs text-white/50 hover:text-white disabled:opacity-0 transition-all font-playfair py-2.5 px-3 -ml-1"
               >
                 ← Back
               </button>
               {isLast ? (
                 <button
                   onClick={handleDismiss}
-                  className="text-xs text-white/50 hover:text-white transition-all font-playfair italic py-1 px-2"
+                  className="text-xs text-white/50 hover:text-white transition-all font-playfair italic py-2.5 px-3 -mr-1"
                 >
                   Just explore
                 </button>
               ) : (
                 <button
                   onClick={() => goToStep(step + 1)}
-                  className="text-xs font-playfair font-bold text-[#1e0c04] bg-[#f7d686] hover:bg-white transition-all py-1.5 px-4 rounded-lg tracking-wider uppercase"
+                  className="text-xs font-playfair font-bold text-[#1e0c04] bg-[#f7d686] hover:bg-white transition-all py-2.5 px-4 rounded-lg tracking-wider uppercase"
                 >
                   Next →
                 </button>

@@ -246,7 +246,11 @@ function parseHashRoute(hashValue = window.location.hash) {
     const validModes = new Set(['beginner', 'musician']);
 
     if (first === 'home') {
-        return { view: 'home', segments: ['home'], mode: null, workspace: false };
+        return { view: 'home', segments: ['home'], mode: null, workspace: false, about: false };
+    }
+
+    if (first === 'about') {
+        return { view: 'home', segments: ['home'], mode: null, workspace: false, about: true };
     }
 
     if (first === 'workspace') {
@@ -360,7 +364,7 @@ function App() {
     const [activeMode, setActiveMode] = useState('standard');
     const [tourActive, setTourActive] = useState(false);
     const [quizActive, setQuizActive] = useState(false);
-    const [aboutOpen, setAboutOpen] = useState(false);
+    const [aboutOpen, setAboutOpen] = useState(() => initialRoute.about === true);
     const [tutorLaunchTarget, setTutorLaunchTarget] = useState(() => {
         const route = initialRoute;
         return route.view === 'tutor' ? parseTutorHashTarget(route.segments) : null;
@@ -727,6 +731,7 @@ function App() {
                 window.location.hash = '#/home';
                 return;
             }
+            setAboutOpen(!!route.about);
             if (route.mode && route.mode !== appMode) {
                 setAppMode(route.mode);
             }
@@ -775,6 +780,15 @@ function App() {
     const goToAdvanced = (id, options = {}) => goTo(id, { ...options, modeOverride: 'musician' });
     const enterWorkspace = (modeOverride = appMode) => goTo('home', { modeOverride, workspace: true });
 
+    const openAbout = () => {
+        setAboutOpen(true);
+        if (window.location.hash !== '#/about') window.location.hash = '#/about';
+    };
+    const closeAbout = () => {
+        closeAbout();
+        if (window.location.hash === '#/about') window.location.hash = '#/home';
+    };
+
     const handleTutorNavigation = (target = null, options = {}) => {
         const { replace = false } = options;
         const normalizedTarget = target && Object.keys(target).length ? target : null;
@@ -816,7 +830,7 @@ function App() {
             id: 'about',
             label: 'About',
             action: () => {
-                setAboutOpen(true);
+                openAbout();
             },
         },
     ];
@@ -857,7 +871,7 @@ function App() {
                 <div
                     className="fixed inset-0 z-[9980] flex items-center justify-center p-3 sm:p-6 lg:p-10"
                     style={{ background: 'rgba(8,3,1,0.72)', backdropFilter: 'blur(6px)' }}
-                    onClick={() => setAboutOpen(false)}
+                    onClick={() => closeAbout()}
                 >
                     <div
                         className="relative w-full max-w-[1100px] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-[0_40px_120px_rgba(0,0,0,0.7)] border border-c-gold/10 animate-fade-in"
@@ -877,7 +891,7 @@ function App() {
 
                         {/* Close button */}
                         <button
-                            onClick={() => setAboutOpen(false)}
+                            onClick={() => closeAbout()}
                             className="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center rounded-full text-white/40 hover:text-white/80 hover:bg-white/10 transition-all text-sm"
                         >
                             ✕
@@ -900,14 +914,14 @@ function App() {
                                 </p>
                                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
                                     <button
-                                        onClick={() => { setAboutOpen(false); setAppMode('beginner'); setQuizActive(true); }}
+                                        onClick={() => { closeAbout(); setAppMode('beginner'); setQuizActive(true); }}
                                         className="inline-flex items-center gap-3 rounded-[14px] bg-c-gold px-6 sm:px-7 py-3 sm:py-3.5 text-c-bg text-[11px] font-bold uppercase tracking-[0.15em] shadow-[0_8px_24px_rgba(199,139,34,0.18)] transition-all hover:bg-[#f0c664]"
                                     >
                                         Start Learning
                                         <ArrowRightMini className="w-4 h-4" />
                                     </button>
                                     <button
-                                        onClick={() => { setAboutOpen(false); try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {} enterWorkspace(appMode); }}
+                                        onClick={() => { closeAbout(); try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {} enterWorkspace(appMode); }}
                                         className="inline-flex items-center gap-3 rounded-[14px] border border-c-gold/50 px-6 sm:px-7 py-3 sm:py-3.5 text-c-gold text-[11px] font-bold uppercase tracking-[0.15em] transition-all hover:border-c-gold hover:text-c-gold-light"
                                     >
                                         Enter Practice Room
@@ -1261,6 +1275,15 @@ function App() {
                                                 Enter Practice Room
                                             </button>
                                         </div>
+                                        <button
+                                            onClick={openAbout}
+                                            className="mt-5 text-[9px] sm:text-[10px] uppercase tracking-[0.22em] font-playfair transition-colors duration-300"
+                                            style={{ color: 'rgba(247,214,134,0.4)' }}
+                                            onMouseEnter={e => e.currentTarget.style.color = 'rgba(247,214,134,0.7)'}
+                                            onMouseLeave={e => e.currentTarget.style.color = 'rgba(247,214,134,0.4)'}
+                                        >
+                                            About Ālāpana
+                                        </button>
                                     </div>
                                 </div>
 

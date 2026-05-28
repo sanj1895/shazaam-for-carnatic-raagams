@@ -878,15 +878,22 @@ function App() {
                         style={{ minHeight: 'min(680px, 92vh)' }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {/* Full-bleed image */}
+                        {/* Full-bleed image — sits on right, fades out toward left */}
                         <div className="absolute inset-0">
                             <img
                                 src="/diya-and-veena.png"
                                 alt=""
                                 className="w-full h-full object-cover object-center"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#070201]/18 via-[#0c0301]/44 to-[#0c0301]/96 lg:from-transparent lg:via-[#0c0301]/34 lg:to-[#0c0301]" />
-                            <div className="absolute inset-0 bg-gradient-to-b from-[#0c0301]/60 via-transparent to-[#0c0301]/80" />
+                            {/* Mobile: heavy dark overlay so text is readable */}
+                            <div className="absolute inset-0 bg-[#070201]/82 lg:hidden" />
+                            {/* Desktop: left=solid dark, right=transparent so image shows cleanly */}
+                            <div
+                                className="absolute inset-0 hidden lg:block"
+                                style={{ background: 'linear-gradient(to right, #070201 0%, #070201 24%, rgba(7,2,1,0.88) 34%, rgba(7,2,1,0.3) 48%, transparent 62%)' }}
+                            />
+                            {/* Top/bottom depth */}
+                            <div className="absolute inset-0 bg-gradient-to-b from-[#0c0301]/55 via-transparent to-[#0c0301]/65" />
                         </div>
 
                         {/* Close button */}
@@ -897,14 +904,12 @@ function App() {
                             ✕
                         </button>
 
-                        {/* Content */}
+                        {/* Content — text on LEFT, image visible on RIGHT */}
                         <div
-                            className="relative z-10 grid min-h-[min(680px,92vh)] lg:grid-cols-[48%_52%]"
+                            className="relative z-10 grid min-h-[min(680px,92vh)] lg:grid-cols-[54%_46%]"
                             style={{ minHeight: 'min(680px, 92vh)' }}
                         >
-                            <div className="hidden lg:block" />
-
-                            <div className="flex items-center justify-end px-7 py-10 sm:px-10 sm:py-12 md:px-14 lg:px-16 xl:px-20">
+                            <div className="flex items-center px-7 py-10 sm:px-10 sm:py-12 md:px-14 lg:px-14 xl:px-16">
                                 <div className="w-full max-w-[560px]">
                                     <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.3em] mb-4" style={{ color: 'rgba(247,214,134,0.6)' }}>
                                         About Ālāpana
@@ -955,12 +960,11 @@ function App() {
                                         >
                                             Back to Home
                                         </button>
-                                        <p className="max-w-[300px] text-[11px] uppercase tracking-[0.16em]" style={{ color: 'rgba(247,214,134,0.56)' }}>
-                                            Use the home page to choose between guided learning and the practice workspace.
-                                        </p>
                                     </div>
                                 </div>
                             </div>
+                            {/* Empty right col — image shows through the gradient */}
+                            <div className="hidden lg:block" />
                         </div>
                     </div>
                 </div>,

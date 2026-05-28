@@ -1140,23 +1140,18 @@ function App() {
                                 </div>
 
                                 <div
-                                    style={{
-                                        display: 'grid',
-                                        gridTemplateRows: isWorkspaceExpanded ? '0fr' : '1fr',
-                                        transition: 'grid-template-rows 200ms ease',
-                                        marginTop: isWorkspaceExpanded ? '0' : '2.25rem',
-                                        marginBottom: showFeatures ? '0' : '0',
-                                    }}
-                                >
-                                <div
                                     className="flex flex-col items-center text-center max-w-3xl"
                                     style={{
-                                        minHeight: 0,
                                         overflow: 'hidden',
+                                        maxHeight: isWorkspaceExpanded ? '0' : '800px',
                                         opacity: isWorkspaceExpanded ? 0 : isPreviewOpen ? 0.12 : 1,
-                                        transition: 'opacity 200ms ease, filter 200ms ease',
+                                        transition: isWorkspaceExpanded
+                                            ? 'opacity 230ms ease, max-height 0s 230ms'
+                                            : 'opacity 230ms ease',
                                         pointerEvents: showFeatures ? 'none' : 'auto',
                                         filter: isPreviewOpen ? 'blur(2px)' : 'none',
+                                        marginTop: isWorkspaceExpanded ? '0' : '2.25rem',
+                                        marginBottom: showFeatures ? '0' : '0',
                                     }}
                                 >
                                     <h1
@@ -1180,7 +1175,6 @@ function App() {
                                             Enter Alapana
                                         </button>
                                     </div>
-                                </div>
                                 </div>
 
                                 {isPreviewOpen && (
@@ -1260,15 +1254,17 @@ function App() {
                                 <div
                                     className="w-full max-w-6xl"
                                     style={{
-                                        display: 'grid',
-                                        gridTemplateRows: isWorkspaceExpanded ? '1fr' : '0fr',
+                                        overflow: 'hidden',
+                                        maxHeight: isWorkspaceExpanded ? '10000px' : '0',
                                         opacity: isWorkspaceExpanded ? 1 : 0,
-                                        transition: 'grid-template-rows 220ms ease, opacity 280ms ease 60ms',
+                                        transition: isWorkspaceExpanded
+                                            ? 'opacity 280ms ease'
+                                            : 'opacity 280ms ease, max-height 0s 280ms',
                                         pointerEvents: isWorkspaceExpanded ? 'auto' : 'none',
                                         marginTop: isWorkspaceExpanded ? '0.25rem' : '0',
                                     }}
                                 >
-                                    <div className="pb-16" style={{ overflow: 'hidden', minHeight: 0 }}>
+                                    <div className="pb-16">
 
                                         <section className="mt-4 sm:mt-6 px-1.5 sm:px-2 md:px-3">
                                             <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/18 bg-[linear-gradient(180deg,rgba(14,6,3,0.96),rgba(7,3,2,0.98))] shadow-[0_30px_80px_rgba(0,0,0,0.42),0_0_0_1px_rgba(199,139,34,0.08)] overflow-hidden backdrop-blur-md">

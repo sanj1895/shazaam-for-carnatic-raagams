@@ -1130,50 +1130,61 @@ function App() {
 
 
                             <div
-                                className="relative z-10 flex w-full max-w-6xl flex-col items-center px-4 sm:px-7 transition-all duration-700"
-                                style={{ minHeight: 'calc(100vh - 73px)', justifyContent: 'center', paddingTop: '1.25rem', paddingBottom: '2rem' }}
+                                className="relative z-10 w-full max-w-6xl px-4 sm:px-7"
+                                style={{ minHeight: 'calc(100vh - 73px)', paddingTop: '1.25rem', paddingBottom: '2rem' }}
                             >
-                                <div className="flex items-center gap-4 sm:gap-6 w-full max-w-xs sm:max-w-sm opacity-90">
-                                    <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-c-gold/50 to-transparent" />
-                                    <div className="drop-shadow-[0_0_12px_rgba(200,148,31,0.6)] scale-110"><VeenaIcon /></div>
-                                    <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-c-gold/50 to-transparent" />
-                                </div>
-
                                 <div
-                                    className="flex flex-col items-center text-center max-w-3xl"
                                     style={{
-                                        overflow: 'hidden',
-                                        maxHeight: isWorkspaceExpanded ? '0' : '800px',
-                                        opacity: isWorkspaceExpanded ? 0 : isPreviewOpen ? 0.12 : 1,
-                                        transition: isWorkspaceExpanded
-                                            ? 'opacity 230ms ease, max-height 0s 230ms'
-                                            : 'opacity 230ms ease',
-                                        pointerEvents: showFeatures ? 'none' : 'auto',
-                                        filter: isPreviewOpen ? 'blur(2px)' : 'none',
-                                        marginTop: isWorkspaceExpanded ? '0' : '2.25rem',
-                                        marginBottom: showFeatures ? '0' : '0',
+                                        position: 'absolute',
+                                        inset: 0,
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        paddingTop: '1.25rem',
+                                        paddingBottom: '2rem',
+                                        opacity: isWorkspaceExpanded ? 0 : 1,
+                                        transition: 'opacity 250ms ease',
+                                        pointerEvents: isWorkspaceExpanded ? 'none' : 'auto',
                                     }}
                                 >
-                                    <h1
-                                        id="tour-logo"
-                                        className="font-playfair text-4xl sm:text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-br from-c-gold-light via-[#f7d686] to-[#b88014] tracking-wider uppercase leading-none mb-4 drop-shadow-xl"
-                                        style={{ textShadow: '0 4px 30px rgba(227,168,33,0.4)' }}
+                                    <div className="flex items-center gap-4 sm:gap-6 w-full max-w-xs sm:max-w-sm opacity-90">
+                                        <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-c-gold/50 to-transparent" />
+                                        <div className="drop-shadow-[0_0_12px_rgba(200,148,31,0.6)] scale-110"><VeenaIcon /></div>
+                                        <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-c-gold/50 to-transparent" />
+                                    </div>
+
+                                    <div
+                                        className="flex flex-col items-center text-center max-w-3xl"
+                                        style={{
+                                            opacity: isPreviewOpen ? 0.12 : 1,
+                                            transition: 'opacity 250ms ease, filter 250ms ease',
+                                            pointerEvents: showFeatures ? 'none' : 'auto',
+                                            filter: isPreviewOpen ? 'blur(2px)' : 'none',
+                                            marginTop: '2.25rem',
+                                        }}
                                     >
-                                        Ālāpana
-                                    </h1>
-                                    <p className="mb-4 max-w-[18rem] text-[9px] sm:max-w-none sm:text-[11px] md:text-xs uppercase tracking-[0.18em] sm:tracking-[0.22em]" style={{ color: 'rgba(247, 214, 134, 0.76)' }}>
-                                        Designed for dedicated Carnatic learners and musicians
-                                    </p>
-                                    <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
-                                        <button
-                                            onClick={() => {
-                                                setShowFeatures(true);
-                                                setShowWorkspaceSections(false);
-                                            }}
-                                            className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 shadow-[0_0_36px_rgba(200,148,31,0.26)] cursor-pointer"
+                                        <h1
+                                            id="tour-logo"
+                                            className="font-playfair text-4xl sm:text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-br from-c-gold-light via-[#f7d686] to-[#b88014] tracking-wider uppercase leading-none mb-4 drop-shadow-xl"
+                                            style={{ textShadow: '0 4px 30px rgba(227,168,33,0.4)' }}
                                         >
-                                            Enter Alapana
-                                        </button>
+                                            Ālāpana
+                                        </h1>
+                                        <p className="mb-4 max-w-[18rem] text-[9px] sm:max-w-none sm:text-[11px] md:text-xs uppercase tracking-[0.18em] sm:tracking-[0.22em]" style={{ color: 'rgba(247, 214, 134, 0.76)' }}>
+                                            Designed for dedicated Carnatic learners and musicians
+                                        </p>
+                                        <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
+                                            <button
+                                                onClick={() => {
+                                                    setShowFeatures(true);
+                                                    setShowWorkspaceSections(false);
+                                                }}
+                                                className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 shadow-[0_0_36px_rgba(200,148,31,0.26)] cursor-pointer"
+                                            >
+                                                Enter Alapana
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1265,7 +1276,7 @@ function App() {
                                         maxHeight: isWorkspaceExpanded ? '10000px' : '0',
                                         opacity: isWorkspaceExpanded ? 1 : 0,
                                         transition: isWorkspaceExpanded
-                                            ? 'opacity 280ms ease 230ms'
+                                            ? 'opacity 280ms ease'
                                             : 'opacity 280ms ease, max-height 0s 280ms',
                                         pointerEvents: isWorkspaceExpanded ? 'auto' : 'none',
                                         marginTop: isWorkspaceExpanded ? '0.25rem' : '0',

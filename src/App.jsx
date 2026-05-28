@@ -360,6 +360,7 @@ function App() {
     const [activeMode, setActiveMode] = useState('standard');
     const [tourActive, setTourActive] = useState(false);
     const [quizActive, setQuizActive] = useState(false);
+    const [aboutOpen, setAboutOpen] = useState(false);
     const [tutorLaunchTarget, setTutorLaunchTarget] = useState(() => {
         const route = initialRoute;
         return route.view === 'tutor' ? parseTutorHashTarget(route.segments) : null;
@@ -815,8 +816,7 @@ function App() {
             id: 'about',
             label: 'About',
             action: () => {
-                const el = document.getElementById('home-about');
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setAboutOpen(true);
             },
         },
     ];
@@ -851,6 +851,75 @@ function App() {
                 }} 
                 onGoTo={goTo}
             />
+
+            {/* ══ ABOUT MODAL ══ */}
+            {aboutOpen && createPortal(
+                <div
+                    className="fixed inset-0 z-[9980] flex items-center justify-center p-3 sm:p-6 lg:p-10"
+                    style={{ background: 'rgba(8,3,1,0.72)', backdropFilter: 'blur(6px)' }}
+                    onClick={() => setAboutOpen(false)}
+                >
+                    <div
+                        className="relative w-full max-w-[1100px] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-[0_40px_120px_rgba(0,0,0,0.7)] border border-c-gold/10 animate-fade-in"
+                        style={{ minHeight: 'min(560px, 90vh)' }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Full-bleed image */}
+                        <div className="absolute inset-0">
+                            <img
+                                src="/diya-and-veena.png"
+                                alt=""
+                                className="w-full h-full object-cover object-center"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-r from-[#0c0301] via-[#0c0301]/90 to-[#0c0301]/30 lg:to-transparent" />
+                            <div className="absolute inset-0 bg-gradient-to-b from-[#0c0301]/60 via-transparent to-[#0c0301]/80" />
+                        </div>
+
+                        {/* Close button */}
+                        <button
+                            onClick={() => setAboutOpen(false)}
+                            className="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center rounded-full text-white/40 hover:text-white/80 hover:bg-white/10 transition-all text-sm"
+                        >
+                            ✕
+                        </button>
+
+                        {/* Content */}
+                        <div className="relative z-10 flex items-center px-8 sm:px-12 md:px-16 lg:px-20 py-12 sm:py-16" style={{ minHeight: 'min(560px, 90vh)' }}>
+                            <div className="max-w-[460px]">
+                                <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.3em] mb-4" style={{ color: 'rgba(247,214,134,0.6)' }}>
+                                    About Ālāpana
+                                </p>
+                                <h2 className="font-playfair text-c-gold-light text-[1.9rem] sm:text-[2.6rem] md:text-[3.2rem] leading-[1.06] tracking-[-0.02em] font-medium mb-5">
+                                    Carnatic music, made accessible.
+                                </h2>
+                                <p className="text-[0.95rem] sm:text-[1.02rem] leading-[1.8] mb-4" style={{ color: 'rgba(243,234,214,0.86)' }}>
+                                    Ālāpana brings together every tool a Carnatic student or musician needs — a shruti drone, tala keeper, raga encyclopedia, pitch transcription, and a full structured curriculum — in one focused space.
+                                </p>
+                                <p className="text-[0.95rem] sm:text-[1.02rem] leading-[1.8]" style={{ color: 'rgba(243,234,214,0.52)' }}>
+                                    Whether you are finding your Sa for the first time or refining a kriti, Ālāpana meets you where you are.
+                                </p>
+                                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                                    <button
+                                        onClick={() => { setAboutOpen(false); setAppMode('beginner'); setQuizActive(true); }}
+                                        className="inline-flex items-center gap-3 rounded-[14px] bg-c-gold px-6 sm:px-7 py-3 sm:py-3.5 text-c-bg text-[11px] font-bold uppercase tracking-[0.15em] shadow-[0_8px_24px_rgba(199,139,34,0.18)] transition-all hover:bg-[#f0c664]"
+                                    >
+                                        Start Learning
+                                        <ArrowRightMini className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => { setAboutOpen(false); try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {} enterWorkspace(appMode); }}
+                                        className="inline-flex items-center gap-3 rounded-[14px] border border-c-gold/50 px-6 sm:px-7 py-3 sm:py-3.5 text-c-gold text-[11px] font-bold uppercase tracking-[0.15em] transition-all hover:border-c-gold hover:text-c-gold-light"
+                                    >
+                                        Enter Practice Room
+                                        <ArrowRightMini className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
 
             {/* ══ UNIFIED MODAL (PORTAL) ══ */}
             {selectedRaga && createPortal(
@@ -2058,60 +2127,6 @@ function App() {
                                 </div>
                             </div>
 
-                            {/* ── ABOUT SECTION ── */}
-                            <section
-                                id="home-about"
-                                className="relative w-full"
-                                style={{ minHeight: '100vh' }}
-                            >
-                                {/* Full-bleed image */}
-                                <div className="absolute inset-0">
-                                    <img
-                                        src="/diya-and-veena.png"
-                                        alt=""
-                                        className="w-full h-full object-cover object-center"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-r from-[#0c0301] via-[#0c0301]/88 to-[#0c0301]/20 lg:to-transparent" />
-                                    <div className="absolute inset-0 bg-gradient-to-b from-[#0c0301]/75 via-transparent to-[#0c0301]/70" />
-                                </div>
-
-                                {/* Content */}
-                                <div className="relative z-10 flex items-center" style={{ minHeight: '100vh', padding: '6rem 2rem 6rem clamp(2rem, 10vw, 7rem)' }}>
-                                    <div style={{ maxWidth: '520px' }}>
-                                        <p className="text-[9px] sm:text-[11px] uppercase tracking-[0.3em] mb-5" style={{ color: 'rgba(247,214,134,0.6)' }}>
-                                            About Ālāpana
-                                        </p>
-                                        <h2 className="font-playfair text-c-gold-light text-[2.2rem] sm:text-[3rem] md:text-[3.8rem] leading-[1.06] tracking-[-0.02em] font-medium mb-6">
-                                            Carnatic music, made accessible.
-                                        </h2>
-                                        <p className="text-[1rem] sm:text-[1.08rem] leading-[1.82] mb-4" style={{ color: 'rgba(243,234,214,0.88)', maxWidth: '440px' }}>
-                                            Ālāpana brings together every tool a Carnatic student or musician needs — a shruti drone, tala keeper, raga encyclopedia, pitch transcription, and a full structured curriculum — in one focused space.
-                                        </p>
-                                        <p className="text-[1rem] sm:text-[1.08rem] leading-[1.82]" style={{ color: 'rgba(243,234,214,0.56)', maxWidth: '440px' }}>
-                                            Whether you are finding your Sa for the first time or refining a kriti, Ālāpana meets you where you are.
-                                        </p>
-                                        <div className="mt-9 flex flex-col sm:flex-row gap-3">
-                                            <button
-                                                onClick={() => { setAppMode('beginner'); setQuizActive(true); }}
-                                                className="inline-flex items-center gap-3 rounded-[16px] bg-c-gold px-7 sm:px-8 py-3.5 sm:py-4 text-c-bg text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.15em] shadow-[0_10px_28px_rgba(199,139,34,0.18)] transition-all hover:bg-[#f0c664] hover:shadow-[0_12px_34px_rgba(199,139,34,0.26)]"
-                                            >
-                                                Start Learning
-                                                <ArrowRightMini className="w-4 h-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
-                                                    enterWorkspace(appMode);
-                                                }}
-                                                className="inline-flex items-center gap-3 rounded-[16px] border border-c-gold/50 px-7 sm:px-8 py-3.5 sm:py-4 text-c-gold text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.15em] transition-all hover:border-c-gold hover:text-c-gold-light"
-                                            >
-                                                Enter Practice Room
-                                                <ArrowRightMini className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
 
                     </div>
             )}

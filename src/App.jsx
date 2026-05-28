@@ -805,7 +805,7 @@ function App() {
         },
         {
             id: 'basics',
-            label: 'Basics',
+            label: 'Start Learning',
             action: () => {
                 setAppMode('beginner');
                 setQuizActive(true);
@@ -1182,17 +1182,26 @@ function App() {
                                             Ālāpana
                                         </h1>
                                         <p className="mb-4 max-w-[18rem] text-[9px] sm:max-w-none sm:text-[11px] md:text-xs uppercase tracking-[0.18em] sm:tracking-[0.22em]" style={{ color: 'rgba(247, 214, 134, 0.76)' }}>
-                                            Designed for dedicated Carnatic learners and musicians
+                                            Learn, practice, and explore Carnatic music
                                         </p>
                                         <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
+                                            <button
+                                                onClick={() => {
+                                                    setAppMode('beginner');
+                                                    setQuizActive(true);
+                                                }}
+                                                className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 shadow-[0_0_36px_rgba(200,148,31,0.26)] cursor-pointer"
+                                            >
+                                                Start Learning
+                                            </button>
                                             <button
                                                 onClick={() => {
                                                     setShowFeatures(true);
                                                     setShowWorkspaceSections(false);
                                                 }}
-                                                className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 shadow-[0_0_36px_rgba(200,148,31,0.26)] cursor-pointer"
+                                                className="group border border-c-gold/55 hover:border-c-gold text-c-gold hover:text-c-gold-light font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 cursor-pointer"
                                             >
-                                                Enter Alapana
+                                                Enter Practice Room
                                             </button>
                                         </div>
                                     </div>
@@ -1243,31 +1252,33 @@ function App() {
                                                 <div className="flex items-center">
                                                     <div className="max-w-[420px] pb-8 sm:pb-12 lg:pb-0">
                                                         <h2 className="font-playfair text-c-gold-light text-[2.8rem] sm:text-[3.8rem] md:text-[5.5rem] xl:text-[6rem] leading-[0.92] tracking-[-0.04em] font-medium">
-                                                            Your Carnatic practice room, online.
+                                                            One place to learn, practice, and explore.
                                                         </h2>
                                                         <p className="mt-5 sm:mt-8 text-[0.96rem] sm:text-[1.05rem] md:text-[1.18rem] leading-[1.7] sm:leading-[1.75] max-w-[420px]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
-                                                            Practice with focus. Explore with depth. Create with freedom. Everything you need in one dedicated space.
+                                                            Start from your first swara, or enter a full practice workspace for daily sadhana, transcription, and raga exploration.
                                                         </p>
-                                                        <button
-                                                            onClick={() => {
-                                                                try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
-                                                                enterWorkspace(appMode);
-                                                            }}
-                                                            className="mt-6 sm:mt-8 inline-flex items-center gap-3 rounded-[16px] bg-c-gold px-6 sm:px-8 py-3.5 sm:py-4 text-c-bg text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.14em] sm:tracking-[0.16em] shadow-[0_10px_28px_rgba(199,139,34,0.14)] transition-all hover:bg-[#f0c664] hover:shadow-[0_12px_34px_rgba(199,139,34,0.2)]"
-                                                        >
-                                                            Enter Practice Room
-                                                            <ArrowRightMini className="w-4 h-4" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => {
-                                                                setAppMode('beginner');
-                                                                setQuizActive(true);
-                                                            }}
-                                                            className="mt-5 sm:mt-7 inline-flex items-center gap-2 text-c-gold text-[11px] sm:text-[12px] uppercase tracking-[0.14em] sm:tracking-[0.16em] hover:text-c-gold-light transition-colors"
-                                                        >
-                                                            New to Carnatic? Start with Basics
-                                                            <ArrowRightMini className="w-3.5 h-3.5" />
-                                                        </button>
+                                                        <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3">
+                                                            <button
+                                                                onClick={() => {
+                                                                    try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
+                                                                    enterWorkspace(appMode);
+                                                                }}
+                                                                className="inline-flex items-center gap-3 rounded-[16px] bg-c-gold px-6 sm:px-8 py-3.5 sm:py-4 text-c-bg text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.14em] sm:tracking-[0.16em] shadow-[0_10px_28px_rgba(199,139,34,0.14)] transition-all hover:bg-[#f0c664] hover:shadow-[0_12px_34px_rgba(199,139,34,0.2)]"
+                                                            >
+                                                                Enter Practice Room
+                                                                <ArrowRightMini className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setAppMode('beginner');
+                                                                    setQuizActive(true);
+                                                                }}
+                                                                className="inline-flex items-center gap-3 rounded-[16px] border border-c-gold/50 px-6 sm:px-8 py-3.5 sm:py-4 text-c-gold text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.14em] sm:tracking-[0.16em] transition-all hover:border-c-gold hover:text-c-gold-light"
+                                                            >
+                                                                Start Learning
+                                                                <ArrowRightMini className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
 

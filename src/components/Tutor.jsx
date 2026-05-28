@@ -193,8 +193,8 @@ export default function Tutor({ saFrequency, appMode = 'musician', onSadhanaComp
                                 </div>
                                 <p className="text-c-cream-dark text-xs leading-relaxed font-playfair opacity-80">
                                     {appMode === 'musician'
-                                        ? 'A musician-first practice space for raga work, notation, transcription, and advanced repertoire.'
-                                        : 'Structured, progressive vocal training from first shruti work to advanced improvisation.'}
+                                        ? 'A flexible Carnatic workspace for repertoire, notation, ear training, and raga practice.'
+                                        : 'A guided path from shruti and swaras to confident, independent singing.'}
                                 </p>
                             </div>
                         </div>

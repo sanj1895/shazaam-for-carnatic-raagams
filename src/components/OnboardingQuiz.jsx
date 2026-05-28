@@ -134,7 +134,7 @@ function getPath(totalScore, learner, age) {
         return {
             level: 'Intermediate',
             headline: 'Daily Sadhana',
-            body: `${pronoun}'re past the basics. ${possessive} structured daily practice — drone warm-up, scale exercises, keyboard, and ear training — is ready.`,
+            body: `${pronoun}'re past the basics. ${possessive} structured daily practice is ready — plus the full workspace tools: Transcribe, Dhwani, and Raga Kosha.`,
             detail: '4 daily steps · Build your streak',
             note: null,
             action: 'sadhana',
@@ -252,6 +252,12 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSe
                     {!done ? (
                         /* ── Question screen ── */
                         <>
+                            {qIdx === 0 && (
+                                <div className="mb-5 pb-5 border-b border-white/8">
+                                    <h2 className="font-playfair text-[18px] text-[#f7d686] font-bold mb-1.5">Find your best starting point</h2>
+                                    <p className="text-white/45 text-[12px] font-playfair leading-relaxed">We'll recommend the right Carnatic path based on your experience and comfort level.</p>
+                                </div>
+                            )}
                             <div className="mb-6">
                                 <h2 className="font-playfair text-[22px] text-white font-bold leading-snug mb-2">{questionText}</h2>
                                 {q.sub && (
@@ -323,7 +329,10 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSe
                                 </p>
                             )}
 
-                            <div className="flex flex-col gap-2 mt-6">
+                            <p className="text-[#f7d686]/38 text-[11px] italic text-center mt-4 mb-1 px-1 font-playfair">
+                                You can always switch to the full practice tools as you grow.
+                            </p>
+                            <div className="flex flex-col gap-2 mt-3">
                                 <button
                                     onClick={handleBegin}
                                     className="w-full py-3 bg-[#f7d686] hover:bg-white text-[#150801] font-playfair font-bold text-sm tracking-wider uppercase rounded-xl transition-all shadow-[0_0_30px_rgba(247,214,134,0.2)]"

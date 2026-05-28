@@ -6,7 +6,7 @@ const STEPS = [
   {
     view: 'home',
     title: 'Welcome to Ālāpana',
-    body: "Your complete Carnatic music practice companion. Let me take you on a quick tour of each feature.",
+    body: "Your complete Carnatic music companion — whether you're starting from your very first swara or deepening an existing practice. Here's what's inside.",
     isWelcome: true,
   },
   // ── START HERE ──
@@ -92,7 +92,7 @@ const STEPS = [
   {
     view: null,
     title: "You're ready to begin",
-    body: "Open Svara Gurukul to start structured training, or jump into Transcribe and the other tools from the navigation.",
+    body: "New to Carnatic? Start with Svara Gurukul for guided, step-by-step training. Already practicing? Try Dhwani, Transcribe, or Raga Kosha.",
     isLast: true,
   },
 ];
@@ -223,12 +223,20 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onG
             </div>
 
             {isLast ? (
-              <button
-                onClick={() => { handleDismiss(); onStartLearning?.(); }}
-                className="w-full py-2.5 bg-[#f7d686] hover:bg-white text-[#1e0c04] font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all"
-              >
-                Start Learning →
-              </button>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => { handleDismiss(); onStartLearning?.(); }}
+                  className="w-full py-2.5 bg-[#f7d686] hover:bg-white text-[#1e0c04] font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all"
+                >
+                  Start Learning →
+                </button>
+                <button
+                  onClick={handleDismiss}
+                  className="w-full py-2.5 border border-[#f7d686]/35 hover:border-[#f7d686]/65 text-[#f7d686] font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all"
+                >
+                  Open Practice Room →
+                </button>
+              </div>
             ) : null}
 
             <div className="flex items-center justify-between">

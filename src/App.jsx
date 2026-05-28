@@ -1313,7 +1313,7 @@ function App() {
                                                         </div>
                                                     </div>
 
-                                                    <div className="mt-4 lg:mt-0 lg:pl-4">
+                                                    <div className="hidden md:block mt-4 lg:mt-0 lg:pl-4">
                                                         <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/14 bg-[radial-gradient(circle_at_50%_24%,rgba(125,56,24,0.18),transparent_28%),linear-gradient(180deg,rgba(22,8,4,0.9),rgba(10,4,2,0.96))] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.04)] overflow-hidden">
                                                             <div className="grid md:grid-cols-4">
                                                                 <div
@@ -1579,7 +1579,7 @@ function App() {
                                                         </div>
                                                     </div>
 
-                                                    <div className="mt-4 lg:mt-0 lg:pl-4">
+                                                    <div className="hidden md:block mt-4 lg:mt-0 lg:pl-4">
                                                         <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/14 bg-[radial-gradient(circle_at_50%_22%,rgba(120,53,24,0.18),transparent_30%),linear-gradient(180deg,rgba(20,8,4,0.9),rgba(10,4,2,0.96))] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.04)] overflow-hidden">
                                                             <div className="grid md:grid-cols-3">
                                                                 <div

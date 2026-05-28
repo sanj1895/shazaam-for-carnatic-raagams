@@ -1265,7 +1265,7 @@ function App() {
                                         maxHeight: isWorkspaceExpanded ? '10000px' : '0',
                                         opacity: isWorkspaceExpanded ? 1 : 0,
                                         transition: isWorkspaceExpanded
-                                            ? 'opacity 280ms ease'
+                                            ? 'opacity 280ms ease 230ms'
                                             : 'opacity 280ms ease, max-height 0s 280ms',
                                         pointerEvents: isWorkspaceExpanded ? 'auto' : 'none',
                                         marginTop: isWorkspaceExpanded ? '0.25rem' : '0',

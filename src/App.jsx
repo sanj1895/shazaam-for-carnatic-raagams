@@ -1108,7 +1108,7 @@ function App() {
                                 />
                                 <div className="absolute inset-0 bg-[rgba(16,6,2,0.24)]" />
                                 <div className="absolute inset-x-0 top-0 h-[14%] bg-gradient-to-b from-[#120502]/42 to-transparent" />
-                                <div className="absolute inset-x-0 bottom-0 h-[12%] bg-gradient-to-t from-[#0f0402]/52 to-transparent" />
+                                <div className="absolute inset-x-0 bottom-0 h-[12%] bg-gradient-to-t from-[#0f0402]/52 to-transparent hidden sm:block" />
                             </div>
                         </div>
                         {/* Vignette Overlay */}

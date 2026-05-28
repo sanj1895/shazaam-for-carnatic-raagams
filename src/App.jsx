@@ -1056,12 +1056,12 @@ function App() {
                             <img 
                                 src="/home.png" 
                                 alt="" 
-                                className="absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000"
+                                className="absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-[350ms]"
                                 style={{ opacity: isWorkspaceExpanded ? 0 : 0.8 }}
                             />
                             {/* Workspace portrait background */}
                             <div
-                                className="absolute inset-0 transition-opacity duration-1000"
+                                className="absolute inset-0 transition-opacity duration-[350ms]"
                                 style={{ opacity: isWorkspaceExpanded ? 0.96 : 0 }}
                             >
                                 <div className="absolute inset-0 bg-[#1a0804]" />
@@ -1177,8 +1177,15 @@ function App() {
                                     </div>
                                 </div>
 
-                                {isPreviewOpen && (
-                                    <div className="fixed inset-0 z-30 flex items-center justify-center px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
+                                {showFeatures && (
+                                    <div
+                                        className="fixed inset-0 z-30 flex items-center justify-center px-3 sm:px-6 lg:px-8 py-3 sm:py-6"
+                                        style={{
+                                            opacity: isPreviewOpen ? 1 : 0,
+                                            pointerEvents: isPreviewOpen ? 'auto' : 'none',
+                                            transition: 'opacity 280ms ease',
+                                        }}
+                                    >
                                         <div className="absolute inset-0 bg-[rgba(8,3,1,0.54)] backdrop-blur-[4px]" />
                                         <div
                                             className="relative w-full max-w-[1440px] rounded-[24px] sm:rounded-[34px] overflow-hidden shadow-[0_40px_120px_rgba(0,0,0,0.5)] border border-c-gold/10 animate-fade-in"

@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { identifyRagaWithGroq, listGroqModels } from '../utils/groqIdentify';
-import { getSwaram, RAGAS } from '../utils/ragaLogic';
+import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
 
 /* global ml5 */
 
 const RECORD_SECS = 30;
+const MIN_SCORE   = 4.0;
 const STATES = { IDLE: 'idle', RECORDING: 'recording', PROCESSING: 'processing', RESULT: 'result', ERROR: 'error' };
 
 export default function GroqPanel({ saFrequency }) {
@@ -79,21 +80,41 @@ export default function GroqPanel({ saFrequency }) {
                     recordingFlag.current = false;
                     return;
                 }
+                // Stability buffer: require 3 consecutive readings within ±1 semitone
+                // before accepting a pitch as a real note (filters slides and noise).
+                const pitchBuf = [];
+
                 const getPitch = () => {
                     if (!recordingFlag.current) return;
                     pitchModel.getPitch((_, frequency) => {
                         if (frequency && recordingFlag.current) {
-                            const swaram = getSwaram(frequency, saFrequency);
                             const now = Date.now();
-                            if (swaram) {
-                                const len = swaraStreamRef.current.length;
-                                if (len === 0 || swaraStreamRef.current[len - 1].note !== swaram) {
-                                    swaraStreamRef.current.push({ note: swaram, start: now, duration: 0 });
-                                } else {
-                                    swaraStreamRef.current[len - 1].duration = now - swaraStreamRef.current[len - 1].start;
+
+                            // Octave-jump filter — jumps > 0.6 octaves are almost always detection errors.
+                            const lastBuf = pitchBuf[pitchBuf.length - 1];
+                            if (lastBuf && Math.abs(Math.log2(frequency / lastBuf)) >= 0.6) {
+                                pitchBuf.length = 0;
+                            } else {
+                                pitchBuf.push(frequency);
+                                if (pitchBuf.length > 3) pitchBuf.shift();
+
+                                if (pitchBuf.length === 3) {
+                                    const semis = pitchBuf.map(f => Math.round(12 * Math.log2(f / saFrequency)));
+                                    const stable = semis.every(s => Math.abs(s - semis[0]) <= 1);
+                                    if (stable) {
+                                        const swaram = getSwaram(frequency, saFrequency);
+                                        if (swaram) {
+                                            const len = swaraStreamRef.current.length;
+                                            if (len === 0 || swaraStreamRef.current[len - 1].note !== swaram) {
+                                                swaraStreamRef.current.push({ note: swaram, start: now, duration: 0 });
+                                            } else {
+                                                swaraStreamRef.current[len - 1].duration = now - swaraStreamRef.current[len - 1].start;
+                                            }
+                                            const uiNotes = swaraStreamRef.current.filter(x => x.duration > 100).map(x => x.note);
+                                            setCurrentSwaraStream(uiNotes.slice(-8));
+                                        }
+                                    }
                                 }
-                                const uiNotes = swaraStreamRef.current.filter(x => x.duration > 100).map(x => x.note);
-                                setCurrentSwaraStream(uiNotes.slice(-8));
                             }
                         }
                         if (recordingFlag.current) getPitch();
@@ -123,31 +144,45 @@ export default function GroqPanel({ saFrequency }) {
         setPanelState(STATES.PROCESSING);
         try {
             const validNotes = swaraStreamRef.current.filter(x => x.duration > 120);
+
+            if (validNotes.length < 8) {
+                throw new Error('Not enough distinct musical notes detected. Sing clearly for at least 15 seconds, holding each note.');
+            }
+
+            // Duration-weighted note frequency map for identifyRaga.
+            const noteFreqs = {};
+            const swaraList = [];
+            const longNoteCounts = {};
+            validNotes.forEach(x => {
+                const w = Math.max(1, Math.round((x.duration + 120) / 200));
+                for (let i = 0; i < w; i++) swaraList.push(x.note);
+                noteFreqs[x.note] = (noteFreqs[x.note] || 0) + w;
+                if (x.duration > 800) longNoteCounts[x.note] = (longNoteCounts[x.note] || 0) + 1;
+            });
+            const unique = [...new Set(swaraList)];
+
+            // Local shortlist — must clear MIN_SCORE before we trust the evidence enough to call Groq.
+            const localCandidates = identifyRaga(unique, noteFreqs);
+            if (!localCandidates.length || localCandidates[0].score < MIN_SCORE) {
+                throw new Error('The phrase didn\'t match any known raga confidently. Try singing a longer melodic phrase with more note variety.');
+            }
+
             const condensed = validNotes.map(x => {
                 if (x.duration > 1500) return `${x.note}(very long)`;
                 if (x.duration > 800) return `${x.note}(long)`;
                 return x.note;
             }).join(' ');
 
-            if (validNotes.length < 5) {
-                throw new Error('Not enough distinct musical notes detected. Please sing clearly into the mic.');
-            }
-
-            // Build a frequency summary so the AI can distinguish true scale notes
-            // from brief gamakam transitional pitches
+            // Simple event count for display summary (not weighted).
             const noteCounts = {};
-            const longNoteCounts = {};
-            validNotes.forEach(x => {
-                noteCounts[x.note] = (noteCounts[x.note] || 0) + 1;
-                if (x.duration > 800) longNoteCounts[x.note] = (longNoteCounts[x.note] || 0) + 1;
-            });
+            validNotes.forEach(x => { noteCounts[x.note] = (noteCounts[x.note] || 0) + 1; });
             const freqSummary = Object.entries(noteCounts)
                 .sort((a, b) => b[1] - a[1])
                 .map(([note, count]) => `${note}×${count}${longNoteCounts[note] ? `(${longNoteCounts[note]} long)` : ''}`)
                 .join(', ');
             const condensedWithSummary = `${condensed}\n\nNOTE FREQUENCY SUMMARY (most→least frequent): ${freqSummary}`;
 
-            const res = await identifyRagaWithGroq(condensedWithSummary, model);
+            const res = await identifyRagaWithGroq(condensedWithSummary, model, localCandidates);
             setResult(res);
             setPanelState(STATES.RESULT);
         } catch (err) {

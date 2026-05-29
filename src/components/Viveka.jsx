@@ -278,8 +278,12 @@ export default function Viveka({ onSelectRaga }) {
                 if (!analyserRef.current) return;
                 const hz = detectPitch(analyserRef.current, ctx.sampleRate);
                 if (hz) {
-                    framesRef.current.push(hz);
-                    setCurrentHz(hz);
+                    const prev = framesRef.current[framesRef.current.length - 1];
+                    // Reject octave jumps (> 0.6 octaves) — nearly always a detection artifact.
+                    if (!prev || Math.abs(Math.log2(hz / prev)) < 0.6) {
+                        framesRef.current.push(hz);
+                        setCurrentHz(hz);
+                    }
                 }
             }, FRAME_MS);
 

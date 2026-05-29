@@ -23,8 +23,15 @@ export async function listGroqModels() {
         .map(m => ({ id: m.id, displayName: m.id }));
 }
 
-export async function identifyRagaWithGroq(swaraString, model = 'llama-3.3-70b-versatile') {
+export async function identifyRagaWithGroq(swaraString, model = 'llama-3.3-70b-versatile', localCandidates = []) {
     const ragaList = Object.entries(RAGAS).map(([name, data]) => `${name} | Arohanam: ${data.arohanam.join(' ')} | Avarohanam: ${data.avarohanam.join(' ')}`).join('\n');
+
+    const localHint = localCandidates.length > 0
+        ? `\nLOCAL PATTERN ANALYSIS (pre-scored from note-set matching — use as a strong prior, but override if the swara evidence clearly points elsewhere):\n` +
+          localCandidates.slice(0, 5).map((c, i) =>
+              `${i + 1}. ${c.name} — matched ${c.matchCount} notes, ${c.alienCount} alien, score ${c.score.toFixed(1)}`
+          ).join('\n') + '\n'
+        : '';
 
     const PROMPT = `You are an expert Carnatic classical musician and musicologist with deep knowledge of gamakam ornamentation.
 
@@ -43,7 +50,7 @@ HOW TO IDENTIFY CORRECTLY:
 
 Transcribed swara sequence:
 ${swaraString}
-
+${localHint}
 Reference Raga Dictionary:
 ${ragaList}
 

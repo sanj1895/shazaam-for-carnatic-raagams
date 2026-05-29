@@ -12,12 +12,9 @@ const STATUS = {
   ERROR:     'error',
 };
 
-const FRAME_MS      = 80;
+const FRAME_MS       = 80;
 const MAX_RECORD_SEC = 45;
-
-// 12 chromatic candidate tonics covering one octave from C3 (130.81 Hz).
-// Since getSwaram wraps modulo 12, one octave covers all distinct pitch classes.
-const CANDIDATE_SA_HZ = Array.from({ length: 12 }, (_, i) => 130.81 * Math.pow(2, i / 12));
+const MIN_SCORE      = 4.0; // minimum identifyRaga score before we trust a result
 
 // Western note names used only to display the inferred Sa to the user.
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -26,38 +23,85 @@ function hzToNoteName(hz) {
     return `${NOTE_NAMES[((semi % 12) + 12) % 12]}${Math.floor(semi / 12)}`;
 }
 
-// Group consecutive pitch frames (within ±1 semitone) into stable note events.
-// Requires at least 3 frames (~240 ms) to count — filters out transient ornament slides.
+// Group consecutive pitch frames into stable note events.
+// Compares each new frame to the MODE semitone of the current group (not the last frame)
+// so that natural pitch drift within a sustained note doesn't shatter the group.
+// Requires ≥5 frames (~400 ms) to count — filters slides and brief ornaments.
 function buildNoteEvents(hzFrames) {
-    if (hzFrames.length < 3) return [];
+    if (hzFrames.length < 5) return [];
     const toSemi = (hz) => Math.round(12 * Math.log2(hz / 130.81));
+
+    let group   = [hzFrames[0]];
+    let semiBin = { [toSemi(hzFrames[0])]: 1 }; // running semitone-count for this group
+    let modeSemi = toSemi(hzFrames[0]);
+
+    const getMode = (bin) => {
+        let best = modeSemi, bestVal = 0;
+        for (const [k, v] of Object.entries(bin)) { if (v > bestVal) { bestVal = v; best = +k; } }
+        return best;
+    };
+
     const events = [];
-    let group = [hzFrames[0]];
+    const flush  = () => {
+        if (group.length >= 5) {
+            events.push({
+                hz:         group.reduce((a, b) => a + b, 0) / group.length,
+                durationMs: group.length * FRAME_MS,
+            });
+        }
+    };
 
     for (let i = 1; i < hzFrames.length; i++) {
-        if (Math.abs(toSemi(hzFrames[i]) - toSemi(group[group.length - 1])) <= 1) {
+        const cs = toSemi(hzFrames[i]);
+        if (Math.abs(cs - modeSemi) <= 2) {          // ±2 semitone tolerance handles vibrato
             group.push(hzFrames[i]);
+            semiBin[cs] = (semiBin[cs] || 0) + 1;
+            modeSemi = getMode(semiBin);
         } else {
-            if (group.length >= 3) {
-                events.push({
-                    hz: group.reduce((a, b) => a + b, 0) / group.length,
-                    durationMs: group.length * FRAME_MS,
-                });
-            }
-            group = [hzFrames[i]];
+            flush();
+            group    = [hzFrames[i]];
+            semiBin  = { [cs]: 1 };
+            modeSemi = cs;
         }
     }
-    if (group.length >= 3) {
-        events.push({
-            hz: group.reduce((a, b) => a + b, 0) / group.length,
-            durationMs: group.length * FRAME_MS,
-        });
-    }
+    flush();
     return events;
 }
 
-// Score one candidate tonic against all note events.
-// Longer/more stable notes get higher weight so core swaras dominate.
+// Build a 12-bin pitch-class histogram from stable note events (weighted by duration).
+// This tells us which notes the singer actually held longest.
+function buildPitchHistogram(noteEvents) {
+    const hist = new Array(12).fill(0);
+    for (const { hz, durationMs } of noteEvents) {
+        const bin = ((Math.round(12 * Math.log2(hz / 130.81)) % 12) + 12) % 12;
+        hist[bin] += durationMs;
+    }
+    return hist;
+}
+
+// Derive a targeted set of Sa candidates from the histogram rather than trying all 12 blindly.
+// Top bins could be Sa, Pa (7 above Sa), or Ma1 (5 above Sa) — test all three interpretations
+// for each of the top 4 most-sung pitch classes.
+function inferTonicCandidates(histogram) {
+    const ranked = histogram
+        .map((w, bin) => ({ bin, w }))
+        .filter(x => x.w > 0)
+        .sort((a, b) => b.w - a.w);
+
+    const saSet = new Set();
+    for (let i = 0; i < Math.min(4, ranked.length); i++) {
+        const { bin } = ranked[i];
+        saSet.add(bin);                       // top bin might be Sa itself
+        if (i < 3) {
+            saSet.add((bin - 7 + 12) % 12);  // top bin might be Pa  (Sa = bin-7)
+            saSet.add((bin - 5 + 12) % 12);  // top bin might be Ma1 (Sa = bin-5)
+        }
+    }
+    return Array.from(saSet).map(bin => 130.81 * Math.pow(2, bin / 12));
+}
+
+// Score one candidate tonic. Returns null if fewer than 4 unique swaras are detected,
+// or if identifyRaga finds zero matching ragas (prevents zero-score candidates winning).
 function scoreCandidate(saHz, noteEvents) {
     const noteFreqs = {};
     const swaraList = [];
@@ -71,10 +115,12 @@ function scoreCandidate(saHz, noteEvents) {
     }
 
     const unique = [...new Set(swaraList)];
-    if (unique.length < 3) return null;
+    if (unique.length < 4) return null;                      // not enough variety
 
     const candidates = identifyRaga(unique, noteFreqs);
-    return candidates.length ? { saHz, unique, noteFreqs, candidates } : null;
+    if (!candidates.length || candidates[0].score < 1) return null; // no raga match at all
+
+    return { saHz, unique, noteFreqs, candidates };
 }
 
 // Build the swara evidence string in the format identifyRagaWithGroq expects.
@@ -131,14 +177,17 @@ export default function Viveka({ onSelectRaga }) {
     const runAnalysis = useCallback(async (frames) => {
         const noteEvents = buildNoteEvents(frames);
 
-        if (noteEvents.length < 4) {
-            setErrorMsg('Could not detect enough stable notes. Try singing a full phrase slowly and clearly.');
+        if (noteEvents.length < 6) {
+            setErrorMsg('Could not detect enough stable notes. Try singing a full phrase slowly and clearly — hold each note for at least half a second.');
             setStatus(STATUS.ERROR);
             return;
         }
 
-        // Try all 12 chromatic tonics and rank by best local raga match score.
-        const scored = CANDIDATE_SA_HZ
+        // Derive targeted Sa candidates from the pitch histogram instead of testing all 12 blindly.
+        const histogram      = buildPitchHistogram(noteEvents);
+        const tonicCandidates = inferTonicCandidates(histogram);
+
+        const scored = tonicCandidates
             .map(saHz => scoreCandidate(saHz, noteEvents))
             .filter(Boolean)
             .sort((a, b) => (b.candidates[0]?.score ?? -99) - (a.candidates[0]?.score ?? -99));
@@ -149,7 +198,16 @@ export default function Viveka({ onSelectRaga }) {
             return;
         }
 
-        const best = scored[0];
+        const best      = scored[0];
+        const bestScore = best.candidates[0]?.score ?? -99;
+
+        // Gate: don't send weak evidence to Groq — it will hallucinate plausible-sounding wrong answers.
+        if (bestScore < MIN_SCORE) {
+            setErrorMsg('The phrase didn\'t have enough note variety to identify a raga confidently. Try singing a longer melodic phrase.');
+            setStatus(STATUS.ERROR);
+            return;
+        }
+
         const swaraString = buildSwaraString(noteEvents, best.saHz);
 
         // Check whether two competing tonics score very similarly (ambiguous tonic).

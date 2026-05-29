@@ -80,29 +80,19 @@ function buildPitchHistogram(noteEvents) {
     return hist;
 }
 
-// Derive a targeted set of Sa candidates from the histogram rather than trying all 12 blindly.
-// Top bins could be Sa, Pa (7 above Sa), or Ma1 (5 above Sa) — test all three interpretations
-// for each of the top 4 most-sung pitch classes.
-function inferTonicCandidates(histogram) {
-    const ranked = histogram
+// Return all 12 chromatic tonic candidates sorted by histogram weight (most-sung pitch class first).
+// We evaluate every semitone — accuracy matters more than speed — but the ordering lets the
+// best candidates bubble up so the composite sort below can pick the winner confidently.
+function rankTonicCandidates(histogram) {
+    return histogram
         .map((w, bin) => ({ bin, w }))
-        .filter(x => x.w > 0)
-        .sort((a, b) => b.w - a.w);
-
-    const saSet = new Set();
-    for (let i = 0; i < Math.min(4, ranked.length); i++) {
-        const { bin } = ranked[i];
-        saSet.add(bin);                       // top bin might be Sa itself
-        if (i < 3) {
-            saSet.add((bin - 7 + 12) % 12);  // top bin might be Pa  (Sa = bin-7)
-            saSet.add((bin - 5 + 12) % 12);  // top bin might be Ma1 (Sa = bin-5)
-        }
-    }
-    return Array.from(saSet).map(bin => 130.81 * Math.pow(2, bin / 12));
+        .sort((a, b) => b.w - a.w)
+        .map(({ bin }) => 130.81 * Math.pow(2, bin / 12));
 }
 
-// Score one candidate tonic. Returns null if fewer than 4 unique swaras are detected,
-// or if identifyRaga finds zero matching ragas (prevents zero-score candidates winning).
+// Score one candidate tonic. Returns null only if note variety is too low or no raga matches at all.
+// Returns a composite `tonicScore` covering five dimensions so the caller can rank correctly even
+// when two tonics produce the same identifyRaga score.
 function scoreCandidate(saHz, noteEvents) {
     const noteFreqs = {};
     const swaraList = [];
@@ -116,12 +106,48 @@ function scoreCandidate(saHz, noteEvents) {
     }
 
     const unique = [...new Set(swaraList)];
-    if (unique.length < 4) return null;                      // not enough variety
+    if (unique.length < 4) return null;
 
     const candidates = identifyRaga(unique, noteFreqs);
-    if (!candidates.length || candidates[0].score < 1) return null; // no raga match at all
+    if (!candidates.length || candidates[0].score < 1) return null;
 
-    return { saHz, unique, noteFreqs, candidates };
+    // ── Tonic quality dimensions ──────────────────────────────────────────────
+
+    const totalWeight = Object.values(noteFreqs).reduce((a, b) => a + b, 0);
+
+    // 1. Sa prominence: Sa should appear and carry reasonable duration weight.
+    //    Reward proportionally up to 2.0; penalise lightly if Sa is absent.
+    const saFraction = totalWeight > 0 ? (noteFreqs['Sa'] || 0) / totalWeight : 0;
+    const saBonus    = saFraction > 0.03 ? Math.min(saFraction * 5, 2.0) : -0.5;
+
+    // 2. Pa plausibility: Pa is a stable svara in the vast majority of ragas.
+    const paBonus = (noteFreqs['Pa'] || 0) > 0 ? 0.3 : 0;
+
+    // 3. Landing / nyasa plausibility: the last 3 note events should ideally
+    //    resolve to Sa, Pa, or a Madhyama — the most common nyasa swaras.
+    const tail      = noteEvents.slice(-3);
+    const tailNotes = tail.map(e => getSwaram(e.hz, saHz)).filter(Boolean);
+    const landingBonus = tailNotes.some(
+        s => s === 'Sa' || s === 'Pa' || s === 'Ma1' || s === 'Ma2'
+    ) ? 0.5 : 0;
+
+    // 4. Phrase coherence proxy: fraction of consecutive note pairs that move
+    //    by ≤2 semitones (stepwise) or wrap across the octave (Ni→Sa).
+    //    Carnatic melody is overwhelmingly stepwise; a tonic that makes the
+    //    transitions look like leaps is likely wrong.
+    let stepCount = 0;
+    for (let i = 1; i < noteEvents.length; i++) {
+        const s1  = Math.round(12 * Math.log2(noteEvents[i - 1].hz / saHz));
+        const s2  = Math.round(12 * Math.log2(noteEvents[i].hz     / saHz));
+        const gap = Math.abs(((s2 - s1 + 6) % 12) - 6); // shortest circular distance
+        if (gap <= 2) stepCount++;
+    }
+    const pairs          = Math.max(noteEvents.length - 1, 1);
+    const coherenceBonus = (stepCount / pairs) * 0.8;
+
+    const tonicScore = saBonus + paBonus + landingBonus + coherenceBonus;
+
+    return { saHz, unique, noteFreqs, candidates, tonicScore };
 }
 
 // Build the swara evidence string in the format identifyRagaWithGroq expects.
@@ -184,14 +210,22 @@ export default function Viveka({ onSelectRaga }) {
             return;
         }
 
-        // Derive targeted Sa candidates from the pitch histogram instead of testing all 12 blindly.
-        const histogram      = buildPitchHistogram(noteEvents);
-        const tonicCandidates = inferTonicCandidates(histogram);
+        // Evaluate all 12 chromatic tonic candidates, ordered by histogram weight so the
+        // likeliest candidates are processed first. scoreCandidate returns null for any
+        // tonic that produces fewer than 4 unique swaras or zero raga matches.
+        const histogram       = buildPitchHistogram(noteEvents);
+        const tonicCandidates = rankTonicCandidates(histogram);
 
         const scored = tonicCandidates
             .map(saHz => scoreCandidate(saHz, noteEvents))
             .filter(Boolean)
-            .sort((a, b) => (b.candidates[0]?.score ?? -99) - (a.candidates[0]?.score ?? -99));
+            .sort((a, b) => {
+                // Primary rank: identifyRaga score + tonic quality composite.
+                // tonicScore breaks ties when two tonics produce equally good raga matches.
+                const compA = (a.candidates[0]?.score ?? -99) + a.tonicScore;
+                const compB = (b.candidates[0]?.score ?? -99) + b.tonicScore;
+                return compB - compA;
+            });
 
         if (!scored.length) {
             setErrorMsg('Could not match the phrase to any known raga. Try a longer phrase with more varied notes.');
@@ -200,9 +234,9 @@ export default function Viveka({ onSelectRaga }) {
         }
 
         const best      = scored[0];
-        const bestScore = best.candidates[0]?.score ?? -99;
+        const bestScore = best.candidates[0]?.score ?? -99; // raw raga score, not composite
 
-        // Gate: don't send weak evidence to Groq — it will hallucinate plausible-sounding wrong answers.
+        // Gate on raw raga score — tonic quality bonus must not let weak raga evidence through.
         if (bestScore < MIN_SCORE) {
             setErrorMsg('The phrase didn\'t have enough note variety to identify a raga confidently. Try singing a longer melodic phrase.');
             setStatus(STATUS.ERROR);
@@ -211,10 +245,11 @@ export default function Viveka({ onSelectRaga }) {
 
         const swaraString = buildSwaraString(noteEvents, best.saHz);
 
-        // Check whether two competing tonics score very similarly (ambiguous tonic).
-        const topScore    = best.candidates[0]?.score ?? 0;
-        const secondScore = scored[1]?.candidates[0]?.score ?? 0;
-        const tonicAmbiguous = topScore > 0 && secondScore / topScore > 0.88;
+        // Ambiguity check uses the composite score so that a tonic with better Sa/landing
+        // behaviour beats one that is numerically close on raga score alone.
+        const compTop    = (best.candidates[0]?.score ?? 0) + best.tonicScore;
+        const compSecond = scored[1] ? (scored[1].candidates[0]?.score ?? 0) + scored[1].tonicScore : 0;
+        const tonicAmbiguous = compTop > 0 && compSecond / compTop > 0.88;
 
         let groqResult = null;
         try {

@@ -237,6 +237,9 @@ export const RAGAS = {
         compositions: ['Mamava Pattabhirama  ·  Mysore Vasudevachar', 'Bhogeendra Sayana  ·  Dikshitar'],
         color:        'maroon',
         video:        "https://www.youtube.com/watch?v=3QFlAd0xS-U",
+        nyasaSwaras:      ['Sa', 'Pa', 'Ga2', 'Ma1'],
+        importantNotes:   ['Ga2', 'Da1', 'Ni2'],
+        signaturePhrases: [['Da1', 'Pa', 'Ma1', 'Ga2'], ['Ni2', 'Da1', 'Pa', 'Ma1']],
     },
     'Keeravani': {
         arohanam:     ['Sa', 'Ri2', 'Ga2', 'Ma1', 'Pa', 'Da1', 'Ni3', 'Sa'],
@@ -257,6 +260,9 @@ export const RAGAS = {
         compositions: ['Ksheerasagara Shayana  ·  Tyagaraja', 'Sri Navagraha Kirtanam  ·  Dikshitar'],
         color:        'maroon',
         video:        "https://www.youtube.com/watch?v=WmhVmWEas3s",
+        nyasaSwaras:      ['Sa', 'Pa', 'Ga2', 'Ri2'],
+        importantNotes:   ['Ga2', 'Da2', 'Ni2'],
+        signaturePhrases: [['Ga2', 'Ma1', 'Pa', 'Da2'], ['Ni2', 'Da2', 'Pa', 'Ma1', 'Ga2']],
     },
     'Gowrimanohari': {
         arohanam:     ['Sa', 'Ri2', 'Ga2', 'Ma1', 'Pa', 'Da2', 'Ni3', 'Sa'],
@@ -781,6 +787,14 @@ export const RAGAS = {
         compositions: ['Vatapi Ganapatim  ·  Dikshitar'],
         color:        'navy',
         video:        "https://www.youtube.com/watch?v=4dUKUNXJ7SY",
+        // No Ma or Da anywhere — this is one of the defining identifiers of Hamsadhwani
+        nyasaSwaras:      ['Sa', 'Pa', 'Ga3'],
+        importantNotes:   ['Ga3', 'Ni3'],
+        signaturePhrases: [
+            ['Pa', 'Ni3', 'Sa'],    // bright ascending close
+            ['Ni3', 'Pa', 'Ga3'],   // vakra descent
+            ['Sa', 'Ri2', 'Ga3', 'Pa'],
+        ],
     },
     'Bilahari': {
         arohanam:     ['Sa', 'Ri2', 'Ga3', 'Pa', 'Da2', 'Sa'],
@@ -841,6 +855,15 @@ export const RAGAS = {
         compositions: ['Viriboni  ·  Pachimiriam Adiyappaiah'],
         color:        'navy',
         video:        "https://www.youtube.com/watch?v=TgCPwgDYf4k",
+        // Bhashanga: uses Da2 in ascent (outside parent Natabhairavi's Da1)
+        borrowedNotes:    ['Da2'],
+        nyasaSwaras:      ['Sa', 'Ma1', 'Ga2', 'Pa'],
+        importantNotes:   ['Ga2', 'Ni2', 'Da1'],
+        signaturePhrases: [
+            ['Da2', 'Pa', 'Ma1'],   // ascending Da2 → Pa → Ma1: the bhashanga gesture
+            ['Da1', 'Pa', 'Ma1', 'Ga2'], // descending phrase with Da1
+            ['Ga2', 'Ri2', 'Sa'],   // signature closing descent
+        ],
     },
     'Kamboji': {
         arohanam:     ['Sa', 'Ri2', 'Ga3', 'Ma1', 'Pa', 'Da2', 'Sa'],
@@ -851,6 +874,13 @@ export const RAGAS = {
         compositions: ['Sarasamulanu  ·  Tyagaraja'],
         color:        'teal',
         video:        "https://www.youtube.com/watch?v=UiacgqG4ZTg",
+        nyasaSwaras:      ['Sa', 'Pa', 'Ma1', 'Ga3'],
+        importantNotes:   ['Ga3', 'Ni2', 'Da2'],
+        signaturePhrases: [
+            ['Ni2', 'Da2', 'Pa'],   // descending Ni2 → Pa: the defining vakra touch
+            ['Pa', 'Da2', 'Sa'],    // ascending leap to Sa
+            ['Ma1', 'Ga3', 'Ri2', 'Sa'],
+        ],
     },
     'Todi': {
         arohanam:     ['Sa', 'Ri1', 'Ga2', 'Ma1', 'Pa', 'Da1', 'Ni2', 'Sa'],
@@ -861,6 +891,14 @@ export const RAGAS = {
         compositions: ['Ninnukori  ·  Tyagaraja', 'Brovavamma  ·  Tyagaraja'],
         color:        'maroon',
         video:        "https://www.youtube.com/watch?v=nRvU1E3d9Sc",
+        // Ri1 + Ga2 together is one of the heaviest two-note combinations in the system
+        nyasaSwaras:      ['Sa', 'Pa', 'Ma1', 'Ga2'],
+        importantNotes:   ['Ri1', 'Ga2', 'Da1'],
+        signaturePhrases: [
+            ['Ri1', 'Ga2', 'Ma1'],  // the Todi kernel: consecutive flat notes
+            ['Ga2', 'Ri1', 'Sa'],   // descending close
+            ['Da1', 'Pa', 'Ma1', 'Ga2', 'Ri1'],
+        ],
     },
     'Saveri': {
         arohanam:     ['Sa', 'Ri1', 'Ma1', 'Pa', 'Da1', 'Sa'],
@@ -881,6 +919,14 @@ export const RAGAS = {
         compositions: ['Alamelumanga  ·  Tyagaraja'],
         color:        'teal',
         video:        "https://www.youtube.com/shorts/u3jlboz5CwY",
+        // No Ri or Pa — these absences are musically defining
+        nyasaSwaras:      ['Sa', 'Ma1', 'Ga2', 'Ni2'],
+        importantNotes:   ['Ga2', 'Da1', 'Ni2'],
+        signaturePhrases: [
+            ['Ga2', 'Ma1', 'Da1'],  // the core three-note shape
+            ['Ni2', 'Da1', 'Ma1', 'Ga2', 'Sa'],
+            ['Sa', 'Ga2', 'Ma1'],
+        ],
     },
     'Madhyamavati': {
         arohanam:     ['Sa', 'Ri2', 'Ma1', 'Pa', 'Ni2', 'Sa'],
@@ -921,6 +967,17 @@ export const RAGAS = {
         compositions: ['Jagadodharana  ·  Purandara Dasa', 'Meevalla Guna Dosha  ·  Tyagaraja'],
         color:        'maroon',
         video:        "https://www.youtube.com/shorts/GoJ21Nf1n6E",
+        // Bhashanga: Ni3 is borrowed — not present in parent Kharaharapriya
+        borrowedNotes:    ['Ni3'],
+        // All four of these must appear in a real Kapi performance
+        importantNotes:   ['Ri2', 'Ni3', 'Ni2', 'Ga2'],
+        nyasaSwaras:      ['Sa', 'Pa', 'Ma1', 'Ri2', 'Ga2'],
+        signaturePhrases: [
+            ['Ni2', 'Da2', 'Ni2'],       // vakra turn — the single most identifying Kapi gesture
+            ['Pa', 'Ni3', 'Sa'],          // ascending cadence with bhashanga Ni3
+            ['Ma1', 'Ga2', 'Ri2', 'Sa'], // descending resolution phrase
+            ['Ga2', 'Ma1', 'Pa'],         // ascending inner phrase
+        ],
     },
     'Durga': {
         arohanam:     ['Sa', 'Ri2', 'Ma1', 'Pa', 'Da2', 'Sa'],
@@ -970,20 +1027,45 @@ const matchesNote = (detected, ragaNoteSet) => {
     return alt ? ragaNoteSet.has(alt) : false;
 };
 
+// Semitone intervals (relative to Sa) for phrase-matching comparisons.
+// Using semitones lets us compare enharmonic names correctly (Da3 == Ni2, etc.).
+const SEMI_OF = {
+    Sa: 0, Ri1: 1, Ri2: 2, Ga1: 2, Ri3: 3, Ga2: 3, Ga3: 4,
+    Ma1: 5, Ma2: 6, Pa: 7, Da1: 8, Da2: 9, Ni1: 9,
+    Da3: 10, Ni2: 10, Ni3: 11,
+};
+
+// Returns true if `phrase` appears as a contiguous run anywhere in `seq`.
+// Comparison is semitone-based so enharmonic swara names match correctly.
+const containsPhrase = (seq, phrase) => {
+    const pSemis = phrase.map(n => SEMI_OF[n] ?? -1);
+    for (let i = 0; i <= seq.length - phrase.length; i++) {
+        if (pSemis.every((ps, j) => (SEMI_OF[seq[i + j]] ?? -2) === ps)) return true;
+    }
+    return false;
+};
+
 // noteFrequencies: optional map of {note: count} from the rolling pitch history.
-export const identifyRaga = (detectedSwarams, noteFrequencies = {}) => {
+// noteSequence:   optional ordered array of swara strings (one per stable note event),
+//                 used for signature-phrase matching.
+export const identifyRaga = (detectedSwarams, noteFrequencies = {}, noteSequence = []) => {
     const uniqueNotes = new Set(detectedSwarams);
     let candidates = [];
 
     for (const [name, data] of Object.entries(RAGAS)) {
-        const cleanArohanam = data.arohanam.filter(n => n !== '|' && n !== '||' && n !== ',');
+        const cleanArohanam   = data.arohanam.filter(n => n !== '|' && n !== '||' && n !== ',');
         const cleanAvarohanam = data.avarohanam.filter(n => n !== '|' && n !== '||' && n !== ',');
-        
+
         const ragaNotes = new Set([...cleanArohanam, ...cleanAvarohanam]);
+
+        // Bhashanga ragas borrow notes outside their parent scale.
+        // Include them in ragaNotes so they don't inflate the alien count.
+        if (data.borrowedNotes) {
+            data.borrowedNotes.forEach(n => ragaNotes.add(n));
+        }
 
         let matchCount = 0;
         let alienCount = 0;
-
         uniqueNotes.forEach(note => {
             if (matchesNote(note, ragaNotes)) matchCount++;
             else alienCount++;
@@ -991,11 +1073,10 @@ export const identifyRaga = (detectedSwarams, noteFrequencies = {}) => {
 
         if (matchCount < 4 || alienCount > 2) continue;
 
-        // Arohanam prominence: are the arohanam notes sung more than average?
+        // ── Arohanam prominence ───────────────────────────────────────────────
         // Janya ragas with skip notes score higher when those skipped notes are rare.
-        const arohanamSet = new Set(cleanArohanam);
+        const arohanamSet  = new Set(cleanArohanam);
         const arohanamNotes = cleanArohanam.filter(n => n !== 'Sa');
-        // Sum frequency for arohanam notes, checking enharmonic equivalents too
         const getFreq = (n) => (noteFrequencies[n] || 0) + (noteFrequencies[ENHARMONIC[n]] || 0);
         const avgArohanamFreq = arohanamNotes.length
             ? arohanamNotes.reduce((s, n) => s + getFreq(n), 0) / arohanamNotes.length
@@ -1004,19 +1085,59 @@ export const identifyRaga = (detectedSwarams, noteFrequencies = {}) => {
             .reduce((s, n) => s + getFreq(n), 0) / Math.max(uniqueNotes.size - 1, 1);
         const arohanamProminence = avgDetectedFreq > 0 ? avgArohanamFreq / avgDetectedFreq : 1;
 
-        // Vakra penalty: notes that appear in avarohanam but NOT arohanam should be rare.
-        // If they're sung frequently, this raga is a worse fit (those notes should only appear in descent).
+        // ── Vakra penalty (strengthened 0.3 → 0.5) ───────────────────────────
+        // Avarohanam-only notes sung frequently suggest the wrong raga.
         const inArohanam = (n) => arohanamSet.has(n) || (ENHARMONIC[n] && arohanamSet.has(ENHARMONIC[n]));
-        const vakraNotes = cleanAvarohanam.filter(n => !inArohanam(n) && n !== 'Sa');
+        const vakraNotes   = cleanAvarohanam.filter(n => !inArohanam(n) && n !== 'Sa');
         const avgVakraFreq = vakraNotes.length
             ? vakraNotes.reduce((s, n) => s + getFreq(n), 0) / vakraNotes.length
             : 0;
         const vakraPenalty = avgArohanamFreq > 0 ? avgVakraFreq / avgArohanamFreq : 0;
 
-        const coverage = matchCount / ragaNotes.size;
-        const score = (matchCount * 1.5) - (alienCount * 2) + (arohanamProminence * 0.6) - (vakraPenalty * 0.3);
+        // ── Signature phrase bonus ────────────────────────────────────────────
+        // Each matched characteristic phrase adds 1.5 to the score.
+        // This is the primary mechanism for distinguishing same-scale ragas (e.g. Kapi vs Kharaharapriya).
+        let phraseBonus  = 0;
+        let phraseMatches = 0;
+        if (noteSequence.length >= 2 && data.signaturePhrases) {
+            for (const phrase of data.signaturePhrases) {
+                if (containsPhrase(noteSequence, phrase)) {
+                    phraseBonus += 1.5;
+                    phraseMatches++;
+                }
+            }
+        }
 
-        candidates.push({ name, ...data, score, coverage, matchCount, alienCount });
+        // ── Important-note presence bonus ─────────────────────────────────────
+        // All designated important notes should be present; partial credit for partial presence.
+        let importantBonus = 0;
+        if (data.importantNotes?.length) {
+            const present = data.importantNotes.filter(n =>
+                uniqueNotes.has(n) || (ENHARMONIC[n] && uniqueNotes.has(ENHARMONIC[n]))
+            );
+            importantBonus = (present.length / data.importantNotes.length) * 1.0;
+        }
+
+        // ── Nyasa note presence bonus ─────────────────────────────────────────
+        // Resting notes for this raga should appear; partial credit for partial presence.
+        let nyasaBonus = 0;
+        if (data.nyasaSwaras?.length) {
+            const present = data.nyasaSwaras.filter(n =>
+                uniqueNotes.has(n) || (ENHARMONIC[n] && uniqueNotes.has(ENHARMONIC[n]))
+            );
+            nyasaBonus = (present.length / data.nyasaSwaras.length) * 0.5;
+        }
+
+        const coverage = matchCount / ragaNotes.size;
+        const score    = (matchCount * 1.5)
+            - (alienCount  * 2)
+            + (arohanamProminence * 0.6)
+            - (vakraPenalty      * 0.5)
+            + phraseBonus
+            + importantBonus
+            + nyasaBonus;
+
+        candidates.push({ name, ...data, score, coverage, matchCount, alienCount, phraseMatches });
     }
 
     candidates.sort((a, b) => b.score - a.score);

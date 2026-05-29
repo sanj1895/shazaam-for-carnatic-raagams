@@ -27,10 +27,13 @@ export async function identifyRagaWithGroq(swaraString, model = 'llama-3.3-70b-v
     const ragaList = Object.entries(RAGAS).map(([name, data]) => `${name} | Arohanam: ${data.arohanam.join(' ')} | Avarohanam: ${data.avarohanam.join(' ')}`).join('\n');
 
     const localHint = localCandidates.length > 0
-        ? `\nLOCAL PATTERN ANALYSIS (pre-scored from note-set matching — use as a strong prior, but override if the swara evidence clearly points elsewhere):\n` +
-          localCandidates.slice(0, 5).map((c, i) =>
-              `${i + 1}. ${c.name} — matched ${c.matchCount} notes, ${c.alienCount} alien, score ${c.score.toFixed(1)}`
-          ).join('\n') + '\n'
+        ? `\nLOCAL PATTERN ANALYSIS — pre-scored from deterministic note-set + phrase matching.\n` +
+          `Treat this as a strong prior. Your job is to RANK these candidates using the swara evidence, ` +
+          `not to generate a fresh list from scratch. Override only if the swara evidence clearly contradicts.\n` +
+          localCandidates.slice(0, 5).map((c, i) => {
+              const phraseNote = c.phraseMatches > 0 ? `, ${c.phraseMatches} signature phrase(s) matched` : '';
+              return `${i + 1}. ${c.name} — ${c.matchCount} scale notes matched, ${c.alienCount} alien${phraseNote}, local score ${c.score.toFixed(1)}`;
+          }).join('\n') + '\n'
         : '';
 
     const PROMPT = `You are an expert Carnatic classical musician and musicologist with deep knowledge of gamakam ornamentation.

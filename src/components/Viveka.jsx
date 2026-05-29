@@ -94,12 +94,14 @@ function rankTonicCandidates(histogram) {
 // Returns a composite `tonicScore` covering five dimensions so the caller can rank correctly even
 // when two tonics produce the same identifyRaga score.
 function scoreCandidate(saHz, noteEvents) {
-    const noteFreqs = {};
-    const swaraList = [];
+    const noteFreqs   = {};
+    const swaraList   = [];
+    const noteSequence = []; // one swara per stable note event, in order (for phrase matching)
 
     for (const { hz, durationMs } of noteEvents) {
         const s = getSwaram(hz, saHz);
         if (!s) continue;
+        noteSequence.push(s);
         const w = Math.max(1, Math.round(durationMs / 200));
         for (let i = 0; i < w; i++) swaraList.push(s);
         noteFreqs[s] = (noteFreqs[s] || 0) + w;
@@ -108,7 +110,7 @@ function scoreCandidate(saHz, noteEvents) {
     const unique = [...new Set(swaraList)];
     if (unique.length < 4) return null;
 
-    const candidates = identifyRaga(unique, noteFreqs);
+    const candidates = identifyRaga(unique, noteFreqs, noteSequence);
     if (!candidates.length || candidates[0].score < 1) return null;
 
     // ── Tonic quality dimensions ──────────────────────────────────────────────
@@ -251,25 +253,70 @@ export default function Viveka({ onSelectRaga }) {
         const compSecond = scored[1] ? (scored[1].candidates[0]?.score ?? 0) + scored[1].tonicScore : 0;
         const tonicAmbiguous = compTop > 0 && compSecond / compTop > 0.88;
 
+        // ── Multi-factor confidence model ────────────────────────────────────
+        // Points accumulate across: raga score, separation, alien notes, phrase hits, tonic quality.
+        const top        = best.candidates[0];
+        const second     = scored[1]?.candidates[0];
+        const ragaSep    = second ? (top.score ?? 0) - (second.score ?? 0) : (top.score ?? 0);
+        const phraseHits = top.phraseMatches ?? 0;
+        const confPoints = [
+            (top.score  ?? 0) >= 9 ? 2 : (top.score ?? 0) >= 6 ? 1 : 0,
+            ragaSep >= 3           ? 2 : ragaSep >= 1.5         ? 1 : 0,
+            (top.alienCount ?? 99) === 0 ? 1 : 0,
+            phraseHits >= 2        ? 3 : phraseHits >= 1        ? 2 : 0,
+            best.tonicScore >= 2   ? 1 : 0,
+        ].reduce((a, b) => a + b, 0);
+        const localConfidence = confPoints >= 7 ? 'high' : confPoints >= 3 ? 'medium' : 'low';
+
+        // ── Result type ──────────────────────────────────────────────────────
+        // 'likely'   — clear winner (phrase evidence or large separation)
+        // 'ambiguous' — two candidates nearly tied
+        // 'closest'  — best local guess but low confidence
+        const resultType    = phraseHits >= 1 || ragaSep >= 3 ? 'likely'
+                            : ragaSep < 1.5 && scored.length > 1 ? 'ambiguous'
+                            : 'closest';
+        const ambiguousWith = resultType === 'ambiguous' ? second?.name : null;
+
         let groqResult = null;
         try {
-            groqResult = await identifyRagaWithGroq(swaraString);
+            // Pass the local shortlist so Groq ranks candidates rather than guessing blind.
+            groqResult = await identifyRagaWithGroq(swaraString, 'llama-3.3-70b-versatile', best.candidates.slice(0, 5));
         } catch (_) {
             // Network/API failure — fall back to local scoring only.
         }
 
         const topMatches = groqResult?.top_matches ?? best.candidates.slice(0, 3).map(c => ({
             raagam:     c.name,
-            confidence: c.score > 8 ? 'high' : c.score > 4 ? 'medium' : 'low',
-            reasoning:  `Matched ${c.matchCount} of the scale notes; ${c.alienCount} note(s) fell outside the raga.`,
+            confidence: localConfidence,
+            reasoning:  [
+                `Matched ${c.matchCount} of the raga's ${c.ragaNotes?.size ?? '?'} scale notes`,
+                c.alienCount === 0 ? 'no alien notes' : `${c.alienCount} alien note(s)`,
+                c.phraseMatches > 0 ? `${c.phraseMatches} signature phrase(s) found` : '',
+            ].filter(Boolean).join(' · '),
             prayogams:  [],
         }));
 
         setResults({
-            matches: topMatches,
-            saHz: best.saHz,
+            matches:      topMatches,
+            saHz:         best.saHz,
             tonicAmbiguous,
-            localOnly: !groqResult,
+            localOnly:    !groqResult,
+            resultType,
+            ambiguousWith,
+            localConfidence, // single source-of-truth confidence for the top match
+            // Developer-facing: full intermediate analysis attached for debugging
+            _debug: {
+                noteEventCount: noteEvents.length,
+                tonicHz:        best.saHz,
+                tonicScore:     best.tonicScore,
+                topLocal:       best.candidates.slice(0, 5).map(c => ({
+                    name:    c.name,
+                    score:   +c.score.toFixed(2),
+                    matchCount:   c.matchCount,
+                    alienCount:   c.alienCount,
+                    phraseMatches: c.phraseMatches,
+                })),
+            },
         });
         setStatus(STATUS.RESULTS);
     }, []);
@@ -396,9 +443,17 @@ export default function Viveka({ onSelectRaga }) {
         return 'text-c-cream-dark bg-white/5 border-c-border';
     };
 
-    const topConf = results?.matches?.[0]?.confidence;
-    const guidanceMsg = results?.tonicAmbiguous
+    // Surface debug info to console so developers can inspect intermediate analysis
+    // without needing a dedicated UI panel.
+    if (results?._debug) console.debug('[Viveka analysis]', results._debug);
+
+    const topConf = results?.matches?.[0]?.confidence ?? results?.localConfidence;
+    const guidanceMsg = results?.resultType === 'ambiguous'
+        ? `Ambiguous between ${results.matches[0]?.raagam} and ${results.ambiguousWith} — sing the characteristic phrase more clearly`
+        : results?.tonicAmbiguous
         ? 'The tonic (Sa) was ambiguous — try starting or ending a phrase cleanly on Sa'
+        : results?.resultType === 'closest'
+        ? 'Low confidence — showing closest match. Sing a longer phrase with the raga\'s characteristic movement'
         : topConf === 'low'
         ? 'For a sharper result, sing a longer phrase with more note variety and movement'
         : null;

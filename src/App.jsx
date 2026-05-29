@@ -2034,7 +2034,7 @@ function App() {
 
                                                     <div className="hidden md:block mt-4 lg:mt-0 lg:pl-4">
                                                         <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/14 bg-[radial-gradient(circle_at_54%_18%,rgba(122,54,23,0.18),transparent_26%),linear-gradient(180deg,rgba(20,8,4,0.9),rgba(10,4,2,0.96))] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.04)] overflow-hidden">
-                                                            <div className="grid md:grid-cols-[1.05fr_0.95fr]">
+                                                            <div className="grid md:grid-cols-3">
                                                                 <div
                                                                     className="workspace-preview-panel group min-h-[212px] sm:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('transcribe')}
@@ -2125,6 +2125,7 @@ function App() {
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('viveka')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'viveka' ? null : current)}
                                                                 >
+                                                                    <div className="absolute right-0 top-[18px] bottom-[18px] w-px bg-c-gold/10 hidden md:block" />
                                                                     <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                                         <span>Viveka</span>
                                                                         <span className="inline-flex items-center gap-1 rounded-full px-2 py-1" style={{
@@ -2144,7 +2145,7 @@ function App() {
                                                                             </span>
                                                                         </div>
 
-                                                                        <div className="mt-4 flex items-center gap-4">
+                                                                        <div className="mt-4 flex flex-col items-center gap-4">
                                                                             <div className="relative flex h-[108px] w-[108px] items-center justify-center">
                                                                                 <div className="workspace-hover-reveal workspace-hover-anim absolute inset-0 rounded-full border border-c-gold/10" style={{ animation: 'talaBeatPulse 2.8s ease-out infinite' }} />
                                                                                 <div className="absolute inset-[10px] rounded-full border border-c-gold/16" />
@@ -2169,7 +2170,7 @@ function App() {
                                                                                 </div>
                                                                             </div>
 
-                                                                            <div className="min-w-0 flex-1">
+                                                                            <div className="w-full">
                                                                                 <div className="text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(214,156,68,0.55)' }}>
                                                                                     Top matches
                                                                                 </div>
@@ -2214,6 +2215,75 @@ function App() {
                                                                                 />
                                                                                 vakra contour
                                                                             </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    className="workspace-preview-panel group min-h-[212px] sm:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    onMouseEnter={() => setHoveredWorkspacePreview('gurukul')}
+                                                                    onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'gurukul' ? null : current)}
+                                                                >
+                                                                    <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                        <span>Gurukul</span>
+                                                                        <span className="relative" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                            <span className="inline-flex items-center gap-1 rounded-full px-2 py-1 transition-all duration-300" style={{ background: gurukulPreviewMenuOpen ? 'rgba(255,214,134,0.05)' : 'transparent' }}>
+                                                                                <span>My Repertoire</span>
+                                                                                <span style={{ display: 'inline-block', transform: gurukulPreviewMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 200ms ease' }}>▾</span>
+                                                                            </span>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="workspace-preview-shell workspace-preview-float mt-5 rounded-[16px] px-3 py-3">
+                                                                        <div className="flex items-center justify-between">
+                                                                            <span className="text-[9px] uppercase tracking-[0.18em]" style={{ color: 'rgba(214,156,68,0.55)' }}>This Week</span>
+                                                                            <span className="text-[9px]" style={{ color: 'rgba(214,156,68,0.35)' }}>3 pieces</span>
+                                                                        </div>
+                                                                        <div className="mt-3 space-y-2">
+                                                                            {GURUKUL_PRACTICE_LOG.map(({ name, type, tala, progress, days }, i) => {
+                                                                                const active = gurukulPreviewCategoryIndex % 3 === i;
+                                                                                return (
+                                                                                <div
+                                                                                    key={name}
+                                                                                    className="rounded-[12px] px-3 py-2.5 transition-all duration-300"
+                                                                                    style={{
+                                                                                        background: active ? 'rgba(146,96,33,0.16)' : 'rgba(255,245,225,0.02)',
+                                                                                        border: active ? '1px solid rgba(199,139,34,0.18)' : '1px solid rgba(199,139,34,0.06)',
+                                                                                        boxShadow: active ? '0 0 18px rgba(199,139,34,0.07)' : 'none',
+                                                                                        transitionDelay: `${i * 45}ms`,
+                                                                                    }}
+                                                                                >
+                                                                                    <div className="flex items-center justify-between gap-2">
+                                                                                        <div className="min-w-0">
+                                                                                            <div className="truncate text-[11px]" style={{ color: 'rgba(243,234,214,0.92)' }}>{name}</div>
+                                                                                            <div className="mt-0.5 text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.52)' }}>{type} · {tala}</div>
+                                                                                        </div>
+                                                                                        <div className="shrink-0 text-right">
+                                                                                            <div className="text-[10px]" style={{ color: active ? 'rgba(214,156,68,0.88)' : 'rgba(243,234,214,0.45)', transition: 'color 300ms ease' }}>{progress}%</div>
+                                                                                            <div className="text-[8px] uppercase tracking-[0.12em]" style={{ color: 'rgba(214,156,68,0.32)' }}>{days}d</div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div className="mt-2 h-[2px] overflow-hidden rounded-full" style={{ background: 'rgba(199,139,34,0.1)' }}>
+                                                                                        <div
+                                                                                            className="h-full rounded-full transition-all"
+                                                                                            style={{
+                                                                                                width: gurukulPreviewActive ? `${progress}%` : '8%',
+                                                                                                background: active ? 'linear-gradient(90deg,rgba(214,156,68,0.88),rgba(214,156,68,0.44))' : 'rgba(214,156,68,0.36)',
+                                                                                                transitionDuration: '700ms',
+                                                                                                transitionDelay: `${i * 120 + 80}ms`,
+                                                                                            }}
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                        <div className="mt-3 flex items-center justify-between">
+                                                                            <span className="text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.28)' }}>Active streaks</span>
+                                                                            <div className="flex gap-1">
+                                                                                {[14, 7, 3].map((d) => (
+                                                                                    <div key={d} className="h-1.5 w-1.5 rounded-full" style={{ background: 'rgba(214,156,68,0.32)' }} />
+                                                                                ))}
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>

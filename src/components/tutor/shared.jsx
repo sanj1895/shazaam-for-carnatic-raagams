@@ -334,6 +334,28 @@ const playContourTone = (contour, duration = 0.7, options = {}) => {
     }
 };
 
+const playTick = (ctx, time, volume = 1) => {
+    const oscBody = ctx.createOscillator();
+    const gainBody = ctx.createGain();
+    oscBody.type = 'sine';
+    oscBody.frequency.setValueAtTime(600, time);
+    oscBody.frequency.exponentialRampToValueAtTime(300, time + 0.06);
+    gainBody.gain.setValueAtTime(0.5 * volume, time);
+    gainBody.gain.exponentialRampToValueAtTime(0.001, time + 0.06);
+    oscBody.connect(gainBody);
+    gainBody.connect(ctx.destination);
+    const oscClick = ctx.createOscillator();
+    const gainClick = ctx.createGain();
+    oscClick.type = 'sine';
+    oscClick.frequency.setValueAtTime(1600, time);
+    gainClick.gain.setValueAtTime(0.35 * volume, time);
+    gainClick.gain.exponentialRampToValueAtTime(0.001, time + 0.015);
+    oscClick.connect(gainClick);
+    gainClick.connect(ctx.destination);
+    oscBody.start(time); oscBody.stop(time + 0.06);
+    oscClick.start(time); oscClick.stop(time + 0.015);
+};
+
 const waitRhythmicUnits = async (units, delayMs, signal, tala) => {
     if (signal?.aborted) return;
     // Sub-beat notes (duration < 1): sleep without firing intermediate ticks —

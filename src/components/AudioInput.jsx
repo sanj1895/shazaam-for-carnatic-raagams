@@ -70,8 +70,19 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
 
     const startAudio = async () => {
         try {
+            // Create and kick off resume synchronously during the user gesture so
+            // iOS Safari allows it — we'll await the promise after getUserMedia.
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const resumePromise = audioCtx.state === 'suspended' ? audioCtx.resume() : Promise.resolve();
+
+            // Disable echo cancellation / noise suppression for cleaner singing input.
+            const mediaStream = await navigator.mediaDevices.getUserMedia({
+                audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+            });
+
+            // Ensure context is running before ml5 touches it.
+            await resumePromise;
+
             setStream(mediaStream);
             onStart?.();
             startPitchDetection(audioCtx, mediaStream);

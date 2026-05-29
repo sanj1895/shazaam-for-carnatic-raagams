@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
-import { detectPitch } from '../utils/audioUtils';
+import { detectPitch } from '../utils/audioUtils'; // kept as autocorrelation fallback
 import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
+/* global ml5 */
 import { identifyRagaWithGroq } from '../utils/groqIdentify';
 import SketchyRule from './SketchyRule';
 
@@ -264,33 +265,67 @@ export default function Viveka({ onSelectRaga }) {
             });
             streamRef.current = stream;
 
-            const source = ctx.createMediaStreamSource(stream);
-            const analyser = ctx.createAnalyser();
-            analyser.fftSize = 2048;
-            source.connect(analyser);
-            analyserRef.current = analyser;
-
             statusRef.current = STATUS.RECORDING;
             setStatus(STATUS.RECORDING);
 
-            // Poll pitch every 80 ms.
-            pitchTimer.current = setInterval(() => {
-                if (!analyserRef.current) return;
-                const hz = detectPitch(analyserRef.current, ctx.sampleRate);
-                if (hz) {
-                    const prev = framesRef.current[framesRef.current.length - 1];
-                    // Reject octave jumps (> 0.6 octaves) — nearly always a detection artifact.
-                    if (!prev || Math.abs(Math.log2(hz / prev)) < 0.6) {
-                        framesRef.current.push(hz);
-                        setCurrentHz(hz);
-                    }
+            // Shared acceptor: octave-jump filter before pushing any Hz reading.
+            const onHz = (hz) => {
+                const prev = framesRef.current[framesRef.current.length - 1];
+                if (!prev || Math.abs(Math.log2(hz / prev)) < 0.6) {
+                    framesRef.current.push(hz);
+                    setCurrentHz(hz);
                 }
-            }, FRAME_MS);
+            };
 
-            countTimer.current = setInterval(() => {
-                setElapsed(e => e + 1);
-            }, 1000);
+            // Autocorrelation fallback — used only when ml5 model fails to load.
+            const startAutocorrelation = () => {
+                const source  = ctx.createMediaStreamSource(stream);
+                const analyser = ctx.createAnalyser();
+                analyser.fftSize = 2048;
+                source.connect(analyser);
+                analyserRef.current = analyser;
+                pitchTimer.current = setInterval(() => {
+                    if (!analyserRef.current) return;
+                    const hz = detectPitch(analyserRef.current, ctx.sampleRate);
+                    if (hz) onHz(hz);
+                }, FRAME_MS);
+            };
 
+            // Primary: ml5 CREPE — same higher-quality model used by the Ālaap AI panel.
+            // 3-frame stability buffer eliminates slide/transient frames before adding to the pool.
+            const pitchBuf = [];
+            const CREPE_URL = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
+            ml5.pitchDetection(CREPE_URL, ctx, stream, (err, pitchModel) => {
+                if (statusRef.current !== STATUS.RECORDING) return; // stopped before model loaded
+                if (err || !pitchModel) { startAutocorrelation(); return; }
+
+                const loop = () => {
+                    if (statusRef.current !== STATUS.RECORDING) return;
+                    pitchModel.getPitch((_, hz) => {
+                        if (hz && statusRef.current === STATUS.RECORDING) {
+                            const last = pitchBuf[pitchBuf.length - 1];
+                            if (last && Math.abs(Math.log2(hz / last)) >= 0.6) {
+                                pitchBuf.length = 0; // octave jump — reset stability window
+                            } else {
+                                pitchBuf.push(hz);
+                                if (pitchBuf.length > 3) pitchBuf.shift();
+                                if (pitchBuf.length === 3) {
+                                    // All 3 frames within ±1 semitone → stable note, accept it.
+                                    const ref = Math.round(12 * Math.log2(pitchBuf[0] / 130.81));
+                                    const stable = pitchBuf.every(
+                                        f => Math.abs(Math.round(12 * Math.log2(f / 130.81)) - ref) <= 1
+                                    );
+                                    if (stable) onHz(hz);
+                                }
+                            }
+                        }
+                        if (statusRef.current === STATUS.RECORDING) loop();
+                    });
+                };
+                loop();
+            });
+
+            countTimer.current    = setInterval(() => setElapsed(e => e + 1), 1000);
             autoStopTimer.current = setTimeout(stopAndAnalyze, MAX_RECORD_SEC * 1000);
         } catch (err) {
             setErrorMsg(

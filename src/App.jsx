@@ -2118,6 +2118,20 @@ function App() {
                                                                             </div>
                                                                         </div>
                                                                     </div>
+                                                                    <div
+                                                                        className="mt-3 rounded-[12px] border px-3 py-2.5"
+                                                                        style={{
+                                                                            borderColor: 'rgba(199,139,34,0.08)',
+                                                                            background: 'rgba(255,245,225,0.02)',
+                                                                        }}
+                                                                    >
+                                                                        <div className="text-[9px] uppercase tracking-[0.16em]" style={{ color: 'rgba(214,156,68,0.52)' }}>
+                                                                            Best for
+                                                                        </div>
+                                                                        <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
+                                                                            Capture a phrase, sangati, or melodic idea and lay it out in swaras against tala.
+                                                                        </p>
+                                                                    </div>
                                                                 </div>
 
                                                                 <div
@@ -2217,6 +2231,20 @@ function App() {
                                                                             </span>
                                                                         </div>
                                                                     </div>
+                                                                    <div
+                                                                        className="mt-3 rounded-[12px] border px-3 py-2.5"
+                                                                        style={{
+                                                                            borderColor: 'rgba(199,139,34,0.08)',
+                                                                            background: 'rgba(255,245,225,0.02)',
+                                                                        }}
+                                                                    >
+                                                                        <div className="text-[9px] uppercase tracking-[0.16em]" style={{ color: 'rgba(214,156,68,0.52)' }}>
+                                                                            Best for
+                                                                        </div>
+                                                                        <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
+                                                                            Let the app listen to a phrase and suggest the most likely ragam or closest musical match.
+                                                                        </p>
+                                                                    </div>
                                                                 </div>
 
                                                                 <div
@@ -2285,6 +2313,20 @@ function App() {
                                                                                 ))}
                                                                             </div>
                                                                         </div>
+                                                                    </div>
+                                                                    <div
+                                                                        className="mt-3 rounded-[12px] border px-3 py-2.5"
+                                                                        style={{
+                                                                            borderColor: 'rgba(199,139,34,0.08)',
+                                                                            background: 'rgba(255,245,225,0.02)',
+                                                                        }}
+                                                                    >
+                                                                        <div className="text-[9px] uppercase tracking-[0.16em]" style={{ color: 'rgba(214,156,68,0.52)' }}>
+                                                                            Best for
+                                                                        </div>
+                                                                        <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
+                                                                            Guided learning, repertoire structure, and a clearer practice path when you want more than one-off tools.
+                                                                        </p>
                                                                     </div>
                                                                 </div>
                                                             </div>

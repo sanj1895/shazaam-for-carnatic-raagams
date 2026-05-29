@@ -11,6 +11,7 @@ import SingBackChallenge from './components/SingBackChallenge';
 import ShruthiBox from './components/ShruthiBox';
 import Talam from './components/Talam';
 import Tutor from './components/Tutor';
+import Viveka from './components/Viveka';
 import { getSwaram, identifyRaga, RAGAS } from './utils/ragaLogic';
 import RagaDetail from './components/RagaDetail';
 import OnboardingTour from './components/OnboardingTour';
@@ -47,6 +48,7 @@ const renderTabIcon = (id, className = "w-5 h-5") => {
 const FEATURES = [
     { id: 'tutor',     label: 'Gurukul',      desc: 'Classical vocal academy & scale flow', symbol: '📿',  mobileSymbol: '📿', level: 'beginner', highlight: true },
     { id: 'listen',    label: 'Dhwani',       desc: 'Sing a melody & identify the raga',       symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
+    { id: 'viveka',    label: 'Viveka',       desc: 'Discern the raga from your voice',         symbol: '◎',  mobileSymbol: '◎', level: 'intermediate', highlight: true },
     { id: 'transcribe',label: 'Transcribe',   desc: 'Transcribe your sangatis against tala',    symbol: '✍︎', mobileSymbol: '✍︎', level: 'intermediate', highlight: true },
     { id: 'library',   label: 'Raga Kosha',   desc: 'Explore & practice every raga scale',    symbol: '◈',  mobileSymbol: '◈', level: 'all', highlight: true },
     { id: 'sadhana',   label: 'Sadhana',      desc: 'Your recommended daily practice path',    symbol: '🧘‍♀️', mobileSymbol: '🧘‍♀️', level: 'start' },
@@ -77,12 +79,12 @@ const APP_MODES = {
 
 const MODE_FEATURE_ORDER = {
     beginner: ['tutor', 'sadhana', 'shruthi', 'talam', 'keyboard', 'singback'],
-    musician: ['listen', 'transcribe', 'library', 'tutor', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam'],
+    musician: ['listen', 'viveka', 'transcribe', 'library', 'tutor', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam'],
 };
 
 const MODE_ALLOWED_VIEWS = {
     beginner: new Set(['home', 'tutor', 'sadhana', 'shruthi', 'talam', 'keyboard', 'singback']),
-    musician: new Set(['home', 'tutor', 'listen', 'transcribe', 'library', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam']),
+    musician: new Set(['home', 'tutor', 'listen', 'viveka', 'transcribe', 'library', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam']),
 };
 
 function loadAppMode() {
@@ -2003,8 +2005,9 @@ function App() {
 
                                                         <div className="mt-6 sm:mt-10 grid grid-cols-2 gap-x-4 gap-y-5 max-w-[220px] text-c-gold">
                                                             {[
+                                                                { id: 'viveka',     label: 'Viveka' },
                                                                 { id: 'transcribe', label: 'Transcribe' },
-                                                                { id: 'tutor', label: 'Gurukul' },
+                                                                { id: 'tutor',      label: 'Gurukul' },
                                                             ].map(({ id, label }) => (
                                                                 <button
                                                                     key={id}
@@ -2361,6 +2364,11 @@ function App() {
                             )}
                         </div>
                     </main>
+                )}
+
+                {/* ══ VIVEKA ══ */}
+                {view === 'viveka' && (
+                    <Viveka onSelectRaga={(r) => setSelectedRaga(r)} />
                 )}
 
                 {view === 'library' && (

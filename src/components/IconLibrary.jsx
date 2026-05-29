@@ -360,6 +360,18 @@ export const TranscribeIcon = ({ className = "w-5 h-5" }) => (
     </svg>
 );
 
+export const VivekaIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="2" fill="#C8941F" stroke="none" />
+        <circle cx="12" cy="12" r="5" strokeOpacity="0.5" />
+        <circle cx="12" cy="12" r="9" strokeOpacity="0.25" fill="currentColor" fillOpacity="0.04" />
+        <line x1="12" y1="3" x2="12" y2="6" strokeOpacity="0.35" />
+        <line x1="12" y1="18" x2="12" y2="21" strokeOpacity="0.35" />
+        <line x1="3" y1="12" x2="6" y2="12" strokeOpacity="0.35" />
+        <line x1="18" y1="12" x2="21" y2="12" strokeOpacity="0.35" />
+    </svg>
+);
+
 // Generic Curated Icon component mapping symbols/IDs to beautiful SVGs
 export const CuratedIcon = ({ icon, className = "w-5 h-5" }) => {
     // Nav / Feature Tab keys
@@ -370,6 +382,7 @@ export const CuratedIcon = ({ icon, className = "w-5 h-5" }) => {
     if (icon === 'keyboard') return <KeyboardIcon className={className} />;
     if (icon === 'singback') return <TargetIcon className={className} />;
     if (icon === 'listen') return <DhwaniIcon className={className} />;
+    if (icon === 'viveka') return <VivekaIcon className={className} />;
     if (icon === 'transcribe') return <TranscribeIcon className={className} />;
     if (icon === 'library') return <KoshaIcon className={className} />;
     if (icon === 'talam') return <TalamIcon className={className} />;

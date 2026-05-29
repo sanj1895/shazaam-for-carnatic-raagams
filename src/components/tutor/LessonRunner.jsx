@@ -644,6 +644,10 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, octaveMode = 'a
 
     const runAtTempo = useCallback((mult) => {
         abortRef.current?.abort();
+        // Touch AudioContext synchronously during the user gesture so browsers
+        // (especially iOS Safari) allow resume before the async boundary.
+        const ctx = getAudioCtx();
+        if (ctx.state === 'suspended') ctx.resume().catch(() => {});
         const ctrl = new AbortController();
         abortRef.current = ctrl;
         setFinished(false);
@@ -659,7 +663,8 @@ function ExerciseListenSequence({ swaras, sa, instruction, tala, octaveMode = 'a
 
     const run = useCallback(() => runAtTempo(tempoMult), [runAtTempo, tempoMult]);
 
-    useEffect(() => { runAtTempo(1); return () => abortRef.current?.abort(); }, []);
+    // Do NOT auto-play on mount — AudioContext is suspended until first user gesture.
+    useEffect(() => { return () => abortRef.current?.abort(); }, []);
 
     const handleNoteClick = (s, i) => {
         stopPlayback();

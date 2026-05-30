@@ -2278,7 +2278,15 @@ function App() {
                                                                                         transition: 'box-shadow 320ms ease',
                                                                                     }}
                                                                                 />
-                                                                                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[8px] uppercase tracking-[0.18em]" style={{ color: 'rgba(214,156,68,0.55)' }}>
+                                                                                <div
+                                                                                    className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full px-2 py-1 text-[8px] uppercase tracking-[0.18em]"
+                                                                                    style={{
+                                                                                        color: 'rgba(214,156,68,0.72)',
+                                                                                        background: 'rgba(12,5,2,0.92)',
+                                                                                        border: '1px solid rgba(199,139,34,0.12)',
+                                                                                        whiteSpace: 'nowrap',
+                                                                                    }}
+                                                                                >
                                                                                     {practiceDemoPitchState === 'match' ? 'Sa found' : 'Sa mapping'}
                                                                                 </div>
                                                                             </div>

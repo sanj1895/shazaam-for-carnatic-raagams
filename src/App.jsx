@@ -1681,15 +1681,15 @@ function App() {
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('avabodha')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'avabodha' ? null : current)}
                                                                 >
-                                                                    <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                    <div className="flex items-center justify-between gap-3 text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                                         <span>Avabodha</span>
-                                                                        <span className="text-[8px] font-mono tracking-widest" style={{ color: 'rgba(214,156,68,0.45)' }}>Dhwani · Viveka</span>
+                                                                        <span className="ml-2 text-[8px] font-mono tracking-widest" style={{ color: 'rgba(214,156,68,0.45)' }}>Dhwani · Viveka</span>
                                                                     </div>
                                                                     <div className="mt-5 flex flex-col items-center gap-4">
                                                                         <div className="flex items-center gap-6">
                                                                             {/* Dhwani — real-time */}
                                                                             <div className="flex flex-col items-center gap-3">
-                                                                                <div className="relative h-[62px] w-[62px]">
+                                                                                <div className="relative h-[62px] w-[62px] overflow-hidden rounded-full">
                                                                                     <div className="absolute inset-0 rounded-full border border-c-gold/12" />
                                                                                     <div
                                                                                         className="absolute inset-[10px] rounded-full border transition-all duration-300"
@@ -1699,11 +1699,11 @@ function App() {
                                                                                         }}
                                                                                     />
                                                                                     <div
-                                                                                        className="avabodha-sweep absolute inset-[8px] rounded-full"
+                                                                                        className="avabodha-sweep absolute inset-[11px] rounded-full"
                                                                                         style={{
-                                                                                            background: 'conic-gradient(from 0deg, transparent 0deg 300deg, rgba(247,214,134,0.55) 330deg 346deg, transparent 360deg)',
-                                                                                            maskImage: 'radial-gradient(circle, transparent 57%, black 60%, black 71%, transparent 74%)',
-                                                                                            WebkitMaskImage: 'radial-gradient(circle, transparent 57%, black 60%, black 71%, transparent 74%)',
+                                                                                            background: 'conic-gradient(from 0deg, transparent 0deg 304deg, rgba(247,214,134,0.48) 332deg 344deg, transparent 360deg)',
+                                                                                            maskImage: 'radial-gradient(circle, transparent 59%, black 62%, black 69%, transparent 72%)',
+                                                                                            WebkitMaskImage: 'radial-gradient(circle, transparent 59%, black 62%, black 69%, transparent 72%)',
                                                                                         }}
                                                                                     />
                                                                                     <div className="absolute left-1/2 top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(93,43,18,0.96))] flex items-center justify-center">
@@ -1724,12 +1724,12 @@ function App() {
 
                                                                             {/* Viveka — phrase */}
                                                                             <div className="flex flex-col items-center gap-3">
-                                                                                <div className="relative flex h-[62px] w-[62px] items-center justify-center">
+                                                                                <div className="relative flex h-[62px] w-[62px] items-center justify-center overflow-hidden rounded-full">
                                                                                     <div className="absolute inset-0 rounded-full border border-c-gold/12" />
                                                                                     <div
-                                                                                        className="avabodha-sweep absolute inset-[10px] rounded-full border border-c-gold/20"
+                                                                                        className="avabodha-sweep absolute inset-[12px] rounded-full border border-c-gold/20"
                                                                                         style={{
-                                                                                            background: 'conic-gradient(from 0deg, rgba(247,214,134,0) 0deg 220deg, rgba(247,214,134,0.22) 260deg 300deg, rgba(247,214,134,0) 335deg 360deg)',
+                                                                                            background: 'conic-gradient(from 0deg, rgba(247,214,134,0) 0deg 228deg, rgba(247,214,134,0.18) 266deg 296deg, rgba(247,214,134,0) 332deg 360deg)',
                                                                                             boxShadow: avabodhaPreviewActive ? 'inset 0 0 10px rgba(214,156,68,0.08)' : 'none',
                                                                                         }}
                                                                                     />
@@ -2310,31 +2310,6 @@ function App() {
                                                                         </div>
                                                                         <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
                                                                             Capture a phrase, sangati, or melodic idea and lay it out in swaras against tala.
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div
-                                                                    className="workspace-preview-panel group min-h-[212px] sm:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
-                                                                    onMouseEnter={() => setHoveredWorkspacePreview('viveka')}
-                                                                    onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'viveka' ? null : current)}
-                                                                >
-                                                                    <div className="absolute right-0 top-[18px] bottom-[18px] w-px bg-c-gold/10 hidden md:block" />
-                                                                    <div className="text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
-                                                                        <span>Viveka</span>
-                                                                    </div>
-                                                                    <div
-                                                                        className="mt-3 rounded-[12px] border px-3 py-2.5"
-                                                                        style={{
-                                                                            borderColor: 'rgba(199,139,34,0.08)',
-                                                                            background: 'rgba(255,245,225,0.02)',
-                                                                        }}
-                                                                    >
-                                                                        <div className="text-[9px] uppercase tracking-[0.16em]" style={{ color: 'rgba(214,156,68,0.52)' }}>
-                                                                            Best for
-                                                                        </div>
-                                                                        <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
-                                                                            Singing a full phrase and letting Viveka infer your tonic automatically, then find the closest raga match by phrase contour.
                                                                         </p>
                                                                     </div>
                                                                 </div>

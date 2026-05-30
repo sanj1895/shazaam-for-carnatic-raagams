@@ -1475,6 +1475,20 @@ function App() {
                                                                             <span>Drone</span>
                                                                         </div>
                                                                     </div>
+                                                                    <div
+                                                                        className="mt-3 rounded-[12px] border px-3 py-2.5"
+                                                                        style={{
+                                                                            borderColor: 'rgba(199,139,34,0.08)',
+                                                                            background: 'rgba(255,245,225,0.02)',
+                                                                        }}
+                                                                    >
+                                                                        <div className="text-[9px] uppercase tracking-[0.16em]" style={{ color: 'rgba(214,156,68,0.52)' }}>
+                                                                            Best for
+                                                                        </div>
+                                                                        <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
+                                                                            Locking in your Sa, warming up the voice, and keeping a steady drone through practice.
+                                                                        </p>
+                                                                    </div>
                                                                 </div>
 
                                                                 <div
@@ -1523,6 +1537,20 @@ function App() {
                                                                             <div className="absolute left-1/2 top-1/2 h-[30px] w-[30px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(110,56,23,0.92))]" />
                                                                         </div>
                                                                     </div>
+                                                                    <div
+                                                                        className="mt-3 rounded-[12px] border px-3 py-2.5"
+                                                                        style={{
+                                                                            borderColor: 'rgba(199,139,34,0.08)',
+                                                                            background: 'rgba(255,245,225,0.02)',
+                                                                        }}
+                                                                    >
+                                                                        <div className="text-[9px] uppercase tracking-[0.16em]" style={{ color: 'rgba(214,156,68,0.52)' }}>
+                                                                            Best for
+                                                                        </div>
+                                                                        <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
+                                                                            Keeping tala steadily while you sing, practice exercises, or work through compositions.
+                                                                        </p>
+                                                                    </div>
                                                                 </div>
 
                                                                 <div
@@ -1567,6 +1595,20 @@ function App() {
                                                                                 );
                                                                             })}
                                                                         </div>
+                                                                    </div>
+                                                                    <div
+                                                                        className="mt-3 rounded-[12px] border px-3 py-2.5"
+                                                                        style={{
+                                                                            borderColor: 'rgba(199,139,34,0.08)',
+                                                                            background: 'rgba(255,245,225,0.02)',
+                                                                        }}
+                                                                    >
+                                                                        <div className="text-[9px] uppercase tracking-[0.16em]" style={{ color: 'rgba(214,156,68,0.52)' }}>
+                                                                            Best for
+                                                                        </div>
+                                                                        <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
+                                                                            Hearing swaras one by one, understanding scale shape, and internalizing intervals visually.
+                                                                        </p>
                                                                     </div>
                                                                 </div>
 
@@ -1621,6 +1663,20 @@ function App() {
                                                                                 ? (practiceDemoPitchState === 'match' ? `Detected: ${practiceDemoDetectedSwara}` : `Pitch: ${practiceDemoDetectedSwara}`)
                                                                                 : 'Mic inactive'}
                                                                         </div>
+                                                                    </div>
+                                                                    <div
+                                                                        className="mt-3 rounded-[12px] border px-3 py-2.5"
+                                                                        style={{
+                                                                            borderColor: 'rgba(199,139,34,0.08)',
+                                                                            background: 'rgba(255,245,225,0.02)',
+                                                                        }}
+                                                                    >
+                                                                        <div className="text-[9px] uppercase tracking-[0.16em]" style={{ color: 'rgba(214,156,68,0.52)' }}>
+                                                                            Best for
+                                                                        </div>
+                                                                        <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
+                                                                            Singing live and seeing how your pitch behaves in real time while the app listens along.
+                                                                        </p>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -1743,6 +1799,20 @@ function App() {
                                                                         <div className="mt-2 text-center text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.32)' }}>
                                                                             485 ragas searchable
                                                                         </div>
+                                                                    </div>
+                                                                    <div
+                                                                        className="mt-3 rounded-[12px] border px-3 py-2.5"
+                                                                        style={{
+                                                                            borderColor: 'rgba(199,139,34,0.08)',
+                                                                            background: 'rgba(255,245,225,0.02)',
+                                                                        }}
+                                                                    >
+                                                                        <div className="text-[9px] uppercase tracking-[0.16em]" style={{ color: 'rgba(214,156,68,0.52)' }}>
+                                                                            Best for
+                                                                        </div>
+                                                                        <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
+                                                                            Looking up a ragam’s scale, color, and identity before you start practicing or exploring it.
+                                                                        </p>
                                                                     </div>
                                                                 </div>
 
@@ -1876,6 +1946,20 @@ function App() {
                                                                             ))}
                                                                         </div>
                                                                     </div>
+                                                                    <div
+                                                                        className="mt-3 rounded-[12px] border px-3 py-2.5"
+                                                                        style={{
+                                                                            borderColor: 'rgba(199,139,34,0.08)',
+                                                                            background: 'rgba(255,245,225,0.02)',
+                                                                        }}
+                                                                    >
+                                                                        <div className="text-[9px] uppercase tracking-[0.16em]" style={{ color: 'rgba(214,156,68,0.52)' }}>
+                                                                            Best for
+                                                                        </div>
+                                                                        <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
+                                                                            Studying the full 72-parent system and seeing how ragas are organized at the broadest level.
+                                                                        </p>
+                                                                    </div>
                                                                 </div>
 
                                                                 <div
@@ -1984,6 +2068,20 @@ function App() {
                                                                                 />
                                                                             </span>
                                                                         </div>
+                                                                    </div>
+                                                                    <div
+                                                                        className="mt-3 rounded-[12px] border px-3 py-2.5"
+                                                                        style={{
+                                                                            borderColor: 'rgba(199,139,34,0.08)',
+                                                                            background: 'rgba(255,245,225,0.02)',
+                                                                        }}
+                                                                    >
+                                                                        <div className="text-[9px] uppercase tracking-[0.16em]" style={{ color: 'rgba(214,156,68,0.52)' }}>
+                                                                            Best for
+                                                                        </div>
+                                                                        <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
+                                                                            Discovering how shifting Sa transforms one raga into another and reveals deeper relationships.
+                                                                        </p>
                                                                     </div>
                                                                 </div>
                                                             </div>

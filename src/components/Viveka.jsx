@@ -443,6 +443,7 @@ export default function Viveka({ onSelectRaga }) {
             countTimer.current    = setInterval(() => setElapsed(e => e + 1), 1000);
             autoStopTimer.current = setTimeout(stopAndAnalyze, MAX_RECORD_SEC * 1000);
         } catch (err) {
+            cleanup();
             setErrorMsg(
                 err.name === 'NotAllowedError'
                     ? 'Microphone access denied — please allow mic access and try again.'

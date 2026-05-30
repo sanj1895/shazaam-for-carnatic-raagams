@@ -1,16 +1,93 @@
-# React + Vite
+# Ālāpana — Carnatic Music Learning App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Google Cloud Rapid Agent Hackathon · MongoDB Track**
 
-Currently, two official plugins are available:
+Ālāpana is a web app for learning Carnatic classical music. It combines structured lessons, raga identification, and an AI practice coach that remembers your progress across sessions using MongoDB.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## What It Does
 
-## React Compiler
+- **Viveka** — sing any phrase and Ālāpana identifies the raga using CREPE pitch detection + Gemini 2.5 Flash
+- **Ālāpana Coach** — AI practice coach (Gemini 2.5 Flash via Vertex AI Agent Engine) that reads your MongoDB practice history and recommends what to work on next
+- **Gurukul** — structured Carnatic curriculum: varisais, alankarams, gitams
+- **Raga Kosha** — browse 90+ ragas with scales, mood, and curated performances
+- **Dhwani** — AI raga identification panel with swara transcription
+- **Shruthi / Talam / Keyboard** — practice tools
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Architecture
 
-## Expanding the ESLint configuration
+```
+Browser (React + Vite)
+    │
+    ├── /api/coach ──────────────► Vertex AI Agent Engine (Google Cloud Agent Builder)
+    │                                      │
+    │                                 ADK Agent (Gemini 2.5 Flash)
+    │                                      │
+    │                              MongoDB MCP Server ◄──► MongoDB Atlas
+    │
+    └── /api/gemini-identify ──► Gemini 2.5 Flash (Vertex AI)
+              ▲
+         Raga identification prompts with local candidate shortlist
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| AI model | Gemini 2.5 Flash (Vertex AI) |
+| Agent orchestration | Google ADK → Vertex AI Agent Engine (Agent Builder) |
+| Partner integration | MongoDB MCP server (`mongodb-mcp-server`) |
+| Practice memory | MongoDB Atlas (`alapana.sessions` collection) |
+| Pitch detection | ml5 CREPE (browser) |
+| Frontend | React + Vite + Tailwind CSS |
+| Hosting | Vercel |
+
+## Setup
+
+### Prerequisites
+- Node.js 18+, Python 3.11+
+- Google Cloud project with Vertex AI API enabled
+- MongoDB Atlas cluster
+
+### 1. Install dependencies
+
+```bash
+npm install
+python3 -m venv .venv && source .venv/bin/activate
+pip install google-adk mcp
+```
+
+### 2. Environment variables
+
+```bash
+cp .env.example .env
+# Fill in MONGODB_URI, GOOGLE_CLOUD_PROJECT, GOOGLE_CREDENTIALS_B64
+```
+
+### 3. Deploy the agent to Vertex AI Agent Engine
+
+```bash
+pip install "google-cloud-aiplatform[adk]>=1.87.0"
+python agent/deploy_to_agent_engine.py
+# Copy the printed AGENT_ENGINE_RESOURCE value into .env
+```
+
+### 4. Run locally
+
+```bash
+npm run dev       # frontend on http://localhost:5173
+adk web agent     # ADK dev UI on http://localhost:8000 (optional)
+```
+
+## How the MongoDB Integration Works
+
+When a student sends a message to the coach:
+
+1. The ADK agent calls **MongoDB MCP `find`** to retrieve practice history
+2. **Gemini 2.5 Flash** reasons over the history and gives a directed recommendation
+3. After each session, the agent calls **MongoDB MCP `insertOne`** to record progress
+
+Schema: `{ userId, timestamp, tool, raga, durationMinutes, notes }`
+
+## License
+
+MIT — see [LICENSE](LICENSE)

@@ -1,39 +1,29 @@
+/**
+ * Raga identification via Gemini 2.5 Flash (Vertex AI).
+ *
+ * All prompts and evidence-building logic is preserved from the original
+ * implementation. Only the transport layer has changed: Gemini replaces
+ * the previous LLM backend.
+ */
 import { RAGAS } from './ragaLogic';
 
-// Prefer Gemini (Google Cloud) for raga identification; fall back to Groq if unavailable.
-const IDENTIFY_ENDPOINTS = ['/api/gemini-identify', '/api/groq'];
-
-export async function groqChatCompletion(payload) {
-    let lastErr;
-    for (const endpoint of IDENTIFY_ENDPOINTS) {
-        try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-            if (response.ok) return response.json();
-            const err = await response.json().catch(() => ({}));
-            lastErr = new Error(err.error?.message || err.error || `API error ${response.status} from ${endpoint}`);
-        } catch (e) {
-            lastErr = e;
-        }
+export async function geminiChat(payload) {
+    const response = await fetch('/api/gemini-identify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error?.message || err.error || `Gemini API error ${response.status}`);
     }
-    throw lastErr || new Error('All raga identification endpoints failed.');
+    return response.json();
 }
 
-export async function listGroqModels() {
-    const response = await fetch('/api/groq');
-    if (!response.ok) return [];
-    const data = await response.json();
-    return data.data
-        .filter(m => m.id.includes('llama') || m.id.includes('mixtral') || m.id.includes('gemma'))
-        .filter(m => !m.id.includes('tool') && !m.id.includes('guard')) // filter out tool-use or guard models
-        .map(m => ({ id: m.id, displayName: m.id }));
-}
-
-export async function identifyRagaWithGroq(swaraString, model = 'llama-3.3-70b-versatile', localCandidates = []) {
-    const ragaList = Object.entries(RAGAS).map(([name, data]) => `${name} | Arohanam: ${data.arohanam.join(' ')} | Avarohanam: ${data.avarohanam.join(' ')}`).join('\n');
+export async function identifyRagaWithAI(swaraString, localCandidates = []) {
+    const ragaList = Object.entries(RAGAS)
+        .map(([name, data]) => `${name} | Arohanam: ${data.arohanam.join(' ')} | Avarohanam: ${data.avarohanam.join(' ')}`)
+        .join('\n');
 
     const localHint = localCandidates.length > 0
         ? `\nLOCAL PATTERN ANALYSIS — pre-scored from deterministic note-set + phrase matching.\n` +
@@ -85,19 +75,17 @@ Respond ONLY with valid JSON exactly matching this format:
   ]
 }`;
 
-    const data = await groqChatCompletion({
-        model: model,
-        messages: [{ role: "user", content: PROMPT }],
+    const data = await geminiChat({
+        messages: [{ role: 'user', content: PROMPT }],
         temperature: 0.1,
-        response_format: { type: "json_object" }
     });
     const text = data.choices[0]?.message?.content || '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Could not parse Groq JSON response');
+    if (!jsonMatch) throw new Error('Could not parse Gemini JSON response');
     return JSON.parse(jsonMatch[0]);
 }
 
-export async function askGroqAboutRaga(ragaName, model = 'llama-3.3-70b-versatile') {
+export async function askAboutRaga(ragaName) {
     const ragaRef = Object.entries(RAGAS)
         .map(([name, data]) => `${name}: Arohanam=[${data.arohanam.join(', ')}] Avarohanam=[${data.avarohanam.join(', ')}] Parent=${data.type}`)
         .join('\n');
@@ -126,21 +114,18 @@ Respond ONLY with valid JSON:
   "compositions": ["<only compositions you are 100% certain belong to this raga>"]
 }`;
 
-    const data = await groqChatCompletion({
-        model: model,
-        messages: [{ role: "user", content: PROMPT }],
+    const data = await geminiChat({
+        messages: [{ role: 'user', content: PROMPT }],
         temperature: 0.1,
-        response_format: { type: "json_object" }
     });
     const text = data.choices[0]?.message?.content || '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Could not parse Groq JSON response');
+    if (!jsonMatch) throw new Error('Could not parse Gemini JSON response');
     const result = JSON.parse(jsonMatch[0]);
-    // Add custom fields so it renders beautifully in our RagaDetail component
     return {
         ...result,
         type: `AI Search · ${result.parent}`,
         color: 'teal',
-        video: null
+        video: null,
     };
 }

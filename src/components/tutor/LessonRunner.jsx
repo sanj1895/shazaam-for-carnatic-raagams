@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { getSwaram } from '../../utils/ragaLogic';
-import { groqChatCompletion } from '../../utils/groqIdentify';
+import { geminiChat as groqChatCompletion } from '../../utils/ragaIdentify';
 import { CuratedIcon } from '../IconLibrary';
 import {
     detectPitch as detectPitchAudio,

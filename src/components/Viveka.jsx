@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { detectPitch } from '../utils/audioUtils'; // kept as autocorrelation fallback
 import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
 /* global ml5 */
-import { identifyRagaWithGroq } from '../utils/groqIdentify';
+import { identifyRagaWithAI } from '../utils/ragaIdentify';
 import SketchyRule from './SketchyRule';
 
 const STATUS = {
@@ -280,7 +280,7 @@ export default function Viveka({ onSelectRaga }) {
         let groqResult = null;
         try {
             // Pass the local shortlist so Groq ranks candidates rather than guessing blind.
-            groqResult = await identifyRagaWithGroq(swaraString, 'llama-3.3-70b-versatile', best.candidates.slice(0, 5));
+            groqResult = await identifyRagaWithAI(swaraString, best.candidates.slice(0, 5));
         } catch (_) {
             // Network/API failure — fall back to local scoring only.
         }

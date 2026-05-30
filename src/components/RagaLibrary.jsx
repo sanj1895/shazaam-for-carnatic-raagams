@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { RAGAS, toSargam } from '../utils/ragaLogic';
-import { askGroqAboutRaga } from '../utils/groqIdentify';
+import { askAboutRaga } from '../utils/ragaIdentify';
 import RagaDetail from './RagaDetail';
 
 // Mini veena for library cards
@@ -167,7 +167,7 @@ const RagaLibrary = ({ onSelectRaga }) => {
         setAiLoading(true);
         setAiError(null);
         try {
-            const raga = await askGroqAboutRaga(searchQuery);
+            const raga = await askAboutRaga(searchQuery);
             if (raga.error) {
                 throw new Error(raga.error);
             }

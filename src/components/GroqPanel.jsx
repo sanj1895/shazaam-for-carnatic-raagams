@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { identifyRagaWithGroq, listGroqModels } from '../utils/groqIdentify';
+import { useState, useRef } from 'react';
+import { identifyRagaWithAI } from '../utils/ragaIdentify';
 import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
 
 /* global ml5 */
@@ -9,49 +9,16 @@ const MIN_SCORE   = 4.0;
 const STATES = { IDLE: 'idle', RECORDING: 'recording', PROCESSING: 'processing', RESULT: 'result', ERROR: 'error' };
 
 export default function GroqPanel({ saFrequency }) {
-    const [model, setModel]           = useState(() => localStorage.getItem('groq_model') || 'llama3-8b-8192');
     const [panelState, setPanelState] = useState(STATES.IDLE);
     const [countdown, setCountdown]   = useState(RECORD_SECS);
     const [result, setResult]         = useState(null);
     const [errorMsg, setErrorMsg]     = useState('');
-    const [availableModels, setAvailableModels] = useState([]);
-    const [loadingModels, setLoadingModels] = useState(false);
     const [currentSwaraStream, setCurrentSwaraStream] = useState([]);
 
     const swaraStreamRef = useRef([]);
     const timerRef    = useRef(null);
     const streamRef   = useRef(null);
     const recordingFlag = useRef(false);
-
-    const changeModel = (m) => {
-        localStorage.setItem('groq_model', m);
-        setModel(m);
-    };
-
-    const fetchModels = async () => {
-        setLoadingModels(true);
-        setErrorMsg('');
-        try {
-            const models = await listGroqModels();
-            if (models.length === 0) {
-                setLoadingModels(false);
-                return;
-            }
-            setAvailableModels(models);
-            const currentSelected = localStorage.getItem('groq_model') || model;
-            if (!models.find(m => m.id === currentSelected)) {
-                setModel(models[0].id);
-                localStorage.setItem('groq_model', models[0].id);
-            }
-        } catch (e) {
-            console.error('Error fetching Groq models:', e);
-        }
-        setLoadingModels(false);
-    };
-
-    useEffect(() => {
-        fetchModels();
-    }, []);
 
     const startRecording = async () => {
         if (!saFrequency) {
@@ -182,7 +149,7 @@ export default function GroqPanel({ saFrequency }) {
                 .join(', ');
             const condensedWithSummary = `${condensed}\n\nNOTE FREQUENCY SUMMARY (most→least frequent): ${freqSummary}`;
 
-            const res = await identifyRagaWithGroq(condensedWithSummary, model, localCandidates);
+            const res = await identifyRagaWithAI(condensedWithSummary, localCandidates);
             setResult(res);
             setPanelState(STATES.RESULT);
         } catch (err) {
@@ -217,20 +184,7 @@ export default function GroqPanel({ saFrequency }) {
                     <span className="text-c-gold/40 text-xs">✦</span>
                     <h2 className="font-playfair text-sm text-c-cream-dim italic">Ālaap AI Analysis</h2>
                 </div>
-                <select
-                    value={model}
-                    onChange={e => changeModel(e.target.value)}
-                    disabled={panelState === STATES.RECORDING || panelState === STATES.PROCESSING || loadingModels}
-                    className="text-[10px] bg-c-bg border border-c-border text-c-cream-dark rounded px-2 py-1 outline-none focus:border-c-gold/40 disabled:opacity-40 cursor-pointer w-44 truncate"
-                >
-                    {availableModels.length > 0 ? (
-                        availableModels.map(m => (
-                            <option key={m.id} value={m.id}>{m.displayName}</option>
-                        ))
-                    ) : (
-                        <option value={model}>{loadingModels ? 'Loading…' : model}</option>
-                    )}
-                </select>
+                <span className="text-[10px] text-c-cream-dark font-mono opacity-50">Gemini 2.5 Flash</span>
             </div>
 
             <div className="p-6 flex flex-col items-center gap-5">

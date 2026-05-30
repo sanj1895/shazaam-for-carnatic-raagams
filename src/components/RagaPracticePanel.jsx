@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { getAudioCtx, detectPitch, startDrone, SWARA_SEMITONE, playNote, getOctaveSequence, playSequence } from '../utils/audioUtils';
 import { getSwaram, toSargam } from '../utils/ragaLogic';
-import { groqChatCompletion } from '../utils/groqIdentify';
+import { geminiChat as groqChatCompletion } from '../utils/ragaIdentify';
 
 const RECORD_SECS = 20;
 

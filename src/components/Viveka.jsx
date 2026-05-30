@@ -221,6 +221,7 @@ export default function Viveka({ onSelectRaga }) {
     const statusRef     = useRef(STATUS.IDLE); // mirror for use inside closures
     const inputModeRef  = useRef(MODE.RECORD);
     const fileInputRef  = useRef(null);
+    const audioCtxRef   = useRef(null);
 
     useEffect(() => {
         inputModeRef.current = inputMode;
@@ -233,6 +234,11 @@ export default function Viveka({ onSelectRaga }) {
         streamRef.current?.getTracks().forEach(t => t.stop());
         streamRef.current = null;
         analyserRef.current = null;
+        const ctx = audioCtxRef.current;
+        audioCtxRef.current = null;
+        if (ctx && ctx.state !== 'closed') {
+            ctx.close().catch(() => {});
+        }
     }, []);
 
     const runAnalysis = useCallback(async (frames) => {
@@ -371,37 +377,63 @@ export default function Viveka({ onSelectRaga }) {
         setElapsed(0);
 
         try {
-            // Resume synchronously during the user gesture — required on iOS Safari.
+            // Kick off resume synchronously during the user gesture so iOS Safari allows it.
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+            audioCtxRef.current = ctx;
+            const resumePromise = ctx.state === 'suspended' ? ctx.resume() : Promise.resolve();
 
             const stream = await navigator.mediaDevices.getUserMedia({
                 audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
             });
+            await resumePromise.catch(() => {});
             streamRef.current = stream;
 
             statusRef.current = STATUS.RECORDING;
             setStatus(STATUS.RECORDING);
 
-            // Shared acceptor: octave-jump filter before pushing any Hz reading.
-            const onHz = (hz) => {
-                const prev = framesRef.current[framesRef.current.length - 1];
-                if (!prev || Math.abs(Math.log2(hz / prev)) < 0.6) {
-                    framesRef.current.push(hz);
-                    setCurrentHz(hz);
-                }
-            };
-
             // Primary: autocorrelation pitch detector (ml5/CREPE commented out for hackathon)
             const source  = ctx.createMediaStreamSource(stream);
             const analyser = ctx.createAnalyser();
             analyser.fftSize = 2048;
+            analyser.smoothingTimeConstant = 0.12;
             source.connect(analyser);
             analyserRef.current = analyser;
+
+            // Require a short stable run so real singing registers more reliably than
+            // one-off noisy estimates from autocorrelation.
+            const pitchBuf = [];
+            let missCount = 0;
             pitchTimer.current = setInterval(() => {
                 if (!analyserRef.current) return;
                 const hz = detectPitch(analyserRef.current, ctx.sampleRate);
-                if (hz) onHz(hz);
+                if (!hz) {
+                    missCount++;
+                    if (missCount >= 4) {
+                        setCurrentHz(null);
+                    }
+                    return;
+                }
+
+                missCount = 0;
+                setCurrentHz(hz);
+
+                const last = pitchBuf[pitchBuf.length - 1];
+                if (last && Math.abs(Math.log2(hz / last)) >= 0.6) {
+                    pitchBuf.length = 0;
+                }
+
+                pitchBuf.push(hz);
+                if (pitchBuf.length > 3) pitchBuf.shift();
+                if (pitchBuf.length < 3) return;
+
+                const semis = pitchBuf.map(f => Math.round(12 * Math.log2(f / 130.81)));
+                const stable = semis.every(s => Math.abs(s - semis[0]) <= 2);
+                if (!stable) return;
+
+                const prev = framesRef.current[framesRef.current.length - 1];
+                if (!prev || Math.abs(Math.log2(hz / prev)) < 0.6) {
+                    framesRef.current.push(hz);
+                }
             }, FRAME_MS);
 
             // ml5/CREPE mic path commented out for hackathon — restore after contest

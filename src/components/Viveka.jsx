@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { detectPitch } from '../utils/audioUtils'; // kept as autocorrelation fallback
+import { detectPitch, extractPitchFrames } from '../utils/audioUtils';
 import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
 /* global ml5 */
 import { identifyRagaWithAI } from '../utils/ragaIdentify';
@@ -8,14 +8,16 @@ import SketchyRule from './SketchyRule';
 const STATUS = {
   IDLE:      'idle',
   RECORDING: 'recording',
+  UPLOADING: 'uploading',  // processing an uploaded file
   ANALYZING: 'analyzing',
   RESULTS:   'results',
   ERROR:     'error',
 };
 
+const MODE = { RECORD: 'record', UPLOAD: 'upload' };
+
 const FRAME_MS       = 80;
 const MAX_RECORD_SEC = 45;
-const MIN_SCORE      = 4.0; // minimum identifyRaga score before we trust a result
 
 // Western note names used only to display the inferred Sa to the user.
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -180,11 +182,13 @@ function buildSwaraString(noteEvents, saHz) {
 }
 
 export default function Viveka({ onSelectRaga }) {
+    const [inputMode,  setInputMode]  = useState(MODE.RECORD);
     const [status,    setStatus]    = useState(STATUS.IDLE);
     const [elapsed,   setElapsed]   = useState(0);
     const [currentHz, setCurrentHz] = useState(null);
     const [results,   setResults]   = useState(null);
     const [errorMsg,  setErrorMsg]  = useState('');
+    const [uploadProgress, setUploadProgress] = useState(0); // 0-100 during file processing
 
     const streamRef     = useRef(null);
     const analyserRef   = useRef(null);
@@ -238,13 +242,6 @@ export default function Viveka({ onSelectRaga }) {
         const best      = scored[0];
         const bestScore = best.candidates[0]?.score ?? -99; // raw raga score, not composite
 
-        // Gate on raw raga score — tonic quality bonus must not let weak raga evidence through.
-        if (bestScore < MIN_SCORE) {
-            setErrorMsg('The phrase didn\'t have enough note variety to identify a raga confidently. Try singing a longer melodic phrase.');
-            setStatus(STATUS.ERROR);
-            return;
-        }
-
         const swaraString = buildSwaraString(noteEvents, best.saHz);
 
         // Ambiguity check uses the composite score so that a tonic with better Sa/landing
@@ -269,20 +266,24 @@ export default function Viveka({ onSelectRaga }) {
         const localConfidence = confPoints >= 7 ? 'high' : confPoints >= 3 ? 'medium' : 'low';
 
         // ── Result type ──────────────────────────────────────────────────────
-        // 'likely'   — clear winner (phrase evidence or large separation)
-        // 'ambiguous' — two candidates nearly tied
-        // 'closest'  — best local guess but low confidence
-        const resultType    = phraseHits >= 1 || ragaSep >= 3 ? 'likely'
-                            : ragaSep < 1.5 && scored.length > 1 ? 'ambiguous'
+        // 'identified' — high confidence with phrase evidence or large separation
+        // 'likely'     — good match, moderate confidence
+        // 'ambiguous'  — two candidates nearly tied
+        // 'closest'    — best guess from weak evidence (always shown, never an error)
+        const resultType    = (phraseHits >= 1 && ragaSep >= 2) || ragaSep >= 4 ? 'identified'
+                            : phraseHits >= 1 || ragaSep >= 2                   ? 'likely'
+                            : ragaSep < 1.5 && scored.length > 1                ? 'ambiguous'
                             : 'closest';
         const ambiguousWith = resultType === 'ambiguous' ? second?.name : null;
 
         let groqResult = null;
-        try {
-            // Pass the local shortlist so Groq ranks candidates rather than guessing blind.
-            groqResult = await identifyRagaWithAI(swaraString, best.candidates.slice(0, 5));
-        } catch (_) {
-            // Network/API failure — fall back to local scoring only.
+        // Only send to Gemini if local evidence is meaningful — avoids wasting tokens on noise.
+        if (bestScore >= 2) {
+            try {
+                groqResult = await identifyRagaWithAI(swaraString, best.candidates.slice(0, 5));
+            } catch (_) {
+                // Network/API failure — fall back to local scoring only.
+            }
         }
 
         const topMatches = groqResult?.top_matches ?? best.candidates.slice(0, 3).map(c => ({
@@ -437,6 +438,45 @@ export default function Viveka({ onSelectRaga }) {
         framesRef.current = [];
     };
 
+    const handleFileUpload = async (file) => {
+        if (!file || !file.type.startsWith('audio/')) {
+            setErrorMsg('Please upload an audio file (mp3, wav, m4a, etc.)');
+            setStatus(STATUS.ERROR);
+            return;
+        }
+        reset();
+        setStatus(STATUS.UPLOADING);
+        setUploadProgress(10);
+
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            setUploadProgress(30);
+
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+            setUploadProgress(50);
+
+            // Extract pitch frames from the decoded audio (same autocorrelation as mic fallback).
+            const frames = await extractPitchFrames(audioBuffer, { maxSeconds: 45 });
+            setUploadProgress(80);
+
+            audioCtx.close();
+
+            if (frames.length < 6) {
+                setErrorMsg('Could not detect a clear melody in this file. Try a recording with a more prominent lead melody.');
+                setStatus(STATUS.ERROR);
+                return;
+            }
+
+            setUploadProgress(100);
+            setStatus(STATUS.ANALYZING);
+            runAnalysis(frames);
+        } catch (err) {
+            setErrorMsg(err.message || 'Could not read the audio file.');
+            setStatus(STATUS.ERROR);
+        }
+    };
+
     const handleSelectRaga = (ragaName) => {
         const ragaData = RAGAS[ragaName];
         if (ragaData && onSelectRaga) {
@@ -454,15 +494,17 @@ export default function Viveka({ onSelectRaga }) {
     // without needing a dedicated UI panel.
     if (results?._debug) console.debug('[Viveka analysis]', results._debug);
 
-    const topConf = results?.matches?.[0]?.confidence ?? results?.localConfidence;
+    const resultLabel = results?.resultType === 'identified' ? 'Identified'
+                     : results?.resultType === 'likely'      ? 'Most likely'
+                     : results?.resultType === 'ambiguous'   ? 'Ambiguous'
+                     : 'Closest match';
+
     const guidanceMsg = results?.resultType === 'ambiguous'
-        ? `Ambiguous between ${results.matches[0]?.raagam} and ${results.ambiguousWith} — sing the characteristic phrase more clearly`
+        ? `Between ${results.matches[0]?.raagam} and ${results.ambiguousWith} — try the most characteristic phrase`
         : results?.tonicAmbiguous
-        ? 'The tonic (Sa) was ambiguous — try starting or ending a phrase cleanly on Sa'
+        ? 'Tonic was uncertain — start or end your phrase clearly on Sa'
         : results?.resultType === 'closest'
-        ? 'Low confidence — showing closest match. Sing a longer phrase with the raga\'s characteristic movement'
-        : topConf === 'low'
-        ? 'For a sharper result, sing a longer phrase with more note variety and movement'
+        ? 'Weak match — try a longer phrase with more movement'
         : null;
 
     const pct = Math.min((elapsed / MAX_RECORD_SEC) * 100, 100);
@@ -475,7 +517,6 @@ export default function Viveka({ onSelectRaga }) {
                 <div className="w-full flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center text-c-gold shadow-md flex-shrink-0">
-                            {/* Radar / resonance icon — concentric arcs with a centre dot */}
                             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                 <circle cx="12" cy="12" r="2" fill="#C8941F" stroke="none" />
                                 <circle cx="12" cy="12" r="5" strokeOpacity="0.5" />
@@ -511,31 +552,77 @@ export default function Viveka({ onSelectRaga }) {
                 {/* ── IDLE ── */}
                 {status === STATUS.IDLE && (
                     <div className="w-full flex flex-col items-center gap-8 py-4">
-                        <div className="w-full max-w-sm text-center flex flex-col gap-3">
-                            <p className="font-playfair text-c-cream text-base leading-relaxed">
-                                Sing any Carnatic phrase — scales, a melodic fragment, or the characteristic lines of a raga you want to identify.
-                            </p>
-                            <p className="text-c-cream-dark text-xs leading-relaxed">
-                                No Sa setup needed. Viveka infers your tonic automatically and matches the phrase to a raga.
-                            </p>
+
+                        {/* Mode tabs */}
+                        <div className="flex gap-1 bg-c-surface border border-c-border rounded-lg p-1 w-full max-w-xs">
+                            {[
+                                { id: MODE.RECORD, label: 'Sing / Hum' },
+                                { id: MODE.UPLOAD, label: 'Upload audio' },
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setInputMode(tab.id)}
+                                    className={`flex-1 py-1.5 text-xs font-semibold rounded transition-all ${
+                                        inputMode === tab.id
+                                            ? 'bg-c-gold text-c-bg'
+                                            : 'text-c-cream-dark hover:text-c-cream'
+                                    }`}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
                         </div>
 
-                        <button
-                            onClick={startRecording}
-                            className="relative w-24 h-24 rounded-full bg-c-card border-2 border-c-gold/50 hover:border-c-gold hover:bg-c-gold-faint flex items-center justify-center transition-all active:scale-95 group"
-                        >
-                            <div className="absolute inset-[-4px] rounded-full border border-c-gold/15 animate-ping opacity-50" />
-                            <span className="text-c-gold text-[10px] font-mono uppercase tracking-widest font-bold group-hover:text-c-gold-light">Record</span>
-                        </button>
+                        {/* Record mode */}
+                        {inputMode === MODE.RECORD && (
+                            <>
+                                <button
+                                    onClick={startRecording}
+                                    className="relative w-32 h-32 rounded-full bg-c-card border-2 border-c-gold/50 hover:border-c-gold hover:bg-c-gold-faint flex flex-col items-center justify-center gap-1.5 transition-all active:scale-95 group shadow-lg"
+                                >
+                                    <div className="absolute inset-[-6px] rounded-full border border-c-gold/20 animate-ping opacity-40" />
+                                    <div className="absolute inset-[-14px] rounded-full border border-c-gold/08 animate-ping opacity-20" style={{ animationDelay: '0.3s' }} />
+                                    <svg className="w-8 h-8 text-c-gold" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/>
+                                        <path d="M19 11a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 6 6.92V20H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.08A7 7 0 0 0 19 11z" fillOpacity="0.7"/>
+                                    </svg>
+                                    <span className="text-c-gold text-[9px] font-mono uppercase tracking-widest font-bold group-hover:text-c-gold-light">Tap to identify</span>
+                                </button>
+                                <div className="flex flex-col items-center gap-1 text-center">
+                                    <p className="text-[11px] text-c-cream-dark opacity-60">
+                                        Sing, hum, or play near your microphone · 10–45 sec
+                                    </p>
+                                    <p className="text-[10px] text-c-cream-dark font-playfair italic opacity-40">
+                                        No setup needed — Viveka finds the tonic automatically
+                                    </p>
+                                </div>
+                            </>
+                        )}
 
-                        <div className="flex flex-col items-center gap-1.5 text-center">
-                            <p className="text-[10px] text-c-cream-dark font-mono uppercase tracking-widest opacity-60">
-                                Suggested: 15–45 seconds · clear vowels
-                            </p>
-                            <p className="text-[10px] text-c-cream-dark font-playfair italic opacity-50">
-                                Gamakams are fine — hold each core note for a moment so it's detected
-                            </p>
-                        </div>
+                        {/* Upload mode */}
+                        {inputMode === MODE.UPLOAD && (
+                            <label className="w-full max-w-sm flex flex-col items-center gap-4 cursor-pointer group">
+                                <div className="w-full border-2 border-dashed border-c-gold/30 hover:border-c-gold/60 rounded-xl py-10 flex flex-col items-center gap-3 transition-all bg-c-surface hover:bg-c-card">
+                                    <svg className="w-10 h-10 text-c-gold/40 group-hover:text-c-gold/70 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                                    </svg>
+                                    <div className="text-center">
+                                        <p className="font-playfair text-c-cream text-sm">Drop an audio clip here</p>
+                                        <p className="text-xs text-c-cream-dark opacity-50 mt-1">or click to browse</p>
+                                    </div>
+                                    <span className="text-[9px] text-c-cream-dark/40 font-mono uppercase tracking-widest">mp3 · wav · m4a · ogg · flac</span>
+                                </div>
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    className="hidden"
+                                    onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+                                />
+                                <p className="text-[10px] text-c-cream-dark font-playfair italic opacity-40 text-center">
+                                    Best with clear lead melody · Viveka finds the closest raga match
+                                </p>
+                            </label>
+                        )}
                     </div>
                 )}
 
@@ -585,14 +672,28 @@ export default function Viveka({ onSelectRaga }) {
                     </div>
                 )}
 
+                {/* ── UPLOADING ── */}
+                {status === STATUS.UPLOADING && (
+                    <div className="w-full flex flex-col items-center gap-5 py-8">
+                        <div className="w-8 h-8 border-2 border-c-gold/30 border-t-c-gold rounded-full animate-spin" />
+                        <p className="font-playfair text-c-cream italic">Reading audio file…</p>
+                        <div className="w-full max-w-xs h-1 bg-c-border rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-c-gold transition-all duration-300 rounded-full"
+                                style={{ width: `${uploadProgress}%` }}
+                            />
+                        </div>
+                    </div>
+                )}
+
                 {/* ── ANALYZING ── */}
                 {status === STATUS.ANALYZING && (
                     <div className="w-full flex flex-col items-center gap-5 py-8">
                         <div className="w-8 h-8 border-2 border-c-gold/30 border-t-c-gold rounded-full animate-spin" />
                         <div className="text-center flex flex-col gap-1.5">
-                            <p className="font-playfair text-c-cream italic">Contemplating the phrase…</p>
+                            <p className="font-playfair text-c-cream italic">Identifying the raga…</p>
                             <p className="text-[11px] text-c-cream-dark font-playfair italic opacity-70">
-                                Inferring tonic · mapping swaras · discerning the raga
+                                Mapping notes · testing tonics · matching raga patterns
                             </p>
                         </div>
                     </div>
@@ -602,30 +703,41 @@ export default function Viveka({ onSelectRaga }) {
                 {status === STATUS.RESULTS && results && (
                     <div className="w-full flex flex-col gap-4 animate-fade-in">
 
-                        {/* Inferred Sa */}
-                        {results.saHz && (
-                            <div className="flex items-center justify-center gap-2">
-                                <span className="text-c-gold/40 text-xs">◆</span>
-                                <p className="text-[11px] text-c-cream-dark font-playfair italic">
-                                    Inferred Sa ≈{' '}
-                                    <span className="text-c-gold-dim font-mono not-italic">
-                                        {results.saHz.toFixed(1)} Hz · {hzToNoteName(results.saHz)}
-                                    </span>
+                        {/* Shazam-style result header */}
+                        <div className="w-full flex flex-col items-center gap-1 py-2">
+                            <span className={`text-[9px] font-mono uppercase tracking-[0.2em] ${
+                                results.resultType === 'identified' ? 'text-emerald-400' :
+                                results.resultType === 'likely'     ? 'text-c-gold' :
+                                results.resultType === 'ambiguous'  ? 'text-amber-400' :
+                                                                      'text-c-cream-dark'
+                            }`}>
+                                {resultLabel}
+                            </span>
+                            <h2 className="font-playfair text-3xl font-bold text-c-cream leading-none tracking-wide">
+                                {results.matches[0]?.raagam}
+                            </h2>
+                            {RAGAS[results.matches[0]?.raagam]?.mood && (
+                                <p className="text-c-gold/70 text-xs font-playfair italic mt-0.5">
+                                    {RAGAS[results.matches[0]?.raagam].mood}
                                 </p>
-                                <span className="text-c-gold/40 text-xs">◆</span>
-                            </div>
-                        )}
+                            )}
+                            {results.saHz && (
+                                <p className="text-[10px] text-c-cream-dark/40 font-mono mt-1">
+                                    Sa ≈ {results.saHz.toFixed(1)} Hz · {hzToNoteName(results.saHz)}
+                                </p>
+                            )}
+                        </div>
 
-                        {/* Guidance */}
+                        {/* Guidance / hint */}
                         {guidanceMsg && (
-                            <div className="w-full bg-c-gold/5 border border-c-gold/20 rounded-lg px-4 py-3 text-[11px] text-c-cream-dark font-playfair italic text-center">
-                                ✦ {guidanceMsg}
+                            <div className="w-full bg-c-gold/5 border border-c-gold/20 rounded-lg px-4 py-2.5 text-[11px] text-c-cream-dark font-playfair italic text-center">
+                                {guidanceMsg}
                             </div>
                         )}
 
                         {results.localOnly && (
-                            <div className="w-full bg-c-border/10 border border-c-border/30 rounded-lg px-4 py-2 text-[10px] text-c-cream-dark font-mono text-center opacity-60">
-                                AI analysis unavailable · showing local pattern match
+                            <div className="w-full bg-c-border/10 border border-c-border/30 rounded-lg px-4 py-2 text-[10px] text-c-cream-dark font-mono text-center opacity-50">
+                                AI unavailable · local pattern match only
                             </div>
                         )}
 
@@ -708,7 +820,7 @@ export default function Viveka({ onSelectRaga }) {
                                 onClick={reset}
                                 className="px-6 py-2 border border-c-gold/40 hover:border-c-gold hover:bg-c-gold-faint text-c-gold text-sm rounded transition-all font-playfair"
                             >
-                                Sing again
+                                Identify another
                             </button>
                         </div>
                     </div>

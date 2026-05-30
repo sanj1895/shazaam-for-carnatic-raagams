@@ -346,6 +346,68 @@ export function startDrone(saHz, ctx) {
  * Autocorrelation-based pitch detection from an AnalyserNode.
  * Returns frequency in Hz, or null if the signal is too quiet or has no clear pitch.
  */
+/**
+ * Autocorrelation pitch detection on a raw Float32Array frame.
+ * Same algorithm as detectPitch() but works on offline / uploaded audio
+ * without needing a live AnalyserNode.
+ * Yields every 60 frames so the browser stays responsive during long files.
+ */
+export async function extractPitchFrames(audioBuffer, { maxSeconds = 45 } = {}) {
+  const sampleRate  = audioBuffer.sampleRate;
+  const frameSize   = 2048;
+  const hopSize     = Math.round(sampleRate * 0.08); // 80 ms hop
+  const channelData = audioBuffer.getChannelData(0); // use first channel (mono)
+  const maxSamples  = Math.min(channelData.length, Math.round(maxSeconds * sampleRate));
+  const frames      = [];
+
+  for (let offset = 0; offset + frameSize < maxSamples; offset += hopSize) {
+    const frame = channelData.subarray(offset, offset + frameSize);
+    const hz    = _autocorrelate(frame, sampleRate);
+    if (hz) frames.push(hz);
+
+    // Yield every 60 frames so UI stays responsive.
+    if (frames.length > 0 && frames.length % 60 === 0) {
+      await new Promise(r => setTimeout(r, 0));
+    }
+  }
+  return frames;
+}
+
+function _autocorrelate(buffer, sampleRate) {
+  const SIZE = buffer.length;
+  let rms = 0;
+  for (let i = 0; i < SIZE; i++) rms += buffer[i] * buffer[i];
+  rms = Math.sqrt(rms / SIZE);
+  if (rms < 0.003) return null;
+
+  const correlation = new Float32Array(SIZE);
+  for (let lag = 0; lag < SIZE; lag++) {
+    let sum = 0;
+    for (let i = 0; i < SIZE - lag; i++) sum += buffer[i] * buffer[i + lag];
+    correlation[lag] = sum;
+  }
+
+  let d = 0;
+  while (d < SIZE && correlation[d] > correlation[d + 1]) d++;
+
+  let maxVal = -Infinity, maxPos = -1;
+  for (let i = d; i < SIZE; i++) {
+    if (correlation[i] > maxVal) { maxVal = correlation[i]; maxPos = i; }
+  }
+  if (maxPos <= 0) return null;
+
+  const y1 = correlation[maxPos - 1] || 0;
+  const y2 = correlation[maxPos];
+  const y3 = correlation[maxPos + 1] || 0;
+  const denom = 2 * y2 - y1 - y3;
+  const refined = denom !== 0 ? maxPos - (y3 - y1) / (2 * denom) : maxPos;
+  const freq = sampleRate / refined;
+
+  if (freq < 60 || freq > 2000) return null;
+  if (maxVal / correlation[0] < 0.50) return null;
+  return freq;
+}
+
 export function detectPitch(analyserNode, sampleRate) {
   const bufferLength = analyserNode.fftSize;
   const buffer = new Float32Array(bufferLength);

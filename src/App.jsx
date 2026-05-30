@@ -403,6 +403,7 @@ function App() {
     const [practiceDemoKeyIndex, setPracticeDemoKeyIndex] = useState(0);
     const [practiceDemoPitchState, setPracticeDemoPitchState] = useState('match');
     const [hoveredWorkspacePreview, setHoveredWorkspacePreview] = useState(null);
+    const [avabodhaPreviewStarted, setAvabodhaPreviewStarted] = useState(false);
     const [libraryPreviewIndex, setLibraryPreviewIndex] = useState(0);
     const [explorePreviewIndex, setExplorePreviewIndex] = useState(0);
     const [explorePreviewDisplayNumber, setExplorePreviewDisplayNumber] = useState(EXPLORE_DEMO_RAGAS[0].number);
@@ -444,7 +445,7 @@ function App() {
     const selectedGrahaSwara = GRAHA_BHEDAM_SWARAS[explorePreviewShiftIndex % GRAHA_BHEDAM_SWARAS.length];
     const currentTranscribePhrase = TRANSCRIBE_PREVIEW_PHRASES[transcribePreviewPhraseIndex % TRANSCRIBE_PREVIEW_PHRASES.length];
     const selectedGurukulCategory = GURUKUL_PREVIEW_CATEGORIES[gurukulPreviewCategoryIndex % GURUKUL_PREVIEW_CATEGORIES.length];
-    const avabodhaPreviewMode = practiceDemoPitchState === 'match' ? 'dhwani' : 'viveka';
+    const avabodhaPreviewMode = !avabodhaPreviewStarted || practiceDemoPitchState === 'match' ? 'dhwani' : 'viveka';
 
     useEffect(() => {
         const beatTimer = setInterval(() => {
@@ -1696,7 +1697,10 @@ function App() {
 
                                                                 <div
                                                                     className="workspace-preview-panel avabodha-preview-panel group sm:min-h-[340px] px-4 sm:px-5 py-4 sm:py-5 text-left hover:bg-[rgba(255,214,134,0.02)]"
-                                                                    onMouseEnter={() => setHoveredWorkspacePreview('avabodha')}
+                                                                    onMouseEnter={() => {
+                                                                        setHoveredWorkspacePreview('avabodha');
+                                                                        setAvabodhaPreviewStarted(true);
+                                                                    }}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'avabodha' ? null : current)}
                                                                 >
                                                                     <div className="flex items-center justify-between gap-3 text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>

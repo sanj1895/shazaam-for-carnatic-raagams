@@ -26,6 +26,7 @@ Browser (React + Vite)
     │                              (reads + writes sessions collection)
     │
     ├── /api/sessions (POST) ──► Vertex AI Agent Engine → MongoDB MCP insertOne
+    │                            (direct MongoDB fallback if Agent Engine unavailable)
     │
     └── /api/gemini-identify ──► Gemini 2.5 Flash (Vertex AI)
               ▲
@@ -85,12 +86,13 @@ adk web agent     # ADK dev UI on http://localhost:8000 (optional)
 
 When a student sends a message to the coach:
 
-1. The ADK agent calls **MongoDB MCP `find`** to retrieve practice history
-2. **Gemini 2.5 Flash** reasons over the history and gives a directed recommendation
+1. The API layer pre-fetches the learner's profile and recent sessions directly from MongoDB and injects them as structured context into the message (fast path for latency)
+2. The **ADK agent on Agent Engine** receives the enriched message and can also call **MongoDB MCP `find`** directly for live or detailed history lookups
+3. **Gemini 2.5 Flash** reasons over the context and gives a directed recommendation
 
 When a student completes a practice session:
 
-3. The frontend calls `/api/sessions` → Agent Engine → **MongoDB MCP `insertOne`** records the session
+4. The frontend calls `/api/sessions` → **Agent Engine → MongoDB MCP `insertOne`** records the session (with a direct MongoDB fallback if Agent Engine is unavailable)
 
 Schema: `{ userId, timestamp, tool, raga, durationMinutes, notes }`
 

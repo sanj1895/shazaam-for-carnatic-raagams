@@ -1,6 +1,7 @@
 import os
 from google.adk.agents import Agent
-from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
+from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioConnectionParams
+from mcp import StdioServerParameters
 
 MONGODB_URI = os.environ.get("MONGODB_URI", "")
 
@@ -41,13 +42,15 @@ root_agent = Agent(
     instruction=SYSTEM_PROMPT,
     tools=[
         MCPToolset(
-            connection_params=StdioServerParameters(
-                command="npx",
-                args=["-y", "mongodb-mcp-server"],
-                env={
-                    "MDB_MCP_CONNECTION_STRING": MONGODB_URI,
-                    "MDB_MCP_READ_ONLY": "false",
-                },
+            connection_params=StdioConnectionParams(
+                server_params=StdioServerParameters(
+                    command="npx",
+                    args=["-y", "mongodb-mcp-server"],
+                    env={
+                        "MDB_MCP_CONNECTION_STRING": MONGODB_URI,
+                        "MDB_MCP_READ_ONLY": "false",
+                    },
+                )
             )
         )
     ],

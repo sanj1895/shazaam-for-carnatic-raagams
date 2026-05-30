@@ -33,10 +33,16 @@ except ImportError:
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from agent.agent import root_agent  # noqa: E402
 
-PROJECT  = os.getenv("GOOGLE_CLOUD_PROJECT",  "project-24a53985-305d-4031-ae8")
-LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
+PROJECT        = os.getenv("GOOGLE_CLOUD_PROJECT",        "project-24a53985-305d-4031-ae8")
+LOCATION       = os.getenv("GOOGLE_CLOUD_LOCATION",       "us-central1")
+STAGING_BUCKET = os.getenv("GOOGLE_CLOUD_STAGING_BUCKET", f"gs://{PROJECT}-adk-staging")
 
-vertexai.init(project=PROJECT, location=LOCATION)
+# Agent Engine requires a GCS staging bucket for packaging the agent.
+# Create it once with: gsutil mb -l us-central1 gs://<PROJECT>-adk-staging
+print(f"  Staging:  {STAGING_BUCKET}")
+print(f"  (Create bucket if missing: gsutil mb -l {LOCATION} {STAGING_BUCKET})\n")
+
+vertexai.init(project=PROJECT, location=LOCATION, staging_bucket=STAGING_BUCKET)
 
 print(f"Deploying Ālāpana Coach to Vertex AI Agent Engine...")
 print(f"  Project:  {PROJECT}")
@@ -48,11 +54,12 @@ app = reasoning_engines.AdkApp(
     enable_tracing=True,
 )
 
-remote_agent = reasoning_engines.create(
+# reasoning_engines.create() was removed in SDK >=1.87. Use the class method instead.
+remote_agent = reasoning_engines.ReasoningEngine.create(
     app,
     requirements=[
         "google-cloud-aiplatform[adk]>=1.87.0",
-        "google-adk>=0.5.0",
+        "google-adk>=1.0.0",
         "mcp>=1.0.0",
     ],
     display_name="Alapana Coach",

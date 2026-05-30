@@ -347,30 +347,81 @@ export function startDrone(saHz, ctx) {
  * Returns frequency in Hz, or null if the signal is too quiet or has no clear pitch.
  */
 /**
- * Autocorrelation pitch detection on a raw Float32Array frame.
- * Same algorithm as detectPitch() but works on offline / uploaded audio
- * without needing a live AnalyserNode.
- * Yields every 60 frames so the browser stays responsive during long files.
+ * Mix a multi-channel AudioBuffer down to a single Float32Array (mono).
+ * Averages all channels so stereo content isn't lost by discarding the right channel.
  */
-export async function extractPitchFrames(audioBuffer, { maxSeconds = 45 } = {}) {
-  const sampleRate  = audioBuffer.sampleRate;
-  const frameSize   = 2048;
-  const hopSize     = Math.round(sampleRate * 0.08); // 80 ms hop
-  const channelData = audioBuffer.getChannelData(0); // use first channel (mono)
-  const maxSamples  = Math.min(channelData.length, Math.round(maxSeconds * sampleRate));
-  const frames      = [];
+export function mixToMono(audioBuffer) {
+  const n    = audioBuffer.numberOfChannels;
+  const len  = audioBuffer.length;
+  const mono = new Float32Array(len);
+  for (let c = 0; c < n; c++) {
+    const ch = audioBuffer.getChannelData(c);
+    for (let i = 0; i < len; i++) mono[i] += ch[i];
+  }
+  if (n > 1) for (let i = 0; i < len; i++) mono[i] /= n;
+  return mono;
+}
 
-  for (let offset = 0; offset + frameSize < maxSamples; offset += hopSize) {
-    const frame = channelData.subarray(offset, offset + frameSize);
+/**
+ * Find the most melodically active segment of a fixed target duration.
+ * Uses a sliding-window RMS sum over 0.5 s frames as an energy proxy.
+ * Returns sample offsets and wall-clock times of the best window.
+ */
+export function findBestSegment(monoData, sampleRate, targetSec = 25) {
+  const frameSize    = Math.round(sampleRate * 0.5); // 0.5 s scoring frames
+  const targetFrames = Math.round(targetSec / 0.5);
+
+  const scores = [];
+  for (let i = 0; i + frameSize < monoData.length; i += frameSize) {
+    const slice = monoData.subarray(i, i + frameSize);
+    let rms = 0;
+    for (let j = 0; j < slice.length; j++) rms += slice[j] * slice[j];
+    scores.push(Math.sqrt(rms / slice.length));
+  }
+
+  if (scores.length <= targetFrames) {
+    return { startSample: 0, endSample: monoData.length,
+             startSec: 0, endSec: monoData.length / sampleRate };
+  }
+
+  let win = scores.slice(0, targetFrames).reduce((a, b) => a + b, 0);
+  let best = win, bestIdx = 0;
+  for (let i = targetFrames; i < scores.length; i++) {
+    win += scores[i] - scores[i - targetFrames];
+    if (win > best) { best = win; bestIdx = i - targetFrames + 1; }
+  }
+
+  const startSample = bestIdx * frameSize;
+  const endSample   = Math.min(startSample + Math.round(targetSec * sampleRate), monoData.length);
+  return { startSample, endSample,
+           startSec: startSample / sampleRate, endSec: endSample / sampleRate };
+}
+
+/**
+ * Autocorrelation pitch extraction on an offline AudioBuffer.
+ * Used as the fallback path when CREPE isn't available.
+ * Accepts { startSample, endSample } to process a specific segment;
+ * omit both to process the full buffer.
+ * Returns { frames, startSec, endSec }.
+ */
+export async function extractPitchFrames(audioBuffer, { startSample = 0, endSample = null } = {}) {
+  const sampleRate = audioBuffer.sampleRate;
+  const mono       = mixToMono(audioBuffer);
+  const end        = endSample ?? mono.length;
+  const frameSize  = 2048;
+  const hopSize    = Math.round(sampleRate * 0.08); // 80 ms hop
+  const frames     = [];
+
+  for (let offset = startSample; offset + frameSize < end; offset += hopSize) {
+    const frame = mono.subarray(offset, offset + frameSize);
     const hz    = _autocorrelate(frame, sampleRate);
     if (hz) frames.push(hz);
 
-    // Yield every 60 frames so UI stays responsive.
     if (frames.length > 0 && frames.length % 60 === 0) {
       await new Promise(r => setTimeout(r, 0));
     }
   }
-  return frames;
+  return { frames, startSec: startSample / sampleRate, endSec: end / sampleRate };
 }
 
 function _autocorrelate(buffer, sampleRate) {

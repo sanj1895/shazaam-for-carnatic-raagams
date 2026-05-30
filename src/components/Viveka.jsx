@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { detectPitch, extractPitchFrames } from '../utils/audioUtils';
+import { detectPitch, extractPitchFrames, mixToMono, findBestSegment } from '../utils/audioUtils';
 import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
 /* global ml5 */
 import { identifyRagaWithAI } from '../utils/ragaIdentify';
@@ -181,6 +181,62 @@ function buildSwaraString(noteEvents, saHz) {
     return `${noteSeq}\n\nNOTE FREQUENCY SUMMARY (most→least frequent): ${freqSummary}`;
 }
 
+const CREPE_URL = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
+
+/**
+ * Run ml5 CREPE on a pre-decoded, single-channel AudioBuffer.
+ * Routes audio silently through a MediaStreamDestination so CREPE can
+ * process it at real-time speed without playing to speakers.
+ * Returns { frames, rawCount } where frames are stability-filtered Hz values.
+ */
+function runCREPEOnBuffer(ctx, segBuffer) {
+    return new Promise((resolve) => {
+        const frames   = [];
+        const pitchBuf = [];
+        let rawCount   = 0;
+        let done       = false;
+
+        const source = ctx.createBufferSource();
+        source.buffer = segBuffer;
+        const dest = ctx.createMediaStreamDestination(); // silent — not to speakers
+        source.connect(dest);
+
+        ml5.pitchDetection(CREPE_URL, ctx, dest.stream, (err, pitchModel) => {
+            if (err || !pitchModel) { resolve({ frames, rawCount }); return; }
+            source.start(0);
+
+            const loop = () => {
+                if (done) { resolve({ frames, rawCount }); return; }
+                pitchModel.getPitch((_, hz) => {
+                    if (hz && !done) {
+                        rawCount++;
+                        const last = pitchBuf[pitchBuf.length - 1];
+                        if (last && Math.abs(Math.log2(hz / last)) >= 0.6) {
+                            pitchBuf.length = 0;
+                            pitchBuf.push(hz);
+                        } else {
+                            pitchBuf.push(hz);
+                            if (pitchBuf.length > 3) pitchBuf.shift();
+                            if (pitchBuf.length === 3) {
+                                const ref = Math.round(12 * Math.log2(pitchBuf[0] / 130.81));
+                                if (pitchBuf.every(f => Math.abs(Math.round(12 * Math.log2(f / 130.81)) - ref) <= 2)) {
+                                    frames.push(hz);
+                                }
+                            }
+                        }
+                    }
+                    if (!done) loop();
+                });
+            };
+            loop();
+        });
+
+        source.onended = () => { done = true; };
+        // Safety timeout: resolve if source.onended never fires
+        setTimeout(() => { done = true; }, (segBuffer.duration + 8) * 1000);
+    });
+}
+
 export default function Viveka({ onSelectRaga }) {
     const [inputMode,  setInputMode]  = useState(MODE.RECORD);
     const [status,    setStatus]    = useState(STATUS.IDLE);
@@ -188,7 +244,8 @@ export default function Viveka({ onSelectRaga }) {
     const [currentHz, setCurrentHz] = useState(null);
     const [results,   setResults]   = useState(null);
     const [errorMsg,  setErrorMsg]  = useState('');
-    const [uploadProgress, setUploadProgress] = useState(0); // 0-100 during file processing
+    const [uploadProgress,    setUploadProgress]    = useState(0);  // 0-100 during file processing
+    const [uploadSegmentInfo, setUploadSegmentInfo] = useState(null); // { startSec, endSec, filename }
 
     const streamRef     = useRef(null);
     const analyserRef   = useRef(null);
@@ -446,29 +503,84 @@ export default function Viveka({ onSelectRaga }) {
         }
         reset();
         setStatus(STATUS.UPLOADING);
-        setUploadProgress(10);
+        setUploadProgress(5);
+        setUploadSegmentInfo(null);
 
         try {
             const arrayBuffer = await file.arrayBuffer();
-            setUploadProgress(30);
+            setUploadProgress(15);
 
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-            setUploadProgress(50);
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+            setUploadProgress(22);
 
-            // Extract pitch frames from the decoded audio (same autocorrelation as mic fallback).
-            const frames = await extractPitchFrames(audioBuffer, { maxSeconds: 45 });
-            setUploadProgress(80);
+            // Mix all channels to mono so stereo files don't lose the right channel.
+            const mono = mixToMono(audioBuffer);
 
-            audioCtx.close();
+            // Find the highest-energy 25-second window instead of blindly using the start.
+            const { startSample, endSample, startSec, endSec } =
+                findBestSegment(mono, audioBuffer.sampleRate, 25);
+
+            const segInfo = {
+                filename: file.name,
+                startSec: +startSec.toFixed(1),
+                endSec:   +endSec.toFixed(1),
+            };
+            setUploadSegmentInfo(segInfo);
+            setUploadProgress(28);
+
+            // Build a mono AudioBuffer for just the selected segment.
+            const segLen = endSample - startSample;
+            const segBuf = ctx.createBuffer(1, segLen, audioBuffer.sampleRate);
+            segBuf.getChannelData(0).set(mono.subarray(startSample, endSample));
+
+            // ── Primary: CREPE (same quality as mic path, real-time) ──────────
+            const segDuration = endSec - startSec;
+            const progressStart = Date.now();
+            const progressInterval = setInterval(() => {
+                const elapsed = (Date.now() - progressStart) / 1000;
+                setUploadProgress(Math.min(28 + (elapsed / segDuration) * 62, 90));
+            }, 300);
+
+            let frames = [], rawCount = 0;
+            try {
+                ({ frames, rawCount } = await runCREPEOnBuffer(ctx, segBuf));
+            } catch (_) { /* CREPE failed to load — fall through to autocorrelation */ }
+            clearInterval(progressInterval);
+
+            // ── Fallback: autocorrelation if CREPE produced nothing ───────────
+            if (frames.length < 4) {
+                const fb = await extractPitchFrames(audioBuffer, { startSample, endSample });
+                if (fb.frames.length > frames.length) {
+                    frames   = fb.frames;
+                    rawCount = rawCount || fb.frames.length;
+                }
+            }
+
+            ctx.close();
+            setUploadProgress(100);
+
+            // Debug output — always logged, useful for diagnosing weak results
+            console.debug('[Viveka upload]', {
+                file:              file.name,
+                totalDuration:     (audioBuffer.length / audioBuffer.sampleRate).toFixed(1) + 's',
+                selectedSegment:   `${segInfo.startSec}s – ${segInfo.endSec}s`,
+                channels:          audioBuffer.numberOfChannels,
+                rawCREPEFrames:    rawCount,
+                stableFrames:      frames.length,
+            });
 
             if (frames.length < 6) {
-                setErrorMsg('Could not detect a clear melody in this file. Try a recording with a more prominent lead melody.');
+                setErrorMsg(
+                    `Only ${frames.length} stable notes detected in the clearest section ` +
+                    `(${segInfo.startSec}–${segInfo.endSec}s). ` +
+                    `Try uploading a clip where the lead melody is louder and less cluttered ` +
+                    `— or record it closer to your microphone.`
+                );
                 setStatus(STATUS.ERROR);
                 return;
             }
 
-            setUploadProgress(100);
             setStatus(STATUS.ANALYZING);
             runAnalysis(frames);
         } catch (err) {
@@ -674,15 +786,27 @@ export default function Viveka({ onSelectRaga }) {
 
                 {/* ── UPLOADING ── */}
                 {status === STATUS.UPLOADING && (
-                    <div className="w-full flex flex-col items-center gap-5 py-8">
+                    <div className="w-full flex flex-col items-center gap-4 py-8">
                         <div className="w-8 h-8 border-2 border-c-gold/30 border-t-c-gold rounded-full animate-spin" />
-                        <p className="font-playfair text-c-cream italic">Reading audio file…</p>
+                        <div className="text-center flex flex-col gap-1">
+                            <p className="font-playfair text-c-cream italic">
+                                {uploadProgress < 28 ? 'Reading file…' : 'Extracting melody with CREPE…'}
+                            </p>
+                            {uploadSegmentInfo && (
+                                <p className="text-[10px] text-c-cream-dark font-mono opacity-60">
+                                    Best section: {uploadSegmentInfo.startSec}s – {uploadSegmentInfo.endSec}s
+                                </p>
+                            )}
+                        </div>
                         <div className="w-full max-w-xs h-1 bg-c-border rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-c-gold transition-all duration-300 rounded-full"
                                 style={{ width: `${uploadProgress}%` }}
                             />
                         </div>
+                        <p className="text-[9px] text-c-cream-dark font-mono opacity-40 uppercase tracking-widest">
+                            {uploadProgress < 28 ? 'Decoding audio' : 'This may take ~25 seconds'}
+                        </p>
                     </div>
                 )}
 

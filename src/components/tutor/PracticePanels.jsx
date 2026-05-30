@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { RAGAS, getSwaram } from '../../utils/ragaLogic';
-import { detectPitch as detectPitchAudio } from '../../utils/audioUtils';
+import { detectPitch as detectPitchAudio, muteAppAudio, openMicStream, buildMicChain, closeMicStream } from '../../utils/audioUtils';
 import {
     getAudioCtx,
     swaraFreq,
@@ -388,6 +388,7 @@ function TalaSwaraTranscriber({ sa, setSa }) {
     const [mobileMicMode, setMobileMicMode] = useState(isLikelyMobile);
 
     const streamRef = useRef(null);
+    const recordingCtxRef = useRef(null);
     const sourceRef = useRef(null);
     const analyserRef = useRef(null);
     const bucketsRef = useRef([]);
@@ -669,10 +670,9 @@ function TalaSwaraTranscriber({ sa, setSa }) {
             mediaRecorderRef.current.stop();
         }
         mediaRecorderRef.current = null;
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(t => t.stop());
-            streamRef.current = null;
-        }
+        closeMicStream(streamRef.current, recordingCtxRef.current);
+        streamRef.current = null;
+        recordingCtxRef.current = null;
         sourceRef.current = null;
         analyserRef.current = null;
     }, []);
@@ -787,17 +787,12 @@ function TalaSwaraTranscriber({ sa, setSa }) {
             setRecordedAudioUrl('');
         }
         try {
-            const stream = await navigator.mediaDevices.getUserMedia(
-                mobileMicMode
-                    ? {
-                        audio: {
-                            echoCancellation: true,
-                            noiseSuppression: true,
-                            autoGainControl: true,
-                        },
-                    }
-                    : { audio: true }
-            );
+            // Always mute app audio before opening the mic so drone/notes don't bleed in.
+            // Mobile mode keeps echo cancellation for its noisier environment.
+            muteAppAudio();
+            const stream = mobileMicMode
+                ? await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
+                : await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
             streamRef.current = stream;
             if (typeof MediaRecorder !== 'undefined') {
                 try {
@@ -823,14 +818,9 @@ function TalaSwaraTranscriber({ sa, setSa }) {
                 }
             }
 
-            const ctx = getAudioCtx();
+            const { ctx, analyser } = buildMicChain(stream, { fftSize: mobileMicMode ? 2048 : 4096, gain: 2.5 });
+            recordingCtxRef.current = ctx;
             const sampleRate = ctx.sampleRate;
-            const source = ctx.createMediaStreamSource(stream);
-            const analyser = ctx.createAnalyser();
-            analyser.fftSize = mobileMicMode ? 2048 : 4096;
-            analyser.smoothingTimeConstant = mobileMicMode ? 0.48 : 0.58;
-            source.connect(analyser);
-            sourceRef.current = source;
             analyserRef.current = analyser;
 
             const totalSlots = BEATS_PER_AVARTANA * subdiv * avartanas;

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { getAudioCtx, detectPitch, startDrone, SWARA_SEMITONE, playNote, getOctaveSequence, playSequence } from '../utils/audioUtils';
+import { detectPitch, startDrone, SWARA_SEMITONE, playNote, getOctaveSequence, playSequence, openMicStream, buildMicChain, closeMicStream } from '../utils/audioUtils';
 import { getSwaram, toSargam } from '../utils/ragaLogic';
 import { geminiChat as groqChatCompletion } from '../utils/ragaIdentify';
 
@@ -77,6 +77,7 @@ export default function RagaPracticePanel({ raga, initialSaHz = 293.66, compactM
   const [livePitchHistory, setLivePitchHistory] = useState([]);
 
   const streamRef      = useRef(null);
+  const recordingCtxRef = useRef(null);
   const droneStopRef   = useRef(null);
   const analysisRef    = useRef(null);
   const countdownRef   = useRef(null);
@@ -95,8 +96,9 @@ export default function RagaPracticePanel({ raga, initialSaHz = 293.66, compactM
     clearInterval(analysisRef.current);
     clearInterval(countdownRef.current);
     scaleTimeoutsRef.current.forEach(clearTimeout);
-    streamRef.current?.getTracks().forEach(t => t.stop());
+    closeMicStream(streamRef.current, recordingCtxRef.current);
     streamRef.current = null;
+    recordingCtxRef.current = null;
   };
 
   const stopDroneNow = () => { droneStopRef.current?.(); droneStopRef.current = null; setDroneOn(false); };
@@ -131,13 +133,10 @@ export default function RagaPracticePanel({ raga, initialSaHz = 293.66, compactM
     silenceCt.current     = 0;
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await openMicStream();
       streamRef.current = stream;
-      const ctx    = getAudioCtx();
-      const source = ctx.createMediaStreamSource(stream);
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 4096;
-      source.connect(analyser);
+      const { ctx, analyser } = buildMicChain(stream);
+      recordingCtxRef.current = ctx;
 
       setPhase('recording');
       setCountdown(RECORD_SECS);

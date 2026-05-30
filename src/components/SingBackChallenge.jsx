@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { RAGAS, toSargam } from '../utils/ragaLogic';
-import { playSequence, getAudioCtx, detectPitch, SWARA_SEMITONE } from '../utils/audioUtils';
+import { playSequence, detectPitch, SWARA_SEMITONE, openMicStream, buildMicChain, closeMicStream } from '../utils/audioUtils';
 import { CuratedIcon } from './IconLibrary';
 import SketchyRule from './SketchyRule';
 
@@ -45,13 +45,15 @@ export default function SingBackChallenge({ onSadhanaComplete }) {
 
     const abortRef        = useRef(null);
     const streamRef       = useRef(null);
+    const recordingCtxRef = useRef(null);
     const animFrameRef    = useRef(null);
     const listenTimerRef  = useRef(null);
     const detectedRef     = useRef([]); // mutable list of unique notes detected
 
     useEffect(() => () => {
         abortRef.current?.();
-        streamRef.current?.getTracks().forEach(t => t.stop());
+        closeMicStream(streamRef.current, recordingCtxRef.current);
+        streamRef.current = null; recordingCtxRef.current = null;
         cancelAnimationFrame(animFrameRef.current);
         clearInterval(listenTimerRef.current);
     }, []);
@@ -62,8 +64,8 @@ export default function SingBackChallenge({ onSadhanaComplete }) {
     const finishListening = useCallback((targetPhrase) => {
         clearInterval(listenTimerRef.current);
         cancelAnimationFrame(animFrameRef.current);
-        streamRef.current?.getTracks().forEach(t => t.stop());
-        streamRef.current = null;
+        closeMicStream(streamRef.current, recordingCtxRef.current);
+        streamRef.current = null; recordingCtxRef.current = null;
         setState(STATES.SCORING);
 
         // Set-based: each target note is correct if ANY detected note matches it
@@ -103,19 +105,16 @@ export default function SingBackChallenge({ onSadhanaComplete }) {
         // Phase 2: listen
         setState(STATES.LISTENING);
         try {
-            const audioCtx = getAudioCtx();
-            const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaStream = await openMicStream();
             streamRef.current = mediaStream;
-            const source   = audioCtx.createMediaStreamSource(mediaStream);
-            const analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 2048;
-            source.connect(analyser);
+            const { ctx: recordingCtx, analyser } = buildMicChain(mediaStream);
+            recordingCtxRef.current = recordingCtx;
 
             let lastNote = null;
             let lastNoteTime = 0;
 
             const detect = () => {
-                const freq = detectPitch(analyser, audioCtx.sampleRate);
+                const freq = detectPitch(analyser, recordingCtx.sampleRate);
                 if (freq) {
                     const ratio      = freq / 261.63;
                     const semitones  = 12 * (Math.log(ratio) / Math.log(2));
@@ -159,7 +158,8 @@ export default function SingBackChallenge({ onSadhanaComplete }) {
 
     const reset = () => {
         abortRef.current?.();
-        streamRef.current?.getTracks().forEach(t => t.stop());
+        closeMicStream(streamRef.current, recordingCtxRef.current);
+        streamRef.current = null; recordingCtxRef.current = null;
         clearInterval(listenTimerRef.current);
         cancelAnimationFrame(animFrameRef.current);
         setState(STATES.IDLE);

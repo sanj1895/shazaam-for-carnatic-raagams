@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { detectPitch, extractPitchFrames, mixToMono, findBestSegment } from '../utils/audioUtils';
+import { detectPitch, extractPitchFrames, mixToMono, findBestSegment, muteAppAudio, unmuteAppAudio } from '../utils/audioUtils';
 import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
 
 import { identifyRagaWithAI } from '../utils/ragaIdentify';
@@ -234,6 +234,7 @@ export default function Viveka({ onSelectRaga }) {
         if (ctx && ctx.state !== 'closed') {
             ctx.close().catch(() => {});
         }
+        unmuteAppAudio();
     }, []);
 
     const runAnalysis = useCallback(async (frames) => {
@@ -383,6 +384,7 @@ export default function Viveka({ onSelectRaga }) {
 
         try {
             // Kick off resume synchronously during the user gesture so iOS Safari allows it.
+            muteAppAudio();
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             audioCtxRef.current = ctx;
             const resumePromise = ctx.state === 'suspended' ? ctx.resume() : Promise.resolve();
@@ -396,11 +398,14 @@ export default function Viveka({ onSelectRaga }) {
             statusRef.current = STATUS.RECORDING;
             setStatus(STATUS.RECORDING);
 
-            const source  = ctx.createMediaStreamSource(stream);
+            const source   = ctx.createMediaStreamSource(stream);
+            const gainNode = ctx.createGain();
+            gainNode.gain.value = 2.5;
             const analyser = ctx.createAnalyser();
-            analyser.fftSize = 2048;
-            analyser.smoothingTimeConstant = 0.12;
-            source.connect(analyser);
+            analyser.fftSize = 4096;
+            analyser.smoothingTimeConstant = 0;
+            source.connect(gainNode);
+            gainNode.connect(analyser);
             analyserRef.current = analyser;
 
             // Require a short stable run so real singing registers more reliably than

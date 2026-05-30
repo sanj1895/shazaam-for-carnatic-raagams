@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { PlayIcon, StopIcon } from './IconLibrary';
-import { detectPitch } from '../utils/audioUtils';
+import { detectPitch, muteAppAudio, unmuteAppAudio } from '../utils/audioUtils';
 
 
 const STATUS = {
@@ -27,6 +27,7 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
         return () => {
             stopReferenceTone();
             clearInterval(intervalRef.current);
+            unmuteAppAudio();
         };
     }, []);
 
@@ -72,12 +73,11 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
 
     const startAudio = async () => {
         try {
-            // Create and kick off resume synchronously during the user gesture so
-            // iOS Safari allows it — we'll await the promise after getUserMedia.
+            // Mute drone/notes before opening mic so they don't bleed into detection.
+            muteAppAudio();
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const resumePromise = audioCtx.state === 'suspended' ? audioCtx.resume() : Promise.resolve();
 
-            // Disable echo cancellation / noise suppression for cleaner singing input.
             const mediaStream = await navigator.mediaDevices.getUserMedia({
                 audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
             });
@@ -102,9 +102,13 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
         setStatusMsg('Sing or hum clearly');
 
         const source = audioCtx.createMediaStreamSource(mediaStream);
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.value = 2.5;
         const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 2048;
-        source.connect(analyser);
+        analyser.fftSize = 4096;
+        analyser.smoothingTimeConstant = 0;
+        source.connect(gainNode);
+        gainNode.connect(analyser);
 
         intervalRef.current = setInterval(() => {
             const hz = detectPitch(analyser, audioCtx.sampleRate);

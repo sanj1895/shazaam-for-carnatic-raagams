@@ -98,6 +98,47 @@ export function getAudioCtx() {
   return _audioCtx;
 }
 
+// Silence all app playback (drone, notes, etc.) while the mic is recording.
+// The recording uses its own separate AudioContext, so this only affects output.
+export function muteAppAudio() {
+  if (_audioCtx && _audioCtx.state === 'running') _audioCtx.suspend();
+}
+
+export function unmuteAppAudio() {
+  if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume();
+}
+
+// Open the microphone and mute app playback so the drone doesn't leak into the mic.
+// Returns the MediaStream. Always pair with closeMicStream() when done.
+export async function openMicStream() {
+  muteAppAudio();
+  return navigator.mediaDevices.getUserMedia({
+    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+  });
+}
+
+// Build a dedicated recording AudioContext + source → gain → analyser chain.
+// Returns { ctx, analyser } — caller owns both and must close ctx when done.
+export function buildMicChain(stream, { fftSize = 4096, gain = 2.5 } = {}) {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const source = ctx.createMediaStreamSource(stream);
+  const gainNode = ctx.createGain();
+  gainNode.gain.value = gain;
+  const analyser = ctx.createAnalyser();
+  analyser.fftSize = fftSize;
+  analyser.smoothingTimeConstant = 0;
+  source.connect(gainNode);
+  gainNode.connect(analyser);
+  return { ctx, analyser };
+}
+
+// Stop mic tracks, close the recording context, and restore app audio.
+export function closeMicStream(stream, ctx) {
+  stream?.getTracks().forEach(t => t.stop());
+  if (ctx && ctx.state !== 'closed') ctx.close().catch(() => {});
+  unmuteAppAudio();
+}
+
 /**
  * Play a single note using a triangle wave + octave harmonic.
  * Returns duration in ms so callers can chain notes.

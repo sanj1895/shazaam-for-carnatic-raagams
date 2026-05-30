@@ -2956,6 +2956,56 @@ CRITICAL INSTRUCTIONS FOR GURU:
             });
             feedbackText = data.choices[0]?.message?.content || 'Unable to generate feedback at this time.';
 
+            const tryFormatGuruJson = (raw) => {
+                try {
+                    const parsed = JSON.parse(raw);
+                    if (!parsed || typeof parsed !== 'object') return raw;
+
+                    const arohanamHits = parsed.arohanam_accuracy
+                        ? Object.values(parsed.arohanam_accuracy).filter((item) => item?.hit).length
+                        : 0;
+                    const avarohanamHits = parsed.avarohanam_accuracy
+                        ? Object.values(parsed.avarohanam_accuracy).filter((item) => item?.hit).length
+                        : 0;
+
+                    const unstableArohanam = parsed.arohanam_accuracy
+                        ? Object.entries(parsed.arohanam_accuracy)
+                            .filter(([, item]) => item?.hit && item?.stability === 'unstable')
+                            .map(([swara]) => swara.replace('_high', ' high Sa'))
+                        : [];
+                    const unstableAvarohanam = parsed.avarohanam_accuracy
+                        ? Object.entries(parsed.avarohanam_accuracy)
+                            .filter(([, item]) => item?.hit && item?.stability === 'unstable')
+                            .map(([swara]) => swara.replace('_high', ' high Sa'))
+                        : [];
+
+                    const allUnstable = Array.from(new Set([...unstableArohanam, ...unstableAvarohanam]));
+                    const resonance = parsed.voice_quality?.resonance || 'pleasantly resonant';
+                    const breath = parsed.voice_quality?.breath_support || 'fairly steady';
+                    const ornamentation = parsed.voice_quality?.ornamentation;
+                    const ragaName = parsed.raga_name || lesson?.raga?.name || lesson?.title || 'this raga';
+                    const character = parsed.character || '';
+
+                    const opening = `Namaste, my dear student. In ${ragaName}, you found ${arohanamHits} swaras clearly in the ascent and ${avarohanamHits} in the descent. ${character}`.trim();
+
+                    const correction = allUnstable.length
+                        ? `Your main correction is steadiness on ${allUnstable.join(', ')}. A few notes are landing, but they are not yet settling with confidence into shruti.`
+                        : `Your next step is to make each swara settle more confidently into shruti, especially when moving between neighboring notes.`;
+
+                    const voiceLine = `Your voice sounds ${resonance}, and the breath support is ${breath}.${ornamentation ? ` I also noticed: ${ornamentation}.` : ''}`;
+
+                    return [
+                        opening,
+                        correction,
+                        `${voiceLine} Practice slowly with the tambura, hold each swara for a full breath, and let Sa guide every landing before increasing speed.`
+                    ].join('\n\n');
+                } catch {
+                    return raw;
+                }
+            };
+
+            feedbackText = tryFormatGuruJson(feedbackText);
+
             setFeedback(feedbackText);
             setPhase('result');
             onSadhanaComplete?.('tutor');

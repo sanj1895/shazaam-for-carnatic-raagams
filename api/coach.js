@@ -1,12 +1,14 @@
 /**
  * Ālāpana Coach API
  *
- * Production path: React app → this endpoint → Gemini 2.5 Flash (Vertex AI) + MongoDB
- * Full MCP path:   React app → this endpoint → ADK Agent (agent/agent.py) → MongoDB MCP server
+ * When AGENT_ENGINE_RESOURCE is set (after running agent/deploy_to_agent_engine.py):
+ *   React app → this endpoint → Vertex AI Agent Engine → ADK agent → Gemini 2.5 Flash + MongoDB MCP
  *
- * The ADK agent (agent/agent.py) is the reference implementation showing the full
- * MongoDB MCP integration. This endpoint mirrors that agent's behavior for the
- * Vercel deployment where the ADK runtime isn't available.
+ * Fallback (direct Gemini, used in dev before Agent Engine is deployed):
+ *   React app → this endpoint → Gemini 2.5 Flash (Vertex AI) + MongoDB Atlas
+ *
+ * Agent Engine is part of Google Cloud Agent Builder — it's the managed execution
+ * environment that hosts the ADK agent defined in agent/agent.py.
  */
 /* global process */
 import { MongoClient } from 'mongodb';
@@ -95,6 +97,50 @@ export default async function handler(req, res) {
   }
 
   try {
+    const client = getAuthClient();
+    const { token } = await client.getAccessToken();
+
+    // ── Path A: Vertex AI Agent Engine (Google Cloud Agent Builder) ──────────
+    // Used in production when the ADK agent has been deployed via
+    // agent/deploy_to_agent_engine.py. The Agent Engine handles MongoDB MCP
+    // tool calls and session state automatically.
+    const agentEngineResource = process.env.AGENT_ENGINE_RESOURCE;
+    if (agentEngineResource) {
+      // Create or reuse a session keyed by userId.
+      const sessionRes = await fetch(
+        `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}/sessions`,
+        {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        }
+      );
+      const sessionData = await sessionRes.json();
+      const sessionId = sessionData.name?.split('/').pop() || userId;
+
+      const agentRes = await fetch(
+        `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}:streamQuery`,
+        {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            input: { messages: [{ role: 'user', parts: [{ text: message }] }] },
+            userId,
+            sessionId,
+          }),
+        }
+      );
+
+      if (agentRes.ok) {
+        const agentData = await agentRes.json();
+        const reply = agentData?.output?.content?.parts?.[0]?.text
+                   || agentData?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (reply) return res.status(200).json({ reply, via: 'agent-engine' });
+      }
+      // Fall through to direct Gemini if Agent Engine returns an error.
+    }
+
+    // ── Path B: Direct Gemini + MongoDB (dev / pre-deploy fallback) ──────────
     const sessions = await getRecentSessions(userId);
 
     const historyBlock = sessions.length > 0
@@ -102,11 +148,6 @@ export default async function handler(req, res) {
           `${new Date(s.timestamp).toLocaleDateString()}: ${s.tool || 'unknown tool'}${s.raga ? ` · Raga: ${s.raga}` : ''}${s.durationMinutes ? ` · ${s.durationMinutes} min` : ''}${s.notes ? ` · Notes: ${s.notes}` : ''}`
         ).join('\n')}\n---`
       : '\n\n[No practice history yet — new student.]';
-
-    // Get OAuth2 token from ADC or env credentials
-    const client = getAuthClient();
-    const tokenResponse = await client.getAccessToken();
-    const token = tokenResponse.token;
 
     const contents = [
       ...history.slice(-6).map(h => ({
@@ -120,10 +161,7 @@ export default async function handler(req, res) {
       `https://us-central1-aiplatform.googleapis.com/v1/projects/${GCP_PROJECT}/locations/us-central1/publishers/google/models/${GEMINI_MODEL}:generateContent`,
       {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT + historyBlock }] },
           contents,
@@ -137,9 +175,7 @@ export default async function handler(req, res) {
     );
 
     const data = await geminiRes.json();
-    if (!geminiRes.ok) {
-      return res.status(500).json({ error: JSON.stringify(data) });
-    }
+    if (!geminiRes.ok) return res.status(500).json({ error: JSON.stringify(data) });
 
     const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!reply) return res.status(500).json({ error: 'Empty response from Gemini.' });

@@ -1,16 +1,25 @@
 import { RAGAS } from './ragaLogic';
 
+// Prefer Gemini (Google Cloud) for raga identification; fall back to Groq if unavailable.
+const IDENTIFY_ENDPOINTS = ['/api/gemini-identify', '/api/groq'];
+
 export async function groqChatCompletion(payload) {
-    const response = await fetch('/api/groq', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-    });
-    if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.error?.message || err.error || `Groq API error ${response.status}`);
+    let lastErr;
+    for (const endpoint of IDENTIFY_ENDPOINTS) {
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            if (response.ok) return response.json();
+            const err = await response.json().catch(() => ({}));
+            lastErr = new Error(err.error?.message || err.error || `API error ${response.status} from ${endpoint}`);
+        } catch (e) {
+            lastErr = e;
+        }
     }
-    return response.json();
+    throw lastErr || new Error('All raga identification endpoints failed.');
 }
 
 export async function listGroqModels() {

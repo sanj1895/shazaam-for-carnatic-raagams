@@ -1,59 +1,107 @@
-# Ālāpana Coach — ADK Agent with MongoDB MCP
+# Ālāpana Coach — Google Cloud Agent Builder + MongoDB MCP
 
-This is the Google ADK agent that powers the Ālāpana practice coach. It uses the **MongoDB MCP server** to read and write practice sessions, giving the agent long-term memory about the student's progress.
+The Ālāpana practice coach is built with **Google ADK**, deployed to **Vertex AI Agent Engine** (Google Cloud Agent Builder's managed execution environment), and uses the **MongoDB MCP server** for persistent student memory.
 
 ## Architecture
 
 ```
 React App (alapana.vercel.app)
     ↓
-/api/coach  (Vercel serverless)
+/api/coach  (Vercel serverless function)
     ↓
-Google ADK Agent (Gemini 2.5 Flash)
+Vertex AI Agent Engine          ← Google Cloud Agent Builder
     ↓
-MongoDB MCP Server  ←→  MongoDB Atlas (practice sessions)
+ADK Agent  (agent/agent.py)
+├── Gemini 2.5 Flash            ← reasoning model
+└── MongoDB MCP Server          ← practice history tool
+        ↓
+MongoDB Atlas  (sessions collection)
 ```
 
-## Setup
+Raga identification (Viveka feature):
+```
+React App → /api/gemini-identify → Gemini 2.5 Flash (Vertex AI)
+```
 
-**Prerequisites:** Python 3.11+, Node.js 18+, Google Cloud CLI with ADC configured
+## Agent Engine Deployment
+
+> **Run this once** to publish the agent to Google Cloud Agent Builder.
 
 ```bash
-# 1. Create and activate Python virtual environment
+# 1. Install deploy dependencies
+pip install "google-cloud-aiplatform[adk]>=1.87.0" google-adk mcp
+
+# 2. Authenticate with Google Cloud
+gcloud auth application-default login
+
+# 3. Set environment variables
+export GOOGLE_CLOUD_PROJECT="project-24a53985-305d-4031-ae8"
+export GOOGLE_CLOUD_LOCATION="us-central1"
+export MONGODB_URI="<your-atlas-connection-string>"
+
+# 4. Deploy to Agent Engine (~5-10 min on first run)
+python agent/deploy_to_agent_engine.py
+```
+
+The script prints an `AGENT_ENGINE_RESOURCE` value. Add it to Vercel:
+
+```
+AGENT_ENGINE_RESOURCE=projects/project-24a53985-305d-4031-ae8/locations/us-central1/reasoningEngines/<ID>
+```
+
+Once set, `/api/coach` routes through Agent Engine automatically. The agent handles MongoDB MCP tool calls server-side.
+
+## Local Development
+
+```bash
+# 1. Create venv and install
 python3 -m venv .venv
 source .venv/bin/activate
-
-# 2. Install Python dependencies
 pip install google-adk mcp
 
-# 3. Set up environment variables
+# 2. Copy env file
 cp agent/.env.example agent/.env
-# Edit agent/.env with your values
+# Fill in MONGODB_URI and GOOGLE_CLOUD_PROJECT
 
-# 4. Authenticate with Google Cloud (Vertex AI)
+# 3. Authenticate
 gcloud auth application-default login
-bash <(curl -sSL https://storage.googleapis.com/cloud-samples-data/adc/setup_adc.sh)
 
-# 5. Run the agent locally
+# 4. Run locally (opens ADK dev UI at http://localhost:8000)
 adk web agent
-# Opens at http://localhost:8000
 ```
+
+The ADK dev UI shows real-time MongoDB tool call traces.
 
 ## Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `MONGODB_URI` | MongoDB Atlas connection string |
-| `GOOGLE_CLOUD_PROJECT` | GCP project ID |
-| `GOOGLE_CLOUD_LOCATION` | GCP region (us-central1) |
-| `GOOGLE_GENAI_USE_VERTEXAI` | Set to `1` to use Vertex AI |
+| Variable | Where | Description |
+|----------|-------|-------------|
+| `MONGODB_URI` | `.env` + Vercel | MongoDB Atlas connection string |
+| `GOOGLE_CLOUD_PROJECT` | `.env` + Vercel | GCP project ID |
+| `GOOGLE_CLOUD_LOCATION` | `.env` + Vercel | GCP region (`us-central1`) |
+| `GOOGLE_GENAI_USE_VERTEXAI` | `.env` | Set to `1` to use Vertex AI |
+| `GOOGLE_CREDENTIALS_B64` | Vercel only | Base64 service account JSON |
+| `AGENT_ENGINE_RESOURCE` | Vercel only | Resource name after deployment |
 
-## How it works
+## How It Works
 
-When a student sends a message:
-1. The agent calls MongoDB MCP `find` to retrieve their practice history
-2. Gemini 2.5 Flash reasons over the history and the student's request
-3. The agent recommends specific tools in the Ālāpana app (Gurukul, Raga Kosha, Viveka, etc.)
-4. After a session, the agent calls MongoDB MCP `insertOne` to save the session
+When a student sends a message to the coach:
 
-The Events trace in the ADK web UI shows each MongoDB tool call in real time.
+1. `/api/coach` calls the Agent Engine REST API with the message + userId
+2. Agent Engine invokes the ADK agent (`agent/agent.py`)
+3. The agent calls **MongoDB MCP `find`** to retrieve the student's practice history
+4. **Gemini 2.5 Flash** reasons over the history and the student's request
+5. The agent recommends specific tools in the Ālāpana app (Gurukul, Raga Kosha, Viveka, etc.)
+6. After a session, the agent calls **MongoDB MCP `insertOne`** to save progress
+
+For raga identification (Viveka), `/api/gemini-identify` calls Gemini 2.5 Flash directly via Vertex AI with the transcribed swara evidence and local candidate shortlist.
+
+## MongoDB Track — Partner Integration
+
+This submission uses the **MongoDB MCP server** (`mongodb-mcp-server` via npx) as the partner integration:
+
+- **Collection**: `alapana.sessions`
+- **Operations**: `find` (read history), `insertOne` (save sessions)
+- **Schema**: `{ userId, timestamp, tool, raga, durationMinutes, notes }`
+
+The agent reads MongoDB before every response and writes after every completed session — giving it genuine long-term memory that persists across app restarts.

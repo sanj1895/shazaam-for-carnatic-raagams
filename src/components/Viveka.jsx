@@ -191,22 +191,49 @@ const CREPE_URL = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/
  */
 function runCREPEOnBuffer(ctx, segBuffer) {
     return new Promise((resolve) => {
+        if (!window.ml5?.pitchDetection) {
+            resolve({ frames: [], rawCount: 0 });
+            return;
+        }
+
         const frames   = [];
         const pitchBuf = [];
         let rawCount   = 0;
         let done       = false;
+        let resolved   = false;
+        let pollTimer  = null;
+        let failSafeTimer = null;
+
+        const settle = (result) => {
+            if (resolved) return;
+            resolved = true;
+            done = true;
+            if (pollTimer) clearInterval(pollTimer);
+            if (failSafeTimer) clearTimeout(failSafeTimer);
+            resolve(result);
+        };
 
         const source = ctx.createBufferSource();
         source.buffer = segBuffer;
         const dest = ctx.createMediaStreamDestination(); // silent — not to speakers
         source.connect(dest);
 
+        // Offline/upload analysis is more fragile than the live mic path on Safari/WebKit.
+        // Resume explicitly and always bail out to the fallback extractor if CREPE hangs.
+        Promise.resolve(ctx.state === 'suspended' ? ctx.resume() : null).catch(() => {});
+
         ml5.pitchDetection(CREPE_URL, ctx, dest.stream, (err, pitchModel) => {
-            if (err || !pitchModel) { resolve({ frames, rawCount }); return; }
-            source.start(0);
+            if (err || !pitchModel) { settle({ frames, rawCount }); return; }
+
+            try {
+                source.start(0);
+            } catch {
+                settle({ frames, rawCount });
+                return;
+            }
 
             const loop = () => {
-                if (done) { resolve({ frames, rawCount }); return; }
+                if (done) { settle({ frames, rawCount }); return; }
                 pitchModel.getPitch((_, hz) => {
                     if (hz && !done) {
                         rawCount++;
@@ -231,9 +258,20 @@ function runCREPEOnBuffer(ctx, segBuffer) {
             loop();
         });
 
-        source.onended = () => { done = true; };
-        // Safety timeout: resolve if source.onended never fires
-        setTimeout(() => { done = true; }, (segBuffer.duration + 8) * 1000);
+        source.onended = () => settle({ frames, rawCount });
+
+        // If the source never advances, poll wall-clock time and finish manually.
+        const expectedEnd = Date.now() + segBuffer.duration * 1000 + 1500;
+        pollTimer = setInterval(() => {
+            if (!done && Date.now() >= expectedEnd) {
+                settle({ frames, rawCount });
+            }
+        }, 250);
+
+        // Hard timeout for silent CREPE/model-load failures.
+        failSafeTimer = setTimeout(() => {
+            settle({ frames, rawCount });
+        }, Math.max((segBuffer.duration + 10) * 1000, 15000));
     });
 }
 
@@ -511,6 +549,13 @@ export default function Viveka({ onSelectRaga }) {
             setUploadProgress(15);
 
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (ctx.state === 'suspended') {
+                try {
+                    await ctx.resume();
+                } catch {
+                    // If resume fails, the fallback extractor may still succeed.
+                }
+            }
             const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
             setUploadProgress(22);
 

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { detectPitch, extractPitchFrames, mixToMono, findBestSegment } from '../utils/audioUtils';
 import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
 /* global ml5 */
@@ -284,6 +284,7 @@ export default function Viveka({ onSelectRaga }) {
     const [errorMsg,  setErrorMsg]  = useState('');
     const [uploadProgress,    setUploadProgress]    = useState(0);  // 0-100 during file processing
     const [uploadSegmentInfo, setUploadSegmentInfo] = useState(null); // { startSec, endSec, filename }
+    const [uploadStage, setUploadStage] = useState('Reading file…');
 
     const streamRef     = useRef(null);
     const analyserRef   = useRef(null);
@@ -292,6 +293,12 @@ export default function Viveka({ onSelectRaga }) {
     const autoStopTimer = useRef(null);
     const framesRef     = useRef([]);
     const statusRef     = useRef(STATUS.IDLE); // mirror for use inside closures
+    const inputModeRef  = useRef(MODE.RECORD);
+    const fileInputRef  = useRef(null);
+
+    useEffect(() => {
+        inputModeRef.current = inputMode;
+    }, [inputMode]);
 
     const cleanup = useCallback(() => {
         clearInterval(pitchTimer.current);
@@ -427,6 +434,7 @@ export default function Viveka({ onSelectRaga }) {
     }, [cleanup, runAnalysis]);
 
     const startRecording = async () => {
+        if (inputModeRef.current !== MODE.RECORD || statusRef.current !== STATUS.IDLE) return;
         framesRef.current = [];
         setCurrentHz(null);
         setResults(null);
@@ -530,6 +538,9 @@ export default function Viveka({ onSelectRaga }) {
         setErrorMsg('');
         setElapsed(0);
         setCurrentHz(null);
+        setUploadProgress(0);
+        setUploadSegmentInfo(null);
+        setUploadStage('Reading file…');
         framesRef.current = [];
     };
 
@@ -543,6 +554,7 @@ export default function Viveka({ onSelectRaga }) {
         setStatus(STATUS.UPLOADING);
         setUploadProgress(5);
         setUploadSegmentInfo(null);
+        setUploadStage('Reading file…');
 
         try {
             const arrayBuffer = await file.arrayBuffer();
@@ -558,6 +570,7 @@ export default function Viveka({ onSelectRaga }) {
             }
             const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
             setUploadProgress(22);
+            setUploadStage('Selecting clearest section…');
 
             // Mix all channels to mono so stereo files don't lose the right channel.
             const mono = mixToMono(audioBuffer);
@@ -573,6 +586,7 @@ export default function Viveka({ onSelectRaga }) {
             };
             setUploadSegmentInfo(segInfo);
             setUploadProgress(28);
+            setUploadStage('Extracting melody with CREPE…');
 
             // Build a mono AudioBuffer for just the selected segment.
             const segLen = endSample - startSample;
@@ -595,6 +609,8 @@ export default function Viveka({ onSelectRaga }) {
 
             // ── Fallback: autocorrelation if CREPE produced nothing ───────────
             if (frames.length < 4) {
+                setUploadStage('CREPE stalled — switching to fallback analyzer…');
+                setUploadProgress(92);
                 const fb = await extractPitchFrames(audioBuffer, { startSample, endSample });
                 if (fb.frames.length > frames.length) {
                     frames   = fb.frames;
@@ -604,6 +620,7 @@ export default function Viveka({ onSelectRaga }) {
 
             ctx.close();
             setUploadProgress(100);
+            setUploadStage('Preparing results…');
 
             // Debug output — always logged, useful for diagnosing weak results
             console.debug('[Viveka upload]', {
@@ -717,8 +734,13 @@ export default function Viveka({ onSelectRaga }) {
                                 { id: MODE.UPLOAD, label: 'Upload audio' },
                             ].map(tab => (
                                 <button
+                                    type="button"
                                     key={tab.id}
-                                    onClick={() => setInputMode(tab.id)}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setInputMode(tab.id);
+                                    }}
                                     className={`flex-1 py-1.5 text-xs font-semibold rounded transition-all ${
                                         inputMode === tab.id
                                             ? 'bg-c-gold text-c-bg'
@@ -734,6 +756,7 @@ export default function Viveka({ onSelectRaga }) {
                         {inputMode === MODE.RECORD && (
                             <>
                                 <button
+                                    type="button"
                                     onClick={startRecording}
                                     className="relative w-32 h-32 rounded-full bg-c-card border-2 border-c-gold/50 hover:border-c-gold hover:bg-c-gold-faint flex flex-col items-center justify-center gap-1.5 transition-all active:scale-95 group shadow-lg"
                                 >
@@ -758,8 +781,12 @@ export default function Viveka({ onSelectRaga }) {
 
                         {/* Upload mode */}
                         {inputMode === MODE.UPLOAD && (
-                            <label className="w-full max-w-sm flex flex-col items-center gap-4 cursor-pointer group">
-                                <div className="w-full border-2 border-dashed border-c-gold/30 hover:border-c-gold/60 rounded-xl py-10 flex flex-col items-center gap-3 transition-all bg-c-surface hover:bg-c-card">
+                            <div className="w-full max-w-sm flex flex-col items-center gap-4 group">
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="w-full border-2 border-dashed border-c-gold/30 hover:border-c-gold/60 rounded-xl py-10 flex flex-col items-center gap-3 transition-all bg-c-surface hover:bg-c-card"
+                                >
                                     <svg className="w-10 h-10 text-c-gold/40 group-hover:text-c-gold/70 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
                                     </svg>
@@ -768,8 +795,9 @@ export default function Viveka({ onSelectRaga }) {
                                         <p className="text-xs text-c-cream-dark opacity-50 mt-1">or click to browse</p>
                                     </div>
                                     <span className="text-[9px] text-c-cream-dark/40 font-mono uppercase tracking-widest">mp3 · wav · m4a · ogg · flac</span>
-                                </div>
+                                </button>
                                 <input
+                                    ref={fileInputRef}
                                     type="file"
                                     accept="audio/*"
                                     className="hidden"
@@ -778,7 +806,7 @@ export default function Viveka({ onSelectRaga }) {
                                 <p className="text-[10px] text-c-cream-dark font-playfair italic opacity-40 text-center">
                                     Best with clear lead melody · Viveka finds the closest raga match
                                 </p>
-                            </label>
+                            </div>
                         )}
                     </div>
                 )}
@@ -835,7 +863,7 @@ export default function Viveka({ onSelectRaga }) {
                         <div className="w-8 h-8 border-2 border-c-gold/30 border-t-c-gold rounded-full animate-spin" />
                         <div className="text-center flex flex-col gap-1">
                             <p className="font-playfair text-c-cream italic">
-                                {uploadProgress < 28 ? 'Reading file…' : 'Extracting melody with CREPE…'}
+                                {uploadStage}
                             </p>
                             {uploadSegmentInfo && (
                                 <p className="text-[10px] text-c-cream-dark font-mono opacity-60">
@@ -850,7 +878,7 @@ export default function Viveka({ onSelectRaga }) {
                             />
                         </div>
                         <p className="text-[9px] text-c-cream-dark font-mono opacity-40 uppercase tracking-widest">
-                            {uploadProgress < 28 ? 'Decoding audio' : 'This may take ~25 seconds'}
+                            {uploadProgress < 28 ? 'Decoding audio' : uploadProgress < 92 ? 'This may take ~25 seconds' : 'Finalizing analysis'}
                         </p>
                     </div>
                 )}

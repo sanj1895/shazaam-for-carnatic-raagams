@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.61.8",
     "@google-cloud/vertexai": "^1.12.0",
     "@google/genai": "^2.7.0",
     "autoprefixer": "^10.4.22",

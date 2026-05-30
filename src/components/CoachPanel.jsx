@@ -21,25 +21,13 @@ function detectToolNavigation(text) {
   return null;
 }
 
-const getUserId = () => {
-  try {
-    let id = localStorage.getItem('alapana_user_id');
-    if (!id) {
-      id = 'user_' + Math.random().toString(36).slice(2, 10);
-      localStorage.setItem('alapana_user_id', id);
-    }
-    return id;
-  } catch {
-    return 'default';
-  }
-};
-
-export default function CoachPanel({ onNavigate, appMode, sadhanaState, autoMessage, onAutoMessageSent }) {
+export default function CoachPanel({ userId, onNavigate, appMode, sadhanaState, autoMessage, onAutoMessageSent }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([{ role: 'assistant', content: WELCOME }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const userId = useRef(getUserId());
+  const userIdRef = useRef(userId);
+  useEffect(() => { userIdRef.current = userId; }, [userId]);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
   const autoSendRef = useRef(null);
@@ -62,7 +50,7 @@ export default function CoachPanel({ onNavigate, appMode, sadhanaState, autoMess
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: text,
-          userId: userId.current,
+          userId: userIdRef.current,
           history: messages.slice(-8),
           appMode,
           sadhanaCompleted: sadhanaState?.completed || [],
@@ -124,7 +112,7 @@ export default function CoachPanel({ onNavigate, appMode, sadhanaState, autoMess
       await fetch('/api/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: userId.current, ...sessionData }),
+        body: JSON.stringify({ userId: userIdRef.current, ...sessionData }),
       });
     } catch {
       // silently fail — session saving is non-critical

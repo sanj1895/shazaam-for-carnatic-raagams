@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useUser, SignInButton, UserButton } from '@clerk/clerk-react';
 import { createPortal } from 'react-dom';
 import AudioInput from './components/AudioInput';
 import RagaDisplay from './components/RagaDisplay';
@@ -355,7 +356,19 @@ function loadSadhanaState() {
     }
 }
 
+function getGuestUserId() {
+    try {
+        let id = localStorage.getItem('alapana_user_id');
+        if (!id) { id = 'user_' + Math.random().toString(36).slice(2, 10); localStorage.setItem('alapana_user_id', id); }
+        return id;
+    } catch { return 'default'; }
+}
+
 function App() {
+    const { user, isSignedIn } = useUser();
+    const guestUserId = useRef(getGuestUserId());
+    const userId = (isSignedIn && user?.id) ? user.id : guestUserId.current;
+
     const initialRoute = parseHashRoute();
     const [view, setView] = useState(() => initialRoute.view);
     const [appMode, setAppMode] = useState(loadAppMode);
@@ -859,6 +872,7 @@ function App() {
                 active={quizActive}
                 onDismiss={() => setQuizActive(false)}
                 onModeSelected={(mode) => setAppMode(mode)}
+                userId={userId}
                 onOpenCoach={() => {
                     setQuizActive(false);
                     setCoachAutoMessage("I just finished my setup. What's the best place for me to start?");
@@ -1136,8 +1150,17 @@ function App() {
                     ))}
                 </div>
 
-                {/* Mobile hamburger */}
-                <div className="flex items-center gap-2">
+                {/* Mobile hamburger + auth */}
+                <div className="flex items-center gap-3">
+                    {isSignedIn ? (
+                        <UserButton />
+                    ) : (
+                        <SignInButton mode="modal">
+                            <button className="text-[11px] font-playfair font-bold tracking-[0.1em] uppercase text-c-cream-dim hover:text-c-gold/60 transition-all px-1">
+                                Sign in
+                            </button>
+                        </SignInButton>
+                    )}
                     <button
                         onClick={() => setMobileMenuOpen(true)}
                         className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-c-surface transition-colors"
@@ -2881,6 +2904,7 @@ function App() {
         )}
 
         <CoachPanel
+            userId={userId}
             onNavigate={(view) => goTo(view)}
             appMode={appMode}
             sadhanaState={sadhana}

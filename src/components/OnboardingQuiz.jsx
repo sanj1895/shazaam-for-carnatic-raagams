@@ -233,7 +233,7 @@ function getRecommendation(branch, answers) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeSelected }) {
+export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeSelected, userId }) {
     const [uIdx, setUIdx]       = useState(0);
     const [bIdx, setBIdx]       = useState(0);
     const [stage, setStage]     = useState('universal'); // 'universal' | 'branch' | 'result'
@@ -338,11 +338,6 @@ export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeS
     const handleBegin = () => {
         // Persist quiz profile so the coach can personalize immediately
         try {
-            let userId = localStorage.getItem('alapana_user_id');
-            if (!userId) {
-                userId = 'user_' + Math.random().toString(36).slice(2, 10);
-                localStorage.setItem('alapana_user_id', userId);
-            }
             fetch('/api/profile', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

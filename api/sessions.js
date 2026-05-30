@@ -52,46 +52,41 @@ export default async function handler(req, res) {
       const { userId = 'default', tool, raga, durationMinutes, notes } = req.body || {};
       const agentEngineResource = process.env.AGENT_ENGINE_RESOURCE;
 
-      if (agentEngineResource) {
-        // Route writes through Agent Engine → ADK agent → MongoDB MCP insertOne.
-        const client = getAuthClient();
-        const { token } = await client.getAccessToken();
-
-        const sessionRes = await fetch(
-          `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}/sessions`,
-          {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId }),
-          }
-        );
-        const sessionData = await sessionRes.json();
-        const sessionId = sessionData.name?.split('/').pop() || userId;
-
-        const recordMsg = `Record this practice session in the 'sessions' collection of the 'alapana' database using MongoDB insertOne: { userId: "${userId}", tool: "${tool || ''}", raga: "${raga || ''}", durationMinutes: ${durationMinutes || 0}, notes: "${notes || ''}", timestamp: current UTC time }.`;
-
-        await fetch(
-          `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}:streamQuery`,
-          {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              input: { messages: [{ role: 'user', parts: [{ text: recordMsg }] }] },
-              userId,
-              sessionId,
-            }),
-          }
-        );
-
-        return res.status(201).json({ ok: true, via: 'agent-mcp' });
+      if (!agentEngineResource) {
+        return res.status(503).json({ error: 'Agent Engine not configured. Set AGENT_ENGINE_RESOURCE.' });
       }
 
-      // Fallback: direct MongoDB write when Agent Engine is not configured (local dev).
-      const db = await getDb();
-      await db.collection('sessions').insertOne({
-        userId, tool, raga, durationMinutes, notes, timestamp: new Date(),
-      });
-      return res.status(201).json({ ok: true, via: 'direct' });
+      // Route writes through Agent Engine → ADK agent → MongoDB MCP insertOne.
+      const client = getAuthClient();
+      const { token } = await client.getAccessToken();
+
+      const sessionRes = await fetch(
+        `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}/sessions`,
+        {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        }
+      );
+      const sessionData = await sessionRes.json();
+      const sessionId = sessionData.name?.split('/').pop() || userId;
+
+      const recordMsg = `Record this practice session in the 'sessions' collection of the 'alapana' database using MongoDB insertOne: { userId: "${userId}", tool: "${tool || ''}", raga: "${raga || ''}", durationMinutes: ${durationMinutes || 0}, notes: "${notes || ''}", timestamp: current UTC time }.`;
+
+      await fetch(
+        `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}:streamQuery`,
+        {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            input: { messages: [{ role: 'user', parts: [{ text: recordMsg }] }] },
+            userId,
+            sessionId,
+          }),
+        }
+      );
+
+      return res.status(201).json({ ok: true, via: 'agent-mcp' });
     }
 
     res.setHeader('Allow', 'GET, POST');

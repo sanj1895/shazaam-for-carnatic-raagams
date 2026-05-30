@@ -18,6 +18,7 @@ import OnboardingTour from './components/OnboardingTour';
 import OnboardingQuiz from './components/OnboardingQuiz';
 import { CuratedIcon, FireIcon, DhwaniIcon, SadhanaIcon } from './components/IconLibrary';
 import SketchyRule from './components/SketchyRule';
+import CoachPanel from './components/CoachPanel';
 
 const VeenaIcon = () => (
     <svg width="16" height="50" viewBox="0 0 22 68" fill="none" className="text-c-gold-dim">
@@ -2725,6 +2726,8 @@ function App() {
                 </div>
             </>
         )}
+
+        <CoachPanel />
     </>
   );
 }

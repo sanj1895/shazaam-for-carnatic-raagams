@@ -1,0 +1,225 @@
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+
+const WELCOME = "Namaskaram! I'm your Ālāpana practice coach. Tell me what you want to work on today — or ask me to plan a session based on your history.";
+
+const getUserId = () => {
+  try {
+    let id = localStorage.getItem('alapana_user_id');
+    if (!id) {
+      id = 'user_' + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem('alapana_user_id', id);
+    }
+    return id;
+  } catch {
+    return 'default';
+  }
+};
+
+export default function CoachPanel({ onNavigate }) {
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState([{ role: 'assistant', content: WELCOME }]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const userId = useRef(getUserId());
+  const bottomRef = useRef(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (open) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => inputRef.current?.focus(), 80);
+    }
+  }, [open, messages]);
+
+  const send = useCallback(async () => {
+    const text = input.trim();
+    if (!text || loading) return;
+
+    const userMsg = { role: 'user', content: text };
+    setMessages(prev => [...prev, userMsg]);
+    setInput('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text,
+          userId: userId.current,
+          history: messages.slice(-8),
+        }),
+      });
+      const data = await res.json();
+      const reply = data.reply || 'Sorry, I had trouble responding. Please try again.';
+      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+    } catch {
+      setMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: 'Connection error. Check your internet and try again.' },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  }, [input, loading, messages]);
+
+  const handleKey = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  };
+
+  // Save a practice session to MongoDB
+  const saveSession = useCallback(async (sessionData) => {
+    try {
+      await fetch('/api/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: userId.current, ...sessionData }),
+      });
+    } catch {
+      // silently fail — session saving is non-critical
+    }
+  }, []);
+
+  // Expose saveSession so App.jsx can call it
+  useEffect(() => {
+    window.__alapanaCoach = { saveSession };
+    return () => { delete window.__alapanaCoach; };
+  }, [saveSession]);
+
+  return (
+    <>
+      {/* Floating button */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        aria-label="Open practice coach"
+        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-13 h-13 rounded-full shadow-[0_4px_24px_rgba(199,139,34,0.4)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+        style={{ background: 'linear-gradient(135deg, #c78b22, #e8b84b)', width: '52px', height: '52px' }}
+      >
+        <span className="text-xl" style={{ color: '#1a0a00' }}>🪈</span>
+      </button>
+
+      {/* Panel */}
+      {open && (
+        <div
+          className="fixed z-50 flex flex-col overflow-hidden animate-fade-in"
+          style={{
+            bottom: 'calc(80px + 1rem)',
+            right: '1rem',
+            width: 'min(360px, calc(100vw - 2rem))',
+            maxHeight: 'calc(100vh - 120px)',
+            background: 'rgba(14,7,2,0.97)',
+            border: '1px solid rgba(199,139,34,0.25)',
+            borderRadius: '20px',
+            boxShadow: '0 12px 48px rgba(0,0,0,0.7)',
+          }}
+        >
+          {/* Header */}
+          <div
+            className="flex items-center justify-between px-4 py-3 flex-shrink-0"
+            style={{ borderBottom: '1px solid rgba(199,139,34,0.15)', background: 'rgba(20,9,2,0.8)' }}
+          >
+            <div>
+              <div className="font-playfair text-sm" style={{ color: '#e8c96a' }}>Ālāpana Coach</div>
+              <div className="text-[9px] uppercase tracking-[0.25em]" style={{ color: 'rgba(243,234,214,0.4)' }}>
+                Practice Guide · MongoDB Memory
+              </div>
+            </div>
+            <button
+              onClick={() => setOpen(false)}
+              className="w-7 h-7 rounded-full flex items-center justify-center text-xs transition-colors"
+              style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(243,234,214,0.5)' }}
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-3 space-y-3" style={{ scrollbarWidth: 'none' }}>
+            {messages.map((m, i) => (
+              <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  className="rounded-2xl px-3 py-2 text-[12.5px] leading-[1.72]"
+                  style={{
+                    maxWidth: '86%',
+                    ...(m.role === 'user'
+                      ? { background: '#c78b22', color: '#1a0800', fontWeight: 500 }
+                      : {
+                          background: 'rgba(255,255,255,0.05)',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          color: 'rgba(243,234,214,0.92)',
+                          whiteSpace: 'pre-wrap',
+                        }),
+                  }}
+                >
+                  {m.content}
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div className="flex justify-start">
+                <div
+                  className="rounded-2xl px-3 py-2 text-[12px]"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(243,234,214,0.4)' }}
+                >
+                  <span className="animate-pulse">thinking…</span>
+                </div>
+              </div>
+            )}
+            <div ref={bottomRef} />
+          </div>
+
+          {/* Quick prompts (shown only at start) */}
+          {messages.length === 1 && (
+            <div className="px-3 pb-2 flex flex-wrap gap-1.5 flex-shrink-0">
+              {[
+                'Plan a 30-min session',
+                'What should I practice today?',
+                'I want to improve Bhairavi',
+              ].map(prompt => (
+                <button
+                  key={prompt}
+                  onClick={() => { setInput(prompt); setTimeout(() => inputRef.current?.focus(), 50); }}
+                  className="text-[10.5px] px-2.5 py-1 rounded-full transition-colors"
+                  style={{ background: 'rgba(199,139,34,0.12)', border: '1px solid rgba(199,139,34,0.25)', color: 'rgba(199,139,34,0.9)' }}
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Input */}
+          <div
+            className="px-3 py-2.5 flex gap-2 flex-shrink-0"
+            style={{ borderTop: '1px solid rgba(199,139,34,0.12)' }}
+          >
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={handleKey}
+              placeholder="Ask your coach…"
+              className="flex-1 rounded-xl px-3 py-2 text-[12.5px] outline-none transition-colors"
+              style={{
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(199,139,34,0.2)',
+                color: 'rgba(243,234,214,0.95)',
+              }}
+            />
+            <button
+              onClick={send}
+              disabled={loading || !input.trim()}
+              className="w-9 h-9 flex items-center justify-center rounded-xl text-sm font-bold transition-all disabled:opacity-30"
+              style={{ background: '#c78b22', color: '#1a0800', flexShrink: 0 }}
+            >
+              ↑
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

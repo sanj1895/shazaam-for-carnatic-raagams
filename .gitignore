@@ -25,3 +25,10 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# Python agent
+.venv/
+agent/.env
+agent/__pycache__/
+agent/.adk/
+*.pyc

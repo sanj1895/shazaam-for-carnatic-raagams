@@ -1,3 +1,13 @@
+/**
+ * Ālāpana Coach API
+ *
+ * Production path: React app → this endpoint → Gemini 2.5 Flash (Vertex AI) + MongoDB
+ * Full MCP path:   React app → this endpoint → ADK Agent (agent/agent.py) → MongoDB MCP server
+ *
+ * The ADK agent (agent/agent.py) is the reference implementation showing the full
+ * MongoDB MCP integration. This endpoint mirrors that agent's behavior for the
+ * Vercel deployment where the ADK runtime isn't available.
+ */
 /* global process */
 import { MongoClient } from 'mongodb';
 import { GoogleAuth, UserRefreshClient } from 'google-auth-library';

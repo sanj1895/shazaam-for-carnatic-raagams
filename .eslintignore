@@ -1,0 +1,4 @@
+.venv/
+agent/
+node_modules/
+dist/

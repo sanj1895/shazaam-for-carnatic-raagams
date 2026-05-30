@@ -90,6 +90,8 @@ const MODE_ALLOWED_VIEWS = {
     musician: new Set(['home', 'avabodha', 'tutor', 'listen', 'viveka', 'transcribe', 'library', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam']),
 };
 
+const PENDING_ROUTE_KEY = 'alapana_pending_route';
+
 function loadAppMode() {
     try {
         return localStorage.getItem('alapana_app_mode') || 'musician';
@@ -442,6 +444,7 @@ function App() {
     const selectedGrahaSwara = GRAHA_BHEDAM_SWARAS[explorePreviewShiftIndex % GRAHA_BHEDAM_SWARAS.length];
     const currentTranscribePhrase = TRANSCRIBE_PREVIEW_PHRASES[transcribePreviewPhraseIndex % TRANSCRIBE_PREVIEW_PHRASES.length];
     const selectedGurukulCategory = GURUKUL_PREVIEW_CATEGORIES[gurukulPreviewCategoryIndex % GURUKUL_PREVIEW_CATEGORIES.length];
+    const avabodhaPreviewMode = practiceDemoPitchState === 'match' ? 'dhwani' : 'viveka';
 
     useEffect(() => {
         const beatTimer = setInterval(() => {
@@ -740,36 +743,36 @@ function App() {
         }
     }, [appMode, view]);
 
+    const applyParsedRoute = useCallback((route) => {
+        const targetMode = route.mode || appMode;
+        const targetView = route.view || 'home';
+        const allowedViews = MODE_ALLOWED_VIEWS[targetMode] || MODE_ALLOWED_VIEWS.musician;
+        if (!allowedViews.has(targetView)) {
+            window.location.hash = '#/home';
+            return;
+        }
+        setAboutOpen(!!route.about);
+        if (route.mode && route.mode !== appMode) {
+            setAppMode(route.mode);
+        }
+        if (targetView !== viewRef.current) {
+            if (targetView !== 'listen') handleReset();
+            setView(targetView);
+            setShowFeatures(route.workspace ? true : targetView !== 'home');
+            setShowWorkspaceSections(route.workspace);
+        } else if (targetView === 'home') {
+            setShowFeatures(route.workspace ? true : false);
+            setShowWorkspaceSections(route.workspace);
+        }
+        setTutorLaunchTarget(targetView === 'tutor' ? parseTutorHashTarget(route.segments) : null);
+    }, [appMode]);
+
     // Listen for hashchange events (back/forward navigation only — not goTo-triggered changes)
     useEffect(() => {
-        const handleHashChange = () => {
-            const route = parseHashRoute();
-            const targetMode = route.mode || appMode;
-            const targetView = route.view || 'home';
-            const allowedViews = MODE_ALLOWED_VIEWS[targetMode] || MODE_ALLOWED_VIEWS.musician;
-            if (!allowedViews.has(targetView)) {
-                window.location.hash = '#/home';
-                return;
-            }
-            setAboutOpen(!!route.about);
-            if (route.mode && route.mode !== appMode) {
-                setAppMode(route.mode);
-            }
-            if (targetView !== viewRef.current) {
-                if (targetView !== 'listen') handleReset();
-                setView(targetView);
-                setShowFeatures(route.workspace ? true : targetView !== 'home');
-                setShowWorkspaceSections(route.workspace);
-            } else if (targetView === 'home') {
-                setShowFeatures(route.workspace ? true : false);
-                setShowWorkspaceSections(route.workspace);
-            }
-            setTutorLaunchTarget(targetView === 'tutor' ? parseTutorHashTarget(route.segments) : null);
-        };
-
+        const handleHashChange = () => applyParsedRoute(parseHashRoute());
         window.addEventListener('hashchange', handleHashChange);
         return () => window.removeEventListener('hashchange', handleHashChange);
-    }, [appMode]);
+    }, [applyParsedRoute]);
 
     const TRACKED_TOOLS = new Set(['avabodha', 'listen', 'viveka', 'transcribe', 'library', 'tutor', 'singback', 'keyboard', 'shruthi', 'talam']);
 
@@ -780,8 +783,8 @@ function App() {
 
     useEffect(() => {
         if (isSignedIn) return;
-        if (window.location.hash !== '#/home') {
-            window.history.replaceState(null, '', '#/home');
+        if (window.location.hash && window.location.hash !== '#/home' && window.location.hash !== '#/about') {
+            try { localStorage.setItem(PENDING_ROUTE_KEY, window.location.hash); } catch {}
         }
         if (view !== 'home') setView('home');
         if (showFeatures) setShowFeatures(false);
@@ -790,16 +793,27 @@ function App() {
         if (tourActive) setTourActive(false);
     }, [isSignedIn, view, showFeatures, showWorkspaceSections, quizActive, tourActive]);
 
+    useEffect(() => {
+        if (!isSignedIn) return;
+        const hashRoute = window.location.hash && window.location.hash !== '#/home' && window.location.hash !== '#/about'
+            ? window.location.hash
+            : '';
+        const pendingRoute = (() => { try { return localStorage.getItem(PENDING_ROUTE_KEY) || ''; } catch { return ''; } })();
+        const routeToApply = hashRoute || pendingRoute;
+        if (!routeToApply) return;
+        applyParsedRoute(parseHashRoute(routeToApply));
+        try { localStorage.removeItem(PENDING_ROUTE_KEY); } catch {}
+    }, [isSignedIn, applyParsedRoute]);
+
     const goTo = (id, options = {}) => {
         const { tutorTarget = null, modeOverride = null, workspace = false } = options;
         if (!isSignedIn && (id !== 'home' || workspace || tutorTarget || modeOverride)) {
+            const pendingHash = buildHashForView(id, tutorTarget, modeOverride || appMode, { workspace });
+            try { localStorage.setItem(PENDING_ROUTE_KEY, pendingHash); } catch {}
             promptSignIn();
             setView('home');
             setShowFeatures(false);
             setShowWorkspaceSections(false);
-            if (window.location.hash !== '#/home') {
-                window.history.replaceState(null, '', '#/home');
-            }
             return;
         }
         const effectiveMode = modeOverride || appMode;
@@ -1472,7 +1486,7 @@ function App() {
 
                                                     <div className="hidden md:block mt-4 lg:mt-0 lg:pl-4">
                                                         <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/14 bg-[radial-gradient(circle_at_50%_24%,rgba(125,56,24,0.18),transparent_28%),linear-gradient(180deg,rgba(22,8,4,0.9),rgba(10,4,2,0.96))] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.04)] overflow-hidden">
-                                                            <div className="grid md:grid-cols-3">
+                                                            <div className="grid md:grid-cols-4">
                                                                 <div
                                                                     className="workspace-preview-panel group sm:min-h-[340px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('shruthi')}
@@ -1681,7 +1695,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel avabodha-preview-panel group md:col-span-3 sm:min-h-[340px] px-4 sm:px-5 py-4 sm:py-5 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel avabodha-preview-panel group sm:min-h-[340px] px-4 sm:px-5 py-4 sm:py-5 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('avabodha')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'avabodha' ? null : current)}
                                                                 >
@@ -1690,61 +1704,69 @@ function App() {
                                                                         <span className="ml-2 text-[8px] font-mono tracking-widest" style={{ color: 'rgba(214,156,68,0.45)' }}>Dhwani · Viveka</span>
                                                                     </div>
                                                                     <div className="mt-5 flex flex-col items-center gap-4">
-                                                                        <div className="flex items-center gap-8">
-                                                                            {/* Dhwani — real-time */}
-                                                                            <div className="flex flex-col items-center gap-3">
-                                                                                <div className="relative h-[52px] w-[52px] overflow-hidden rounded-full">
-                                                                                    <div className="absolute inset-0 rounded-full border border-c-gold/12" />
-                                                                                    <div
-                                                                                        className="absolute inset-[8px] rounded-full border transition-all duration-300"
-                                                                                        style={{
-                                                                                            borderColor: practiceDemoPitchState === 'match' ? 'rgba(199,139,34,0.48)' : 'rgba(199,139,34,0.22)',
-                                                                                            boxShadow: avabodhaPreviewActive && practiceDemoPitchState === 'match' ? '0 0 14px rgba(199,139,34,0.18)' : 'none',
-                                                                                        }}
-                                                                                    />
-                                                                                    <div
-                                                                                        className="avabodha-sweep absolute inset-[10px] rounded-full"
-                                                                                        style={{
-                                                                                            background: 'conic-gradient(from 0deg, transparent 0deg 304deg, rgba(247,214,134,0.48) 332deg 344deg, transparent 360deg)',
-                                                                                            maskImage: 'radial-gradient(circle, transparent 59%, black 62%, black 69%, transparent 72%)',
-                                                                                            WebkitMaskImage: 'radial-gradient(circle, transparent 59%, black 62%, black 69%, transparent 72%)',
-                                                                                        }}
-                                                                                    />
-                                                                                    <div className="absolute left-1/2 top-1/2 h-[14px] w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(93,43,18,0.96))] flex items-center justify-center">
-                                                                                        <div className="h-[5px] w-[5px] rounded-full bg-[#160603]" />
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div className="flex h-[18px] items-end gap-[2px]">
-                                                                                    {Array.from({ length: 6 }).map((_, i) => (
-                                                                                        <span key={i} className="avabodha-voice-bar w-[2px] rounded-full bg-c-gold/55"
+                                                                        <div className="avabodha-preview-modes flex flex-col items-center justify-center">
+                                                                            <div className="relative flex h-[64px] w-[64px] items-center justify-center overflow-hidden rounded-full">
+                                                                                <div className="absolute inset-0 rounded-full border border-c-gold/12" />
+                                                                                {avabodhaPreviewMode === 'dhwani' ? (
+                                                                                    <>
+                                                                                        <div
+                                                                                            className="absolute inset-[9px] rounded-full border transition-all duration-300"
+                                                                                            style={{
+                                                                                                borderColor: 'rgba(199,139,34,0.48)',
+                                                                                                boxShadow: avabodhaPreviewActive ? '0 0 14px rgba(199,139,34,0.18)' : 'none',
+                                                                                            }}
+                                                                                        />
+                                                                                        <div
+                                                                                            className="avabodha-sweep absolute inset-[11px] rounded-full"
+                                                                                            style={{
+                                                                                                background: 'conic-gradient(from 0deg, transparent 0deg 304deg, rgba(247,214,134,0.48) 332deg 344deg, transparent 360deg)',
+                                                                                                maskImage: 'radial-gradient(circle, transparent 59%, black 62%, black 69%, transparent 72%)',
+                                                                                                WebkitMaskImage: 'radial-gradient(circle, transparent 59%, black 62%, black 69%, transparent 72%)',
+                                                                                            }}
+                                                                                        />
+                                                                                        <div className="absolute left-1/2 top-1/2 h-[16px] w-[16px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(93,43,18,0.96))] flex items-center justify-center">
+                                                                                            <div className="h-[6px] w-[6px] rounded-full bg-[#160603]" />
+                                                                                        </div>
+                                                                                    </>
+                                                                                ) : (
+                                                                                    <>
+                                                                                        <div
+                                                                                            className="avabodha-sweep absolute inset-[11px] rounded-full border border-c-gold/20"
+                                                                                            style={{
+                                                                                                background: 'conic-gradient(from 0deg, rgba(247,214,134,0) 0deg 228deg, rgba(247,214,134,0.18) 266deg 296deg, rgba(247,214,134,0) 332deg 360deg)',
+                                                                                                boxShadow: avabodhaPreviewActive ? 'inset 0 0 10px rgba(214,156,68,0.08)' : 'none',
+                                                                                            }}
+                                                                                        />
+                                                                                        <div
+                                                                                            className="absolute left-1/2 top-1/2 h-[16px] w-[16px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                                                                                            style={{ background: 'radial-gradient(circle at 35% 35%, rgba(246,219,164,0.95), rgba(205,144,48,0.85) 44%, rgba(99,44,18,0.95) 76%)' }}
+                                                                                        />
+                                                                                    </>
+                                                                                )}
+                                                                            </div>
+                                                                            <div className="mt-4 flex min-h-[18px] items-end justify-center gap-[2px]">
+                                                                                {avabodhaPreviewMode === 'dhwani' ? (
+                                                                                    Array.from({ length: 6 }).map((_, i) => (
+                                                                                        <span
+                                                                                            key={i}
+                                                                                            className="avabodha-voice-bar w-[2px] rounded-full bg-c-gold/55"
                                                                                             style={{ height: `${7 + (i % 3) * 3}px`, animationDelay: `${i * 0.12}s` }}
                                                                                         />
-                                                                                    ))}
-                                                                                </div>
-                                                                                <span className="text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.5)' }}>Real-time</span>
+                                                                                    ))
+                                                                                ) : (
+                                                                                    <div className="text-[9px] text-center" style={{ color: 'rgba(214,156,68,0.65)' }}>
+                                                                                        Sa mapping
+                                                                                    </div>
+                                                                                )}
                                                                             </div>
-
-                                                                            <div className="h-14 w-px" style={{ background: 'rgba(199,139,34,0.15)' }} />
-
-                                                                            {/* Viveka — phrase */}
-                                                                            <div className="flex flex-col items-center gap-3">
-                                                                                <div className="relative flex h-[52px] w-[52px] items-center justify-center overflow-hidden rounded-full">
-                                                                                    <div className="absolute inset-0 rounded-full border border-c-gold/12" />
-                                                                                    <div
-                                                                                        className="avabodha-sweep absolute inset-[10px] rounded-full border border-c-gold/20"
-                                                                                        style={{
-                                                                                            background: 'conic-gradient(from 0deg, rgba(247,214,134,0) 0deg 228deg, rgba(247,214,134,0.18) 266deg 296deg, rgba(247,214,134,0) 332deg 360deg)',
-                                                                                            boxShadow: avabodhaPreviewActive ? 'inset 0 0 10px rgba(214,156,68,0.08)' : 'none',
-                                                                                        }}
-                                                                                    />
-                                                                                    <div className="absolute left-1/2 top-1/2 h-[14px] w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full"
-                                                                                        style={{ background: 'radial-gradient(circle at 35% 35%, rgba(246,219,164,0.95), rgba(205,144,48,0.85) 44%, rgba(99,44,18,0.95) 76%)' }} />
-                                                                                </div>
-                                                                                <div className="text-[9px] text-center" style={{ color: 'rgba(214,156,68,0.65)' }}>
-                                                                                    {practiceDemoPitchState === 'match' ? 'Sa found' : 'Sa mapping'}
-                                                                                </div>
-                                                                                <span className="text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.5)' }}>Phrase</span>
+                                                                            <div className="mt-4 flex items-center gap-2 text-[8px] uppercase tracking-[0.16em]" style={{ color: 'rgba(214,156,68,0.58)' }}>
+                                                                                <span style={{ opacity: avabodhaPreviewMode === 'dhwani' ? 1 : 0.4 }}>Dhwani</span>
+                                                                                <span className="h-px w-5 bg-c-gold/20" />
+                                                                                <span style={{ opacity: avabodhaPreviewMode === 'viveka' ? 1 : 0.4 }}>Viveka</span>
                                                                             </div>
+                                                                            <span className="mt-2 text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.5)' }}>
+                                                                                {avabodhaPreviewMode === 'dhwani' ? 'Real-time' : 'Phrase'}
+                                                                            </span>
                                                                         </div>
                                                                         <div className="text-[10px] text-center" style={{ color: avabodhaPreviewActive ? 'rgba(243,234,214,0.7)' : 'rgba(243,234,214,0.42)', transition: 'color 280ms ease' }}>
                                                                             Two modes of raga discernment
@@ -1814,7 +1836,7 @@ function App() {
 
                                                     <div className="hidden md:block mt-4 lg:mt-0 lg:pl-4">
                                                         <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/14 bg-[radial-gradient(circle_at_50%_22%,rgba(120,53,24,0.18),transparent_30%),linear-gradient(180deg,rgba(20,8,4,0.9),rgba(10,4,2,0.96))] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.04)] overflow-hidden">
-                                                            <div className="grid md:grid-cols-2">
+                                                            <div className="grid md:grid-cols-3">
                                                                 <div
                                                                     className="workspace-preview-panel group min-h-[172px] sm:min-h-[200px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('library')}

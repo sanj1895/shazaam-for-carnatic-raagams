@@ -712,6 +712,9 @@ function App() {
     };
 
     const markSadhanaStep = (tab) => {
+        // Sadhana is a Guided Basics feature — no-op in musician/workspace mode
+        if (appMode !== 'beginner') return;
+
         const detailsMap = {
             shruthi: { title: 'Warm-Up Complete', stepName: 'Step 1' },
             tutor: { title: 'AI Vocal Practice Complete', stepName: 'Step 2' },
@@ -719,7 +722,6 @@ function App() {
             singback: { title: 'Ear Training Challenge Complete', stepName: 'Step 4' },
         };
 
-        // Read current state synchronously before the update — reliable in React 18 concurrent mode
         if (sadhana.completed.includes(tab)) return;
 
         setSadhana(prev => {
@@ -2694,7 +2696,21 @@ function App() {
                 {view === 'learner-model' && (
                     <LearnerModelPanel userId={userId} getToken={getToken} />
                 )}
-                {view === 'sadhana' && (() => {
+                {view === 'sadhana' && appMode !== 'beginner' && (
+                    <div className="w-full max-w-xl mx-auto flex flex-col items-center gap-5 py-16 px-6 text-center animate-fade-in">
+                        <p className="font-playfair text-lg text-c-cream-dim italic">Sadhana is part of the Guided Basics path</p>
+                        <p className="text-sm text-c-cream-dark max-w-sm leading-relaxed">
+                            Daily Sadhana is designed for learners building their foundation. Switch to Guided Basics to access your practice checklist and streak.
+                        </p>
+                        <button
+                            onClick={() => goTo('home', { modeOverride: 'beginner' })}
+                            className="px-6 py-2.5 bg-c-gold hover:bg-c-gold-light text-c-bg font-semibold text-sm rounded transition-all"
+                        >
+                            Switch to Guided Basics
+                        </button>
+                    </div>
+                )}
+                {view === 'sadhana' && appMode === 'beginner' && (() => {
                     const steps = [
                         { n: 1, name: 'Tune & Warm Up',  tab: 'shruthi',  desc: 'Drone Baseline Alignment',    longDesc: 'Open the Shruthi Box and sustain a warm "ah" sound along with the drone for 30 seconds to lock in your pitch center.', btnText: 'Launch Shruthi Box' },
                         { n: 2, name: 'Svara Gurukul',  tab: 'tutor',    desc: 'Vocal Academy & Scale Flow',  longDesc: 'Master structured vocal exercises (Varisais) or practice ascending and descending scales under real-time guidance from the AI Guru.', btnText: 'Enter Svara Gurukul' },

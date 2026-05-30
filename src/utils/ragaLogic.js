@@ -1082,13 +1082,10 @@ export const identifyRaga = (detectedSwarams, noteFrequencies = {}, noteSequence
     const maxFreq  = allFreqs.length ? Math.max(...allFreqs) : 1;
     const globalGetFreq = (n) => (noteFrequencies[n] || 0) + (noteFrequencies[ENHARMONIC[n]] || 0);
 
-    // Critical branch-point note frequencies — evaluated once, shared across loop.
+    // Dhaivatam frequencies — evaluated once, shared across loop.
+    // Da1/Da2 are the primary branch-point decision; Ma/Ni excluded (see criticalSwaraBonus).
     const da1Freq = globalGetFreq('Da1');
     const da2Freq = globalGetFreq('Da2');
-    const ma1Freq = globalGetFreq('Ma1');
-    const ma2Freq = globalGetFreq('Ma2');
-    const ni2Freq = globalGetFreq('Ni2');
-    const ni3Freq = globalGetFreq('Ni3');
 
     for (const [name, data] of Object.entries(RAGAS)) {
         const cleanArohanam   = data.arohanam.filter(n => n !== '|' && n !== '||' && n !== ',');
@@ -1157,24 +1154,23 @@ export const identifyRaga = (detectedSwarams, noteFrequencies = {}, noteSequence
 
         // ── Critical swara discrimination ─────────────────────────────────────
         // Dhaivatam and Madhyama are branch-point decisions, not minor features.
-        // When the detected dominant variant contradicts a raga's expected note,
-        // that is strong disconfirming evidence — not just an alien-count increment.
+        // Dhaivatam is the primary branch-point decision — Da1/Da2 sit far enough
+        // apart in the octave that autocorrelation can reliably distinguish them.
+        // Madhyama (Ma1/Ma2) is intentionally excluded: they are only 1 semitone
+        // apart and autocorrelation routinely slips between them via gamaka slides.
+        // Ma discrimination is already handled by the alien-note penalty; adding an
+        // extra bonus/penalty here causes more harm than good with the current detector.
         let criticalSwaraBonus = 0;
         const ragaHasDa1 = ragaNotes.has('Da1');
         const ragaHasDa2 = ragaNotes.has('Da2');
 
         if (ragaHasDa1 && !ragaHasDa2) {
             if (da1Freq > 0 && da1Freq >= da2Freq)  criticalSwaraBonus += 2.0;
-            if (da2Freq > da1Freq * 1.5)             criticalSwaraBonus -= 2.5;
+            if (da2Freq > da1Freq * 2.5)             criticalSwaraBonus -= 2.0;
         } else if (ragaHasDa2 && !ragaHasDa1) {
             if (da2Freq > 0 && da2Freq >= da1Freq)  criticalSwaraBonus += 2.0;
-            if (da1Freq > da2Freq * 1.5)             criticalSwaraBonus -= 2.5;
+            if (da1Freq > da2Freq * 2.5)             criticalSwaraBonus -= 2.0;
         }
-
-        const ragaHasMa1 = ragaNotes.has('Ma1');
-        const ragaHasMa2 = ragaNotes.has('Ma2');
-        if (ragaHasMa1 && !ragaHasMa2 && ma2Freq > ma1Freq * 1.5) criticalSwaraBonus -= 2.5;
-        if (ragaHasMa2 && !ragaHasMa1 && ma1Freq > ma2Freq * 1.5) criticalSwaraBonus -= 2.5;
 
         // ── Janya-over-melakarta preference ───────────────────────────────────
         // When a janya's phrase signature is heard, prefer it over the parent melakarta.

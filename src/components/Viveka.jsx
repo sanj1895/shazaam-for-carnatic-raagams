@@ -373,8 +373,10 @@ export default function Viveka({ onSelectRaga }) {
                 }, FRAME_MS);
             };
 
-            // Primary: ml5 CREPE — same higher-quality model used by the Ālaap AI panel.
-            // 3-frame stability buffer eliminates slide/transient frames before adding to the pool.
+            // Primary: ml5 CREPE pitch detector.
+            // Stability buffer: require 3 consecutive readings within ±2 semitones before
+            // accepting a frame into framesRef. ±2 (not ±1) matches vocal vibrato range.
+            // The live Hz display updates on every valid reading so the user always sees feedback.
             const pitchBuf = [];
             const CREPE_URL = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
             ml5.pitchDetection(CREPE_URL, ctx, stream, (err, pitchModel) => {
@@ -385,17 +387,22 @@ export default function Viveka({ onSelectRaga }) {
                     if (statusRef.current !== STATUS.RECORDING) return;
                     pitchModel.getPitch((_, hz) => {
                         if (hz && statusRef.current === STATUS.RECORDING) {
+                            // Always update the live display so the user knows their voice is heard.
+                            setCurrentHz(hz);
+
                             const last = pitchBuf[pitchBuf.length - 1];
                             if (last && Math.abs(Math.log2(hz / last)) >= 0.6) {
-                                pitchBuf.length = 0; // octave jump — reset stability window
+                                // Octave jump: start a fresh stability window with this frame.
+                                pitchBuf.length = 0;
+                                pitchBuf.push(hz);
                             } else {
                                 pitchBuf.push(hz);
                                 if (pitchBuf.length > 3) pitchBuf.shift();
                                 if (pitchBuf.length === 3) {
-                                    // All 3 frames within ±1 semitone → stable note, accept it.
+                                    // All 3 frames within ±2 semitones → stable, add to pool.
                                     const ref = Math.round(12 * Math.log2(pitchBuf[0] / 130.81));
                                     const stable = pitchBuf.every(
-                                        f => Math.abs(Math.round(12 * Math.log2(f / 130.81)) - ref) <= 1
+                                        f => Math.abs(Math.round(12 * Math.log2(f / 130.81)) - ref) <= 2
                                     );
                                     if (stable) onHz(hz);
                                 }

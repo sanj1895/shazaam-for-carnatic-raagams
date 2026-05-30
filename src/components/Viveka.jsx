@@ -6,12 +6,13 @@ import { identifyRagaWithAI } from '../utils/ragaIdentify';
 import SketchyRule from './SketchyRule';
 
 const STATUS = {
-  IDLE:      'idle',
-  RECORDING: 'recording',
-  UPLOADING: 'uploading',  // processing an uploaded file
-  ANALYZING: 'analyzing',
-  RESULTS:   'results',
-  ERROR:     'error',
+  IDLE:        'idle',
+  CALIBRATING: 'calibrating', // brief silence measurement before recording
+  RECORDING:   'recording',
+  UPLOADING:   'uploading',
+  ANALYZING:   'analyzing',
+  RESULTS:     'results',
+  ERROR:       'error',
 };
 
 const MODE = { RECORD: 'record', UPLOAD: 'upload' };
@@ -207,16 +208,17 @@ export default function Viveka({ onSelectRaga }) {
     const [uploadSegmentInfo, setUploadSegmentInfo] = useState(null); // { startSec, endSec, filename }
     const [uploadStage, setUploadStage] = useState('Reading file…');
 
-    const streamRef     = useRef(null);
-    const analyserRef   = useRef(null);
-    const pitchTimer    = useRef(null);
-    const countTimer    = useRef(null);
-    const autoStopTimer = useRef(null);
-    const framesRef     = useRef([]);
-    const statusRef     = useRef(STATUS.IDLE); // mirror for use inside closures
-    const inputModeRef  = useRef(MODE.RECORD);
-    const fileInputRef  = useRef(null);
-    const audioCtxRef   = useRef(null);
+    const streamRef      = useRef(null);
+    const analyserRef    = useRef(null);
+    const pitchTimer     = useRef(null);
+    const countTimer     = useRef(null);
+    const autoStopTimer  = useRef(null);
+    const framesRef      = useRef([]);
+    const statusRef      = useRef(STATUS.IDLE);
+    const inputModeRef   = useRef(MODE.RECORD);
+    const fileInputRef   = useRef(null);
+    const audioCtxRef    = useRef(null);
+    const dynamicGateRef = useRef(0.01); // calibrated per-session noise floor
 
     useEffect(() => {
         inputModeRef.current = inputMode;
@@ -408,13 +410,45 @@ export default function Viveka({ onSelectRaga }) {
             gainNode.connect(analyser);
             analyserRef.current = analyser;
 
+            // ── Calibration: measure ambient noise floor ───────────────────
+            // Sample 1.5 s of silence so the gate adapts to drones, AC hum,
+            // or any other room noise rather than using a fixed threshold.
+            statusRef.current = STATUS.CALIBRATING;
+            setStatus(STATUS.CALIBRATING);
+
+            const calibRMS = [];
+            const calibInterval = setInterval(() => {
+                const a = analyserRef.current;
+                if (!a) return;
+                const b = new Float32Array(a.fftSize);
+                a.getFloatTimeDomainData(b);
+                let sq = 0;
+                for (let i = 0; i < b.length; i++) sq += b[i] * b[i];
+                calibRMS.push(Math.sqrt(sq / b.length));
+            }, 80);
+
+            await new Promise(r => setTimeout(r, 1500));
+            clearInterval(calibInterval);
+
+            if (!analyserRef.current) return; // cancelled during calibration
+
+            // Gate = 4× the 75th-percentile silence RMS (rejects drone/hum,
+            // accepts singing which is typically 5–15× above the noise floor).
+            const sorted = [...calibRMS].sort((a, b) => a - b);
+            const p75 = sorted[Math.floor(sorted.length * 0.75)] ?? 0.002;
+            dynamicGateRef.current = Math.max(p75 * 4, 0.005);
+            // ──────────────────────────────────────────────────────────────
+
+            statusRef.current = STATUS.RECORDING;
+            setStatus(STATUS.RECORDING);
+
             // Require a short stable run so real singing registers more reliably than
             // one-off noisy estimates from autocorrelation.
             const pitchBuf = [];
             let missCount = 0;
             pitchTimer.current = setInterval(() => {
                 if (!analyserRef.current) return;
-                const hz = detectPitch(analyserRef.current, ctx.sampleRate);
+                const hz = detectPitch(analyserRef.current, ctx.sampleRate, dynamicGateRef.current);
                 if (!hz) {
                     missCount++;
                     if (missCount >= 4) {
@@ -462,6 +496,7 @@ export default function Viveka({ onSelectRaga }) {
         cleanup();
         statusRef.current = STATUS.IDLE;
         setStatus(STATUS.IDLE);
+        dynamicGateRef.current = 0.01;
         setResults(null);
         setErrorMsg('');
         setElapsed(0);
@@ -718,6 +753,33 @@ export default function Viveka({ onSelectRaga }) {
                                 </p>
                             </div>
                         )}
+                    </div>
+                )}
+
+                {/* ── CALIBRATING ── */}
+                {status === STATUS.CALIBRATING && (
+                    <div className="w-full flex flex-col items-center gap-5 py-8">
+                        <div className="flex gap-1.5 items-end h-5">
+                            {[...Array(5)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="w-1 bg-c-gold/40 rounded-full animate-pulse"
+                                    style={{ height: `${8 + (i % 3) * 4}px`, animationDelay: `${i * 0.15}s` }}
+                                />
+                            ))}
+                        </div>
+                        <div className="text-center flex flex-col gap-1.5">
+                            <p className="font-playfair text-c-cream-dim">Please be silent…</p>
+                            <p className="text-[11px] text-c-cream-dark font-playfair italic">
+                                Measuring your room's noise floor · takes 1–2 seconds
+                            </p>
+                        </div>
+                        <button
+                            onClick={reset}
+                            className="text-xs text-c-cream-dark hover:text-c-gold transition-colors font-playfair underline underline-offset-2"
+                        >
+                            Cancel
+                        </button>
                     </div>
                 )}
 

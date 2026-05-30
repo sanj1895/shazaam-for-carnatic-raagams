@@ -500,16 +500,16 @@ function _autocorrelate(buffer, sampleRate) {
   return freq;
 }
 
-export function detectPitch(analyserNode, sampleRate) {
+// minRms defaults to 0.01 but callers can pass a calibrated dynamic gate instead.
+export function detectPitch(analyserNode, sampleRate, minRms = 0.01) {
   const bufferLength = analyserNode.fftSize;
   const buffer = new Float32Array(bufferLength);
   analyserNode.getFloatTimeDomainData(buffer);
 
-  // RMS gate — rejects hum and room noise below typical singing level.
   let rms = 0;
   for (let i = 0; i < bufferLength; i++) rms += buffer[i] * buffer[i];
   rms = Math.sqrt(rms / bufferLength);
-  if (rms < 0.01) return null;
+  if (rms < minRms) return null;
 
   const SIZE = bufferLength;
   const correlation = new Float32Array(SIZE);

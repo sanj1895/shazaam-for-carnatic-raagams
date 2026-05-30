@@ -1,15 +1,25 @@
 /* global process */
 import { MongoClient } from 'mongodb';
-import { GoogleAuth } from 'google-auth-library';
+import { GoogleAuth, UserRefreshClient } from 'google-auth-library';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 const GCP_PROJECT = 'project-24a53985-305d-4031-ae8';
 const GEMINI_MODEL = 'gemini-2.5-flash';
 
 let cachedClient = null;
-const auth = new GoogleAuth({
-  scopes: ['https://www.googleapis.com/auth/cloud-platform'],
-});
+
+function getAuthClient() {
+  const b64 = process.env.GOOGLE_CREDENTIALS_B64;
+  if (b64) {
+    const creds = JSON.parse(Buffer.from(b64, 'base64').toString());
+    return new UserRefreshClient({
+      clientId: creds.client_id,
+      clientSecret: creds.client_secret,
+      refreshToken: creds.refresh_token,
+    });
+  }
+  return new GoogleAuth({ scopes: ['https://www.googleapis.com/auth/cloud-platform'] });
+}
 
 async function getDb() {
   if (!cachedClient) {
@@ -85,8 +95,8 @@ export default async function handler(req, res) {
         ).join('\n')}\n---`
       : '\n\n[No practice history yet — new student.]';
 
-    // Get OAuth2 token from ADC
-    const client = await auth.getClient();
+    // Get OAuth2 token from ADC or env credentials
+    const client = getAuthClient();
     const tokenResponse = await client.getAccessToken();
     const token = tokenResponse.token;
 

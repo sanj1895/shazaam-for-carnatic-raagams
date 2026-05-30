@@ -464,8 +464,7 @@ export function detectPitch(analyserNode, sampleRate) {
   const buffer = new Float32Array(bufferLength);
   analyserNode.getFloatTimeDomainData(buffer);
 
-  // RMS gate — rejects electrical hum and quiet room noise.
-  // Singing voice near a mic is typically 0.02+ RMS; hum is usually below 0.01.
+  // RMS gate — rejects hum and room noise below typical singing level.
   let rms = 0;
   for (let i = 0; i < bufferLength; i++) rms += buffer[i] * buffer[i];
   rms = Math.sqrt(rms / bufferLength);
@@ -479,25 +478,40 @@ export function detectPitch(analyserNode, sampleRate) {
     correlation[lag] = sum;
   }
 
-  // Skip the initial decay to find the first trough
+  // Skip the initial decay to find the first trough.
   let d = 0;
   while (d < SIZE && correlation[d] > correlation[d + 1]) d++;
 
-  // Find the peak using lag-normalized correlation.
-  // Raw autocorrelation sums (SIZE - lag) terms, so large lags accumulate fewer
-  // samples and still produce large absolute values — this biases the detector
-  // toward subharmonics (half-frequency). Dividing by (SIZE - lag) corrects for
-  // this and makes the true fundamental consistently win over its subharmonic.
-  let maxNorm = -Infinity;
-  let maxPos  = -1;
+  // Find the raw correlation peak (unnormalized).
+  // Unnormalized values sum more terms at shorter lags, giving a small natural
+  // preference to higher frequencies — which is correct behaviour.
+  let maxVal = -Infinity;
+  let maxPos = -1;
   for (let i = d; i < SIZE; i++) {
-    const norm = correlation[i] / (SIZE - i);
-    if (norm > maxNorm) { maxNorm = norm; maxPos = i; }
+    if (correlation[i] > maxVal) { maxVal = correlation[i]; maxPos = i; }
   }
-
   if (maxPos <= 0) return null;
 
-  // Parabolic interpolation for sub-sample accuracy
+  // Subharmonic suppression.
+  // A voiced signal at frequency F has autocorrelation peaks at lags T, 2T, 3T…
+  // The raw max often lands on 2T (half the frequency, one octave down).
+  // If the half-lag candidate has ≥ 80 % of the current peak's strength, it is
+  // a valid alternative — prefer it (higher pitch = true fundamental).
+  // Repeat up to twice to also catch sub-subharmonic cases (4× subharmonic).
+  for (let pass = 0; pass < 2; pass++) {
+    const half = Math.round(maxPos / 2);
+    if (half <= d) break;
+    const halfFreq = sampleRate / half;
+    if (halfFreq < 60 || halfFreq > 2000) break;
+    if (correlation[half] >= maxVal * 0.80) {
+      maxPos = half;
+      maxVal = correlation[maxPos];
+    } else {
+      break;
+    }
+  }
+
+  // Parabolic interpolation for sub-sample accuracy.
   const y1 = correlation[maxPos - 1] || 0;
   const y2 = correlation[maxPos];
   const y3 = correlation[maxPos + 1] || 0;
@@ -506,10 +520,7 @@ export function detectPitch(analyserNode, sampleRate) {
 
   const frequency = sampleRate / refinedPos;
   if (frequency < 60 || frequency > 2000) return null;
-
-  // Confidence: normalized peak vs mean energy (correlation[0] / SIZE = RMS²).
-  // 0.50 accepts natural voice; rejects diffuse noise.
-  if (maxNorm / (correlation[0] / SIZE) < 0.50) return null;
+  if (maxVal / correlation[0] < 0.50) return null;
 
   return frequency;
 }

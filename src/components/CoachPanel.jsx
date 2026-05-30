@@ -64,7 +64,9 @@ export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadh
         }),
       });
       const data = await res.json();
-      const reply = data.reply || 'Sorry, I had trouble responding. Please try again.';
+      const rawReply = data.reply || 'Sorry, I had trouble responding. Please try again.';
+      // Strip the pre-injected context line if the agent echoes it back
+      const reply = rawReply.replace(/^\[Profile:[^\]]*\]\s*/i, '').trimStart();
       setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
       if (onNavigate) {
         const nav = detectToolNavigation(reply);

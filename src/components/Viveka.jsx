@@ -239,8 +239,8 @@ export default function Viveka({ onSelectRaga }) {
     const runAnalysis = useCallback(async (frames) => {
         const noteEvents = buildNoteEvents(frames);
 
-        if (noteEvents.length < 6) {
-            setErrorMsg('Could not detect enough stable notes. Try singing a full phrase slowly and clearly — hold each note for at least half a second.');
+        if (noteEvents.length < 4) {
+            setErrorMsg('Could not detect enough stable notes. Try singing 5–6 notes slowly — hold each note for at least a second, and sing close to your mic.');
             setStatus(STATUS.ERROR);
             return;
         }

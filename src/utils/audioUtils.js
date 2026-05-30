@@ -514,9 +514,10 @@ export function detectPitch(analyserNode, sampleRate) {
   // Reject frequencies outside vocal/instrument range
   if (frequency < 60 || frequency > 2000) return null;
 
-  // Confidence check — correlation peak must be strong relative to lag-0 energy.
-  // 0.65 filters out noise patterns that have weak or broad autocorrelation peaks.
-  if (maxVal / correlation[0] < 0.65) return null;
+  // Confidence check — correlation peak relative to lag-0 energy.
+  // 0.50 is the right balance for voice: strict enough to reject diffuse noise,
+  // permissive enough to accept natural voice with harmonics (which typically lands 0.50–0.75).
+  if (maxVal / correlation[0] < 0.50) return null;
 
   return frequency;
 }

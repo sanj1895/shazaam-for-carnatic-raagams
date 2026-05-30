@@ -29,7 +29,7 @@ async function buildUserContext(userId, appMode, sadhanaCompleted) {
       .sort({ timestamp: -1 })
       .limit(5)
       .toArray();
-    const parts = [];
+    const parts = [`userId=${userId}`];
     if (profile) {
       const exp = profile.experience ? `experience=${profile.experience}` : null;
       const goal = profile.goal ? `goal=${profile.goal}` : null;

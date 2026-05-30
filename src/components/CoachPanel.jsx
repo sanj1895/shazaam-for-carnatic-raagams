@@ -3,17 +3,18 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 const WELCOME = "Namaskaram! I'm your Ālāpana practice coach. Tell me what you want to work on today — or ask me to plan a session based on your history.";
 
 // Only navigate when the coach explicitly says to open a tool — never on incidental mentions
+const OPEN = /open(?:ing)?:?\s+/i;
 const TOOL_PATTERNS = [
-  { pattern: /open(?:ing)?\s+avabodha/i,                                    view: 'avabodha' },
-  { pattern: /open(?:ing)?\s+(?:gurukul|svara gurukul)/i,                   view: 'tutor' },
-  { pattern: /open(?:ing)?\s+(?:raga kosha|raga library|kosha)/i,           view: 'library' },
-  { pattern: /open(?:ing)?\s+viveka/i,                                       view: 'viveka' },
-  { pattern: /open(?:ing)?\s+dhwani/i,                                       view: 'listen' },
-  { pattern: /open(?:ing)?\s+transcri(?:be|ption)/i,                        view: 'transcribe' },
-  { pattern: /open(?:ing)?\s+shru(?:thi|ti)/i,                              view: 'shruthi' },
-  { pattern: /open(?:ing)?\s+tala(?:m)?/i,                                  view: 'talam' },
-  { pattern: /open(?:ing)?\s+keyboard/i,                                     view: 'keyboard' },
-  { pattern: /open(?:ing)?\s+sing.?back/i,                                  view: 'singback' },
+  { pattern: new RegExp(OPEN.source + 'avabodha', 'i'),                          view: 'avabodha' },
+  { pattern: new RegExp(OPEN.source + '(?:gurukul|svara gurukul)', 'i'),          view: 'tutor' },
+  { pattern: new RegExp(OPEN.source + '(?:raga kosha|raga library|kosha)', 'i'), view: 'library' },
+  { pattern: new RegExp(OPEN.source + 'viveka', 'i'),                             view: 'viveka' },
+  { pattern: new RegExp(OPEN.source + 'dhwani', 'i'),                             view: 'listen' },
+  { pattern: new RegExp(OPEN.source + 'transcri(?:be|ption)', 'i'),               view: 'transcribe' },
+  { pattern: new RegExp(OPEN.source + 'shru(?:thi|ti)', 'i'),                     view: 'shruthi' },
+  { pattern: new RegExp(OPEN.source + 'tala(?:m)?', 'i'),                         view: 'talam' },
+  { pattern: new RegExp(OPEN.source + 'keyboard', 'i'),                           view: 'keyboard' },
+  { pattern: new RegExp(OPEN.source + 'sing.?back', 'i'),                         view: 'singback' },
 ];
 
 function detectToolNavigation(text) {

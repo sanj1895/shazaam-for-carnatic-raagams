@@ -1,24 +1,15 @@
 /**
  * Ālāpana Coach API
  *
- * When AGENT_ENGINE_RESOURCE is set (after running agent/deploy_to_agent_engine.py):
- *   React app → this endpoint → Vertex AI Agent Engine → ADK agent → Gemini 2.5 Flash + MongoDB MCP
+ * Required path (production):
+ *   React app → this endpoint → Vertex AI Agent Engine (Google Cloud Agent Builder)
+ *                                       → ADK agent → Gemini 2.5 Flash + MongoDB MCP
  *
- * Fallback (direct Gemini, used in dev before Agent Engine is deployed):
- *   React app → this endpoint → Gemini 2.5 Flash (Vertex AI) + MongoDB Atlas
- *
- * Agent Engine is part of Google Cloud Agent Builder — it's the managed execution
- * environment that hosts the ADK agent defined in agent/agent.py.
+ * Deploy the agent first: python agent/deploy_to_agent_engine.py
+ * Then set AGENT_ENGINE_RESOURCE in your environment.
  */
-/* global process */
-import { MongoClient } from 'mongodb';
+/* global process, Buffer */
 import { GoogleAuth, UserRefreshClient } from 'google-auth-library';
-
-const MONGODB_URI = process.env.MONGODB_URI;
-const GCP_PROJECT = 'project-24a53985-305d-4031-ae8';
-const GEMINI_MODEL = 'gemini-2.5-flash';
-
-let cachedClient = null;
 
 function getAuthClient() {
   const b64 = process.env.GOOGLE_CREDENTIALS_B64;
@@ -31,27 +22,6 @@ function getAuthClient() {
     });
   }
   return new GoogleAuth({ scopes: ['https://www.googleapis.com/auth/cloud-platform'] });
-}
-
-async function getDb() {
-  if (!cachedClient) {
-    cachedClient = new MongoClient(MONGODB_URI);
-    await cachedClient.connect();
-  }
-  return cachedClient.db('alapana');
-}
-
-async function getRecentSessions(userId) {
-  try {
-    const db = await getDb();
-    return await db.collection('sessions')
-      .find({ userId })
-      .sort({ timestamp: -1 })
-      .limit(10)
-      .toArray();
-  } catch {
-    return [];
-  }
 }
 
 const SYSTEM_PROMPT = `You are Ālāpana Coach — a direct, warm Carnatic music practice guide inside the Ālāpana app.
@@ -96,91 +66,53 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid message.' });
   }
 
+  const agentEngineResource = process.env.AGENT_ENGINE_RESOURCE;
+  if (!agentEngineResource) {
+    return res.status(503).json({
+      error: 'Agent Engine not configured. Deploy the agent first: python agent/deploy_to_agent_engine.py, then set AGENT_ENGINE_RESOURCE.',
+    });
+  }
+
   try {
     const client = getAuthClient();
     const { token } = await client.getAccessToken();
 
-    // ── Path A: Vertex AI Agent Engine (Google Cloud Agent Builder) ──────────
-    // Used in production when the ADK agent has been deployed via
-    // agent/deploy_to_agent_engine.py. The Agent Engine handles MongoDB MCP
-    // tool calls and session state automatically.
-    const agentEngineResource = process.env.AGENT_ENGINE_RESOURCE;
-    if (agentEngineResource) {
-      // Create or reuse a session keyed by userId.
-      const sessionRes = await fetch(
-        `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}/sessions`,
-        {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId }),
-        }
-      );
-      const sessionData = await sessionRes.json();
-      const sessionId = sessionData.name?.split('/').pop() || userId;
-
-      const agentRes = await fetch(
-        `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}:streamQuery`,
-        {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            input: { messages: [{ role: 'user', parts: [{ text: message }] }] },
-            userId,
-            sessionId,
-          }),
-        }
-      );
-
-      if (agentRes.ok) {
-        const agentData = await agentRes.json();
-        const reply = agentData?.output?.content?.parts?.[0]?.text
-                   || agentData?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (reply) return res.status(200).json({ reply, via: 'agent-engine' });
+    // Create or reuse an Agent Engine session keyed by userId.
+    const sessionRes = await fetch(
+      `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}/sessions`,
+      {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
       }
-      // Fall through to direct Gemini if Agent Engine returns an error.
-    }
+    );
+    const sessionData = await sessionRes.json();
+    const sessionId = sessionData.name?.split('/').pop() || userId;
 
-    // ── Path B: Direct Gemini + MongoDB (dev / pre-deploy fallback) ──────────
-    const sessions = await getRecentSessions(userId);
-
-    const historyBlock = sessions.length > 0
-      ? `\n\n--- Student's recent practice history (from MongoDB) ---\n${sessions.map(s =>
-          `${new Date(s.timestamp).toLocaleDateString()}: ${s.tool || 'unknown tool'}${s.raga ? ` · Raga: ${s.raga}` : ''}${s.durationMinutes ? ` · ${s.durationMinutes} min` : ''}${s.notes ? ` · Notes: ${s.notes}` : ''}`
-        ).join('\n')}\n---`
-      : '\n\n[No practice history yet — new student.]';
-
-    const contents = [
-      ...history.slice(-6).map(h => ({
-        role: h.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: h.content }],
-      })),
-      { role: 'user', parts: [{ text: message }] },
-    ];
-
-    const geminiRes = await fetch(
-      `https://us-central1-aiplatform.googleapis.com/v1/projects/${GCP_PROJECT}/locations/us-central1/publishers/google/models/${GEMINI_MODEL}:generateContent`,
+    const agentRes = await fetch(
+      `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}:streamQuery`,
       {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT + historyBlock }] },
-          contents,
-          generationConfig: {
-            maxOutputTokens: 400,
-            temperature: 0.7,
-            thinkingConfig: { thinkingBudget: 0 },
-          },
+          input: { messages: [{ role: 'user', parts: [{ text: message }] }] },
+          userId,
+          sessionId,
         }),
       }
     );
 
-    const data = await geminiRes.json();
-    if (!geminiRes.ok) return res.status(500).json({ error: JSON.stringify(data) });
+    if (!agentRes.ok) {
+      const errBody = await agentRes.text();
+      return res.status(500).json({ error: `Agent Engine error: ${errBody}` });
+    }
 
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!reply) return res.status(500).json({ error: 'Empty response from Gemini.' });
+    const agentData = await agentRes.json();
+    const reply = agentData?.output?.content?.parts?.[0]?.text
+               || agentData?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!reply) return res.status(500).json({ error: 'Empty response from Agent Engine.' });
 
-    return res.status(200).json({ reply });
+    return res.status(200).json({ reply, via: 'agent-engine' });
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Coach request failed.' });
   }

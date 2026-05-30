@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { PlayIcon, StopIcon } from './IconLibrary';
+import { detectPitch } from '../utils/audioUtils';
 
-// ml5 is loaded as a global via <script> tag in index.html
-/* global ml5 */
+// ml5/CREPE commented out for hackathon — restore after contest
+// /* global ml5 */
 
 const STATUS = {
   READY:    'ready',
@@ -25,7 +26,10 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
 
     useEffect(() => { onPitchDetectedRef.current = onPitchDetected; }, [onPitchDetected]);
     useEffect(() => {
-        return () => stopReferenceTone();
+        return () => {
+            stopReferenceTone();
+            clearInterval(intervalRef.current);
+        };
     }, []);
 
     const playReferenceTone = (freq) => {
@@ -94,49 +98,36 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
         }
     };
 
+    const intervalRef = useRef(null);
+
     const startPitchDetection = (audioCtx, mediaStream) => {
-        const modelUrl = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
-        setStatus(STATUS.LOADING);
-        setStatusMsg('Loading pitch model…');
+        setStatus(STATUS.LISTENING);
+        setStatusMsg('Sing or hum clearly');
 
-        const slowTimer = setTimeout(() => {
-            setStatus(s => s === STATUS.LOADING ? STATUS.SLOW : s);
-            setStatusMsg('Still loading  ·  may take a minute on first visit');
-        }, 10000);
+        const source = audioCtx.createMediaStreamSource(mediaStream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        source.connect(analyser);
 
-        try {
-            ml5.pitchDetection(modelUrl, audioCtx, mediaStream, (err, model) => {
-                clearTimeout(slowTimer);
-                if (err) {
-                    setStatus(STATUS.ERROR);
-                    setStatusMsg(`Model error: ${err.message || err}`);
-                    return;
-                }
-                setStatus(STATUS.LISTENING);
-                setStatusMsg('Sing or hum clearly');
-                getPitch(model);
-            });
-        } catch (err) {
-            clearTimeout(slowTimer);
-            setStatus(STATUS.ERROR);
-            setStatusMsg(`ml5 error: ${err.message}`);
-        }
-    };
-
-    const getPitch = (model) => {
-        model.getPitch((_, frequency) => {
-            if (frequency) {
-                setCurrentFreq(frequency);
-                onPitchDetectedRef.current?.(frequency);
+        intervalRef.current = setInterval(() => {
+            const hz = detectPitch(analyser, audioCtx.sampleRate);
+            if (hz) {
+                setCurrentFreq(hz);
+                onPitchDetectedRef.current?.(hz);
                 setStatus(STATUS.LISTENING);
                 setStatusMsg('Sing or hum clearly');
             } else {
                 setStatus(STATUS.NO_PITCH);
                 setStatusMsg('No pitch detected  ·  try singing louder');
             }
-            getPitch(model);
-        });
+        }, 80);
     };
+
+    // ml5/CREPE path commented out for hackathon — restore after contest
+    // const startPitchDetectionCREPE = (audioCtx, mediaStream) => {
+    //     const modelUrl = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
+    //     ml5.pitchDetection(modelUrl, audioCtx, mediaStream, (err, model) => { ... });
+    // };
 
     const handleSetSa = () => {
         if (currentFreq > 0) onSaSet(currentFreq);

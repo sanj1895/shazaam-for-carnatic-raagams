@@ -250,6 +250,13 @@ export const RAGAS = {
         compositions: [],
         color:        'maroon',
         video:        'https://www.youtube.com/shorts/oUvswrCsuHc',
+        nyasaSwaras:      ['Sa', 'Pa', 'Ga2', 'Da1'],
+        importantNotes:   ['Ga2', 'Da1', 'Ni3'],
+        signaturePhrases: [
+            ['Sa', 'Ri2', 'Ga2', 'Ma1', 'Pa'],
+            ['Pa', 'Da1', 'Ni3', 'Sa'],
+            ['Ni3', 'Da1', 'Pa', 'Ma1', 'Ga2', 'Ri2'],
+        ],
     },
     'Kharaharapriya': {
         arohanam:     ['Sa', 'Ri2', 'Ga2', 'Ma1', 'Pa', 'Da2', 'Ni2', 'Sa'],
@@ -273,6 +280,13 @@ export const RAGAS = {
         compositions: [],
         color:        'maroon',
         video:        "https://www.youtube.com/watch?v=D_Ep_YW4qlU",
+        nyasaSwaras:      ['Sa', 'Pa', 'Ga2', 'Da2'],
+        importantNotes:   ['Ga2', 'Da2', 'Ni3'],
+        signaturePhrases: [
+            ['Sa', 'Ri2', 'Ga2', 'Ma1', 'Pa'],
+            ['Pa', 'Da2', 'Ni3', 'Sa'],
+            ['Da2', 'Pa', 'Ma1', 'Ga2'],
+        ],
     },
     'Varunapriya': {
         arohanam:     ['Sa', 'Ri2', 'Ga2', 'Ma1', 'Pa', 'Da3', 'Ni3', 'Sa'],
@@ -825,6 +839,17 @@ export const RAGAS = {
         compositions: ['Kalyana Vasantham Geetham'],
         color:        'maroon',
         video:        'https://www.youtube.com/shorts/zGZ0XxaYzIw',
+        // Notes absent from arohanam — their absence is POSITIVE evidence for this janya.
+        arohanamOmissions: ['Ri2', 'Pa'],
+        nyasaSwaras:       ['Sa', 'Ma1', 'Ga2', 'Da1'],
+        importantNotes:    ['Ga2', 'Da1', 'Ni3'],
+        signaturePhrases: [
+            ['Sa', 'Ga2', 'Ma1', 'Da1'],        // skip-note ascending gesture
+            ['Da1', 'Ni3', 'Sa'],               // upper resolution
+            ['Ni3', 'Da1', 'Pa', 'Ma1', 'Ga2'], // characteristic descent
+            ['Ga2', 'Ri2', 'Sa'],               // closing cadence
+            ['Ma1', 'Da1', 'Ni3'],             // inner rising phrase
+        ],
     },
     'Bowli': {
         arohanam:     ['Sa', 'Ri1', 'Ga3', 'Pa', 'Da1', 'Sa'],
@@ -1052,17 +1077,27 @@ export const identifyRaga = (detectedSwarams, noteFrequencies = {}, noteSequence
     const uniqueNotes = new Set(detectedSwarams);
     let candidates = [];
 
+    // Pre-compute global frequency stats used across all raga scorings.
+    const allFreqs = Object.values(noteFrequencies);
+    const maxFreq  = allFreqs.length ? Math.max(...allFreqs) : 1;
+    const globalGetFreq = (n) => (noteFrequencies[n] || 0) + (noteFrequencies[ENHARMONIC[n]] || 0);
+
+    // Critical branch-point note frequencies — evaluated once, shared across loop.
+    const da1Freq = globalGetFreq('Da1');
+    const da2Freq = globalGetFreq('Da2');
+    const ma1Freq = globalGetFreq('Ma1');
+    const ma2Freq = globalGetFreq('Ma2');
+    const ni2Freq = globalGetFreq('Ni2');
+    const ni3Freq = globalGetFreq('Ni3');
+
     for (const [name, data] of Object.entries(RAGAS)) {
         const cleanArohanam   = data.arohanam.filter(n => n !== '|' && n !== '||' && n !== ',');
         const cleanAvarohanam = data.avarohanam.filter(n => n !== '|' && n !== '||' && n !== ',');
 
         const ragaNotes = new Set([...cleanArohanam, ...cleanAvarohanam]);
+        if (data.borrowedNotes) data.borrowedNotes.forEach(n => ragaNotes.add(n));
 
-        // Bhashanga ragas borrow notes outside their parent scale.
-        // Include them in ragaNotes so they don't inflate the alien count.
-        if (data.borrowedNotes) {
-            data.borrowedNotes.forEach(n => ragaNotes.add(n));
-        }
+        const getFreq = (n) => (noteFrequencies[n] || 0) + (noteFrequencies[ENHARMONIC[n]] || 0);
 
         let matchCount = 0;
         let alienCount = 0;
@@ -1070,14 +1105,11 @@ export const identifyRaga = (detectedSwarams, noteFrequencies = {}, noteSequence
             if (matchesNote(note, ragaNotes)) matchCount++;
             else alienCount++;
         });
-
         if (matchCount < 4 || alienCount > 2) continue;
 
         // ── Arohanam prominence ───────────────────────────────────────────────
-        // Janya ragas with skip notes score higher when those skipped notes are rare.
-        const arohanamSet  = new Set(cleanArohanam);
+        const arohanamSet   = new Set(cleanArohanam);
         const arohanamNotes = cleanArohanam.filter(n => n !== 'Sa');
-        const getFreq = (n) => (noteFrequencies[n] || 0) + (noteFrequencies[ENHARMONIC[n]] || 0);
         const avgArohanamFreq = arohanamNotes.length
             ? arohanamNotes.reduce((s, n) => s + getFreq(n), 0) / arohanamNotes.length
             : 0;
@@ -1085,41 +1117,90 @@ export const identifyRaga = (detectedSwarams, noteFrequencies = {}, noteSequence
             .reduce((s, n) => s + getFreq(n), 0) / Math.max(uniqueNotes.size - 1, 1);
         const arohanamProminence = avgDetectedFreq > 0 ? avgArohanamFreq / avgDetectedFreq : 1;
 
-        // ── Vakra penalty (strengthened 0.3 → 0.5) ───────────────────────────
-        // Avarohanam-only notes sung frequently suggest the wrong raga.
+        // ── Vakra penalty ─────────────────────────────────────────────────────
         const inArohanam = (n) => arohanamSet.has(n) || (ENHARMONIC[n] && arohanamSet.has(ENHARMONIC[n]));
-        const vakraNotes   = cleanAvarohanam.filter(n => !inArohanam(n) && n !== 'Sa');
-        const avgVakraFreq = vakraNotes.length
+        const vakraNotes    = cleanAvarohanam.filter(n => !inArohanam(n) && n !== 'Sa');
+        const avgVakraFreq  = vakraNotes.length
             ? vakraNotes.reduce((s, n) => s + getFreq(n), 0) / vakraNotes.length
             : 0;
         const vakraPenalty = avgArohanamFreq > 0 ? avgVakraFreq / avgArohanamFreq : 0;
 
         // ── Signature phrase bonus ────────────────────────────────────────────
-        // Each matched characteristic phrase adds 1.5 to the score.
-        // This is the primary mechanism for distinguishing same-scale ragas (e.g. Kapi vs Kharaharapriya).
+        // Primary janya discriminator. Each matched phrase scores 3.0 (up from 1.5).
+        // Phrase evidence outranks raw note-set coverage — a janya whose characteristic
+        // movement is heard should beat a melakarta that merely contains more notes.
         let phraseBonus  = 0;
         let phraseMatches = 0;
         if (noteSequence.length >= 2 && data.signaturePhrases) {
             for (const phrase of data.signaturePhrases) {
                 if (containsPhrase(noteSequence, phrase)) {
-                    phraseBonus += 1.5;
+                    phraseBonus += 3.0;
                     phraseMatches++;
                 }
             }
         }
 
+        // ── Arohanam omission bonus ───────────────────────────────────────────
+        // For janyas: notes structurally absent from arohanam carry identity information.
+        // Their absence is POSITIVE evidence — not just lack of data.
+        let omissionBonus = 0;
+        if (data.arohanamOmissions?.length) {
+            for (const omittedNote of data.arohanamOmissions) {
+                const freq = getFreq(omittedNote);
+                if (freq === 0) {
+                    omissionBonus += 1.5;         // fully absent: strong positive signal
+                } else if (freq / maxFreq < 0.12) {
+                    omissionBonus += 0.75;        // rare but present: mild positive signal
+                }
+            }
+        }
+
+        // ── Critical swara discrimination ─────────────────────────────────────
+        // Dhaivatam and Madhyama are branch-point decisions, not minor features.
+        // When the detected dominant variant contradicts a raga's expected note,
+        // that is strong disconfirming evidence — not just an alien-count increment.
+        let criticalSwaraBonus = 0;
+        const ragaHasDa1 = ragaNotes.has('Da1');
+        const ragaHasDa2 = ragaNotes.has('Da2');
+
+        if (ragaHasDa1 && !ragaHasDa2) {
+            if (da1Freq > 0 && da1Freq >= da2Freq)  criticalSwaraBonus += 2.0;
+            if (da2Freq > da1Freq * 1.5)             criticalSwaraBonus -= 2.5;
+        } else if (ragaHasDa2 && !ragaHasDa1) {
+            if (da2Freq > 0 && da2Freq >= da1Freq)  criticalSwaraBonus += 2.0;
+            if (da1Freq > da2Freq * 1.5)             criticalSwaraBonus -= 2.5;
+        }
+
+        const ragaHasMa1 = ragaNotes.has('Ma1');
+        const ragaHasMa2 = ragaNotes.has('Ma2');
+        if (ragaHasMa1 && !ragaHasMa2 && ma2Freq > ma1Freq * 1.5) criticalSwaraBonus -= 2.5;
+        if (ragaHasMa2 && !ragaHasMa1 && ma1Freq > ma2Freq * 1.5) criticalSwaraBonus -= 2.5;
+
+        // ── Janya-over-melakarta preference ───────────────────────────────────
+        // When a janya's phrase signature is heard, prefer it over the parent melakarta.
+        // Only fires when there is actual phrase evidence — not a blanket janya boost.
+        const janyaBonus = data.type?.includes('Janya') && phraseMatches >= 1 ? 2.0 : 0;
+
+        // ── High-frequency alien penalty ──────────────────────────────────────
+        // An alien note sung frequently is much stronger evidence of the wrong raga
+        // than a rare transitional glide. Penalise aliens proportional to their prominence.
+        let alienPenaltyExtra = 0;
+        uniqueNotes.forEach(note => {
+            if (!matchesNote(note, ragaNotes)) {
+                if (getFreq(note) / maxFreq > 0.2) alienPenaltyExtra += 1.0;
+            }
+        });
+
         // ── Important-note presence bonus ─────────────────────────────────────
-        // All designated important notes should be present; partial credit for partial presence.
         let importantBonus = 0;
         if (data.importantNotes?.length) {
             const present = data.importantNotes.filter(n =>
                 uniqueNotes.has(n) || (ENHARMONIC[n] && uniqueNotes.has(ENHARMONIC[n]))
             );
-            importantBonus = (present.length / data.importantNotes.length) * 1.0;
+            importantBonus = (present.length / data.importantNotes.length) * 1.5;
         }
 
         // ── Nyasa note presence bonus ─────────────────────────────────────────
-        // Resting notes for this raga should appear; partial credit for partial presence.
         let nyasaBonus = 0;
         if (data.nyasaSwaras?.length) {
             const present = data.nyasaSwaras.filter(n =>
@@ -1128,16 +1209,29 @@ export const identifyRaga = (detectedSwarams, noteFrequencies = {}, noteSequence
             nyasaBonus = (present.length / data.nyasaSwaras.length) * 0.5;
         }
 
+        // ── Score ─────────────────────────────────────────────────────────────
+        // matchCount weight reduced 1.5 → 1.0: raw scale coverage is no longer dominant.
+        // phraseBonus is now the primary signal for janyas.
         const coverage = matchCount / ragaNotes.size;
-        const score    = (matchCount * 1.5)
-            - (alienCount  * 2)
-            + (arohanamProminence * 0.6)
-            - (vakraPenalty      * 0.5)
-            + phraseBonus
-            + importantBonus
-            + nyasaBonus;
+        const score    = (matchCount * 1.0)
+                       - (alienCount       * 2.0)
+                       - alienPenaltyExtra
+                       + (arohanamProminence * 0.4)
+                       - (vakraPenalty       * 0.5)
+                       + phraseBonus
+                       + omissionBonus
+                       + criticalSwaraBonus
+                       + janyaBonus
+                       + importantBonus
+                       + nyasaBonus;
 
-        candidates.push({ name, ...data, score, coverage, matchCount, alienCount, phraseMatches });
+        // Derive family for "closest family" display layer.
+        const familyMatch = data.type?.match(/Janya · (.+?) \(/);
+        const family = familyMatch ? familyMatch[1]
+                     : data.type?.startsWith('Melakarta') ? name
+                     : null;
+
+        candidates.push({ name, ...data, score, coverage, matchCount, alienCount, phraseMatches, family, omissionBonus });
     }
 
     candidates.sort((a, b) => b.score - a.score);

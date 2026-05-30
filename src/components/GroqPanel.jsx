@@ -1,8 +1,10 @@
 import { useState, useRef } from 'react';
 import { identifyRagaWithAI } from '../utils/ragaIdentify';
 import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
+import { detectPitch } from '../utils/audioUtils';
 
-/* global ml5 */
+// ml5/CREPE commented out for hackathon — restore after contest
+// /* global ml5 */
 
 const RECORD_SECS = 30;
 const MIN_SCORE   = 4.0;
@@ -16,8 +18,9 @@ export default function GroqPanel({ saFrequency }) {
     const [currentSwaraStream, setCurrentSwaraStream] = useState([]);
 
     const swaraStreamRef = useRef([]);
-    const timerRef    = useRef(null);
-    const streamRef   = useRef(null);
+    const timerRef      = useRef(null);
+    const pitchTimerRef = useRef(null);
+    const streamRef     = useRef(null);
     const recordingFlag = useRef(false);
 
     const startRecording = async () => {
@@ -39,56 +42,47 @@ export default function GroqPanel({ saFrequency }) {
             setPanelState(STATES.RECORDING);
             setCountdown(RECORD_SECS);
 
-            const modelUrl = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
-            ml5.pitchDetection(modelUrl, audioCtx, mediaStream, (err, pitchModel) => {
-                if (err) {
-                    setErrorMsg('Error loading pitch model for AI');
-                    setPanelState(STATES.ERROR);
-                    recordingFlag.current = false;
-                    return;
-                }
-                // Stability buffer: require 3 consecutive readings within ±1 semitone
-                // before accepting a pitch as a real note (filters slides and noise).
-                const pitchBuf = [];
+            // Autocorrelation pitch detection (ml5/CREPE commented out for hackathon)
+            const source = audioCtx.createMediaStreamSource(mediaStream);
+            const analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 2048;
+            source.connect(analyser);
 
-                const getPitch = () => {
-                    if (!recordingFlag.current) return;
-                    pitchModel.getPitch((_, frequency) => {
-                        if (frequency && recordingFlag.current) {
-                            const now = Date.now();
-
-                            // Octave-jump filter — jumps > 0.6 octaves are almost always detection errors.
-                            const lastBuf = pitchBuf[pitchBuf.length - 1];
-                            if (lastBuf && Math.abs(Math.log2(frequency / lastBuf)) >= 0.6) {
-                                pitchBuf.length = 0;
-                            } else {
-                                pitchBuf.push(frequency);
-                                if (pitchBuf.length > 3) pitchBuf.shift();
-
-                                if (pitchBuf.length === 3) {
-                                    const semis = pitchBuf.map(f => Math.round(12 * Math.log2(f / saFrequency)));
-                                    const stable = semis.every(s => Math.abs(s - semis[0]) <= 1);
-                                    if (stable) {
-                                        const swaram = getSwaram(frequency, saFrequency);
-                                        if (swaram) {
-                                            const len = swaraStreamRef.current.length;
-                                            if (len === 0 || swaraStreamRef.current[len - 1].note !== swaram) {
-                                                swaraStreamRef.current.push({ note: swaram, start: now, duration: 0 });
-                                            } else {
-                                                swaraStreamRef.current[len - 1].duration = now - swaraStreamRef.current[len - 1].start;
-                                            }
-                                            const uiNotes = swaraStreamRef.current.filter(x => x.duration > 100).map(x => x.note);
-                                            setCurrentSwaraStream(uiNotes.slice(-8));
-                                        }
+            const pitchBuf = [];
+            pitchTimerRef.current = setInterval(() => {
+                if (!recordingFlag.current) return;
+                const frequency = detectPitch(analyser, audioCtx.sampleRate);
+                if (frequency) {
+                    const now = Date.now();
+                    const lastBuf = pitchBuf[pitchBuf.length - 1];
+                    if (lastBuf && Math.abs(Math.log2(frequency / lastBuf)) >= 0.6) {
+                        pitchBuf.length = 0;
+                    } else {
+                        pitchBuf.push(frequency);
+                        if (pitchBuf.length > 3) pitchBuf.shift();
+                        if (pitchBuf.length === 3) {
+                            const semis = pitchBuf.map(f => Math.round(12 * Math.log2(f / saFrequency)));
+                            const stable = semis.every(s => Math.abs(s - semis[0]) <= 1);
+                            if (stable) {
+                                const swaram = getSwaram(frequency, saFrequency);
+                                if (swaram) {
+                                    const len = swaraStreamRef.current.length;
+                                    if (len === 0 || swaraStreamRef.current[len - 1].note !== swaram) {
+                                        swaraStreamRef.current.push({ note: swaram, start: now, duration: 0 });
+                                    } else {
+                                        swaraStreamRef.current[len - 1].duration = now - swaraStreamRef.current[len - 1].start;
                                     }
+                                    const uiNotes = swaraStreamRef.current.filter(x => x.duration > 100).map(x => x.note);
+                                    setCurrentSwaraStream(uiNotes.slice(-8));
                                 }
                             }
                         }
-                        if (recordingFlag.current) getPitch();
-                    });
-                };
-                getPitch();
-            });
+                    }
+                }
+            }, 80);
+
+            // ml5/CREPE path commented out for hackathon — restore after contest
+            // ml5.pitchDetection(modelUrl, audioCtx, mediaStream, (err, pitchModel) => { ... });
 
             let remaining = RECORD_SECS;
             timerRef.current = setInterval(() => {
@@ -105,6 +99,7 @@ export default function GroqPanel({ saFrequency }) {
 
     const stopEarly = async () => {
         clearInterval(timerRef.current);
+        clearInterval(pitchTimerRef.current);
         recordingFlag.current = false;
         streamRef.current?.getTracks().forEach(t => t.stop());
 

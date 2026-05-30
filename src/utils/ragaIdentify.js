@@ -44,11 +44,14 @@ Example: A singer performing Ma2 with gamakam will slide through Ma1 on the way 
 
 HOW TO IDENTIFY CORRECTLY:
 1. The NOTE FREQUENCY SUMMARY is your primary evidence. High-frequency notes that also appear as (long) are TRUE scale swaras. Low-frequency notes with no long occurrences are gamakam artifacts.
-2. The Madhyama variant is the single most critical distinguishing factor between raga families — identify it from the most frequent and longest Ma notes FIRST, before making any other decisions.
-   — Ma1 (suddha madhyama) = semitone 5
-   — Ma2 (prati madhyama) = semitone 6
+2. Madhyama and Dhaivatam are branch-point decisions — identify them from the most frequent and longest notes FIRST.
+   — Ma1 (suddha madhyama) = semitone 5 | Ma2 (prati madhyama) = semitone 6
+   — Da1 (suddha dhaivatam) = semitone 8 | Da2 (chathusruti dhaivatam) = semitone 9
 3. Do NOT count a low-frequency note as an "alien note" if it sits one semitone away from a high-frequency note — it is almost certainly a slide artifact.
 4. Notes marked (long) or (very long) are established swaras. Plain notes may be passing tones.
+5. ASCENT / DESCENT ASYMMETRY: Many Carnatic janyas omit notes in ascent that appear in descent. A note appearing only rarely suggests it is avarohanam-only. Treat omissions in arohanam as POSITIVE evidence for the janya, not absence of information.
+6. PHRASE GRAMMAR over note inventory: Look for characteristic movement contours — the order and direction of notes matters more than whether all scale degrees appear. A janya whose movement pattern fits should beat a melakarta that merely contains all the detected notes.
+7. STRUCTURAL vs. ORNAMENTAL: Only frequently repeated notes and (long)/(very long) notes are structurally identity-bearing. Rare notes are ornamental or transitional.
 
 Transcribed swara sequence:
 ${swaraString}
@@ -58,18 +61,22 @@ ${ragaList}
 
 Using the reference dictionary as your strict baseline, identify the Top 3 most likely Carnatic raagams. Determine the correct madhyama from the prominent/long notes before comparing against the full scale.
 
-CRITICAL INSTRUCTION: If the sequence precisely matches the scale of a specific Janya raga (e.g., Margahindolam, Abhogi, Hindolam) defined in the dictionary, you MUST select that Janya raga as your top choice. DO NOT default to a parent Melakarta (like Natabhairavi) unless the specific signature notes (like the missing Pa/Ri, or the vakra phrases) of the Janya are clearly absent from the LONG notes. Only fall back to parent Melakartas if you strongly believe the Janya is NOT in the reference dictionary.
+CRITICAL INSTRUCTIONS:
+- If the sequence matches a specific Janya raga's MOVEMENT PATTERN (arohanam/avarohanam shape, omitted notes, characteristic phrases), you MUST prefer that Janya over the parent Melakarta, even if the parent technically contains all the detected notes.
+- When two ragas are close, explicitly check: which Dhaivatam is dominant? Which Ni is dominant? Which Ma is used? These are branch points, not tie-breakers.
+- Absence of a note in arohanam (e.g., no Ri in the ascending phrase) is POSITIVE evidence for a janya that structurally omits that note.
 
 Respond ONLY with valid JSON exactly matching this format:
 {
   "top_matches": [
     {
-      "raagam": "<Name of the 1st identified raagam>",
-      "arohanam": "<The ascending scale of this raagam>",
-      "avarohanam": "<The descending scale of this raagam>",
+      "raagam": "<Name>",
+      "family": "<Parent melakarta name, or same as raagam if it IS the melakarta>",
+      "arohanam": "<ascending scale>",
+      "avarohanam": "<descending scale>",
       "confidence": "<high, medium, or low>",
-      "prayogams": ["<phrase 1 found in sequence>", "<phrase 2 found in sequence>"],
-      "reasoning": "<Why this sequence matches this raagam>"
+      "prayogams": ["<phrase 1>", "<phrase 2>"],
+      "reasoning": "<Why this sequence matches this raagam, including ascent/descent analysis and key omissions>"
     },
     ... (provide exactly 3 matches)
   ]

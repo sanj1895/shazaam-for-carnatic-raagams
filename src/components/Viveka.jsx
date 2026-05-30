@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { detectPitch, extractPitchFrames, mixToMono, findBestSegment } from '../utils/audioUtils';
 import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
-/* global ml5 */
+// ml5/CREPE commented out for hackathon — restore after contest
+// /* global ml5 */
 import { identifyRagaWithAI } from '../utils/ragaIdentify';
 import SketchyRule from './SketchyRule';
 
@@ -178,102 +179,27 @@ function buildSwaraString(noteEvents, saHz) {
         .map(([n, c]) => `${n}×${c}${longCounts[n] ? `(${longCounts[n]} long)` : ''}`)
         .join(', ');
 
-    return `${noteSeq}\n\nNOTE FREQUENCY SUMMARY (most→least frequent): ${freqSummary}`;
-}
-
-const CREPE_URL = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
-
-/**
- * Run ml5 CREPE on a pre-decoded, single-channel AudioBuffer.
- * Routes audio silently through a MediaStreamDestination so CREPE can
- * process it at real-time speed without playing to speakers.
- * Returns { frames, rawCount } where frames are stability-filtered Hz values.
- */
-function runCREPEOnBuffer(ctx, segBuffer) {
-    return new Promise((resolve) => {
-        if (!window.ml5?.pitchDetection) {
-            resolve({ frames: [], rawCount: 0 });
-            return;
+    // Approximate ascent/descent note distribution
+    const ascentCounts = {};
+    const descentCounts = {};
+    for (let i = 1; i < noteEvents.length; i++) {
+        const s = getSwaram(noteEvents[i].hz, saHz);
+        if (!s) continue;
+        if (noteEvents[i].hz > noteEvents[i - 1].hz * 1.03) {
+            ascentCounts[s] = (ascentCounts[s] || 0) + 1;
+        } else if (noteEvents[i].hz < noteEvents[i - 1].hz * 0.97) {
+            descentCounts[s] = (descentCounts[s] || 0) + 1;
         }
+    }
+    const ascentStr  = Object.entries(ascentCounts).sort((a,b) => b[1]-a[1]).map(([n,c]) => `${n}×${c}`).join(', ');
+    const descentStr = Object.entries(descentCounts).sort((a,b) => b[1]-a[1]).map(([n,c]) => `${n}×${c}`).join(', ');
 
-        const frames   = [];
-        const pitchBuf = [];
-        let rawCount   = 0;
-        let done       = false;
-        let resolved   = false;
-        let pollTimer  = null;
-        let failSafeTimer = null;
-
-        const settle = (result) => {
-            if (resolved) return;
-            resolved = true;
-            done = true;
-            if (pollTimer) clearInterval(pollTimer);
-            if (failSafeTimer) clearTimeout(failSafeTimer);
-            resolve(result);
-        };
-
-        const source = ctx.createBufferSource();
-        source.buffer = segBuffer;
-        const dest = ctx.createMediaStreamDestination(); // silent — not to speakers
-        source.connect(dest);
-
-        // Offline/upload analysis is more fragile than the live mic path on Safari/WebKit.
-        // Resume explicitly and always bail out to the fallback extractor if CREPE hangs.
-        Promise.resolve(ctx.state === 'suspended' ? ctx.resume() : null).catch(() => {});
-
-        ml5.pitchDetection(CREPE_URL, ctx, dest.stream, (err, pitchModel) => {
-            if (err || !pitchModel) { settle({ frames, rawCount }); return; }
-
-            try {
-                source.start(0);
-            } catch {
-                settle({ frames, rawCount });
-                return;
-            }
-
-            const loop = () => {
-                if (done) { settle({ frames, rawCount }); return; }
-                pitchModel.getPitch((_, hz) => {
-                    if (hz && !done) {
-                        rawCount++;
-                        const last = pitchBuf[pitchBuf.length - 1];
-                        if (last && Math.abs(Math.log2(hz / last)) >= 0.6) {
-                            pitchBuf.length = 0;
-                            pitchBuf.push(hz);
-                        } else {
-                            pitchBuf.push(hz);
-                            if (pitchBuf.length > 3) pitchBuf.shift();
-                            if (pitchBuf.length === 3) {
-                                const ref = Math.round(12 * Math.log2(pitchBuf[0] / 130.81));
-                                if (pitchBuf.every(f => Math.abs(Math.round(12 * Math.log2(f / 130.81)) - ref) <= 2)) {
-                                    frames.push(hz);
-                                }
-                            }
-                        }
-                    }
-                    if (!done) loop();
-                });
-            };
-            loop();
-        });
-
-        source.onended = () => settle({ frames, rawCount });
-
-        // If the source never advances, poll wall-clock time and finish manually.
-        const expectedEnd = Date.now() + segBuffer.duration * 1000 + 1500;
-        pollTimer = setInterval(() => {
-            if (!done && Date.now() >= expectedEnd) {
-                settle({ frames, rawCount });
-            }
-        }, 250);
-
-        // Hard timeout for silent CREPE/model-load failures.
-        failSafeTimer = setTimeout(() => {
-            settle({ frames, rawCount });
-        }, Math.max((segBuffer.duration + 10) * 1000, 15000));
-    });
+    return `${noteSeq}\n\nNOTE FREQUENCY SUMMARY (most→least frequent): ${freqSummary}\nASCENT NOTES (approx): ${ascentStr || 'n/a'}\nDESCENT NOTES (approx): ${descentStr || 'n/a'}`;
 }
+
+// ml5/CREPE upload analysis commented out for hackathon — restore after contest
+// const CREPE_URL = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
+// function runCREPEOnBuffer(ctx, segBuffer) { ... }
 
 export default function Viveka({ onSelectRaga }) {
     const [inputMode,  setInputMode]  = useState(MODE.RECORD);
@@ -359,7 +285,7 @@ export default function Viveka({ onSelectRaga }) {
         const ragaSep    = second ? (top.score ?? 0) - (second.score ?? 0) : (top.score ?? 0);
         const phraseHits = top.phraseMatches ?? 0;
         const confPoints = [
-            (top.score  ?? 0) >= 9 ? 2 : (top.score ?? 0) >= 6 ? 1 : 0,
+            (top.score ?? 0) >= 14 ? 2 : (top.score ?? 0) >= 8 ? 1 : 0,
             ragaSep >= 3           ? 2 : ragaSep >= 1.5         ? 1 : 0,
             (top.alienCount ?? 99) === 0 ? 1 : 0,
             phraseHits >= 2        ? 3 : phraseHits >= 1        ? 2 : 0,
@@ -388,15 +314,18 @@ export default function Viveka({ onSelectRaga }) {
             }
         }
 
+        const topOmission = top.omissionBonus > 0 ? `characteristic omissions detected` : '';
         const topMatches = groqResult?.top_matches ?? best.candidates.slice(0, 3).map(c => ({
             raagam:     c.name,
             confidence: localConfidence,
             reasoning:  [
-                `Matched ${c.matchCount} of the raga's ${c.ragaNotes?.size ?? '?'} scale notes`,
+                `Matched ${c.matchCount} of the raga's scale notes`,
                 c.alienCount === 0 ? 'no alien notes' : `${c.alienCount} alien note(s)`,
                 c.phraseMatches > 0 ? `${c.phraseMatches} signature phrase(s) found` : '',
+                c.omissionBonus > 0 ? 'characteristic omissions confirm identity' : '',
             ].filter(Boolean).join(' · '),
             prayogams:  [],
+            family:     c.family,
         }));
 
         setResults({
@@ -463,60 +392,22 @@ export default function Viveka({ onSelectRaga }) {
                 }
             };
 
-            // Autocorrelation fallback — used only when ml5 model fails to load.
-            const startAutocorrelation = () => {
-                const source  = ctx.createMediaStreamSource(stream);
-                const analyser = ctx.createAnalyser();
-                analyser.fftSize = 2048;
-                source.connect(analyser);
-                analyserRef.current = analyser;
-                pitchTimer.current = setInterval(() => {
-                    if (!analyserRef.current) return;
-                    const hz = detectPitch(analyserRef.current, ctx.sampleRate);
-                    if (hz) onHz(hz);
-                }, FRAME_MS);
-            };
+            // Primary: autocorrelation pitch detector (ml5/CREPE commented out for hackathon)
+            const source  = ctx.createMediaStreamSource(stream);
+            const analyser = ctx.createAnalyser();
+            analyser.fftSize = 2048;
+            source.connect(analyser);
+            analyserRef.current = analyser;
+            pitchTimer.current = setInterval(() => {
+                if (!analyserRef.current) return;
+                const hz = detectPitch(analyserRef.current, ctx.sampleRate);
+                if (hz) onHz(hz);
+            }, FRAME_MS);
 
-            // Primary: ml5 CREPE pitch detector.
-            // Stability buffer: require 3 consecutive readings within ±2 semitones before
-            // accepting a frame into framesRef. ±2 (not ±1) matches vocal vibrato range.
-            // The live Hz display updates on every valid reading so the user always sees feedback.
-            const pitchBuf = [];
-            const CREPE_URL = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
-            ml5.pitchDetection(CREPE_URL, ctx, stream, (err, pitchModel) => {
-                if (statusRef.current !== STATUS.RECORDING) return; // stopped before model loaded
-                if (err || !pitchModel) { startAutocorrelation(); return; }
-
-                const loop = () => {
-                    if (statusRef.current !== STATUS.RECORDING) return;
-                    pitchModel.getPitch((_, hz) => {
-                        if (hz && statusRef.current === STATUS.RECORDING) {
-                            // Always update the live display so the user knows their voice is heard.
-                            setCurrentHz(hz);
-
-                            const last = pitchBuf[pitchBuf.length - 1];
-                            if (last && Math.abs(Math.log2(hz / last)) >= 0.6) {
-                                // Octave jump: start a fresh stability window with this frame.
-                                pitchBuf.length = 0;
-                                pitchBuf.push(hz);
-                            } else {
-                                pitchBuf.push(hz);
-                                if (pitchBuf.length > 3) pitchBuf.shift();
-                                if (pitchBuf.length === 3) {
-                                    // All 3 frames within ±2 semitones → stable, add to pool.
-                                    const ref = Math.round(12 * Math.log2(pitchBuf[0] / 130.81));
-                                    const stable = pitchBuf.every(
-                                        f => Math.abs(Math.round(12 * Math.log2(f / 130.81)) - ref) <= 2
-                                    );
-                                    if (stable) onHz(hz);
-                                }
-                            }
-                        }
-                        if (statusRef.current === STATUS.RECORDING) loop();
-                    });
-                };
-                loop();
-            });
+            // ml5/CREPE mic path commented out for hackathon — restore after contest
+            // const pitchBuf = [];
+            // const CREPE_URL = '...';
+            // ml5.pitchDetection(CREPE_URL, ctx, stream, (err, pitchModel) => { ... });
 
             countTimer.current    = setInterval(() => setElapsed(e => e + 1), 1000);
             autoStopTimer.current = setTimeout(stopAndAnalyze, MAX_RECORD_SEC * 1000);
@@ -586,37 +477,16 @@ export default function Viveka({ onSelectRaga }) {
             };
             setUploadSegmentInfo(segInfo);
             setUploadProgress(28);
-            setUploadStage('Extracting melody with CREPE…');
+            setUploadStage('Extracting melody…');
 
-            // Build a mono AudioBuffer for just the selected segment.
-            const segLen = endSample - startSample;
-            const segBuf = ctx.createBuffer(1, segLen, audioBuffer.sampleRate);
-            segBuf.getChannelData(0).set(mono.subarray(startSample, endSample));
+            // ml5/CREPE upload path commented out for hackathon — restore after contest
+            // ({ frames, rawCount } = await runCREPEOnBuffer(ctx, segBuf));
 
-            // ── Primary: CREPE (same quality as mic path, real-time) ──────────
-            const segDuration = endSec - startSec;
-            const progressStart = Date.now();
-            const progressInterval = setInterval(() => {
-                const elapsed = (Date.now() - progressStart) / 1000;
-                setUploadProgress(Math.min(28 + (elapsed / segDuration) * 62, 90));
-            }, 300);
-
-            let frames = [], rawCount = 0;
-            try {
-                ({ frames, rawCount } = await runCREPEOnBuffer(ctx, segBuf));
-            } catch (_) { /* CREPE failed to load — fall through to autocorrelation */ }
-            clearInterval(progressInterval);
-
-            // ── Fallback: autocorrelation if CREPE produced nothing ───────────
-            if (frames.length < 4) {
-                setUploadStage('CREPE stalled — switching to fallback analyzer…');
-                setUploadProgress(92);
-                const fb = await extractPitchFrames(audioBuffer, { startSample, endSample });
-                if (fb.frames.length > frames.length) {
-                    frames   = fb.frames;
-                    rawCount = rawCount || fb.frames.length;
-                }
-            }
+            // Autocorrelation (primary for hackathon)
+            setUploadProgress(50);
+            const fb = await extractPitchFrames(audioBuffer, { startSample, endSample });
+            let frames = fb.frames;
+            let rawCount = fb.frames.length;
 
             ctx.close();
             setUploadProgress(100);
@@ -680,6 +550,13 @@ export default function Viveka({ onSelectRaga }) {
         : results?.resultType === 'closest'
         ? 'Weak match — try a longer phrase with more movement'
         : null;
+
+    const ragaFamily = (ragaName) => {
+        const type = RAGAS[ragaName]?.type;
+        if (!type) return null;
+        const m = type.match(/Janya · (.+?) \(/);
+        return m ? m[1] : null;
+    };
 
     const pct = Math.min((elapsed / MAX_RECORD_SEC) * 100, 100);
 
@@ -910,6 +787,12 @@ export default function Viveka({ onSelectRaga }) {
                             }`}>
                                 {resultLabel}
                             </span>
+                            {/* Family bucket — one layer above the identity */}
+                            {ragaFamily(results.matches[0]?.raagam) && (
+                                <p className="text-[9px] font-mono uppercase tracking-[0.15em] text-c-cream-dark/40 mb-0.5">
+                                    {ragaFamily(results.matches[0]?.raagam)} family
+                                </p>
+                            )}
                             <h2 className="font-playfair text-3xl font-bold text-c-cream leading-none tracking-wide">
                                 {results.matches[0]?.raagam}
                             </h2>

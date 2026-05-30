@@ -6,7 +6,7 @@
 
 ## What It Does
 
-- **Viveka** — sing any phrase and Ālāpana identifies the raga using CREPE pitch detection + Gemini 2.5 Flash
+- **Viveka** — sing any phrase and Ālāpana identifies the raga using autocorrelation pitch detection + Gemini 2.5 Flash
 - **Ālāpana Coach** — AI practice coach (Gemini 2.5 Flash via Vertex AI Agent Engine) that reads your MongoDB practice history and recommends what to work on next
 - **Gurukul** — structured Carnatic curriculum: varisais, alankarams, gitams
 - **Raga Kosha** — browse 90+ ragas with scales, mood, and curated performances
@@ -23,6 +23,9 @@ Browser (React + Vite)
     │                                 ADK Agent (Gemini 2.5 Flash)
     │                                      │
     │                              MongoDB MCP Server ◄──► MongoDB Atlas
+    │                              (reads + writes sessions collection)
+    │
+    ├── /api/sessions (POST) ──► Vertex AI Agent Engine → MongoDB MCP insertOne
     │
     └── /api/gemini-identify ──► Gemini 2.5 Flash (Vertex AI)
               ▲
@@ -37,7 +40,7 @@ Browser (React + Vite)
 | Agent orchestration | Google ADK → Vertex AI Agent Engine (Agent Builder) |
 | Partner integration | MongoDB MCP server (`mongodb-mcp-server`) |
 | Practice memory | MongoDB Atlas (`alapana.sessions` collection) |
-| Pitch detection | ml5 CREPE (browser) |
+| Pitch detection | Autocorrelation (browser Web Audio API) |
 | Frontend | React + Vite + Tailwind CSS |
 | Hosting | Vercel |
 
@@ -84,7 +87,10 @@ When a student sends a message to the coach:
 
 1. The ADK agent calls **MongoDB MCP `find`** to retrieve practice history
 2. **Gemini 2.5 Flash** reasons over the history and gives a directed recommendation
-3. After each session, the agent calls **MongoDB MCP `insertOne`** to record progress
+
+When a student completes a practice session:
+
+3. The frontend calls `/api/sessions` → Agent Engine → **MongoDB MCP `insertOne`** records the session
 
 Schema: `{ userId, timestamp, tool, raga, durationMinutes, notes }`
 

@@ -87,12 +87,11 @@ export default async function handler(req, res) {
         body: JSON.stringify({ user_id: userId }),
       }
     );
-    const sessionData = await sessionRes.json();
+    const sessionRawText = await sessionRes.text();
+    let sessionData = {};
+    try { sessionData = JSON.parse(sessionRawText); } catch {}
     const sessionId = sessionData.name?.split('/').pop() || userId;
 
-    // All fields must be nested inside `input` — userId/sessionId are not valid
-    // top-level fields for the Reasoning Engine streamQuery proto.
-    // ADK agents expect input.message (string), not the Gemini messages array format.
     const agentRes = await fetch(
       `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}:streamQuery`,
       {
@@ -108,13 +107,21 @@ export default async function handler(req, res) {
       }
     );
 
+    const rawBody = await agentRes.text();
+
     if (!agentRes.ok) {
-      const errBody = await agentRes.text();
-      return res.status(500).json({ error: `Agent Engine error: ${errBody}` });
+      return res.status(500).json({ error: `Agent Engine error: ${rawBody}` });
     }
 
-    // streamQuery returns NDJSON — scan lines in reverse to find the final text.
-    const rawBody = await agentRes.text();
+    // DEBUG — remove after confirming response shape
+    return res.status(200).json({
+      _debug: {
+        sessionStatus: sessionRes.status,
+        sessionBody:   sessionRawText.slice(0, 500),
+        agentStatus:   agentRes.status,
+        agentBody:     rawBody.slice(0, 2000),
+      }
+    });
     let reply = null;
     for (const line of rawBody.split('\n').reverse()) {
       const trimmed = line.trim();

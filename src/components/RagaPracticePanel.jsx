@@ -304,7 +304,7 @@ VOICE QUALITY:
 - Breath Support: ${breathLabel}
 - Ornamentation: ${ornamentLabel}
 
-Respond in exactly 3 short paragraphs, max 200 words total:
+Respond in plain prose — exactly 3 short paragraphs, max 200 words total. Do NOT use JSON, bullet points, or headers.
 1. Note accuracy — which notes they nailed, which were consistently flat or sharp, which they missed. Be specific.
 2. Voice quality — address the resonance and breath support using proper Carnatic terms (akaram, gamakam, shruti, swarasthana). If ornamentation was detected, comment on whether it was clean.
 3. One precise, actionable tip for their next practice session.
@@ -316,7 +316,16 @@ Tone: warm but direct. Address them as a serious student. Do not mention numbers
         messages: [{ role: 'user', content: PROMPT }],
         temperature: 0.65,
       });
-      setFeedback(data.choices[0]?.message?.content || 'No feedback generated.');
+      const raw = data.choices[0]?.message?.content || 'No feedback generated.';
+      // Model sometimes returns JSON despite prose instruction — extract evaluation if so
+      let parsed = raw;
+      if (raw.trimStart().startsWith('{')) {
+        try {
+          const obj = JSON.parse(raw);
+          parsed = obj.evaluation || obj.feedback || obj.summary || raw;
+        } catch { /* keep raw */ }
+      }
+      setFeedback(parsed);
 
       setPhase('result');
     } catch (err) {

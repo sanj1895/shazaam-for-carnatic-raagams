@@ -1,0 +1,307 @@
+import { useState, useEffect, useCallback } from 'react';
+
+const MASTERY_STYLES = {
+  strong:     { label: 'Strong',     dot: 'bg-emerald-400', badge: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30', bar: 'bg-emerald-400' },
+  stable:     { label: 'Stable',     dot: 'bg-c-gold',      badge: 'text-c-gold bg-c-gold/10 border-c-gold/30',               bar: 'bg-c-gold' },
+  developing: { label: 'Developing', dot: 'bg-amber-400',   badge: 'text-amber-400 bg-amber-500/10 border-amber-500/30',      bar: 'bg-amber-400' },
+  exploring:  { label: 'Exploring',  dot: 'bg-c-cream-dark', badge: 'text-c-cream-dark bg-white/5 border-c-border',           bar: 'bg-c-cream-dark/40' },
+};
+
+function daysSince(dateStr) {
+  if (!dateStr) return null;
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (days === 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 7) return `${days}d ago`;
+  if (days < 30) return `${Math.floor(days / 7)}w ago`;
+  return `${Math.floor(days / 30)}mo ago`;
+}
+
+function buildTimelineGrid(practiceTimeline) {
+  const today = new Date();
+  const grid = [];
+  for (let i = 20; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    const entry = practiceTimeline.find(t => t.date === key);
+    grid.push({ date: key, count: entry?.count || 0, ragas: entry?.ragas || [] });
+  }
+  return grid;
+}
+
+async function authHeaders(getToken) {
+  try {
+    const token = getToken ? await getToken() : null;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
+
+export default function LearnerModelPanel({ userId, getToken }) {
+  const [data, setData]       = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
+
+  const fetchModel = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const headers = await authHeaders(getToken);
+      const res = await fetch(`/api/learner-model?userId=${encodeURIComponent(userId || 'default')}`, { headers });
+      if (!res.ok) throw new Error('Could not load your musical memory.');
+      const json = await res.json();
+      setData(json);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId, getToken]);
+
+  useEffect(() => { fetchModel(); }, [fetchModel]);
+
+  if (loading) {
+    return (
+      <div className="w-full flex flex-col items-center gap-4 py-16 animate-fade-in">
+        <div className="w-8 h-8 border-2 border-c-gold/30 border-t-c-gold rounded-full animate-spin" />
+        <p className="text-c-cream-dim text-sm font-playfair italic">Loading your musical memory…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full flex flex-col items-center gap-4 py-12">
+        <p className="text-red-400 text-sm font-playfair">{error}</p>
+        <button onClick={fetchModel} className="text-xs text-c-gold underline underline-offset-2">Retry</button>
+      </div>
+    );
+  }
+
+  const { ragaStats = [], confusionPairs = [], practiceTimeline = [], totalSessions = 0, activeDays = 0 } = data || {};
+  const timelineGrid = buildTimelineGrid(practiceTimeline);
+  const maxCount = Math.max(...timelineGrid.map(d => d.count), 1);
+  const isEmpty = ragaStats.length === 0 && confusionPairs.length === 0;
+
+  return (
+    <main className="w-full max-w-3xl mx-auto flex flex-col gap-8 px-4 md:px-8 py-10 animate-fade-in">
+
+      {/* ── Header ── */}
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center flex-shrink-0">
+            <svg className="w-5 h-5 text-c-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5"/>
+              <path d="M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <div>
+            <h1 className="font-playfair text-xl font-bold text-c-gold tracking-wide">Your Musical Memory</h1>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-c-cream-dark/50">
+              Progressive learner model · powered by MongoDB
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Stats bar ── */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: 'Total Sessions', value: totalSessions },
+          { label: 'Ragas Practiced', value: ragaStats.length },
+          { label: 'Active Days (3w)', value: activeDays },
+        ].map(({ label, value }) => (
+          <div key={label} className="bg-c-card border border-c-border rounded-xl p-3 flex flex-col items-center gap-0.5">
+            <span className="font-playfair text-2xl font-bold text-c-cream">{value}</span>
+            <span className="text-[9px] font-mono uppercase tracking-widest text-c-cream-dark/50 text-center">{label}</span>
+          </div>
+        ))}
+      </div>
+
+      {isEmpty ? (
+        <div className="w-full bg-c-card border border-c-border rounded-xl p-8 flex flex-col items-center gap-3 text-center">
+          <p className="font-playfair text-c-cream italic">Your musical memory is just beginning.</p>
+          <p className="text-xs text-c-cream-dark leading-relaxed max-w-xs">
+            Use Viveka to identify ragas, practice with Gurukul, or explore Raga Kosha.
+            Every session builds your personal learner model here.
+          </p>
+          <p className="text-[9px] font-mono uppercase tracking-widest text-c-cream-dark/40 mt-1">
+            MongoDB stores your patterns · coach learns from them
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* ── Raga Mastery ── */}
+          {ragaStats.length > 0 && (
+            <section className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <h2 className="font-playfair text-base font-semibold text-c-cream">Raga Mastery</h2>
+                <div className="flex items-center gap-3">
+                  {['strong', 'stable', 'developing', 'exploring'].map(level => (
+                    <div key={level} className="flex items-center gap-1">
+                      <div className={`w-1.5 h-1.5 rounded-full ${MASTERY_STYLES[level].dot}`} />
+                      <span className="text-[9px] font-mono text-c-cream-dark/50 uppercase tracking-widest">{MASTERY_STYLES[level].label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {ragaStats.map(raga => {
+                  const style = MASTERY_STYLES[raga.masteryLevel] || MASTERY_STYLES.exploring;
+                  const successPct = raga.totalSessions > 0
+                    ? Math.round((raga.identifiedCount / raga.totalSessions) * 100)
+                    : 0;
+                  return (
+                    <div
+                      key={raga.raga}
+                      className="bg-c-card border border-c-border rounded-xl px-4 py-3 flex flex-col gap-2"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-0.5 ${style.dot}`} />
+                          <span className="font-playfair font-semibold text-c-cream text-sm truncate">{raga.raga}</span>
+                        </div>
+                        <span className={`text-[8px] font-mono uppercase tracking-widest px-1.5 py-0.5 rounded border flex-shrink-0 ${style.badge}`}>
+                          {style.label}
+                        </span>
+                      </div>
+
+                      {/* Session count bar */}
+                      <div className="flex flex-col gap-1">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-c-cream-dark/60 font-mono">
+                            {raga.totalSessions} session{raga.totalSessions !== 1 ? 's' : ''}
+                            {raga.identifiedCount > 0 && ` · ${successPct}% identified`}
+                          </span>
+                          {raga.lastPracticed && (
+                            <span className="text-[9px] text-c-cream-dark/40 font-mono">{daysSince(raga.lastPracticed)}</span>
+                          )}
+                        </div>
+                        <div className="w-full h-1 bg-c-border rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${style.bar}`}
+                            style={{ width: `${Math.min((raga.totalSessions / 10) * 100, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {raga.confusedCount > 0 && (
+                        <p className="text-[9px] text-amber-400/70 font-mono">
+                          {raga.confusedCount} ambiguous result{raga.confusedCount !== 1 ? 's' : ''}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* ── Common Confusions ── The MongoDB story ── */}
+          {confusionPairs.length > 0 && (
+            <section className="flex flex-col gap-3">
+              <div className="flex flex-col gap-0.5">
+                <h2 className="font-playfair text-base font-semibold text-c-cream">Common Confusions</h2>
+                <p className="text-[10px] text-c-cream-dark/50 font-mono">
+                  MongoDB tracks these patterns · your coach cites them when you practice
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                {confusionPairs.map((pair, i) => (
+                  <div
+                    key={i}
+                    className="bg-c-card border border-amber-500/20 rounded-xl px-4 py-3.5 flex items-center gap-3"
+                  >
+                    <div className="flex-1 min-w-0 flex items-center gap-2 justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="font-playfair font-semibold text-c-cream text-sm truncate">{pair.raga}</span>
+                        <span className="text-c-gold/50 text-xs flex-shrink-0">↔</span>
+                        <span className="font-playfair font-semibold text-c-cream text-sm truncate">{pair.confusedWith}</span>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex gap-0.5">
+                          {Array.from({ length: Math.min(pair.count, 5) }).map((_, j) => (
+                            <div key={j} className="w-1.5 h-1.5 rounded-full bg-amber-400/70" />
+                          ))}
+                        </div>
+                        <span className="text-[10px] font-mono text-amber-400/70">{pair.count}×</span>
+                      </div>
+                    </div>
+                    {pair.lastOccurred && (
+                      <span className="text-[9px] font-mono text-c-cream-dark/30 flex-shrink-0">
+                        {daysSince(pair.lastOccurred)}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <p className="text-[9px] text-c-cream-dark/30 font-playfair italic text-center mt-1">
+                Ask your coach to help you distinguish these ragas
+              </p>
+            </section>
+          )}
+
+          {/* ── Practice Timeline ── */}
+          <section className="flex flex-col gap-3">
+            <h2 className="font-playfair text-base font-semibold text-c-cream">Practice Timeline</h2>
+            <div className="bg-c-card border border-c-border rounded-xl p-4 flex flex-col gap-3">
+              <div className="flex items-end gap-1 h-12">
+                {timelineGrid.map((day, i) => {
+                  const heightPct = day.count === 0 ? 0 : Math.max((day.count / maxCount) * 100, 15);
+                  const isToday = i === timelineGrid.length - 1;
+                  return (
+                    <div
+                      key={day.date}
+                      className="flex-1 flex flex-col items-center justify-end gap-0.5 group relative"
+                      title={day.count > 0 ? `${day.date}: ${day.count} session${day.count !== 1 ? 's' : ''}${day.ragas.filter(Boolean).length ? ` · ${day.ragas.filter(Boolean).join(', ')}` : ''}` : day.date}
+                    >
+                      <div
+                        className={`w-full rounded-sm transition-all ${
+                          day.count === 0
+                            ? 'bg-c-border/40'
+                            : isToday
+                            ? 'bg-c-gold'
+                            : 'bg-c-gold/50'
+                        }`}
+                        style={{ height: day.count === 0 ? '4px' : `${heightPct}%` }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex justify-between text-[8px] font-mono text-c-cream-dark/30 uppercase tracking-widest">
+                <span>21 days ago</span>
+                <span>Today</span>
+              </div>
+              {practiceTimeline.length === 0 && (
+                <p className="text-[10px] text-c-cream-dark/40 font-playfair italic text-center">
+                  No practice sessions in the last 21 days
+                </p>
+              )}
+            </div>
+          </section>
+        </>
+      )}
+
+      {/* ── MongoDB attribution ── */}
+      <div className="flex items-center justify-center gap-2 pt-2 pb-4">
+        <div className="w-3 h-3 flex-shrink-0">
+          <svg viewBox="0 0 24 24" fill="#00ED64">
+            <path d="M12.004.063C5.982.063 1.1 4.946 1.1 10.968c0 3.694 1.808 6.97 4.61 9.007l.003.002c.022 5.078 4.28 3.959 4.28 3.959v-3.01c0-.618.504-1.12 1.124-1.12h1.77c.62 0 1.123.502 1.123 1.12v3.01s4.258 1.12 4.281-3.959l.002-.002c2.803-2.037 4.61-5.313 4.61-9.007C22.903 4.946 18.022.063 12.004.063z"/>
+          </svg>
+        </div>
+        <span className="text-[9px] font-mono text-c-cream-dark/30 uppercase tracking-widest">
+          Built on MongoDB · learner model updates with every session
+        </span>
+      </div>
+
+    </main>
+  );
+}

@@ -329,6 +329,16 @@ export default function Viveka({ onSelectRaga }) {
             family:     c.family,
         }));
 
+        // Save a rich identification event to MongoDB so the learner model can track
+        // per-raga mastery and confusion patterns over time.
+        window.__alapanaCoach?.saveSession({
+            tool: 'viveka',
+            raga: topMatches[0]?.raagam || '',
+            outcome: resultType,
+            confidence: localConfidence,
+            confusedWith: ambiguousWith || '',
+        });
+
         setResults({
             matches:      topMatches,
             saHz:         best.saHz,

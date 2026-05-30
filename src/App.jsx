@@ -20,6 +20,7 @@ import OnboardingQuiz from './components/OnboardingQuiz';
 import { CuratedIcon, FireIcon, DhwaniIcon, SadhanaIcon } from './components/IconLibrary';
 import SketchyRule from './components/SketchyRule';
 import CoachPanel from './components/CoachPanel';
+import LearnerModelPanel from './components/LearnerModelPanel';
 
 const VeenaIcon = () => (
     <svg width="16" height="50" viewBox="0 0 22 68" fill="none" className="text-c-gold-dim">
@@ -86,8 +87,8 @@ const MODE_FEATURE_ORDER = {
 };
 
 const MODE_ALLOWED_VIEWS = {
-    beginner: new Set(['home', 'tutor', 'sadhana', 'shruthi', 'talam', 'keyboard', 'singback']),
-    musician: new Set(['home', 'avabodha', 'tutor', 'listen', 'viveka', 'transcribe', 'library', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam']),
+    beginner: new Set(['home', 'tutor', 'sadhana', 'shruthi', 'talam', 'keyboard', 'singback', 'learner-model']),
+    musician: new Set(['home', 'avabodha', 'tutor', 'listen', 'viveka', 'transcribe', 'library', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam', 'learner-model']),
 };
 
 const PENDING_ROUTE_KEY = 'alapana_pending_route';
@@ -2686,6 +2687,9 @@ function App() {
                     <div className="w-full p-4 md:p-8 flex flex-col items-center animate-fade-in">
                         <Talam />
                     </div>
+                )}
+                {view === 'learner-model' && (
+                    <LearnerModelPanel userId={userId} getToken={getToken} />
                 )}
                 {view === 'sadhana' && (() => {
                     const steps = [

@@ -173,13 +173,28 @@ export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadh
                 Practice Guide · MongoDB Memory
               </div>
             </div>
-            <button
-              onClick={() => setOpen(false)}
-              className="w-7 h-7 rounded-full flex items-center justify-center text-xs transition-colors"
-              style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(243,234,214,0.5)' }}
-            >
-              ✕
-            </button>
+            <div className="flex items-center gap-2">
+              {onNavigate && (
+                <button
+                  onClick={() => { setOpen(false); onNavigate('learner-model'); }}
+                  className="flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-mono uppercase tracking-widest transition-colors"
+                  style={{ background: 'rgba(199,139,34,0.12)', border: '1px solid rgba(199,139,34,0.25)', color: 'rgba(199,139,34,0.85)' }}
+                  title="View your musical memory"
+                >
+                  <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                  </svg>
+                  Memory
+                </button>
+              )}
+              <button
+                onClick={() => setOpen(false)}
+                className="w-7 h-7 rounded-full flex items-center justify-center text-xs transition-colors"
+                style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(243,234,214,0.5)' }}
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           {/* Messages */}

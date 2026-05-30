@@ -94,14 +94,29 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const { userId: bodyUserId = 'default', tool, raga, durationMinutes, notes } = req.body || {};
+      const {
+        userId: bodyUserId = 'default',
+        tool, raga, durationMinutes, notes,
+        outcome, confidence, confusedWith,
+      } = req.body || {};
       const userId = verifiedUserId || bodyUserId;
-      const sessionData = { tool: tool || '', raga: raga || '', durationMinutes: durationMinutes || 0, notes: notes || '' };
+      const sessionData = {
+        tool: tool || '',
+        raga: raga || '',
+        durationMinutes: durationMinutes || 0,
+        notes: notes || '',
+        ...(outcome    && { outcome }),
+        ...(confidence && { confidence }),
+        ...(confusedWith && { confusedWith }),
+      };
 
-      // Primary path: write through Agent Engine → MongoDB MCP
-      const wroteViaMCP = await writeSessionViaMCP(userId, sessionData);
+      // Rich identification sessions (with outcome data) skip MCP — write directly so all
+      // fields are stored. Plain navigation sessions use the MCP path as usual.
+      let wroteViaMCP = false;
+      if (!outcome) {
+        wroteViaMCP = await writeSessionViaMCP(userId, sessionData);
+      }
 
-      // Fallback: direct MongoDB write if MCP path failed or isn't configured
       if (!wroteViaMCP) {
         const db = await getDb();
         await db.collection('sessions').insertOne({ userId, ...sessionData, timestamp: new Date() });

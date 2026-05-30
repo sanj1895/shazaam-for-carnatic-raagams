@@ -15,11 +15,82 @@ async function getDb() {
   return cachedClient.db('alapana');
 }
 
+function computeMasteryLevel({ totalSessions, identifiedCount }) {
+  const successRate = totalSessions > 0 ? identifiedCount / totalSessions : 0;
+  if (totalSessions >= 8 && successRate >= 0.7) return 'strong';
+  if (totalSessions >= 4 && successRate >= 0.5) return 'stable';
+  if (totalSessions >= 2 || identifiedCount > 0) return 'developing';
+  return 'exploring';
+}
+
+async function buildLearnerModelSummary(db, userId) {
+  try {
+    const [ragaStatsRaw, confusionPairsRaw] = await Promise.all([
+      db.collection('sessions').aggregate([
+        { $match: { userId, raga: { $exists: true, $nin: ['', null] } } },
+        {
+          $group: {
+            _id: '$raga',
+            totalSessions: { $sum: 1 },
+            identifiedCount: {
+              $sum: { $cond: [{ $in: ['$outcome', ['identified', 'likely']] }, 1, 0] },
+            },
+          },
+        },
+        { $sort: { totalSessions: -1 } },
+        { $limit: 10 },
+      ]).toArray(),
+
+      db.collection('sessions').aggregate([
+        {
+          $match: {
+            userId,
+            confusedWith: { $exists: true, $nin: ['', null] },
+            raga: { $exists: true, $nin: ['', null] },
+          },
+        },
+        {
+          $group: {
+            _id: { raga: '$raga', confusedWith: '$confusedWith' },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { count: -1 } },
+        { $limit: 4 },
+      ]).toArray(),
+    ]);
+
+    const ragaStats = ragaStatsRaw.map(r => ({
+      raga: r._id,
+      totalSessions: r.totalSessions,
+      identifiedCount: r.identifiedCount,
+      masteryLevel: computeMasteryLevel(r),
+    }));
+
+    const parts = [];
+    const strong = ragaStats.filter(r => r.masteryLevel === 'strong' || r.masteryLevel === 'stable');
+    const developing = ragaStats.filter(r => r.masteryLevel === 'exploring' || r.masteryLevel === 'developing');
+    if (strong.length) parts.push(`Strong ragas: ${strong.map(r => `${r.raga}(${r.masteryLevel})`).join(', ')}`);
+    if (developing.length) parts.push(`Developing: ${developing.map(r => `${r.raga}(${r.totalSessions} sessions)`).join(', ')}`);
+    if (confusionPairsRaw.length) {
+      parts.push(
+        `Recurring confusions: ${confusionPairsRaw.map(c => `${c._id.raga}↔${c._id.confusedWith}(${c.count}x)`).join(', ')}`
+      );
+    }
+    return parts.length ? `Learner model: ${parts.join(' | ')}` : '';
+  } catch {
+    return '';
+  }
+}
+
 async function buildUserContext(userId, appMode, sadhanaCompleted) {
   if (!MONGODB_URI) return '';
   try {
     const db = await getDb();
-    const profile = await db.collection('profiles').findOne({ userId }, { projection: { _id: 0 } });
+    const [profile, learnerModelSummary] = await Promise.all([
+      db.collection('profiles').findOne({ userId }, { projection: { _id: 0 } }),
+      buildLearnerModelSummary(db, userId),
+    ]);
     // Only surface sessions from after the most recent quiz — redoing the quiz starts a clean slate
     const sessionFilter = profile?.updatedAt
       ? { userId, timestamp: { $gt: profile.updatedAt } }
@@ -45,6 +116,7 @@ async function buildUserContext(userId, appMode, sadhanaCompleted) {
         .join(', ');
       if (recent) parts.push(`Recent tools: ${recent}`);
     }
+    if (learnerModelSummary) parts.push(learnerModelSummary);
     if (appMode) parts.push(`App mode: ${appMode}`);
     if (sadhanaCompleted?.length) parts.push(`Sadhana done today: ${sadhanaCompleted.join(', ')}`);
     if (!parts.length) return '';

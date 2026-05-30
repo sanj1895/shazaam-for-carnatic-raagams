@@ -1677,7 +1677,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel avabodha-preview-panel group sm:min-h-[340px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel avabodha-preview-panel group sm:min-h-[340px] px-4 sm:px-5 py-4 sm:py-5 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('avabodha')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'avabodha' ? null : current)}
                                                                 >

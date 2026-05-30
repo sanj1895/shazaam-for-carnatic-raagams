@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 
-// Colours tuned for the light parchment theme (c-bg #FAF4E8, c-card #EDE0C4).
-// "strong" / "developing" use darker Tailwind shades so they read on cream.
+// Four visually distinct levels on the parchment theme.
+// cool-grey (exploring) → amber (developing) → gold (stable) → green (strong)
 const MASTERY_STYLES = {
   strong:     { label: 'Strong',     dot: 'bg-emerald-700', badge: 'text-emerald-800 bg-emerald-700/10 border-emerald-700/30', bar: 'bg-emerald-700' },
   stable:     { label: 'Stable',     dot: 'bg-c-gold',      badge: 'text-c-gold bg-c-gold/10 border-c-gold/40',               bar: 'bg-c-gold' },
   developing: { label: 'Developing', dot: 'bg-amber-700',   badge: 'text-amber-800 bg-amber-700/10 border-amber-700/30',      bar: 'bg-amber-700' },
-  exploring:  { label: 'Exploring',  dot: 'bg-c-cream-dark', badge: 'text-c-cream-dim bg-c-border/20 border-c-border',        bar: 'bg-c-cream-dark' },
+  exploring:  { label: 'Exploring',  dot: 'bg-slate-500',   badge: 'text-slate-600 bg-slate-500/10 border-slate-400',         bar: 'bg-slate-400' },
 };
 
 function daysSince(dateStr) {
@@ -20,6 +20,8 @@ function daysSince(dateStr) {
   return `${Math.floor(days / 30)}mo ago`;
 }
 
+const DAY_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
 function buildTimelineGrid(practiceTimeline) {
   const today = new Date();
   const grid = [];
@@ -28,9 +30,20 @@ function buildTimelineGrid(practiceTimeline) {
     d.setDate(d.getDate() - i);
     const key = d.toISOString().slice(0, 10);
     const entry = practiceTimeline.find(t => t.date === key);
-    grid.push({ date: key, count: entry?.count || 0, ragas: entry?.ragas || [] });
+    grid.push({
+      date: key,
+      count: entry?.count || 0,
+      ragas: entry?.ragas || [],
+      dayLabel: DAY_LABELS[d.getDay()],
+      isToday: i === 0,
+    });
   }
-  return grid;
+  // Return as 3 weeks of 7 days
+  return [
+    { label: '3 weeks ago', days: grid.slice(0, 7) },
+    { label: '2 weeks ago', days: grid.slice(7, 14) },
+    { label: 'This week',   days: grid.slice(14, 21) },
+  ];
 }
 
 async function authHeaders(getToken) {
@@ -84,8 +97,9 @@ export default function LearnerModelPanel({ userId, getToken }) {
   }
 
   const { ragaStats = [], confusionPairs = [], practiceTimeline = [], totalSessions = 0, activeDays = 0 } = data || {};
-  const timelineGrid = buildTimelineGrid(practiceTimeline);
-  const maxCount = Math.max(...timelineGrid.map(d => d.count), 1);
+  const timelineWeeks = buildTimelineGrid(practiceTimeline);
+  const allDays = timelineWeeks.flatMap(w => w.days);
+  const maxCount = Math.max(...allDays.map(d => d.count), 1);
   const isEmpty = ragaStats.length === 0 && confusionPairs.length === 0;
 
   return (
@@ -246,38 +260,79 @@ export default function LearnerModelPanel({ userId, getToken }) {
 
           {/* ── Practice Timeline ── */}
           <section className="flex flex-col gap-3">
-            <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Practice Timeline</h2>
+            <div className="flex flex-col gap-0.5">
+              <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Practice Timeline</h2>
+              <p className="text-[10px] text-c-cream-dark font-mono">
+                Each column is one day · bar height = number of sessions that day
+              </p>
+            </div>
+
             <div className="bg-c-card border border-c-border rounded-xl p-4 flex flex-col gap-3">
-              <div className="flex items-end gap-1 h-12">
-                {timelineGrid.map((day, i) => {
-                  const heightPct = day.count === 0 ? 0 : Math.max((day.count / maxCount) * 100, 15);
-                  const isToday = i === timelineGrid.length - 1;
-                  return (
-                    <div
-                      key={day.date}
-                      className="flex-1 flex flex-col items-center justify-end"
-                      title={day.count > 0
-                        ? `${day.date}: ${day.count} session${day.count !== 1 ? 's' : ''}${day.ragas.filter(Boolean).length ? ` · ${day.ragas.filter(Boolean).join(', ')}` : ''}`
-                        : day.date}
-                    >
-                      <div
-                        className={`w-full rounded-sm transition-all ${
-                          day.count === 0 ? 'bg-c-border/50' : isToday ? 'bg-c-gold' : 'bg-c-gold-dim'
-                        }`}
-                        style={{ height: day.count === 0 ? '4px' : `${heightPct}%` }}
-                      />
+              {activeDays === 0 ? (
+                <div className="flex flex-col items-center gap-2 py-4 text-center">
+                  <div className="flex gap-1 items-end h-8 opacity-30">
+                    {Array.from({ length: 21 }).map((_, i) => (
+                      <div key={i} className="flex-1 bg-c-border rounded-sm" style={{ height: '4px' }} />
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-c-cream-dark font-playfair italic mt-1">
+                    No sessions yet in the last 21 days
+                  </p>
+                  <p className="text-[10px] text-c-cream-dark/70 font-mono">
+                    Practice with Viveka, Gurukul, or any tool to start your timeline
+                  </p>
+                </div>
+              ) : (
+                <div className="flex gap-3">
+                  {timelineWeeks.map((week) => (
+                    <div key={week.label} className="flex-1 flex flex-col gap-1.5">
+                      {/* bars */}
+                      <div className="flex items-end gap-0.5 h-10">
+                        {week.days.map((day) => {
+                          const heightPct = day.count === 0 ? 0 : Math.max((day.count / maxCount) * 100, 18);
+                          return (
+                            <div
+                              key={day.date}
+                              className="flex-1 flex flex-col items-center justify-end"
+                              title={day.count > 0
+                                ? `${day.dayLabel} ${day.date}: ${day.count} session${day.count !== 1 ? 's' : ''}${day.ragas.filter(Boolean).length ? ` · ${day.ragas.filter(Boolean).join(', ')}` : ''}`
+                                : `${day.dayLabel} — no practice`}
+                            >
+                              <div
+                                className={`w-full rounded-sm transition-all ${
+                                  day.count === 0
+                                    ? 'bg-c-border/50'
+                                    : day.isToday
+                                    ? 'bg-c-gold'
+                                    : 'bg-c-gold-dim'
+                                }`}
+                                style={{ height: day.count === 0 ? '3px' : `${heightPct}%` }}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {/* day labels — only for this week */}
+                      {week.label === 'This week' ? (
+                        <div className="flex gap-0.5">
+                          {week.days.map((day) => (
+                            <div key={day.date} className="flex-1 text-center">
+                              <span className={`text-[7px] font-mono uppercase ${day.isToday ? 'text-c-gold font-bold' : 'text-c-cream-dark/60'}`}>
+                                {day.isToday ? 'now' : day.dayLabel}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="h-[10px]" />
+                      )}
+                      {/* week label */}
+                      <p className="text-[8px] font-mono text-c-cream-dark uppercase tracking-widest text-center">
+                        {week.label}
+                      </p>
                     </div>
-                  );
-                })}
-              </div>
-              <div className="flex justify-between text-[8px] font-mono text-c-cream-dark uppercase tracking-widest">
-                <span>21 days ago</span>
-                <span>Today</span>
-              </div>
-              {practiceTimeline.length === 0 && (
-                <p className="text-[10px] text-c-cream-dark font-playfair italic text-center">
-                  No practice sessions in the last 21 days
-                </p>
+                  ))}
+                </div>
               )}
             </div>
           </section>

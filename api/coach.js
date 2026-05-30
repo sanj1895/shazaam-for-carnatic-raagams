@@ -77,27 +77,33 @@ export default async function handler(req, res) {
     const client = getAuthClient();
     const { token } = await client.getAccessToken();
 
-    // Create or reuse an Agent Engine session keyed by userId.
+    // Create a session keyed by userId so the ADK agent can maintain conversation state.
+    // Note: user_id uses snake_case as required by the Vertex AI Agent Engine API.
     const sessionRes = await fetch(
       `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}/sessions`,
       {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ user_id: userId }),
       }
     );
     const sessionData = await sessionRes.json();
     const sessionId = sessionData.name?.split('/').pop() || userId;
 
+    // All fields must be nested inside `input` — userId/sessionId are not valid
+    // top-level fields for the Reasoning Engine streamQuery proto.
+    // ADK agents expect input.message (string), not the Gemini messages array format.
     const agentRes = await fetch(
       `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}:streamQuery`,
       {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          input: { messages: [{ role: 'user', parts: [{ text: message }] }] },
-          userId,
-          sessionId,
+          input: {
+            message,
+            user_id:    userId,
+            session_id: sessionId,
+          },
         }),
       }
     );
@@ -107,11 +113,23 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: `Agent Engine error: ${errBody}` });
     }
 
-    const agentData = await agentRes.json();
-    const reply = agentData?.output?.content?.parts?.[0]?.text
-               || agentData?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!reply) return res.status(500).json({ error: 'Empty response from Agent Engine.' });
+    // streamQuery returns NDJSON — scan lines in reverse to find the final text.
+    const rawBody = await agentRes.text();
+    let reply = null;
+    for (const line of rawBody.split('\n').reverse()) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      try {
+        const event = JSON.parse(trimmed);
+        const text = event?.output
+                  || event?.response?.parts?.[0]?.text
+                  || event?.content?.parts?.[0]?.text
+                  || (event?.actions?.at(-1))?.response?.parts?.[0]?.text;
+        if (text) { reply = text; break; }
+      } catch { /* skip malformed lines */ }
+    }
 
+    if (!reply) return res.status(500).json({ error: 'Empty response from Agent Engine.' });
     return res.status(200).json({ reply, via: 'agent-engine' });
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Coach request failed.' });

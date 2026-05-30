@@ -65,7 +65,7 @@ export default async function handler(req, res) {
         {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId }),
+          body: JSON.stringify({ user_id: userId }),
         }
       );
       const sessionData = await sessionRes.json();
@@ -79,9 +79,11 @@ export default async function handler(req, res) {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            input: { messages: [{ role: 'user', parts: [{ text: recordMsg }] }] },
-            userId,
-            sessionId,
+            input: {
+              message:    recordMsg,
+              user_id:    userId,
+              session_id: sessionId,
+            },
           }),
         }
       );

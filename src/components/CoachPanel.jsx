@@ -114,14 +114,21 @@ export default function CoachPanel({ onNavigate }) {
     return () => { delete window.__alapanaCoach; };
   }, [saveSession]);
 
+  const mobileBottomOffset = 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)';
+
   return (
     <>
       {/* Floating button */}
       <button
         onClick={() => setOpen(o => !o)}
         aria-label="Open practice coach"
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-13 h-13 rounded-full shadow-[0_4px_24px_rgba(199,139,34,0.4)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
-        style={{ background: 'linear-gradient(135deg, #c78b22, #e8b84b)', width: '52px', height: '52px' }}
+        className="fixed right-4 md:right-6 z-50 w-13 h-13 rounded-full shadow-[0_4px_24px_rgba(199,139,34,0.4)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+        style={{
+          background: 'linear-gradient(135deg, #c78b22, #e8b84b)',
+          width: '52px',
+          height: '52px',
+          bottom: mobileBottomOffset,
+        }}
       >
         <span className="text-xl" style={{ color: '#1a0a00' }}>🪈</span>
       </button>
@@ -131,10 +138,10 @@ export default function CoachPanel({ onNavigate }) {
         <div
           className="fixed z-50 flex flex-col overflow-hidden animate-fade-in"
           style={{
-            bottom: 'calc(80px + 1rem)',
-            right: '1rem',
+            bottom: `calc(${mobileBottomOffset} + 1rem)`,
+            right: 'max(1rem, env(safe-area-inset-right, 0px))',
             width: 'min(360px, calc(100vw - 2rem))',
-            maxHeight: 'calc(100vh - 120px)',
+            maxHeight: 'calc(100dvh - 140px - env(safe-area-inset-bottom, 0px))',
             background: 'rgba(14,7,2,0.97)',
             border: '1px solid rgba(199,139,34,0.25)',
             borderRadius: '20px',

@@ -317,12 +317,21 @@ Tone: warm but direct. Address them as a serious student. Do not mention numbers
         temperature: 0.65,
       });
       const raw = data.choices[0]?.message?.content || 'No feedback generated.';
-      // Model sometimes returns JSON despite prose instruction — extract evaluation if so
+      // Model sometimes returns JSON despite prose instruction — convert common
+      // structured shapes back into readable guru prose.
       let parsed = raw;
       if (raw.trimStart().startsWith('{')) {
         try {
           const obj = JSON.parse(raw);
-          parsed = obj.evaluation || obj.feedback || obj.summary || raw;
+          if (obj.evaluation || obj.feedback || obj.summary) {
+            parsed = obj.evaluation || obj.feedback || obj.summary || raw;
+          } else if (obj.notes_accuracy || obj.voice_quality || obj.actionable_tip) {
+            parsed = [
+              obj.notes_accuracy ? `Namaste, dear student. ${obj.notes_accuracy}` : null,
+              obj.voice_quality ? obj.voice_quality : null,
+              obj.actionable_tip ? `For your next practice: ${obj.actionable_tip}` : null,
+            ].filter(Boolean).join('\n\n');
+          }
         } catch { /* keep raw */ }
       }
       setFeedback(parsed);

@@ -18,10 +18,16 @@ async function buildUserContext(userId, appMode, sadhanaCompleted) {
   if (!MONGODB_URI) return '';
   try {
     const db = await getDb();
-    const [profile, sessions] = await Promise.all([
-      db.collection('profiles').findOne({ userId }, { projection: { _id: 0 } }),
-      db.collection('sessions').find({ userId }).sort({ timestamp: -1 }).limit(5).toArray(),
-    ]);
+    const profile = await db.collection('profiles').findOne({ userId }, { projection: { _id: 0 } });
+    // Only surface sessions from after the most recent quiz — redoing the quiz starts a clean slate
+    const sessionFilter = profile?.updatedAt
+      ? { userId, timestamp: { $gt: profile.updatedAt } }
+      : { userId };
+    const sessions = await db.collection('sessions')
+      .find(sessionFilter)
+      .sort({ timestamp: -1 })
+      .limit(5)
+      .toArray();
     const parts = [];
     if (profile) {
       const exp = profile.experience ? `experience=${profile.experience}` : null;

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useUser, useAuth, SignInButton, UserButton } from '@clerk/clerk-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useUser, useAuth, useClerk, SignInButton, UserButton } from '@clerk/clerk-react';
 import { createPortal } from 'react-dom';
 import AudioInput from './components/AudioInput';
 import RagaDisplay from './components/RagaDisplay';
@@ -367,6 +367,7 @@ function getGuestUserId() {
 function App() {
     const { user, isSignedIn } = useUser();
     const { getToken } = useAuth();
+    const { openSignIn } = useClerk();
     const guestUserId = useRef(getGuestUserId());
     const userId = (isSignedIn && user?.id) ? user.id : guestUserId.current;
 
@@ -776,8 +777,35 @@ function App() {
 
     const TRACKED_TOOLS = new Set(['listen', 'viveka', 'transcribe', 'library', 'tutor', 'singback', 'keyboard', 'shruthi', 'talam']);
 
+    const promptSignIn = useCallback(() => {
+        setMobileMenuOpen(false);
+        openSignIn?.();
+    }, [openSignIn]);
+
+    useEffect(() => {
+        if (isSignedIn) return;
+        if (window.location.hash !== '#/home') {
+            window.history.replaceState(null, '', '#/home');
+        }
+        if (view !== 'home') setView('home');
+        if (showFeatures) setShowFeatures(false);
+        if (showWorkspaceSections) setShowWorkspaceSections(false);
+        if (quizActive) setQuizActive(false);
+        if (tourActive) setTourActive(false);
+    }, [isSignedIn, view, showFeatures, showWorkspaceSections, quizActive, tourActive]);
+
     const goTo = (id, options = {}) => {
         const { tutorTarget = null, modeOverride = null, workspace = false } = options;
+        if (!isSignedIn && (id !== 'home' || workspace || tutorTarget || modeOverride)) {
+            promptSignIn();
+            setView('home');
+            setShowFeatures(false);
+            setShowWorkspaceSections(false);
+            if (window.location.hash !== '#/home') {
+                window.history.replaceState(null, '', '#/home');
+            }
+            return;
+        }
         const effectiveMode = modeOverride || appMode;
         const allowedViews = MODE_ALLOWED_VIEWS[effectiveMode] || MODE_ALLOWED_VIEWS.musician;
         if (!allowedViews.has(id) && id !== 'home') {
@@ -1309,10 +1337,10 @@ function App() {
                                         <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-c-gold/50 to-transparent" />
                                     </div>
 
-                                    <div
-                                        className="flex flex-col items-center text-center max-w-3xl"
-                                        style={{
-                                            opacity: isPreviewOpen ? 0.12 : 1,
+                                <div
+                                    className="flex flex-col items-center text-center max-w-3xl"
+                                    style={{
+                                        opacity: isPreviewOpen ? 0.12 : 1,
                                             transition: 'opacity 250ms ease, filter 250ms ease',
                                             pointerEvents: showFeatures ? 'none' : 'auto',
                                             filter: isPreviewOpen ? 'blur(2px)' : 'none',
@@ -1329,26 +1357,46 @@ function App() {
                                         <p className="mb-4 max-w-[18rem] text-[9px] sm:max-w-none sm:text-[11px] md:text-xs uppercase tracking-[0.18em] sm:tracking-[0.22em]" style={{ color: 'rgba(247, 214, 134, 0.76)' }}>
                                             Learn, practice, and explore Carnatic music
                                         </p>
-                                        <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
-                                            <button
-                                                onClick={() => {
-                                                    setAppMode('beginner');
-                                                    setQuizActive(true);
-                                                }}
-                                                className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 shadow-[0_0_36px_rgba(200,148,31,0.26)] cursor-pointer"
-                                            >
-                                                Start Learning
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
-                                                    enterWorkspace('musician');
-                                                }}
-                                                className="group border border-c-gold/55 hover:border-c-gold text-c-gold hover:text-c-gold-light font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 cursor-pointer"
-                                            >
-                                                Enter Practice Room
-                                            </button>
-                                        </div>
+                                        {isSignedIn ? (
+                                            <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
+                                                <button
+                                                    onClick={() => {
+                                                        setAppMode('beginner');
+                                                        setQuizActive(true);
+                                                    }}
+                                                    className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 shadow-[0_0_36px_rgba(200,148,31,0.26)] cursor-pointer"
+                                                >
+                                                    Start Learning
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
+                                                        enterWorkspace('musician');
+                                                    }}
+                                                    className="group border border-c-gold/55 hover:border-c-gold text-c-gold hover:text-c-gold-light font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 cursor-pointer"
+                                                >
+                                                    Enter Practice Room
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <p className="mt-1 max-w-[22rem] text-[11px] sm:text-[12px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.82)' }}>
+                                                    Sign in first to open Guided Basics, save your practice memory, and enter the full musician workspace.
+                                                </p>
+                                                <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
+                                                    <SignInButton mode="modal">
+                                                        <button className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 shadow-[0_0_36px_rgba(200,148,31,0.26)] cursor-pointer">
+                                                            Sign In To Begin
+                                                        </button>
+                                                    </SignInButton>
+                                                    <SignInButton mode="modal">
+                                                        <button className="group border border-c-gold/55 hover:border-c-gold text-c-gold hover:text-c-gold-light font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 cursor-pointer">
+                                                            Create Account
+                                                        </button>
+                                                    </SignInButton>
+                                                </div>
+                                            </>
+                                        )}
                                         <button
                                             onClick={openAbout}
                                             className="mt-5 text-[9px] sm:text-[10px] uppercase tracking-[0.22em] font-playfair transition-colors duration-300"
@@ -2904,13 +2952,15 @@ function App() {
             </>
         )}
 
-        <CoachPanel
-            userId={userId}
-            getToken={getToken}
-            onNavigate={(view) => goTo(view)}
-            appMode={appMode}
-            sadhanaState={sadhana}
-        />
+        {isSignedIn && view !== 'home' && (
+            <CoachPanel
+                userId={userId}
+                getToken={getToken}
+                onNavigate={(view) => goTo(view)}
+                appMode={appMode}
+                sadhanaState={sadhana}
+            />
+        )}
     </>
   );
 }

@@ -233,7 +233,7 @@ function getRecommendation(branch, answers) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSelected }) {
+export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeSelected }) {
     const [uIdx, setUIdx]       = useState(0);
     const [bIdx, setBIdx]       = useState(0);
     const [stage, setStage]     = useState('universal'); // 'universal' | 'branch' | 'result'
@@ -361,11 +361,8 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSe
         } catch {}
 
         onModeSelected?.(recommendation.mode);
-        const dest = recommendation.target
-            ? { view: recommendation.action, target: recommendation.target, mode: recommendation.mode }
-            : { view: recommendation.action, mode: recommendation.mode };
         dismiss();
-        onNavigate?.(dest);
+        onOpenCoach?.();
     };
 
     const switchBranch = (toBranch) => {

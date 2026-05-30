@@ -34,7 +34,7 @@ const getUserId = () => {
   }
 };
 
-export default function CoachPanel({ onNavigate, appMode, sadhanaState }) {
+export default function CoachPanel({ onNavigate, appMode, sadhanaState, autoMessage, onAutoMessageSent }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([{ role: 'assistant', content: WELCOME }]);
   const [input, setInput] = useState('');
@@ -42,6 +42,8 @@ export default function CoachPanel({ onNavigate, appMode, sadhanaState }) {
   const userId = useRef(getUserId());
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
+  const autoSendRef = useRef(null);
+  const sendMessageRef = useRef(null);
 
   useEffect(() => {
     if (open) {
@@ -50,15 +52,10 @@ export default function CoachPanel({ onNavigate, appMode, sadhanaState }) {
     }
   }, [open, messages]);
 
-  const send = useCallback(async () => {
-    const text = input.trim();
+  const sendMessage = useCallback(async (text) => {
     if (!text || loading) return;
-
-    const userMsg = { role: 'user', content: text };
-    setMessages(prev => [...prev, userMsg]);
-    setInput('');
+    setMessages(prev => [...prev, { role: 'user', content: text }]);
     setLoading(true);
-
     try {
       const res = await fetch('/api/coach', {
         method: 'POST',
@@ -74,21 +71,45 @@ export default function CoachPanel({ onNavigate, appMode, sadhanaState }) {
       const data = await res.json();
       const reply = data.reply || 'Sorry, I had trouble responding. Please try again.';
       setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
-
-      // Auto-navigate if coach mentions a specific tool
       if (onNavigate) {
         const nav = detectToolNavigation(reply);
         if (nav) setTimeout(() => onNavigate(nav), 800);
       }
     } catch {
-      setMessages(prev => [
-        ...prev,
-        { role: 'assistant', content: 'Connection error. Check your internet and try again.' },
-      ]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error. Check your internet and try again.' }]);
     } finally {
       setLoading(false);
     }
-  }, [input, loading, messages, appMode, sadhanaState]);
+  }, [loading, messages, appMode, sadhanaState, onNavigate]);
+
+  // Keep a stable ref so the auto-send effect can call sendMessage without
+  // re-triggering every time its dependencies change
+  useEffect(() => { sendMessageRef.current = sendMessage; }, [sendMessage]);
+
+  const send = useCallback(() => {
+    const text = input.trim();
+    if (!text) return;
+    setInput('');
+    sendMessage(text);
+  }, [input, sendMessage]);
+
+  // Auto-open panel and queue the first message when the quiz finishes
+  useEffect(() => {
+    if (autoMessage) {
+      autoSendRef.current = autoMessage;
+      setOpen(true);
+      onAutoMessageSent?.();
+    }
+  }, [autoMessage, onAutoMessageSent]);
+
+  // Fire the queued message once the panel is open
+  useEffect(() => {
+    if (open && autoSendRef.current) {
+      const msg = autoSendRef.current;
+      autoSendRef.current = null;
+      setTimeout(() => sendMessageRef.current?.(msg), 300);
+    }
+  }, [open]);
 
   const handleKey = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {

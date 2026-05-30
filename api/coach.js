@@ -1,15 +1,51 @@
-/**
- * Ālāpana Coach API
- *
- * Required path (production):
- *   React app → this endpoint → Vertex AI Agent Engine (Google Cloud Agent Builder)
- *                                       → ADK agent → Gemini 2.5 Flash + MongoDB MCP
- *
- * Deploy the agent first: python agent/deploy_to_agent_engine.py
- * Then set AGENT_ENGINE_RESOURCE in your environment.
- */
 /* global process, Buffer */
+import { MongoClient } from 'mongodb';
 import { GoogleAuth, UserRefreshClient } from 'google-auth-library';
+
+const MONGODB_URI = process.env.MONGODB_URI;
+let cachedClient = null;
+
+async function getDb() {
+  if (!cachedClient) {
+    cachedClient = new MongoClient(MONGODB_URI);
+    await cachedClient.connect();
+  }
+  return cachedClient.db('alapana');
+}
+
+async function buildUserContext(userId, appMode, sadhanaCompleted) {
+  if (!MONGODB_URI) return '';
+  try {
+    const db = await getDb();
+    const [profile, sessions] = await Promise.all([
+      db.collection('profiles').findOne({ userId }, { projection: { _id: 0 } }),
+      db.collection('sessions').find({ userId }).sort({ timestamp: -1 }).limit(5).toArray(),
+    ]);
+    const parts = [];
+    if (profile) {
+      const exp = profile.experience ? `experience=${profile.experience}` : null;
+      const goal = profile.goal ? `goal=${profile.goal}` : null;
+      const learner = profile.learner ? `learner=${profile.learner}` : null;
+      const age = profile.age ? `age=${profile.age}` : null;
+      const branch = profile.branch ? `path=${profile.branch}` : null;
+      const filtered = [exp, goal, learner, age, branch].filter(Boolean);
+      if (filtered.length) parts.push(`Profile: ${filtered.join(', ')}`);
+    }
+    if (sessions.length) {
+      const recent = sessions
+        .map(s => [s.tool, s.raga].filter(Boolean).join('/'))
+        .filter(Boolean)
+        .join(', ');
+      if (recent) parts.push(`Recent tools: ${recent}`);
+    }
+    if (appMode) parts.push(`App mode: ${appMode}`);
+    if (sadhanaCompleted?.length) parts.push(`Sadhana done today: ${sadhanaCompleted.join(', ')}`);
+    if (!parts.length) return '';
+    return `[${parts.join(' | ')}]\n\n`;
+  } catch {
+    return '';
+  }
+}
 
 function getAuthClient() {
   const b64 = process.env.GOOGLE_CREDENTIALS_B64;
@@ -61,7 +97,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { message, userId = 'default', history = [] } = req.body || {};
+  const { message, userId = 'default', history = [], appMode, sadhanaCompleted } = req.body || {};
   if (!message || typeof message !== 'string' || message.length > 2000) {
     return res.status(400).json({ error: 'Invalid message.' });
   }
@@ -74,6 +110,9 @@ export default async function handler(req, res) {
   }
 
   try {
+    const userContext = await buildUserContext(userId, appMode, sadhanaCompleted);
+    const enrichedMessage = userContext ? `${userContext}${message}` : message;
+
     const client = getAuthClient();
     const { token } = await client.getAccessToken();
 
@@ -101,7 +140,7 @@ export default async function handler(req, res) {
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           input: {
-            message,
+            message:    enrichedMessage,
             user_id:    userId,
             session_id: sessionId,
           },

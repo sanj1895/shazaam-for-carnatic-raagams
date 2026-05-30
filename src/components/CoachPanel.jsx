@@ -34,7 +34,7 @@ const getUserId = () => {
   }
 };
 
-export default function CoachPanel({ onNavigate }) {
+export default function CoachPanel({ onNavigate, appMode, sadhanaState }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([{ role: 'assistant', content: WELCOME }]);
   const [input, setInput] = useState('');
@@ -67,6 +67,8 @@ export default function CoachPanel({ onNavigate }) {
           message: text,
           userId: userId.current,
           history: messages.slice(-8),
+          appMode,
+          sadhanaCompleted: sadhanaState?.completed || [],
         }),
       });
       const data = await res.json();
@@ -86,7 +88,7 @@ export default function CoachPanel({ onNavigate }) {
     } finally {
       setLoading(false);
     }
-  }, [input, loading, messages]);
+  }, [input, loading, messages, appMode, sadhanaState]);
 
   const handleKey = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {

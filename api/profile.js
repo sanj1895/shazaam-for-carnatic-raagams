@@ -2,7 +2,6 @@
 import { MongoClient } from 'mongodb';
 
 const MONGODB_URI = process.env.MONGODB_URI;
-
 let cachedClient = null;
 
 async function getDb() {
@@ -18,34 +17,25 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
-
   if (!MONGODB_URI) return res.status(500).json({ error: 'MongoDB not configured.' });
 
   try {
+    const db = await getDb();
+
     if (req.method === 'GET') {
-      // Direct MongoDB read — used for dev/debug inspection of practice history.
-      const db = await getDb();
       const userId = req.query.userId || 'default';
-      const recent = await db.collection('sessions')
-        .find({ userId })
-        .sort({ timestamp: -1 })
-        .limit(15)
-        .toArray();
-      return res.status(200).json({ sessions: recent });
+      const profile = await db.collection('profiles').findOne({ userId }, { projection: { _id: 0 } });
+      return res.status(200).json({ profile: profile || null });
     }
 
     if (req.method === 'POST') {
-      const { userId = 'default', tool, raga, durationMinutes, notes } = req.body || {};
-      const db = await getDb();
-      await db.collection('sessions').insertOne({
-        userId,
-        tool: tool || '',
-        raga: raga || '',
-        durationMinutes: durationMinutes || 0,
-        notes: notes || '',
-        timestamp: new Date(),
-      });
-      return res.status(201).json({ ok: true });
+      const { userId = 'default', ...profileData } = req.body || {};
+      await db.collection('profiles').updateOne(
+        { userId },
+        { $set: { userId, ...profileData, updatedAt: new Date() } },
+        { upsert: true }
+      );
+      return res.status(200).json({ ok: true });
     }
 
     res.setHeader('Allow', 'GET, POST');

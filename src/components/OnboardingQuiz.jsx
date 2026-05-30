@@ -336,6 +336,30 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSe
     };
 
     const handleBegin = () => {
+        // Persist quiz profile so the coach can personalize immediately
+        try {
+            let userId = localStorage.getItem('alapana_user_id');
+            if (!userId) {
+                userId = 'user_' + Math.random().toString(36).slice(2, 10);
+                localStorage.setItem('alapana_user_id', userId);
+            }
+            fetch('/api/profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId,
+                    experience: answers.experience,
+                    goal: answers.goal,
+                    learner: answers.learner,
+                    age: answers.age,
+                    preference: answers.preference,
+                    branch,
+                    mode: recommendation.mode,
+                    workspace_intent: answers.workspace_intent ?? null,
+                }),
+            }).catch(() => {});
+        } catch {}
+
         onModeSelected?.(recommendation.mode);
         const dest = recommendation.target
             ? { view: recommendation.action, target: recommendation.target, mode: recommendation.mode }

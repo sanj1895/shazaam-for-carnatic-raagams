@@ -760,6 +760,8 @@ function App() {
         return () => window.removeEventListener('hashchange', handleHashChange);
     }, [appMode]);
 
+    const TRACKED_TOOLS = new Set(['listen', 'viveka', 'transcribe', 'library', 'tutor', 'singback', 'keyboard', 'shruthi', 'talam']);
+
     const goTo = (id, options = {}) => {
         const { tutorTarget = null, modeOverride = null, workspace = false } = options;
         const effectiveMode = modeOverride || appMode;
@@ -772,6 +774,12 @@ function App() {
         }
         if (id !== 'listen') handleReset();
         setTutorLaunchTarget(id === 'tutor' ? tutorTarget : null);
+
+        // Track meaningful tool navigation events
+        if (TRACKED_TOOLS.has(id) && id !== viewRef.current) {
+            window.__alapanaCoach?.saveSession({ tool: id });
+        }
+
         setView(id);
         if (id === 'home') {
             setShowFeatures(workspace);
@@ -2878,7 +2886,7 @@ function App() {
             </>
         )}
 
-        <CoachPanel onNavigate={(view) => goTo(view)} />
+        <CoachPanel onNavigate={(view) => goTo(view)} appMode={appMode} sadhanaState={sadhana} />
     </>
   );
 }

@@ -24,6 +24,18 @@ function detectToolNavigation(text) {
   return null;
 }
 
+function cleanAssistantText(text) {
+  return String(text || '')
+    .replace(/^\[[^\]]+\]\s*/i, '')
+    .replace(/```+/g, '')
+    .replace(/`([^`]*)`/g, '$1')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/__([^_]+)__/g, '$1')
+    .replace(/^[ \t]*[-*#>]+\s?/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 async function authHeaders(getToken) {
   try {
     const token = getToken ? await getToken() : null;
@@ -67,8 +79,7 @@ export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadh
       });
       const data = await res.json();
       const rawReply = data.reply || 'Sorry, I had trouble responding. Please try again.';
-      // Strip the pre-injected context line if the agent echoes it back
-      const reply = rawReply.replace(/^\[[^\]]+\]\s*/i, '').trimStart();
+      const reply = cleanAssistantText(rawReply);
       setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
       if (onNavigate) {
         const nav = detectToolNavigation(reply);

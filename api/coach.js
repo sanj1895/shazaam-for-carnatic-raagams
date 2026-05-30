@@ -1,6 +1,7 @@
 /* global process, Buffer */
 import { MongoClient } from 'mongodb';
 import { GoogleAuth, UserRefreshClient } from 'google-auth-library';
+import { getVerifiedUserId } from './_auth.js';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 let cachedClient = null;
@@ -104,7 +105,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { message, userId = 'default', history = [], appMode, sadhanaCompleted } = req.body || {};
+  const verifiedUserId = await getVerifiedUserId(req);
+  const { message, userId: bodyUserId = 'default', history = [], appMode, sadhanaCompleted } = req.body || {};
+  const userId = verifiedUserId || bodyUserId;
   if (!message || typeof message !== 'string' || message.length > 2000) {
     return res.status(400).json({ error: 'Invalid message.' });
   }

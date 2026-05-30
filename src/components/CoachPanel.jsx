@@ -21,7 +21,14 @@ function detectToolNavigation(text) {
   return null;
 }
 
-export default function CoachPanel({ userId, onNavigate, appMode, sadhanaState, autoMessage, onAutoMessageSent }) {
+async function authHeaders(getToken) {
+  try {
+    const token = getToken ? await getToken() : null;
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+  } catch { return {}; }
+}
+
+export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadhanaState, autoMessage, onAutoMessageSent }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([{ role: 'assistant', content: WELCOME }]);
   const [input, setInput] = useState('');
@@ -47,7 +54,7 @@ export default function CoachPanel({ userId, onNavigate, appMode, sadhanaState, 
     try {
       const res = await fetch('/api/coach', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...await authHeaders(getToken) },
         body: JSON.stringify({
           message: text,
           userId: userIdRef.current,
@@ -111,13 +118,11 @@ export default function CoachPanel({ userId, onNavigate, appMode, sadhanaState, 
     try {
       await fetch('/api/sessions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...await authHeaders(getToken) },
         body: JSON.stringify({ userId: userIdRef.current, ...sessionData }),
       });
-    } catch {
-      // silently fail — session saving is non-critical
-    }
-  }, []);
+    } catch {}
+  }, [getToken]);
 
   // Expose saveSession so App.jsx can call it
   useEffect(() => {

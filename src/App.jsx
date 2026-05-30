@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useUser, SignInButton, UserButton } from '@clerk/clerk-react';
+import { useUser, useAuth, SignInButton, UserButton } from '@clerk/clerk-react';
 import { createPortal } from 'react-dom';
 import AudioInput from './components/AudioInput';
 import RagaDisplay from './components/RagaDisplay';
@@ -366,6 +366,7 @@ function getGuestUserId() {
 
 function App() {
     const { user, isSignedIn } = useUser();
+    const { getToken } = useAuth();
     const guestUserId = useRef(getGuestUserId());
     const userId = (isSignedIn && user?.id) ? user.id : guestUserId.current;
 
@@ -873,6 +874,7 @@ function App() {
                 onDismiss={() => setQuizActive(false)}
                 onModeSelected={(mode) => setAppMode(mode)}
                 userId={userId}
+                getToken={getToken}
                 onOpenCoach={() => {
                     setQuizActive(false);
                     setCoachAutoMessage("I just finished my setup. What's the best place for me to start?");
@@ -2905,6 +2907,7 @@ function App() {
 
         <CoachPanel
             userId={userId}
+            getToken={getToken}
             onNavigate={(view) => goTo(view)}
             appMode={appMode}
             sadhanaState={sadhana}

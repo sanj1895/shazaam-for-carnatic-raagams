@@ -1,5 +1,6 @@
 /* global process */
 import { MongoClient } from 'mongodb';
+import { getVerifiedUserId } from './_auth.js';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -23,10 +24,11 @@ export default async function handler(req, res) {
   if (!MONGODB_URI) return res.status(500).json({ error: 'MongoDB not configured.' });
 
   try {
+    const verifiedUserId = await getVerifiedUserId(req);
+
     if (req.method === 'GET') {
-      // Direct MongoDB read — used for dev/debug inspection of practice history.
       const db = await getDb();
-      const userId = req.query.userId || 'default';
+      const userId = verifiedUserId || req.query.userId || 'default';
       const recent = await db.collection('sessions')
         .find({ userId })
         .sort({ timestamp: -1 })
@@ -36,7 +38,8 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const { userId = 'default', tool, raga, durationMinutes, notes } = req.body || {};
+      const { userId: bodyUserId = 'default', tool, raga, durationMinutes, notes } = req.body || {};
+      const userId = verifiedUserId || bodyUserId;
       const db = await getDb();
       await db.collection('sessions').insertOne({
         userId,

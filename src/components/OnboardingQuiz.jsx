@@ -233,7 +233,7 @@ function getRecommendation(branch, answers) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeSelected, userId }) {
+export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeSelected, userId, getToken }) {
     const [uIdx, setUIdx]       = useState(0);
     const [bIdx, setBIdx]       = useState(0);
     const [stage, setStage]     = useState('universal'); // 'universal' | 'branch' | 'result'
@@ -335,12 +335,16 @@ export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeS
         }
     };
 
-    const handleBegin = () => {
+    const handleBegin = async () => {
         // Persist quiz profile so the coach can personalize immediately
         try {
+            const token = getToken ? await getToken().catch(() => null) : null;
             fetch('/api/profile', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                },
                 body: JSON.stringify({
                     userId,
                     experience: answers.experience,

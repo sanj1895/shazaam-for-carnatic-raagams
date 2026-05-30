@@ -1,5 +1,6 @@
 /* global process */
 import { MongoClient } from 'mongodb';
+import { getVerifiedUserId } from './_auth.js';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 let cachedClient = null;
@@ -21,16 +22,18 @@ export default async function handler(req, res) {
   if (!MONGODB_URI) return res.status(500).json({ error: 'MongoDB not configured.' });
 
   try {
+    const verifiedUserId = await getVerifiedUserId(req);
     const db = await getDb();
 
     if (req.method === 'GET') {
-      const userId = req.query.userId || 'default';
+      const userId = verifiedUserId || req.query.userId || 'default';
       const profile = await db.collection('profiles').findOne({ userId }, { projection: { _id: 0 } });
       return res.status(200).json({ profile: profile || null });
     }
 
     if (req.method === 'POST') {
-      const { userId = 'default', ...profileData } = req.body || {};
+      const { userId: bodyUserId = 'default', ...profileData } = req.body || {};
+      const userId = verifiedUserId || bodyUserId;
       await db.collection('profiles').updateOne(
         { userId },
         { $set: { userId, ...profileData, updatedAt: new Date() } },

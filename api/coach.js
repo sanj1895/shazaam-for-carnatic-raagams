@@ -94,10 +94,8 @@ export default async function handler(req, res) {
     // the middle of the path (…/sessions/{id}/operations/{opId}), not the end.
     const sessionId = sessionData.name?.match(/\/sessions\/(\d+)/)?.[1] || userId;
 
-    // Use :query (non-streaming) — :streamQuery streams NDJSON which Vercel
-    // serverless functions can't reliably consume before the connection closes.
     const agentRes = await fetch(
-      `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}:query`,
+      `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}:streamQuery`,
       {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -107,7 +105,6 @@ export default async function handler(req, res) {
             user_id:    userId,
             session_id: sessionId,
           },
-          class_method: 'query',
         }),
       }
     );

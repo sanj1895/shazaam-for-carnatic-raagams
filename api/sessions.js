@@ -68,8 +68,9 @@ export default async function handler(req, res) {
           body: JSON.stringify({ user_id: userId }),
         }
       );
-      const sessionData = await sessionRes.json();
-      const sessionId = sessionData.name?.split('/').pop() || userId;
+      let sessionData = {};
+      try { sessionData = await sessionRes.json(); } catch {}
+      const sessionId = sessionData.name?.match(/\/sessions\/(\d+)/)?.[1] || userId;
 
       const recordMsg = `Record this practice session in the 'sessions' collection of the 'alapana' database using MongoDB insertOne: { userId: "${userId}", tool: "${tool || ''}", raga: "${raga || ''}", durationMinutes: ${durationMinutes || 0}, notes: "${notes || ''}", timestamp: current UTC time }.`;
 

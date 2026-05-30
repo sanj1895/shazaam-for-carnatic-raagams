@@ -6,6 +6,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 let cachedClient = null;
 
 async function getDb() {
+  if (cachedClient && !cachedClient.topology?.isConnected()) cachedClient = null;
   if (!cachedClient) {
     cachedClient = new MongoClient(MONGODB_URI);
     await cachedClient.connect();

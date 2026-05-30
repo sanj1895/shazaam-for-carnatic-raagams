@@ -54,6 +54,20 @@ async function buildUserContext(userId, appMode, sadhanaCompleted) {
   }
 }
 
+function buildConversationContext(history = []) {
+  if (!Array.isArray(history) || !history.length) return '';
+  const normalized = history
+    .filter((entry) => entry && typeof entry.content === 'string' && entry.content.trim())
+    .slice(-8)
+    .map((entry) => {
+      const role = entry.role === 'assistant' ? 'Coach' : 'User';
+      const content = entry.content.replace(/\s+/g, ' ').trim();
+      return `${role}: ${content}`;
+    });
+  if (!normalized.length) return '';
+  return `Recent conversation:\n${normalized.join('\n')}\n\n`;
+}
+
 function getAuthClient() {
   const b64 = process.env.GOOGLE_CREDENTIALS_B64;
   if (b64) {
@@ -98,7 +112,8 @@ export default async function handler(req, res) {
 
   try {
     const userContext = await buildUserContext(userId, appMode, sadhanaCompleted);
-    const enrichedMessage = userContext ? `${userContext}${message}` : message;
+    const conversationContext = buildConversationContext(history);
+    const enrichedMessage = `${userContext || ''}${conversationContext || ''}Current user message: ${message}`.trim();
 
     const client = getAuthClient();
     const { token } = await client.getAccessToken();

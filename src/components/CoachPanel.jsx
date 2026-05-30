@@ -28,7 +28,7 @@ async function authHeaders(getToken) {
   } catch { return {}; }
 }
 
-export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadhanaState, autoMessage, onAutoMessageSent }) {
+export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadhanaState }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([{ role: 'assistant', content: WELCOME }]);
   const [input, setInput] = useState('');
@@ -37,7 +37,6 @@ export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadh
   useEffect(() => { userIdRef.current = userId; }, [userId]);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
-  const autoSendRef = useRef(null);
   const sendMessageRef = useRef(null);
 
   useEffect(() => {
@@ -88,23 +87,6 @@ export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadh
     sendMessage(text);
   }, [input, sendMessage]);
 
-  // Auto-open panel and queue the first message when the quiz finishes
-  useEffect(() => {
-    if (autoMessage) {
-      autoSendRef.current = autoMessage;
-      setOpen(true);
-      onAutoMessageSent?.();
-    }
-  }, [autoMessage, onAutoMessageSent]);
-
-  // Fire the queued message once the panel is open
-  useEffect(() => {
-    if (open && autoSendRef.current) {
-      const msg = autoSendRef.current;
-      autoSendRef.current = null;
-      setTimeout(() => sendMessageRef.current?.(msg), 300);
-    }
-  }, [open]);
 
   const handleKey = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {

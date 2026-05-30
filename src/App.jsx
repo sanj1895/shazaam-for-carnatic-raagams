@@ -393,7 +393,6 @@ function App() {
     });
     const [sadhana, setSadhana] = useState(loadSadhanaState);
     const [sadhanaToast, setSadhanaToast] = useState(null); // { title, stepName }
-    const [coachAutoMessage, setCoachAutoMessage] = useState(null);
     const [selectedRaga, setSelectedRaga] = useState(null); // { raga, hasClearMatch, type: 'library' | 'identify' | 'melakarta' }
     const [showGuide, setShowGuide] = useState(false);
     const [practiceDemoBeat, setPracticeDemoBeat] = useState(0);
@@ -875,9 +874,9 @@ function App() {
                 onModeSelected={(mode) => setAppMode(mode)}
                 userId={userId}
                 getToken={getToken}
-                onOpenCoach={() => {
+                onNavigate={(dest) => {
                     setQuizActive(false);
-                    setCoachAutoMessage("I just finished my setup. What's the best place for me to start?");
+                    goTo(dest.view, { modeOverride: dest.mode || null });
                 }}
             />
             <OnboardingTour
@@ -2911,8 +2910,6 @@ function App() {
             onNavigate={(view) => goTo(view)}
             appMode={appMode}
             sadhanaState={sadhana}
-            autoMessage={coachAutoMessage}
-            onAutoMessageSent={() => setCoachAutoMessage(null)}
         />
     </>
   );

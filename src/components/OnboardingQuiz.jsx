@@ -139,6 +139,39 @@ const WORKSPACE_QUESTIONS = [
     },
 ];
 
+// ── Tool detection (mirrors CoachPanel) ──────────────────────────────────────
+
+const QUIZ_TOOL_PATTERNS = [
+    { pattern: /\b(gurukul|varisai|alankaram|kriti|gitam|lesson)\b/i, view: 'tutor' },
+    { pattern: /\b(raga kosha|raga library|kosha)\b/i,                 view: 'library' },
+    { pattern: /\b(viveka)\b/i,                                         view: 'viveka' },
+    { pattern: /\b(dhwani)\b/i,                                         view: 'listen' },
+    { pattern: /\b(transcribe|sangati)\b/i,                             view: 'transcribe' },
+    { pattern: /\b(shruthi|drone|shruti)\b/i,                           view: 'shruthi' },
+    { pattern: /\b(talam|tala)\b/i,                                     view: 'talam' },
+    { pattern: /\b(keyboard)\b/i,                                       view: 'keyboard' },
+    { pattern: /\b(sing.?back|ear training)\b/i,                        view: 'singback' },
+];
+
+const TOOL_LABELS = {
+    transcribe: 'Open Transcribe',
+    listen:     'Open Dhwani',
+    tutor:      'Open Gurukul',
+    library:    'Open Raga Kosha',
+    viveka:     'Open Viveka',
+    shruthi:    'Open Shruthi',
+    talam:      'Open Talam',
+    keyboard:   'Open Keyboard',
+    singback:   'Open Sing-Back',
+};
+
+function detectTool(text) {
+    for (const { pattern, view } of QUIZ_TOOL_PATTERNS) {
+        if (pattern.test(text)) return view;
+    }
+    return null;
+}
+
 // ── Branch computation ────────────────────────────────────────────────────────
 
 function computeBranch(answers) {
@@ -162,78 +195,9 @@ function computeBranch(answers) {
     return 'guided_path';
 }
 
-// ── Recommendation logic ──────────────────────────────────────────────────────
-
-function getRecommendation(branch, answers) {
-    const isOther = answers.learner === 'other';
-    const pronoun = isOther ? 'They' : 'You';
-
-    if (branch === 'guided_path') {
-        if (answers.age === 'very_young') {
-            return {
-                type: 'guided',
-                headline: 'Carnatic Singing Foundations',
-                body: `${pronoun}'ll start with shruti, breath, first swaras, and early listening. Built to make the basics feel calm and approachable.`,
-                detail: 'Best for complete beginners',
-                cta: 'Start Foundations',
-                mode: 'beginner',
-                action: 'tutor',
-                target: { courseId: 'foundations', unitId: 'stage1', lessonId: 'm1_1' },
-            };
-        }
-
-        const score = ['studied', 'swaras', 'shruti', 'tala'].reduce((sum, k) => sum + (answers[k] ?? 0), 0);
-
-        if (score <= 2) {
-            return {
-                type: 'guided',
-                headline: 'Carnatic Singing Foundations',
-                body: `${pronoun}'ll build from the ground up — shruti, breath, first swaras, and early listening. No prior knowledge needed.`,
-                detail: 'Best for complete beginners',
-                cta: 'Start Foundations',
-                mode: 'beginner',
-                action: 'tutor',
-                target: { courseId: 'foundations', unitId: 'stage1', lessonId: 'm1_1' },
-            };
-        } else if (score <= 5) {
-            return {
-                type: 'guided',
-                headline: 'Sarali Varisai',
-                body: `${pronoun} have some basics already. This path strengthens pitch, timing, and control through foundational Carnatic exercises.`,
-                detail: 'Best for learners with some familiarity',
-                cta: 'Start Sarali Varisai',
-                mode: 'beginner',
-                action: 'tutor',
-                target: { courseId: 'sarali_varisai', unitId: 'sarali_stage1', lessonId: 's_1' },
-            };
-        } else {
-            return {
-                type: 'guided',
-                headline: 'Daily Sadhana',
-                body: `${pronoun}'re ready for a consistent guided routine. Build momentum with shruti work, exercises, keyboard practice, and ear training.`,
-                detail: 'Best for learners past the earliest basics',
-                cta: 'Open Daily Sadhana',
-                mode: 'beginner',
-                action: 'sadhana',
-            };
-        }
-    }
-
-    // Practice Workspace
-    const INTENT_MAP = {
-        identify:       { headline: 'Start with Dhwani',          body: 'Sing freely and begin with raga identification and swara listening.',                    cta: 'Open Dhwani',          action: 'listen',     secondary: 'You may also want Raga Kosha for deeper study.' },
-        transcribe:     { headline: 'Start with Transcribe',       body: 'Capture your sangatis and study your musical ideas against tala.',                        cta: 'Open Transcribe',      action: 'transcribe', secondary: 'You may also want Daily Sadhana for a consistent practice base.' },
-        study:          { headline: 'Start with Raga Kosha',       body: 'Explore scales, relationships, and ragas in a more study-driven way.',                   cta: 'Open Raga Kosha',      action: 'library',    secondary: 'You may also want Graha Bhedam and Melakarta for scale relationships.' },
-        daily_practice: { headline: 'Start with Practice Setup',   body: 'Begin with shruti, tala, and your practice tools before diving into deeper analysis.',   cta: 'Open Practice Room',   action: 'tutor',      target: { tab: 'practice' }, secondary: 'You may also want Dhwani once you want feedback and analysis.' },
-    };
-
-    const rec = INTENT_MAP[answers.workspace_intent] || INTENT_MAP.daily_practice;
-    return { type: 'workspace', mode: 'musician', ...rec };
-}
-
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeSelected, userId, getToken }) {
+export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSelected, userId, getToken }) {
     const [uIdx, setUIdx]       = useState(0);
     const [bIdx, setBIdx]       = useState(0);
     const [stage, setStage]     = useState('universal'); // 'universal' | 'branch' | 'result'
@@ -242,6 +206,9 @@ export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeS
     const [selected, setSelected]   = useState(null);
     const [advancing, setAdvancing] = useState(false);
     const [exiting, setExiting]     = useState(false);
+    const [coachLoading, setCoachLoading] = useState(false);
+    const [coachReply, setCoachReply]     = useState(null);
+    const [coachTool, setCoachTool]       = useState(null);
 
     useEffect(() => {
         if (active) {
@@ -251,6 +218,9 @@ export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeS
             setAnswers({});
             setSelected(null);
             setAdvancing(false);
+            setCoachLoading(false);
+            setCoachReply(null);
+            setCoachTool(null);
         }
     }, [active]);
 
@@ -269,8 +239,52 @@ export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeS
     const currentQNum = stage === 'universal' ? uIdx + 1 : U_QUESTIONS.length + bIdx + 1;
     const progress = stage === 'result' ? 1 : (currentQNum - 1) / totalQ;
 
-    const recommendation = stage === 'result' ? getRecommendation(branch, answers) : null;
-    const canGoBack = !(stage === 'universal' && uIdx === 0);
+    const canGoBack = !(stage === 'universal' && uIdx === 0) && !coachLoading;
+
+    const fetchCoachRecommendation = async (finalAnswers, finalBranch) => {
+        const mode = finalBranch === 'practice_workspace' ? 'musician' : 'beginner';
+        try {
+            const token = getToken ? await getToken().catch(() => null) : null;
+            const headers = { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) };
+            await fetch('/api/profile', {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    userId,
+                    experience: finalAnswers.experience,
+                    goal: finalAnswers.goal,
+                    learner: finalAnswers.learner,
+                    age: finalAnswers.age,
+                    preference: finalAnswers.preference,
+                    branch: finalBranch,
+                    mode,
+                    workspace_intent: finalAnswers.workspace_intent ?? null,
+                }),
+            });
+        } catch {}
+        try {
+            const token = getToken ? await getToken().catch(() => null) : null;
+            const res = await fetch('/api/coach', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+                body: JSON.stringify({
+                    message: "I just finished my setup. What's the best place for me to start?",
+                    userId,
+                    history: [],
+                    appMode: mode,
+                }),
+            });
+            const data = await res.json();
+            const reply = data.reply || null;
+            setCoachReply(reply);
+            setCoachTool(reply ? detectTool(reply) : null);
+        } catch {
+            setCoachReply(null);
+            setCoachTool(null);
+        } finally {
+            setCoachLoading(false);
+        }
+    };
 
     const dismiss = () => {
         setExiting(true);
@@ -295,6 +309,14 @@ export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeS
             [currentQ.id]: opt.score !== undefined ? opt.score : opt.value,
         };
         setAnswers(newAnswers);
+
+        // Start coach fetch immediately on last branch question so it overlaps the animation
+        if (stage === 'branch' && bIdx >= branchQuestions.length - 1) {
+            setCoachLoading(true);
+            setCoachReply(null);
+            setCoachTool(null);
+            fetchCoachRecommendation(newAnswers, branch);
+        }
 
         setTimeout(() => {
             if (stage === 'universal') {
@@ -335,42 +357,14 @@ export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeS
         }
     };
 
-    const handleBegin = async () => {
-        // Persist quiz profile so the coach can personalize immediately
-        try {
-            const token = getToken ? await getToken().catch(() => null) : null;
-            fetch('/api/profile', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-                },
-                body: JSON.stringify({
-                    userId,
-                    experience: answers.experience,
-                    goal: answers.goal,
-                    learner: answers.learner,
-                    age: answers.age,
-                    preference: answers.preference,
-                    branch,
-                    mode: recommendation.mode,
-                    workspace_intent: answers.workspace_intent ?? null,
-                }),
-            }).catch(() => {});
-        } catch {}
-
-        onModeSelected?.(recommendation.mode);
+    const handleBegin = () => {
+        const mode = branch === 'practice_workspace' ? 'musician' : 'beginner';
+        onModeSelected?.(mode);
         dismiss();
-        onOpenCoach?.();
+        const view = coachTool || (branch === 'practice_workspace' ? 'listen' : 'tutor');
+        onNavigate?.({ view, mode });
     };
 
-    const switchBranch = (toBranch) => {
-        const branchKeys = [...GUIDED_QUESTIONS, ...WORKSPACE_QUESTIONS].map((q) => q.id);
-        setAnswers((prev) => Object.fromEntries(Object.entries(prev).filter(([k]) => !branchKeys.includes(k))));
-        setBranch(toBranch);
-        setStage('branch');
-        setBIdx(0);
-    };
 
     // ── Branch pill colours
     const isGuided = branch === 'guided_path';
@@ -489,97 +483,39 @@ export default function OnboardingQuiz({ active, onDismiss, onOpenCoach, onModeS
                                 })}
                             </div>
                         </>
-                    ) : recommendation.type === 'guided' ? (
-                        /* ── Guided Path result ── */
-                        <>
-                            <div className="text-center mb-5">
-                                <span className="text-[9px] font-mono text-[#f7d686]/50 uppercase tracking-[0.25em] block mb-4">Your best starting point</span>
-                                <div className="w-14 h-14 rounded-full border border-[#f7d686]/25 bg-[#f7d686]/8 flex items-center justify-center mx-auto mb-4">
-                                    <svg className="w-6 h-6 text-[#f7d686]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M9 18V5l12-2v13"/>
-                                        <circle cx="6" cy="18" r="3"/>
-                                        <circle cx="18" cy="16" r="3"/>
-                                    </svg>
-                                </div>
-                                <span className="text-[9px] font-mono text-[#f7d686]/50 uppercase tracking-widest block mb-1">Guided Path</span>
-                                <h2 className="font-playfair text-2xl text-[#f7d686] font-bold leading-tight">{recommendation.headline}</h2>
-                                {recommendation.detail && (
-                                    <p className="text-white/35 text-[10px] font-mono mt-1.5 tracking-wider">{recommendation.detail}</p>
-                                )}
-                            </div>
-
-                            <p className="text-white/60 text-[13px] font-playfair leading-relaxed text-center mb-2">
-                                {recommendation.body}
-                            </p>
-
-                            <p className="text-[#f7d686]/35 text-[11px] italic text-center mt-3 mb-1 px-1 font-playfair">
-                                You can switch to the full practice workspace anytime as your needs grow.
-                            </p>
-
-                            <div className="flex flex-col gap-2 mt-4">
-                                <button
-                                    onClick={handleBegin}
-                                    className="w-full py-3 bg-[#f7d686] hover:bg-white text-[#150801] font-playfair font-bold text-sm tracking-wider uppercase rounded-xl transition-all shadow-[0_0_30px_rgba(247,214,134,0.2)]"
-                                >
-                                    {recommendation.cta} →
-                                </button>
-                                <button
-                                    onClick={() => switchBranch('practice_workspace')}
-                                    className="w-full py-2 text-[11px] text-white/25 hover:text-white/50 transition-colors font-playfair italic"
-                                >
-                                    Actually, show me the full workspace
-                                </button>
-                            </div>
-                        </>
                     ) : (
-                        /* ── Practice Workspace result ── */
+                        /* ── AI-driven result ── */
                         <>
                             <div className="text-center mb-5">
-                                <span className="text-[9px] font-mono uppercase tracking-[0.25em] block mb-4" style={{ color: 'rgba(180,210,247,0.5)' }}>Your practice workspace is ready</span>
-                                <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4"
-                                     style={{ border: '1px solid rgba(180,210,247,0.20)', background: 'rgba(180,210,247,0.07)' }}>
-                                    <svg className="w-6 h-6" style={{ color: 'rgba(180,210,247,0.85)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <rect x="3" y="3" width="7" height="7" rx="1"/>
-                                        <rect x="14" y="3" width="7" height="7" rx="1"/>
-                                        <rect x="3" y="14" width="7" height="7" rx="1"/>
-                                        <rect x="14" y="14" width="7" height="7" rx="1"/>
-                                    </svg>
+                                <span className="text-[9px] font-mono text-[#f7d686]/50 uppercase tracking-[0.25em] block mb-3">Your best starting point</span>
+                                <div className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1"
+                                     style={{ background: pillBg, border: `1px solid ${pillBorder}` }}>
+                                    <span className="text-[9px] font-mono uppercase tracking-[0.18em]" style={{ color: pillText }}>{pillLabel}</span>
                                 </div>
-                                <span className="text-[9px] font-mono uppercase tracking-widest block mb-1" style={{ color: 'rgba(180,210,247,0.5)' }}>Practice Workspace</span>
-                                <h2 className="font-playfair text-2xl font-bold leading-tight" style={{ color: 'rgba(200,226,255,0.92)' }}>{recommendation.headline}</h2>
                             </div>
 
-                            <p className="text-white/60 text-[13px] font-playfair leading-relaxed text-center mb-2">
-                                {recommendation.body}
-                            </p>
-
-                            {recommendation.secondary && (
-                                <p className="text-[11px] font-playfair italic text-center mb-2 px-1" style={{ color: 'rgba(180,210,247,0.35)' }}>
-                                    ✦ {recommendation.secondary}
-                                </p>
+                            {coachLoading ? (
+                                <div className="flex flex-col items-center py-8 gap-4">
+                                    <div className="w-7 h-7 rounded-full border-2 border-[#f7d686]/20 border-t-[#f7d686]/70 animate-spin" />
+                                    <p className="text-white/35 text-[11px] font-playfair">Personalizing your path…</p>
+                                </div>
+                            ) : (
+                                <>
+                                    {coachReply && (
+                                        <p className="text-white/65 text-[13px] font-playfair leading-relaxed text-center mb-5">
+                                            {coachReply}
+                                        </p>
+                                    )}
+                                    <div className="flex flex-col gap-2 mt-2">
+                                        <button
+                                            onClick={handleBegin}
+                                            className="w-full py-3 bg-[#f7d686] hover:bg-white text-[#150801] font-playfair font-bold text-sm tracking-wider uppercase rounded-xl transition-all shadow-[0_0_30px_rgba(247,214,134,0.2)]"
+                                        >
+                                            {coachTool ? (TOOL_LABELS[coachTool] || 'Begin') : 'Begin'} →
+                                        </button>
+                                    </div>
+                                </>
                             )}
-
-                            <p className="text-[#f7d686]/35 text-[11px] italic text-center mb-2 px-1 font-playfair">
-                                Prefer more structure? You can switch to Guided Path anytime.
-                            </p>
-
-                            <div className="flex flex-col gap-2 mt-3">
-                                <button
-                                    onClick={handleBegin}
-                                    className="w-full py-3 font-playfair font-bold text-sm tracking-wider uppercase rounded-xl transition-all"
-                                    style={{ background: 'rgba(180,210,247,0.12)', border: '1px solid rgba(180,210,247,0.24)', color: 'rgba(200,226,255,0.92)' }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(180,210,247,0.20)'; }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(180,210,247,0.12)'; }}
-                                >
-                                    {recommendation.cta} →
-                                </button>
-                                <button
-                                    onClick={() => switchBranch('guided_path')}
-                                    className="w-full py-2 text-[11px] text-white/25 hover:text-white/50 transition-colors font-playfair italic"
-                                >
-                                    Actually, I want the guided path
-                                </button>
-                            </div>
                         </>
                     )}
                 </div>

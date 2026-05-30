@@ -17,7 +17,7 @@ import { getSwaram, identifyRaga, RAGAS } from './utils/ragaLogic';
 import RagaDetail from './components/RagaDetail';
 import OnboardingTour from './components/OnboardingTour';
 import OnboardingQuiz from './components/OnboardingQuiz';
-import { CuratedIcon, FireIcon, DhwaniIcon, VivekaIcon, SadhanaIcon } from './components/IconLibrary';
+import { CuratedIcon, FireIcon, DhwaniIcon, SadhanaIcon } from './components/IconLibrary';
 import SketchyRule from './components/SketchyRule';
 import CoachPanel from './components/CoachPanel';
 
@@ -99,7 +99,7 @@ function loadAppMode() {
 }
 
 const SADHANA_TABS = ['shruthi', 'tutor', 'keyboard', 'singback'];
-const PRACTICE_DEMO_SWARAS = ['Sa', 'Ri1', 'Ga3', 'Ma1', 'Pa', 'Da1', 'Ni3', 'Sa'];
+
 const PRACTICE_DEMO_SWARA_LABELS = ['S', 'R1', 'G3', 'M1', 'P', 'D1', 'N3', 'S'];
 const EXPLORE_DEMO_RAGAS = [
     {
@@ -184,11 +184,7 @@ const TRANSCRIBE_PREVIEW_PHRASES = [
     ['sa', 'ri', 'ga', 'ma', '|', 'pa,', 'ma', 'ga', 'ri', '|', 'sa'],
     ['sa', 'ma', 'ga', 'ri', '|', 'pa', 'dha', 'ni', '|', 'sa'],
 ];
-const VIVEKA_PREVIEW_MATCHES = [
-    { name: 'Kapi', confidence: 'high', cue: 'vakra phrase found' },
-    { name: 'Kharaharapriya', confidence: 'medium', cue: 'parent scale fit' },
-    { name: 'Abheri', confidence: 'low', cue: 'closest descent contour' },
-];
+
 const GURUKUL_PREVIEW_CATEGORIES = [
     {
         name: 'Varisais',
@@ -400,7 +396,6 @@ function App() {
     const [practiceDemoBeat, setPracticeDemoBeat] = useState(0);
     const [practiceDemoSlider, setPracticeDemoSlider] = useState(4);
     const [practiceDemoKeyIndex, setPracticeDemoKeyIndex] = useState(0);
-    const [practiceDemoDetectedIndex, setPracticeDemoDetectedIndex] = useState(0);
     const [practiceDemoPitchState, setPracticeDemoPitchState] = useState('match');
     const [hoveredWorkspacePreview, setHoveredWorkspacePreview] = useState(null);
     const [libraryPreviewIndex, setLibraryPreviewIndex] = useState(0);
@@ -428,12 +423,10 @@ function App() {
     const step = !isListening ? 1 : !saFrequency ? 2 : 3;
     const isPreviewOpen = view === 'home' && showFeatures && !showWorkspaceSections;
     const isWorkspaceExpanded = view === 'home' && showFeatures && showWorkspaceSections;
-    const practiceDemoDetectedSwara = PRACTICE_DEMO_SWARAS[practiceDemoDetectedIndex % PRACTICE_DEMO_SWARAS.length];
     const shruthiPreviewActive = hoveredWorkspacePreview === 'shruthi';
     const talamPreviewActive = hoveredWorkspacePreview === 'talam';
     const keyboardPreviewActive = hoveredWorkspacePreview === 'keyboard';
     const avabodhaPreviewActive = hoveredWorkspacePreview === 'avabodha';
-    const vivekaPreviewActive = hoveredWorkspacePreview === 'viveka';
     const libraryPreviewActive = hoveredWorkspacePreview === 'library';
     const melakartaPreviewActive = hoveredWorkspacePreview === 'melakarta';
     const bhedamPreviewActive = hoveredWorkspacePreview === 'bhedam';
@@ -465,7 +458,6 @@ function App() {
         }, 1250);
 
         const listeningTimer = setInterval(() => {
-            setPracticeDemoDetectedIndex((prev) => (prev + 1) % PRACTICE_DEMO_SWARAS.length);
             setPracticeDemoPitchState((prev) => (prev === 'match' ? 'off' : 'match'));
         }, 1800);
 
@@ -1694,56 +1686,54 @@ function App() {
                                                                 >
                                                                     <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                                         <span>Avabodha</span>
-                                                                        <span className="inline-flex items-center gap-1 rounded-full px-2 py-1" style={{
-                                                                            color: avabodhaPreviewActive ? 'rgba(214,156,68,0.88)' : 'rgba(243,234,214,0.55)',
-                                                                            background: avabodhaPreviewActive ? 'rgba(255,214,134,0.05)' : 'transparent',
-                                                                            transition: 'all 280ms ease',
-                                                                        }}>
-                                                                            <span>Sister</span>
-                                                                            <VivekaIcon className="w-3.5 h-3.5" />
-                                                                        </span>
+                                                                        <span className="text-[8px] font-mono tracking-widest" style={{ color: 'rgba(214,156,68,0.45)' }}>Dhwani · Viveka</span>
                                                                     </div>
-                                                                    <div className="mt-5 flex flex-col items-center">
-                                                                        <div className="relative h-[148px] w-[148px] transition-transform duration-500 group-hover:scale-[1.03]">
-                                                                            <div className="absolute inset-0 rounded-full border border-c-gold/10" />
-                                                                            <div
-                                                                                className="absolute inset-[14px] rounded-full border"
-                                                                                style={{
-                                                                                    borderColor: practiceDemoPitchState === 'match' ? 'rgba(199,139,34,0.42)' : 'rgba(196,129,84,0.34)',
-                                                                                    boxShadow: practiceDemoPitchState === 'match'
-                                                                                        ? '0 0 18px rgba(199,139,34,0.18)'
-                                                                                        : '0 0 18px rgba(196,129,84,0.12)',
-                                                                                    transition: 'all 320ms ease',
-                                                                                }}
-                                                                            />
-                                                                            <div
-                                                                                className="workspace-hover-reveal workspace-hover-anim absolute left-1/2 top-1/2 h-[144px] w-[144px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-c-gold/10"
-                                                                                style={{ animation: 'talaBeatPulse 2s ease-out infinite' }}
-                                                                            />
-                                                                            <div className="absolute left-1/2 top-1/2 h-[34px] w-[34px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(93,43,18,0.96))] flex items-center justify-center">
-                                                                                <div className="h-[12px] w-[12px] rounded-full bg-[#160603]" />
+                                                                    <div className="mt-5 flex flex-col items-center gap-4">
+                                                                        <div className="flex items-center gap-5">
+                                                                            {/* Dhwani — real-time */}
+                                                                            <div className="flex flex-col items-center gap-3">
+                                                                                <div className="relative h-[62px] w-[62px]">
+                                                                                    <div className="absolute inset-0 rounded-full border border-c-gold/12" />
+                                                                                    <div
+                                                                                        className="absolute inset-[10px] rounded-full border transition-all duration-300"
+                                                                                        style={{
+                                                                                            borderColor: practiceDemoPitchState === 'match' ? 'rgba(199,139,34,0.48)' : 'rgba(199,139,34,0.22)',
+                                                                                            boxShadow: avabodhaPreviewActive && practiceDemoPitchState === 'match' ? '0 0 14px rgba(199,139,34,0.18)' : 'none',
+                                                                                        }}
+                                                                                    />
+                                                                                    <div className="absolute left-1/2 top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(93,43,18,0.96))] flex items-center justify-center">
+                                                                                        <div className="h-[7px] w-[7px] rounded-full bg-[#160603]" />
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="flex h-[18px] items-end gap-[2px]">
+                                                                                    {Array.from({ length: 6 }).map((_, i) => (
+                                                                                        <span key={i} className="w-[2px] origin-bottom rounded-full workspace-hover-anim bg-c-gold/55"
+                                                                                            style={{ height: `${5 + (i % 3) * 4}px`, animation: `listeningWave ${0.44 + i * 0.07}s ease-in-out ${i * 0.04}s infinite` }}
+                                                                                        />
+                                                                                    ))}
+                                                                                </div>
+                                                                                <span className="text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.5)' }}>Real-time</span>
+                                                                            </div>
+
+                                                                            <div className="h-14 w-px" style={{ background: 'rgba(199,139,34,0.15)' }} />
+
+                                                                            {/* Viveka — phrase */}
+                                                                            <div className="flex flex-col items-center gap-3">
+                                                                                <div className="relative flex h-[62px] w-[62px] items-center justify-center">
+                                                                                    <div className="absolute inset-0 rounded-full border border-c-gold/12" />
+                                                                                    <div className="absolute inset-[10px] rounded-full border border-c-gold/20"
+                                                                                        style={{ animation: 'workspaceOrbit 12s linear infinite' }} />
+                                                                                    <div className="absolute left-1/2 top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                                                                                        style={{ background: 'radial-gradient(circle at 35% 35%, rgba(246,219,164,0.95), rgba(205,144,48,0.85) 44%, rgba(99,44,18,0.95) 76%)' }} />
+                                                                                </div>
+                                                                                <div className="text-[9px] text-center" style={{ color: 'rgba(214,156,68,0.65)' }}>
+                                                                                    {practiceDemoPitchState === 'match' ? 'Sa found' : 'Sa mapping'}
+                                                                                </div>
+                                                                                <span className="text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.5)' }}>Phrase</span>
                                                                             </div>
                                                                         </div>
-                                                                        <div className="mt-3 flex h-[30px] items-end gap-[3px]">
-                                                                            {Array.from({ length: 12 }).map((_, index) => (
-                                                                                <span
-                                                                                    key={index}
-                                                                                    className="w-[3px] origin-bottom rounded-full workspace-hover-anim bg-c-gold/70"
-                                                                                    style={{
-                                                                                        height: `${12 + ((index % 4) * 5)}px`,
-                                                                                        animation: `listeningWave ${0.44 + ((index % 5) * 0.06)}s ease-in-out ${index * 0.03}s infinite`,
-                                                                                    }}
-                                                                                />
-                                                                            ))}
-                                                                        </div>
-                                                                        <div className="mt-2 text-xs" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>{avabodhaPreviewActive ? 'Listening...' : 'Ready to listen'}</div>
-                                                                        <div
-                                                                            className="mt-1 text-[10px] uppercase tracking-[0.16em]"
-                                                                            style={{ color: !avabodhaPreviewActive ? 'rgba(243, 234, 214, 0.45)' : practiceDemoPitchState === 'match' ? '#d7a448' : '#c48154', transition: 'color 320ms ease' }}
-                                                                        >
-                                                                            {avabodhaPreviewActive
-                                                                                ? (practiceDemoPitchState === 'match' ? `Detected: ${practiceDemoDetectedSwara}` : `Pitch: ${practiceDemoDetectedSwara}`)
-                                                                                : 'Mic inactive'}
+                                                                        <div className="text-[10px] text-center" style={{ color: avabodhaPreviewActive ? 'rgba(243,234,214,0.7)' : 'rgba(243,234,214,0.35)', transition: 'color 280ms ease' }}>
+                                                                            {avabodhaPreviewActive ? 'Two modes of raga discernment' : 'Sing · Identify · Discern'}
                                                                         </div>
                                                                     </div>
                                                                     <div
@@ -1757,7 +1747,7 @@ function App() {
                                                                             Best for
                                                                         </div>
                                                                         <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
-                                                                            Singing live and seeing how your pitch behaves in real time before switching to Viveka for phrase-level discernment.
+                                                                            Identifying ragas from your voice — real-time note-by-note with Dhwani, or full-phrase tonic inference with Viveka.
                                                                         </p>
                                                                     </div>
                                                                 </div>
@@ -2320,104 +2310,8 @@ function App() {
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'viveka' ? null : current)}
                                                                 >
                                                                     <div className="absolute right-0 top-[18px] bottom-[18px] w-px bg-c-gold/10 hidden md:block" />
-                                                                    <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
+                                                                    <div className="text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                                         <span>Viveka</span>
-                                                                        <span className="inline-flex items-center gap-1 rounded-full px-2 py-1" style={{
-                                                                            color: vivekaPreviewActive ? 'rgba(214,156,68,0.88)' : 'rgba(243,234,214,0.55)',
-                                                                            background: vivekaPreviewActive ? 'rgba(255,214,134,0.05)' : 'transparent',
-                                                                            transition: 'all 280ms ease',
-                                                                        }}>
-                                                                            <span>Discern</span>
-                                                                            <span style={{ opacity: vivekaPreviewActive ? 1 : 0.58 }}>⌁</span>
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="workspace-preview-shell workspace-preview-float mt-5 rounded-[16px] px-3 py-3">
-                                                                        <div className="flex items-center justify-between">
-                                                                            <span className="text-[9px] uppercase tracking-[0.18em]" style={{ color: 'rgba(214,156,68,0.55)' }}>Auto tonic</span>
-                                                                            <span className="text-[9px]" style={{ color: vivekaPreviewActive ? 'rgba(214,156,68,0.72)' : 'rgba(214,156,68,0.35)', transition: 'color 300ms ease' }}>
-                                                                                {vivekaPreviewActive ? 'Sa settling…' : 'Listening'}
-                                                                            </span>
-                                                                        </div>
-
-                                                                        <div className="mt-4 flex flex-col items-center gap-4">
-                                                                            <div className="relative flex h-[108px] w-[108px] items-center justify-center">
-                                                                                <div className="workspace-hover-reveal workspace-hover-anim absolute inset-0 rounded-full border border-c-gold/10" style={{ animation: 'talaBeatPulse 2.8s ease-out infinite' }} />
-                                                                                <div className="absolute inset-[10px] rounded-full border border-c-gold/16" />
-                                                                                <div
-                                                                                    className="workspace-hover-anim absolute inset-[18px] rounded-full border"
-                                                                                    style={{
-                                                                                        borderColor: vivekaPreviewActive ? 'rgba(214,156,68,0.44)' : 'rgba(214,156,68,0.2)',
-                                                                                        boxShadow: vivekaPreviewActive ? '0 0 24px rgba(214,156,68,0.16)' : '0 0 10px rgba(214,156,68,0.05)',
-                                                                                        animation: 'workspaceOrbit 12s linear infinite',
-                                                                                    }}
-                                                                                />
-                                                                                <div
-                                                                                    className="absolute left-1/2 top-1/2 h-[32px] w-[32px] -translate-x-1/2 -translate-y-1/2 rounded-full"
-                                                                                    style={{
-                                                                                        background: 'radial-gradient(circle at 35% 35%, rgba(246,219,164,0.98), rgba(205,144,48,0.88) 44%, rgba(99,44,18,0.95) 76%)',
-                                                                                        boxShadow: vivekaPreviewActive ? '0 0 24px rgba(214,156,68,0.26)' : '0 0 10px rgba(214,156,68,0.08)',
-                                                                                        transition: 'box-shadow 320ms ease',
-                                                                                    }}
-                                                                                />
-                                                                                <div
-                                                                                    className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full px-2 py-1 text-[8px] uppercase tracking-[0.18em]"
-                                                                                    style={{
-                                                                                        color: 'rgba(214,156,68,0.72)',
-                                                                                        background: 'rgba(12,5,2,0.92)',
-                                                                                        border: '1px solid rgba(199,139,34,0.12)',
-                                                                                        whiteSpace: 'nowrap',
-                                                                                    }}
-                                                                                >
-                                                                                    {practiceDemoPitchState === 'match' ? 'Sa found' : 'Sa mapping'}
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div className="w-full">
-                                                                                <div className="text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(214,156,68,0.55)' }}>
-                                                                                    Top matches
-                                                                                </div>
-                                                                                <div className="mt-3 space-y-2">
-                                                                                    {VIVEKA_PREVIEW_MATCHES.map(({ name, confidence, cue }, i) => {
-                                                                                        const active = practiceDemoDetectedIndex % VIVEKA_PREVIEW_MATCHES.length === i;
-                                                                                        return (
-                                                                                            <div
-                                                                                                key={name}
-                                                                                                className="rounded-[12px] px-3 py-2.5 transition-all duration-300"
-                                                                                                style={{
-                                                                                                    background: active ? 'rgba(146,96,33,0.16)' : 'rgba(255,245,225,0.02)',
-                                                                                                    border: active ? '1px solid rgba(199,139,34,0.18)' : '1px solid rgba(199,139,34,0.06)',
-                                                                                                    boxShadow: active ? '0 0 18px rgba(199,139,34,0.07)' : 'none',
-                                                                                                    transform: vivekaPreviewActive && active ? 'translateX(2px)' : 'translateX(0)',
-                                                                                                }}
-                                                                                            >
-                                                                                                <div className="flex items-center justify-between gap-2">
-                                                                                                    <div className="min-w-0">
-                                                                                                        <div className="truncate text-[11px]" style={{ color: 'rgba(243,234,214,0.92)' }}>{name}</div>
-                                                                                                        <div className="mt-0.5 text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.52)' }}>{cue}</div>
-                                                                                                    </div>
-                                                                                                    <div className="shrink-0 text-right">
-                                                                                                        <div className="text-[8px] uppercase tracking-[0.12em]" style={{ color: active ? 'rgba(214,156,68,0.88)' : 'rgba(243,234,214,0.45)', transition: 'color 300ms ease' }}>{confidence}</div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        );
-                                                                                    })}
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div className="mt-4 flex items-center justify-between">
-                                                                            <span className="text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.28)' }}>
-                                                                                phrase evidence
-                                                                            </span>
-                                                                            <span className="inline-flex items-center gap-2 text-[9px]" style={{ color: 'rgba(214,156,68,0.48)' }}>
-                                                                                <span
-                                                                                    className="h-1.5 rounded-full bg-c-gold/50 transition-all duration-500"
-                                                                                    style={{ width: vivekaPreviewActive ? '48px' : '20px' }}
-                                                                                />
-                                                                                vakra contour
-                                                                            </span>
-                                                                        </div>
                                                                     </div>
                                                                     <div
                                                                         className="mt-3 rounded-[12px] border px-3 py-2.5"
@@ -2430,7 +2324,7 @@ function App() {
                                                                             Best for
                                                                         </div>
                                                                         <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
-                                                                            Taking the Dhwani sister flow deeper so the app can listen to a full phrase, infer tonic automatically, and suggest the closest ragam match.
+                                                                            Singing a full phrase and letting Viveka infer your tonic automatically, then find the closest raga match by phrase contour.
                                                                         </p>
                                                                     </div>
                                                                 </div>

@@ -80,7 +80,7 @@ const APP_MODES = {
 
 const MODE_FEATURE_ORDER = {
     beginner: ['tutor', 'sadhana', 'shruthi', 'talam', 'keyboard', 'singback'],
-    musician: ['listen', 'viveka', 'transcribe', 'library', 'tutor', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam'],
+    musician: ['listen', 'transcribe', 'library', 'tutor', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam'],
 };
 
 const MODE_ALLOWED_VIEWS = {
@@ -2468,6 +2468,24 @@ function App() {
                     <main className="w-full max-w-3xl mx-auto flex flex-col items-center gap-7 px-4 md:px-8 py-10 animate-fade-in">
                         <div className="w-full flex flex-col items-center gap-7">
 
+                            {/* Dhwani · Viveka sister-tab strip */}
+                            <div className="flex gap-1 bg-c-surface border border-c-border rounded-lg p-1 w-full max-w-[260px]">
+                                <button
+                                    onClick={() => goTo('listen')}
+                                    className="flex-1 py-2 flex flex-col items-center gap-0.5 rounded transition-all bg-c-gold text-c-bg"
+                                >
+                                    <span className="text-[11px] font-semibold font-playfair">Dhwani</span>
+                                    <span className="text-[8px] font-mono uppercase tracking-widest opacity-70">real-time</span>
+                                </button>
+                                <button
+                                    onClick={() => goTo('viveka')}
+                                    className="flex-1 py-2 flex flex-col items-center gap-0.5 rounded transition-all text-c-cream-dark hover:text-c-cream"
+                                >
+                                    <span className="text-[11px] font-semibold font-playfair">Viveka</span>
+                                    <span className="text-[8px] font-mono uppercase tracking-widest opacity-70">phrase</span>
+                                </button>
+                            </div>
+
                             {/* Branded Header Section - Compact */}
                             <div className="w-full flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -2622,7 +2640,26 @@ function App() {
 
                 {/* ══ VIVEKA ══ */}
                 {view === 'viveka' && (
-                    <Viveka onSelectRaga={(r) => setSelectedRaga(r)} />
+                    <div className="w-full max-w-3xl mx-auto flex flex-col items-center gap-4 px-4 md:px-8 pt-8 animate-fade-in">
+                        {/* Dhwani · Viveka sister-tab strip */}
+                        <div className="flex gap-1 bg-c-surface border border-c-border rounded-lg p-1 w-full max-w-[260px]">
+                            <button
+                                onClick={() => goTo('listen')}
+                                className="flex-1 py-2 flex flex-col items-center gap-0.5 rounded transition-all text-c-cream-dark hover:text-c-cream"
+                            >
+                                <span className="text-[11px] font-semibold font-playfair">Dhwani</span>
+                                <span className="text-[8px] font-mono uppercase tracking-widest opacity-70">real-time</span>
+                            </button>
+                            <button
+                                onClick={() => goTo('viveka')}
+                                className="flex-1 py-2 flex flex-col items-center gap-0.5 rounded transition-all bg-c-gold text-c-bg"
+                            >
+                                <span className="text-[11px] font-semibold font-playfair">Viveka</span>
+                                <span className="text-[8px] font-mono uppercase tracking-widest opacity-70">phrase</span>
+                            </button>
+                        </div>
+                        <Viveka onSelectRaga={(r) => setSelectedRaga(r)} />
+                    </div>
                 )}
 
                 {view === 'library' && (

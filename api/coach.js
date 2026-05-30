@@ -90,10 +90,14 @@ export default async function handler(req, res) {
     const sessionRawText = await sessionRes.text();
     let sessionData = {};
     try { sessionData = JSON.parse(sessionRawText); } catch {}
-    const sessionId = sessionData.name?.split('/').pop() || userId;
+    // Session creation returns a long-running operation — extract session ID from
+    // the middle of the path (…/sessions/{id}/operations/{opId}), not the end.
+    const sessionId = sessionData.name?.match(/\/sessions\/(\d+)/)?.[1] || userId;
 
+    // Use :query (non-streaming) — :streamQuery streams NDJSON which Vercel
+    // serverless functions can't reliably consume before the connection closes.
     const agentRes = await fetch(
-      `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}:streamQuery`,
+      `https://us-central1-aiplatform.googleapis.com/v1/${agentEngineResource}:query`,
       {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -103,6 +107,7 @@ export default async function handler(req, res) {
             user_id:    userId,
             session_id: sessionId,
           },
+          class_method: 'query',
         }),
       }
     );
@@ -116,10 +121,9 @@ export default async function handler(req, res) {
     // DEBUG — remove after confirming response shape
     return res.status(200).json({
       _debug: {
-        sessionStatus: sessionRes.status,
-        sessionBody:   sessionRawText.slice(0, 500),
-        agentStatus:   agentRes.status,
-        agentBody:     rawBody.slice(0, 2000),
+        sessionId,
+        agentStatus: agentRes.status,
+        agentBody:   rawBody.slice(0, 2000),
       }
     });
     let reply = null;

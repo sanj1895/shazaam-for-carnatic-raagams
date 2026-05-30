@@ -16,7 +16,7 @@ import { getSwaram, identifyRaga, RAGAS } from './utils/ragaLogic';
 import RagaDetail from './components/RagaDetail';
 import OnboardingTour from './components/OnboardingTour';
 import OnboardingQuiz from './components/OnboardingQuiz';
-import { CuratedIcon, FireIcon, DhwaniIcon, SadhanaIcon } from './components/IconLibrary';
+import { CuratedIcon, FireIcon, DhwaniIcon, VivekaIcon, SadhanaIcon } from './components/IconLibrary';
 import SketchyRule from './components/SketchyRule';
 import CoachPanel from './components/CoachPanel';
 
@@ -48,8 +48,8 @@ const renderTabIcon = (id, className = "w-5 h-5") => {
 
 const FEATURES = [
     { id: 'tutor',     label: 'Gurukul',      desc: 'Classical vocal academy & scale flow', symbol: '📿',  mobileSymbol: '📿', level: 'beginner', highlight: true },
-    { id: 'listen',    label: 'Dhwani',       desc: 'Sing a melody & identify the raga',       symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
-    { id: 'viveka',    label: 'Viveka',       desc: 'Discern the raga from your voice',         symbol: '◎',  mobileSymbol: '◎', level: 'intermediate', highlight: true },
+    { id: 'listen',    label: 'Dhwani',       desc: 'Real-time raga listening from your singing', symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
+    { id: 'viveka',    label: 'Viveka',       desc: 'Phrase-first sister tool for deeper discernment', symbol: '◎',  mobileSymbol: '◎', level: 'intermediate', highlight: true },
     { id: 'transcribe',label: 'Transcribe',   desc: 'Transcribe your sangatis against tala',    symbol: '✍︎', mobileSymbol: '✍︎', level: 'intermediate', highlight: true },
     { id: 'library',   label: 'Raga Kosha',   desc: 'Explore & practice every raga scale',    symbol: '◈',  mobileSymbol: '◈', level: 'all', highlight: true },
     { id: 'sadhana',   label: 'Sadhana',      desc: 'Your recommended daily practice path',    symbol: '🧘‍♀️', mobileSymbol: '🧘‍♀️', level: 'start' },
@@ -80,7 +80,7 @@ const APP_MODES = {
 
 const MODE_FEATURE_ORDER = {
     beginner: ['tutor', 'sadhana', 'shruthi', 'talam', 'keyboard', 'singback'],
-    musician: ['listen', 'transcribe', 'library', 'tutor', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam'],
+    musician: ['listen', 'viveka', 'transcribe', 'library', 'tutor', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam'],
 };
 
 const MODE_ALLOWED_VIEWS = {
@@ -1378,12 +1378,13 @@ function App() {
                                                             Stay in tune, keep the rhythm, and train your ear — all in one focused practice flow.
                                                         </p>
 
-                                                        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 max-w-[260px] text-c-gold">
+                                                        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 max-w-[320px] text-c-gold">
                                                             {[
                                                                 { id: 'shruthi', label: 'Shruthi' },
                                                                 { id: 'talam', label: 'Talam' },
                                                                 { id: 'keyboard', label: 'Keyboard' },
                                                                 { id: 'listen', label: 'Dhwani' },
+                                                                { id: 'viveka', label: 'Viveka' },
                                                             ].map(({ id, label }) => (
                                                                 <button
                                                                     key={id}
@@ -1619,7 +1620,14 @@ function App() {
                                                                 >
                                                                     <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
                                                                         <span>Dhwani</span>
-                                                                        <span>~</span>
+                                                                        <span className="inline-flex items-center gap-1 rounded-full px-2 py-1" style={{
+                                                                            color: dhwaniPreviewActive ? 'rgba(214,156,68,0.88)' : 'rgba(243,234,214,0.55)',
+                                                                            background: dhwaniPreviewActive ? 'rgba(255,214,134,0.05)' : 'transparent',
+                                                                            transition: 'all 280ms ease',
+                                                                        }}>
+                                                                            <span>Sister</span>
+                                                                            <VivekaIcon className="w-3.5 h-3.5" />
+                                                                        </span>
                                                                     </div>
                                                                     <div className="mt-5 flex flex-col items-center">
                                                                         <div className="relative h-[148px] w-[148px] transition-transform duration-500 group-hover:scale-[1.03]">
@@ -1675,7 +1683,7 @@ function App() {
                                                                             Best for
                                                                         </div>
                                                                         <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
-                                                                            Singing live and seeing how your pitch behaves in real time while the app listens along.
+                                                                            Singing live and seeing how your pitch behaves in real time before switching to Viveka for phrase-level discernment.
                                                                         </p>
                                                                     </div>
                                                                 </div>
@@ -2349,7 +2357,7 @@ function App() {
                                                                             Best for
                                                                         </div>
                                                                         <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
-                                                                            Let the app listen to a phrase and suggest the most likely ragam or closest musical match.
+                                                                            Taking the Dhwani sister flow deeper so the app can listen to a full phrase, infer tonic automatically, and suggest the closest ragam match.
                                                                         </p>
                                                                     </div>
                                                                 </div>

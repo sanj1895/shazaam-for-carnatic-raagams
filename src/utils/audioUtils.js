@@ -464,43 +464,38 @@ export function detectPitch(analyserNode, sampleRate) {
   const buffer = new Float32Array(bufferLength);
   analyserNode.getFloatTimeDomainData(buffer);
 
-  // RMS gate — must be above noise floor before running autocorrelation.
-  // 0.01 rejects electrical hum (60/120 Hz mains interference) and quiet room noise
-  // while still accepting soft humming (typically 0.02+ RMS near a mic).
+  // RMS gate — rejects electrical hum and quiet room noise.
+  // Singing voice near a mic is typically 0.02+ RMS; hum is usually below 0.01.
   let rms = 0;
-  for (let i = 0; i < bufferLength; i++) {
-    rms += buffer[i] * buffer[i];
-  }
+  for (let i = 0; i < bufferLength; i++) rms += buffer[i] * buffer[i];
   rms = Math.sqrt(rms / bufferLength);
   if (rms < 0.01) return null;
 
-  // Autocorrelation
   const SIZE = bufferLength;
   const correlation = new Float32Array(SIZE);
-
   for (let lag = 0; lag < SIZE; lag++) {
     let sum = 0;
-    for (let i = 0; i < SIZE - lag; i++) {
-      sum += buffer[i] * buffer[i + lag];
-    }
+    for (let i = 0; i < SIZE - lag; i++) sum += buffer[i] * buffer[i + lag];
     correlation[lag] = sum;
   }
 
-  // Find first local minimum after lag 0
+  // Skip the initial decay to find the first trough
   let d = 0;
   while (d < SIZE && correlation[d] > correlation[d + 1]) d++;
 
-  // Find the peak after the dip
-  let maxVal = -Infinity;
-  let maxPos = -1;
+  // Find the peak using lag-normalized correlation.
+  // Raw autocorrelation sums (SIZE - lag) terms, so large lags accumulate fewer
+  // samples and still produce large absolute values — this biases the detector
+  // toward subharmonics (half-frequency). Dividing by (SIZE - lag) corrects for
+  // this and makes the true fundamental consistently win over its subharmonic.
+  let maxNorm = -Infinity;
+  let maxPos  = -1;
   for (let i = d; i < SIZE; i++) {
-    if (correlation[i] > maxVal) {
-      maxVal = correlation[i];
-      maxPos = i;
-    }
+    const norm = correlation[i] / (SIZE - i);
+    if (norm > maxNorm) { maxNorm = norm; maxPos = i; }
   }
 
-  if (maxPos === -1 || maxPos === 0) return null;
+  if (maxPos <= 0) return null;
 
   // Parabolic interpolation for sub-sample accuracy
   const y1 = correlation[maxPos - 1] || 0;
@@ -510,14 +505,11 @@ export function detectPitch(analyserNode, sampleRate) {
   const refinedPos = denom !== 0 ? maxPos - (y3 - y1) / (2 * denom) : maxPos;
 
   const frequency = sampleRate / refinedPos;
-
-  // Reject frequencies outside vocal/instrument range
   if (frequency < 60 || frequency > 2000) return null;
 
-  // Confidence check — correlation peak relative to lag-0 energy.
-  // 0.50 is the right balance for voice: strict enough to reject diffuse noise,
-  // permissive enough to accept natural voice with harmonics (which typically lands 0.50–0.75).
-  if (maxVal / correlation[0] < 0.50) return null;
+  // Confidence: normalized peak vs mean energy (correlation[0] / SIZE = RMS²).
+  // 0.50 accepts natural voice; rejects diffuse noise.
+  if (maxNorm / (correlation[0] / SIZE) < 0.50) return null;
 
   return frequency;
 }

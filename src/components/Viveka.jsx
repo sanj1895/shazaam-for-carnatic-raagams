@@ -402,7 +402,7 @@ export default function Viveka({ onSelectRaga }) {
 
             const source   = ctx.createMediaStreamSource(stream);
             const gainNode = ctx.createGain();
-            gainNode.gain.value = 2.5;
+            gainNode.gain.value = 4.0;
             const analyser = ctx.createAnalyser();
             analyser.fftSize = 4096;
             analyser.smoothingTimeConstant = 0;
@@ -436,7 +436,7 @@ export default function Viveka({ onSelectRaga }) {
             // accepts singing which is typically 5–15× above the noise floor).
             const sorted = [...calibRMS].sort((a, b) => a - b);
             const p75 = sorted[Math.floor(sorted.length * 0.75)] ?? 0.002;
-            dynamicGateRef.current = Math.max(p75 * 4, 0.005);
+            dynamicGateRef.current = Math.max(p75 * 2.5, 0.003);
             // ──────────────────────────────────────────────────────────────
 
             statusRef.current = STATUS.RECORDING;

@@ -32,11 +32,10 @@ async function buildUserContext(userId, appMode, sadhanaCompleted) {
     const parts = [`userId=${userId}`];
     if (profile) {
       const exp = profile.experience ? `experience=${profile.experience}` : null;
-      const goal = profile.goal ? `goal=${profile.goal}` : null;
       const learner = profile.learner ? `learner=${profile.learner}` : null;
       const age = profile.age ? `age=${profile.age}` : null;
       const branch = profile.branch ? `path=${profile.branch}` : null;
-      const filtered = [exp, goal, learner, age, branch].filter(Boolean);
+      const filtered = [exp, learner, age, branch].filter(Boolean);
       if (filtered.length) parts.push(`Profile: ${filtered.join(', ')}`);
     }
     if (sessions.length) {

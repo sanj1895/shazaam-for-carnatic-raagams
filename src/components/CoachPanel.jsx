@@ -2,17 +2,18 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 const WELCOME = "Namaskaram! I'm your Ālāpana practice coach. Tell me what you want to work on today — or ask me to plan a session based on your history.";
 
+// Only navigate when the coach explicitly says to open a tool — never on incidental mentions
 const TOOL_PATTERNS = [
-  { pattern: /\b(avabodha)\b/i, view: 'avabodha' },
-  { pattern: /\b(gurukul|varisai|alankaram|kriti|gitam|lesson)\b/i, view: 'tutor' },
-  { pattern: /\b(raga kosha|raga library|kosha)\b/i, view: 'library' },
-  { pattern: /\b(viveka)\b/i, view: 'viveka' },
-  { pattern: /\b(dhwani)\b/i, view: 'listen' },
-  { pattern: /\b(transcribe|sangati)\b/i, view: 'transcribe' },
-  { pattern: /\b(shruthi|drone|shruti)\b/i, view: 'shruthi' },
-  { pattern: /\b(talam|rhythm|tala)\b/i, view: 'talam' },
-  { pattern: /\b(keyboard|swara keyboard)\b/i, view: 'keyboard' },
-  { pattern: /\b(sing.back|ear training)\b/i, view: 'singback' },
+  { pattern: /open(?:ing)?\s+avabodha/i,                                    view: 'avabodha' },
+  { pattern: /open(?:ing)?\s+(?:gurukul|svara gurukul)/i,                   view: 'tutor' },
+  { pattern: /open(?:ing)?\s+(?:raga kosha|raga library|kosha)/i,           view: 'library' },
+  { pattern: /open(?:ing)?\s+viveka/i,                                       view: 'viveka' },
+  { pattern: /open(?:ing)?\s+dhwani/i,                                       view: 'listen' },
+  { pattern: /open(?:ing)?\s+transcri(?:be|ption)/i,                        view: 'transcribe' },
+  { pattern: /open(?:ing)?\s+shru(?:thi|ti)/i,                              view: 'shruthi' },
+  { pattern: /open(?:ing)?\s+tala(?:m)?/i,                                  view: 'talam' },
+  { pattern: /open(?:ing)?\s+keyboard/i,                                     view: 'keyboard' },
+  { pattern: /open(?:ing)?\s+sing.?back/i,                                  view: 'singback' },
 ];
 
 function detectToolNavigation(text) {

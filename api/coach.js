@@ -129,7 +129,7 @@ export default async function handler(req, res) {
       } catch { /* skip malformed lines */ }
     }
 
-    if (!reply) return res.status(500).json({ error: 'Empty response from Agent Engine.' });
+    if (!reply) return res.status(500).json({ error: 'Empty response from Agent Engine.', _raw: rawBody.slice(0, 2000) });
     return res.status(200).json({ reply, via: 'agent-engine' });
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Coach request failed.' });

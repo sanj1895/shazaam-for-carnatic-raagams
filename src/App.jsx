@@ -1373,9 +1373,6 @@ function App() {
                                             </div>
                                         ) : (
                                             <>
-                                                <p className="mt-1 max-w-[22rem] text-[11px] sm:text-[12px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.82)' }}>
-                                                    Sign in first to open Guided Basics, save your practice memory, and enter the full musician workspace.
-                                                </p>
                                                 <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
                                                     <SignInButton mode="modal">
                                                         <button className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 shadow-[0_0_36px_rgba(200,148,31,0.26)] cursor-pointer">
@@ -1680,7 +1677,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel group sm:min-h-[340px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel avabodha-preview-panel group sm:min-h-[340px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('avabodha')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'avabodha' ? null : current)}
                                                                 >
@@ -1689,7 +1686,7 @@ function App() {
                                                                         <span className="text-[8px] font-mono tracking-widest" style={{ color: 'rgba(214,156,68,0.45)' }}>Dhwani · Viveka</span>
                                                                     </div>
                                                                     <div className="mt-5 flex flex-col items-center gap-4">
-                                                                        <div className="flex items-center gap-5">
+                                                                        <div className="flex items-center gap-6">
                                                                             {/* Dhwani — real-time */}
                                                                             <div className="flex flex-col items-center gap-3">
                                                                                 <div className="relative h-[62px] w-[62px]">
@@ -1701,14 +1698,22 @@ function App() {
                                                                                             boxShadow: avabodhaPreviewActive && practiceDemoPitchState === 'match' ? '0 0 14px rgba(199,139,34,0.18)' : 'none',
                                                                                         }}
                                                                                     />
+                                                                                    <div
+                                                                                        className="avabodha-sweep absolute inset-[8px] rounded-full"
+                                                                                        style={{
+                                                                                            background: 'conic-gradient(from 0deg, transparent 0deg 300deg, rgba(247,214,134,0.55) 330deg 346deg, transparent 360deg)',
+                                                                                            maskImage: 'radial-gradient(circle, transparent 57%, black 60%, black 71%, transparent 74%)',
+                                                                                            WebkitMaskImage: 'radial-gradient(circle, transparent 57%, black 60%, black 71%, transparent 74%)',
+                                                                                        }}
+                                                                                    />
                                                                                     <div className="absolute left-1/2 top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(93,43,18,0.96))] flex items-center justify-center">
                                                                                         <div className="h-[7px] w-[7px] rounded-full bg-[#160603]" />
                                                                                     </div>
                                                                                 </div>
                                                                                 <div className="flex h-[18px] items-end gap-[2px]">
                                                                                     {Array.from({ length: 6 }).map((_, i) => (
-                                                                                        <span key={i} className="w-[2px] origin-bottom rounded-full workspace-hover-anim bg-c-gold/55"
-                                                                                            style={{ height: `${5 + (i % 3) * 4}px`, animation: `listeningWave ${0.44 + i * 0.07}s ease-in-out ${i * 0.04}s infinite` }}
+                                                                                        <span key={i} className="avabodha-voice-bar w-[2px] rounded-full bg-c-gold/55"
+                                                                                            style={{ height: `${7 + (i % 3) * 3}px`, animationDelay: `${i * 0.12}s` }}
                                                                                         />
                                                                                     ))}
                                                                                 </div>
@@ -1721,8 +1726,13 @@ function App() {
                                                                             <div className="flex flex-col items-center gap-3">
                                                                                 <div className="relative flex h-[62px] w-[62px] items-center justify-center">
                                                                                     <div className="absolute inset-0 rounded-full border border-c-gold/12" />
-                                                                                    <div className="absolute inset-[10px] rounded-full border border-c-gold/20"
-                                                                                        style={{ animation: 'workspaceOrbit 12s linear infinite' }} />
+                                                                                    <div
+                                                                                        className="avabodha-sweep absolute inset-[10px] rounded-full border border-c-gold/20"
+                                                                                        style={{
+                                                                                            background: 'conic-gradient(from 0deg, rgba(247,214,134,0) 0deg 220deg, rgba(247,214,134,0.22) 260deg 300deg, rgba(247,214,134,0) 335deg 360deg)',
+                                                                                            boxShadow: avabodhaPreviewActive ? 'inset 0 0 10px rgba(214,156,68,0.08)' : 'none',
+                                                                                        }}
+                                                                                    />
                                                                                     <div className="absolute left-1/2 top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full"
                                                                                         style={{ background: 'radial-gradient(circle at 35% 35%, rgba(246,219,164,0.95), rgba(205,144,48,0.85) 44%, rgba(99,44,18,0.95) 76%)' }} />
                                                                                 </div>
@@ -1732,8 +1742,8 @@ function App() {
                                                                                 <span className="text-[8px] uppercase tracking-[0.14em]" style={{ color: 'rgba(214,156,68,0.5)' }}>Phrase</span>
                                                                             </div>
                                                                         </div>
-                                                                        <div className="text-[10px] text-center" style={{ color: avabodhaPreviewActive ? 'rgba(243,234,214,0.7)' : 'rgba(243,234,214,0.35)', transition: 'color 280ms ease' }}>
-                                                                            {avabodhaPreviewActive ? 'Two modes of raga discernment' : 'Sing · Identify · Discern'}
+                                                                        <div className="text-[10px] text-center" style={{ color: avabodhaPreviewActive ? 'rgba(243,234,214,0.7)' : 'rgba(243,234,214,0.42)', transition: 'color 280ms ease' }}>
+                                                                            Two modes of raga discernment
                                                                         </div>
                                                                     </div>
                                                                     <div

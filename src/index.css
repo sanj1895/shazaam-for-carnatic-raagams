@@ -74,6 +74,32 @@ body {
   50% { transform: scaleY(1); opacity: 0.88; }
 }
 
+@keyframes avabodhaSignal {
+  0%, 100% {
+    opacity: 0.28;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.88;
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes avabodhaSweep {
+  0% {
+    opacity: 0;
+    transform: rotate(-20deg);
+  }
+  18%,
+  64% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(340deg);
+  }
+}
+
 @keyframes recordPulse {
   from {
     transform: scale(0.9);
@@ -339,6 +365,29 @@ body {
 
 .workspace-preview-panel:hover .workspace-hover-reveal {
   opacity: 1;
+}
+
+.avabodha-preview-panel:hover {
+  transform: translateY(-2px);
+}
+
+.avabodha-preview-panel .avabodha-voice-bar {
+  animation: avabodhaSignal 1.8s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.avabodha-preview-panel:hover .avabodha-voice-bar {
+  animation-play-state: running;
+}
+
+.avabodha-preview-panel .avabodha-sweep {
+  animation: avabodhaSweep 5.8s linear infinite;
+  animation-play-state: paused;
+  transform-origin: 50% 50%;
+}
+
+.avabodha-preview-panel:hover .avabodha-sweep {
+  animation-play-state: running;
 }
 
 .workspace-recording-pulse::after {

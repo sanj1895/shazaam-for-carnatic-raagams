@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 
+// Colours tuned for the light parchment theme (c-bg #FAF4E8, c-card #EDE0C4).
+// "strong" / "developing" use darker Tailwind shades so they read on cream.
 const MASTERY_STYLES = {
-  strong:     { label: 'Strong',     dot: 'bg-emerald-400', badge: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30', bar: 'bg-emerald-400' },
-  stable:     { label: 'Stable',     dot: 'bg-c-gold',      badge: 'text-c-gold bg-c-gold/10 border-c-gold/30',               bar: 'bg-c-gold' },
-  developing: { label: 'Developing', dot: 'bg-amber-400',   badge: 'text-amber-400 bg-amber-500/10 border-amber-500/30',      bar: 'bg-amber-400' },
-  exploring:  { label: 'Exploring',  dot: 'bg-c-cream-dark', badge: 'text-c-cream-dark bg-white/5 border-c-border',           bar: 'bg-c-cream-dark/40' },
+  strong:     { label: 'Strong',     dot: 'bg-emerald-700', badge: 'text-emerald-800 bg-emerald-700/10 border-emerald-700/30', bar: 'bg-emerald-700' },
+  stable:     { label: 'Stable',     dot: 'bg-c-gold',      badge: 'text-c-gold bg-c-gold/10 border-c-gold/40',               bar: 'bg-c-gold' },
+  developing: { label: 'Developing', dot: 'bg-amber-700',   badge: 'text-amber-800 bg-amber-700/10 border-amber-700/30',      bar: 'bg-amber-700' },
+  exploring:  { label: 'Exploring',  dot: 'bg-c-cream-dark', badge: 'text-c-cream-dim bg-c-border/20 border-c-border',        bar: 'bg-c-cream-dark' },
 };
 
 function daysSince(dateStr) {
@@ -66,7 +68,7 @@ export default function LearnerModelPanel({ userId, getToken }) {
   if (loading) {
     return (
       <div className="w-full flex flex-col items-center gap-4 py-16 animate-fade-in">
-        <div className="w-8 h-8 border-2 border-c-gold/30 border-t-c-gold rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-c-border border-t-c-gold rounded-full animate-spin" />
         <p className="text-c-cream-dim text-sm font-playfair italic">Loading your musical memory…</p>
       </div>
     );
@@ -75,7 +77,7 @@ export default function LearnerModelPanel({ userId, getToken }) {
   if (error) {
     return (
       <div className="w-full flex flex-col items-center gap-4 py-12">
-        <p className="text-red-400 text-sm font-playfair">{error}</p>
+        <p className="text-red-700 text-sm font-playfair">{error}</p>
         <button onClick={fetchModel} className="text-xs text-c-gold underline underline-offset-2">Retry</button>
       </div>
     );
@@ -90,21 +92,19 @@ export default function LearnerModelPanel({ userId, getToken }) {
     <main className="w-full max-w-3xl mx-auto flex flex-col gap-8 px-4 md:px-8 py-10 animate-fade-in">
 
       {/* ── Header ── */}
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-c-card border border-c-gold/30 flex items-center justify-center flex-shrink-0">
-            <svg className="w-5 h-5 text-c-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          <div>
-            <h1 className="font-playfair text-xl font-bold text-c-gold tracking-wide">Your Musical Memory</h1>
-            <p className="text-[10px] font-mono uppercase tracking-widest text-c-cream-dark/50">
-              Progressive learner model · powered by MongoDB
-            </p>
-          </div>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-c-card border border-c-border flex items-center justify-center flex-shrink-0">
+          <svg className="w-5 h-5 text-c-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div>
+          <h1 className="font-playfair text-xl font-bold text-c-gold tracking-wide">Your Musical Memory</h1>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-c-cream-dim">
+            Progressive learner model · powered by MongoDB
+          </p>
         </div>
       </div>
 
@@ -116,20 +116,20 @@ export default function LearnerModelPanel({ userId, getToken }) {
           { label: 'Active Days (3w)', value: activeDays },
         ].map(({ label, value }) => (
           <div key={label} className="bg-c-card border border-c-border rounded-xl p-3 flex flex-col items-center gap-0.5">
-            <span className="font-playfair text-2xl font-bold text-c-cream">{value}</span>
-            <span className="text-[9px] font-mono uppercase tracking-widest text-c-cream-dark/50 text-center">{label}</span>
+            <span className="font-playfair text-2xl font-bold text-c-cream-dim">{value}</span>
+            <span className="text-[9px] font-mono uppercase tracking-widest text-c-cream-dark text-center">{label}</span>
           </div>
         ))}
       </div>
 
       {isEmpty ? (
         <div className="w-full bg-c-card border border-c-border rounded-xl p-8 flex flex-col items-center gap-3 text-center">
-          <p className="font-playfair text-c-cream italic">Your musical memory is just beginning.</p>
+          <p className="font-playfair text-c-cream-dim italic">Your musical memory is just beginning.</p>
           <p className="text-xs text-c-cream-dark leading-relaxed max-w-xs">
             Use Viveka to identify ragas, practice with Gurukul, or explore Raga Kosha.
             Every session builds your personal learner model here.
           </p>
-          <p className="text-[9px] font-mono uppercase tracking-widest text-c-cream-dark/40 mt-1">
+          <p className="text-[9px] font-mono uppercase tracking-widest text-c-cream-dark/70 mt-1">
             MongoDB stores your patterns · coach learns from them
           </p>
         </div>
@@ -138,13 +138,13 @@ export default function LearnerModelPanel({ userId, getToken }) {
           {/* ── Raga Mastery ── */}
           {ragaStats.length > 0 && (
             <section className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <h2 className="font-playfair text-base font-semibold text-c-cream">Raga Mastery</h2>
-                <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Raga Mastery</h2>
+                <div className="flex items-center gap-3 flex-wrap">
                   {['strong', 'stable', 'developing', 'exploring'].map(level => (
                     <div key={level} className="flex items-center gap-1">
                       <div className={`w-1.5 h-1.5 rounded-full ${MASTERY_STYLES[level].dot}`} />
-                      <span className="text-[9px] font-mono text-c-cream-dark/50 uppercase tracking-widest">{MASTERY_STYLES[level].label}</span>
+                      <span className="text-[9px] font-mono text-c-cream-dark uppercase tracking-widest">{MASTERY_STYLES[level].label}</span>
                     </div>
                   ))}
                 </div>
@@ -157,32 +157,28 @@ export default function LearnerModelPanel({ userId, getToken }) {
                     ? Math.round((raga.identifiedCount / raga.totalSessions) * 100)
                     : 0;
                   return (
-                    <div
-                      key={raga.raga}
-                      className="bg-c-card border border-c-border rounded-xl px-4 py-3 flex flex-col gap-2"
-                    >
+                    <div key={raga.raga} className="bg-c-card border border-c-border rounded-xl px-4 py-3 flex flex-col gap-2">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
                           <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-0.5 ${style.dot}`} />
-                          <span className="font-playfair font-semibold text-c-cream text-sm truncate">{raga.raga}</span>
+                          <span className="font-playfair font-semibold text-c-cream-dim text-sm truncate">{raga.raga}</span>
                         </div>
                         <span className={`text-[8px] font-mono uppercase tracking-widest px-1.5 py-0.5 rounded border flex-shrink-0 ${style.badge}`}>
                           {style.label}
                         </span>
                       </div>
 
-                      {/* Session count bar */}
                       <div className="flex flex-col gap-1">
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] text-c-cream-dark/60 font-mono">
+                          <span className="text-[10px] text-c-cream-dark font-mono">
                             {raga.totalSessions} session{raga.totalSessions !== 1 ? 's' : ''}
                             {raga.identifiedCount > 0 && ` · ${successPct}% identified`}
                           </span>
                           {raga.lastPracticed && (
-                            <span className="text-[9px] text-c-cream-dark/40 font-mono">{daysSince(raga.lastPracticed)}</span>
+                            <span className="text-[9px] text-c-cream-dark/70 font-mono">{daysSince(raga.lastPracticed)}</span>
                           )}
                         </div>
-                        <div className="w-full h-1 bg-c-border rounded-full overflow-hidden">
+                        <div className="w-full h-1 bg-c-border/60 rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all ${style.bar}`}
                             style={{ width: `${Math.min((raga.totalSessions / 10) * 100, 100)}%` }}
@@ -191,7 +187,7 @@ export default function LearnerModelPanel({ userId, getToken }) {
                       </div>
 
                       {raga.confusedCount > 0 && (
-                        <p className="text-[9px] text-amber-400/70 font-mono">
+                        <p className="text-[9px] text-amber-800 font-mono">
                           {raga.confusedCount} ambiguous result{raga.confusedCount !== 1 ? 's' : ''}
                         </p>
                       )}
@@ -202,12 +198,12 @@ export default function LearnerModelPanel({ userId, getToken }) {
             </section>
           )}
 
-          {/* ── Common Confusions ── The MongoDB story ── */}
+          {/* ── Common Confusions ── */}
           {confusionPairs.length > 0 && (
             <section className="flex flex-col gap-3">
               <div className="flex flex-col gap-0.5">
-                <h2 className="font-playfair text-base font-semibold text-c-cream">Common Confusions</h2>
-                <p className="text-[10px] text-c-cream-dark/50 font-mono">
+                <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Common Confusions</h2>
+                <p className="text-[10px] text-c-cream-dark font-mono">
                   MongoDB tracks these patterns · your coach cites them when you practice
                 </p>
               </div>
@@ -216,25 +212,25 @@ export default function LearnerModelPanel({ userId, getToken }) {
                 {confusionPairs.map((pair, i) => (
                   <div
                     key={i}
-                    className="bg-c-card border border-amber-500/20 rounded-xl px-4 py-3.5 flex items-center gap-3"
+                    className="bg-c-card border border-c-border rounded-xl px-4 py-3.5 flex items-center gap-3"
                   >
                     <div className="flex-1 min-w-0 flex items-center gap-2 justify-between">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="font-playfair font-semibold text-c-cream text-sm truncate">{pair.raga}</span>
-                        <span className="text-c-gold/50 text-xs flex-shrink-0">↔</span>
-                        <span className="font-playfair font-semibold text-c-cream text-sm truncate">{pair.confusedWith}</span>
+                        <span className="font-playfair font-semibold text-c-cream-dim text-sm truncate">{pair.raga}</span>
+                        <span className="text-c-gold text-xs flex-shrink-0">↔</span>
+                        <span className="font-playfair font-semibold text-c-cream-dim text-sm truncate">{pair.confusedWith}</span>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <div className="flex gap-0.5">
                           {Array.from({ length: Math.min(pair.count, 5) }).map((_, j) => (
-                            <div key={j} className="w-1.5 h-1.5 rounded-full bg-amber-400/70" />
+                            <div key={j} className="w-1.5 h-1.5 rounded-full bg-amber-700" />
                           ))}
                         </div>
-                        <span className="text-[10px] font-mono text-amber-400/70">{pair.count}×</span>
+                        <span className="text-[10px] font-mono text-amber-800">{pair.count}×</span>
                       </div>
                     </div>
                     {pair.lastOccurred && (
-                      <span className="text-[9px] font-mono text-c-cream-dark/30 flex-shrink-0">
+                      <span className="text-[9px] font-mono text-c-cream-dark/70 flex-shrink-0">
                         {daysSince(pair.lastOccurred)}
                       </span>
                     )}
@@ -242,7 +238,7 @@ export default function LearnerModelPanel({ userId, getToken }) {
                 ))}
               </div>
 
-              <p className="text-[9px] text-c-cream-dark/30 font-playfair italic text-center mt-1">
+              <p className="text-[9px] text-c-cream-dark font-playfair italic text-center mt-1">
                 Ask your coach to help you distinguish these ragas
               </p>
             </section>
@@ -250,7 +246,7 @@ export default function LearnerModelPanel({ userId, getToken }) {
 
           {/* ── Practice Timeline ── */}
           <section className="flex flex-col gap-3">
-            <h2 className="font-playfair text-base font-semibold text-c-cream">Practice Timeline</h2>
+            <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Practice Timeline</h2>
             <div className="bg-c-card border border-c-border rounded-xl p-4 flex flex-col gap-3">
               <div className="flex items-end gap-1 h-12">
                 {timelineGrid.map((day, i) => {
@@ -259,16 +255,14 @@ export default function LearnerModelPanel({ userId, getToken }) {
                   return (
                     <div
                       key={day.date}
-                      className="flex-1 flex flex-col items-center justify-end gap-0.5 group relative"
-                      title={day.count > 0 ? `${day.date}: ${day.count} session${day.count !== 1 ? 's' : ''}${day.ragas.filter(Boolean).length ? ` · ${day.ragas.filter(Boolean).join(', ')}` : ''}` : day.date}
+                      className="flex-1 flex flex-col items-center justify-end"
+                      title={day.count > 0
+                        ? `${day.date}: ${day.count} session${day.count !== 1 ? 's' : ''}${day.ragas.filter(Boolean).length ? ` · ${day.ragas.filter(Boolean).join(', ')}` : ''}`
+                        : day.date}
                     >
                       <div
                         className={`w-full rounded-sm transition-all ${
-                          day.count === 0
-                            ? 'bg-c-border/40'
-                            : isToday
-                            ? 'bg-c-gold'
-                            : 'bg-c-gold/50'
+                          day.count === 0 ? 'bg-c-border/50' : isToday ? 'bg-c-gold' : 'bg-c-gold-dim'
                         }`}
                         style={{ height: day.count === 0 ? '4px' : `${heightPct}%` }}
                       />
@@ -276,12 +270,12 @@ export default function LearnerModelPanel({ userId, getToken }) {
                   );
                 })}
               </div>
-              <div className="flex justify-between text-[8px] font-mono text-c-cream-dark/30 uppercase tracking-widest">
+              <div className="flex justify-between text-[8px] font-mono text-c-cream-dark uppercase tracking-widest">
                 <span>21 days ago</span>
                 <span>Today</span>
               </div>
               {practiceTimeline.length === 0 && (
-                <p className="text-[10px] text-c-cream-dark/40 font-playfair italic text-center">
+                <p className="text-[10px] text-c-cream-dark font-playfair italic text-center">
                   No practice sessions in the last 21 days
                 </p>
               )}
@@ -293,11 +287,11 @@ export default function LearnerModelPanel({ userId, getToken }) {
       {/* ── MongoDB attribution ── */}
       <div className="flex items-center justify-center gap-2 pt-2 pb-4">
         <div className="w-3 h-3 flex-shrink-0">
-          <svg viewBox="0 0 24 24" fill="#00ED64">
+          <svg viewBox="0 0 24 24" fill="#3D6B2A">
             <path d="M12.004.063C5.982.063 1.1 4.946 1.1 10.968c0 3.694 1.808 6.97 4.61 9.007l.003.002c.022 5.078 4.28 3.959 4.28 3.959v-3.01c0-.618.504-1.12 1.124-1.12h1.77c.62 0 1.123.502 1.123 1.12v3.01s4.258 1.12 4.281-3.959l.002-.002c2.803-2.037 4.61-5.313 4.61-9.007C22.903 4.946 18.022.063 12.004.063z"/>
           </svg>
         </div>
-        <span className="text-[9px] font-mono text-c-cream-dark/30 uppercase tracking-widest">
+        <span className="text-[9px] font-mono text-c-cream-dark uppercase tracking-widest">
           Built on MongoDB · learner model updates with every session
         </span>
       </div>

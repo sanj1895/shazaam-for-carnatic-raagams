@@ -115,23 +115,19 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: `Agent Engine error: ${rawBody}` });
     }
 
-    // DEBUG — remove after confirming response shape
-    return res.status(200).json({
-      _debug: {
-        sessionId,
-        agentStatus: agentRes.status,
-        agentBody:   rawBody.slice(0, 2000),
-      }
-    });
+    // streamQuery returns NDJSON — each line is an ADK event. Scan for the
+    // final model text, which sits in content.parts[0].text of the last
+    // non-error event whose finish_reason is STOP (or similar).
     let reply = null;
     for (const line of rawBody.split('\n').reverse()) {
       const trimmed = line.trim();
       if (!trimmed) continue;
       try {
         const event = JSON.parse(trimmed);
-        const text = event?.output
+        if (event?.error_code) continue; // skip error events, keep looking
+        const text = event?.content?.parts?.[0]?.text
+                  || event?.output
                   || event?.response?.parts?.[0]?.text
-                  || event?.content?.parts?.[0]?.text
                   || (event?.actions?.at(-1))?.response?.parts?.[0]?.text;
         if (text) { reply = text; break; }
       } catch { /* skip malformed lines */ }

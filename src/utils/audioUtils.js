@@ -464,13 +464,15 @@ export function detectPitch(analyserNode, sampleRate) {
   const buffer = new Float32Array(bufferLength);
   analyserNode.getFloatTimeDomainData(buffer);
 
-  // RMS check  ·  lowered to be more sensitive to soft humming
+  // RMS gate — must be above noise floor before running autocorrelation.
+  // 0.01 rejects electrical hum (60/120 Hz mains interference) and quiet room noise
+  // while still accepting soft humming (typically 0.02+ RMS near a mic).
   let rms = 0;
   for (let i = 0; i < bufferLength; i++) {
     rms += buffer[i] * buffer[i];
   }
   rms = Math.sqrt(rms / bufferLength);
-  if (rms < 0.003) return null;
+  if (rms < 0.01) return null;
 
   // Autocorrelation
   const SIZE = bufferLength;
@@ -512,8 +514,9 @@ export function detectPitch(analyserNode, sampleRate) {
   // Reject frequencies outside vocal/instrument range
   if (frequency < 60 || frequency > 2000) return null;
 
-  // Confidence check  ·  raised to 0.58 to robustly filter out non-periodic room noise, AC hums, and fans
-  if (maxVal / correlation[0] < 0.50) return null;
+  // Confidence check — correlation peak must be strong relative to lag-0 energy.
+  // 0.65 filters out noise patterns that have weak or broad autocorrelation peaks.
+  if (maxVal / correlation[0] < 0.65) return null;
 
   return frequency;
 }

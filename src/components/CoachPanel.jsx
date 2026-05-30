@@ -2,6 +2,25 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 const WELCOME = "Namaskaram! I'm your Ālāpana practice coach. Tell me what you want to work on today — or ask me to plan a session based on your history.";
 
+const TOOL_PATTERNS = [
+  { pattern: /\b(gurukul|varisai|alankaram|kriti|gitam|lesson)\b/i, view: 'tutor' },
+  { pattern: /\b(raga kosha|raga library|kosha)\b/i, view: 'library' },
+  { pattern: /\b(viveka)\b/i, view: 'viveka' },
+  { pattern: /\b(dhwani)\b/i, view: 'listen' },
+  { pattern: /\b(transcribe|sangati)\b/i, view: 'transcribe' },
+  { pattern: /\b(shruthi|drone|shruti)\b/i, view: 'shruthi' },
+  { pattern: /\b(talam|rhythm|tala)\b/i, view: 'talam' },
+  { pattern: /\b(keyboard|swara keyboard)\b/i, view: 'keyboard' },
+  { pattern: /\b(sing.back|ear training)\b/i, view: 'singback' },
+];
+
+function detectToolNavigation(text) {
+  for (const { pattern, view } of TOOL_PATTERNS) {
+    if (pattern.test(text)) return view;
+  }
+  return null;
+}
+
 const getUserId = () => {
   try {
     let id = localStorage.getItem('alapana_user_id');
@@ -53,6 +72,12 @@ export default function CoachPanel({ onNavigate }) {
       const data = await res.json();
       const reply = data.reply || 'Sorry, I had trouble responding. Please try again.';
       setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+
+      // Auto-navigate if coach mentions a specific tool
+      if (onNavigate) {
+        const nav = detectToolNavigation(reply);
+        if (nav) setTimeout(() => onNavigate(nav), 800);
+      }
     } catch {
       setMessages(prev => [
         ...prev,

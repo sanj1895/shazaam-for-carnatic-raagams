@@ -2727,7 +2727,7 @@ function App() {
             </>
         )}
 
-        <CoachPanel />
+        <CoachPanel onNavigate={(view) => goTo(view)} />
     </>
   );
 }

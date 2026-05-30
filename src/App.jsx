@@ -49,6 +49,7 @@ const renderTabIcon = (id, className = "w-5 h-5") => {
 
 const FEATURES = [
     { id: 'tutor',     label: 'Gurukul',      desc: 'Classical vocal academy & scale flow', symbol: '📿',  mobileSymbol: '📿', level: 'beginner', highlight: true },
+    { id: 'avabodha',  label: 'Avabodha',     desc: 'Raga discernment — real-time and phrase-based', symbol: '◉',  mobileSymbol: '◉', level: 'intermediate', highlight: true },
     { id: 'listen',    label: 'Dhwani',       desc: 'Real-time raga listening from your singing', symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
     { id: 'viveka',    label: 'Viveka',       desc: 'Phrase-first sister tool for deeper discernment', symbol: '◎',  mobileSymbol: '◎', level: 'intermediate', highlight: true },
     { id: 'transcribe',label: 'Transcribe',   desc: 'Transcribe your sangatis against tala',    symbol: '✍︎', mobileSymbol: '✍︎', level: 'intermediate', highlight: true },
@@ -81,12 +82,12 @@ const APP_MODES = {
 
 const MODE_FEATURE_ORDER = {
     beginner: ['tutor', 'sadhana', 'shruthi', 'talam', 'keyboard', 'singback'],
-    musician: ['listen', 'viveka', 'transcribe', 'library', 'tutor', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam'],
+    musician: ['avabodha', 'transcribe', 'library', 'tutor', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam'],
 };
 
 const MODE_ALLOWED_VIEWS = {
     beginner: new Set(['home', 'tutor', 'sadhana', 'shruthi', 'talam', 'keyboard', 'singback']),
-    musician: new Set(['home', 'tutor', 'listen', 'viveka', 'transcribe', 'library', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam']),
+    musician: new Set(['home', 'avabodha', 'tutor', 'listen', 'viveka', 'transcribe', 'library', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam']),
 };
 
 function loadAppMode() {
@@ -431,7 +432,7 @@ function App() {
     const shruthiPreviewActive = hoveredWorkspacePreview === 'shruthi';
     const talamPreviewActive = hoveredWorkspacePreview === 'talam';
     const keyboardPreviewActive = hoveredWorkspacePreview === 'keyboard';
-    const dhwaniPreviewActive = hoveredWorkspacePreview === 'listen';
+    const avabodhaPreviewActive = hoveredWorkspacePreview === 'avabodha';
     const vivekaPreviewActive = hoveredWorkspacePreview === 'viveka';
     const libraryPreviewActive = hoveredWorkspacePreview === 'library';
     const melakartaPreviewActive = hoveredWorkspacePreview === 'melakarta';
@@ -775,7 +776,7 @@ function App() {
         return () => window.removeEventListener('hashchange', handleHashChange);
     }, [appMode]);
 
-    const TRACKED_TOOLS = new Set(['listen', 'viveka', 'transcribe', 'library', 'tutor', 'singback', 'keyboard', 'shruthi', 'talam']);
+    const TRACKED_TOOLS = new Set(['avabodha', 'listen', 'viveka', 'transcribe', 'library', 'tutor', 'singback', 'keyboard', 'shruthi', 'talam']);
 
     const promptSignIn = useCallback(() => {
         setMobileMenuOpen(false);
@@ -1164,7 +1165,7 @@ function App() {
                             key={id}
                             onClick={action}
                             className={`px-4 py-2 text-[11px] font-playfair font-bold tracking-[0.1em] uppercase transition-all duration-300 relative flex-shrink-0 ${
-                                view !== 'home' && view === id
+                                view !== 'home' && (view === id || (id === 'avabodha' && (view === 'listen' || view === 'viveka')))
                                     ? 'text-c-gold'
                                     : view === 'home' && showFeatures
                                         ? 'text-c-gold/90 hover:text-c-gold-light'
@@ -1172,7 +1173,7 @@ function App() {
                             }`}
                         >
                             {label}
-                            {view !== 'home' && view === id && (
+                            {view !== 'home' && (view === id || (id === 'avabodha' && (view === 'listen' || view === 'viveka'))) && (
                                 <span className="absolute bottom-1 left-4 right-4 h-[2px] bg-gradient-to-r from-transparent via-c-gold to-transparent" />
                             )}
                         </button>
@@ -1457,8 +1458,7 @@ function App() {
                                                                 { id: 'shruthi', label: 'Shruthi' },
                                                                 { id: 'talam', label: 'Talam' },
                                                                 { id: 'keyboard', label: 'Keyboard' },
-                                                                { id: 'listen', label: 'Dhwani' },
-                                                                { id: 'viveka', label: 'Viveka' },
+                                                                { id: 'avabodha', label: 'Avabodha' },
                                                             ].map(({ id, label }) => (
                                                                 <button
                                                                     key={id}
@@ -1689,14 +1689,14 @@ function App() {
 
                                                                 <div
                                                                     className="workspace-preview-panel group sm:min-h-[340px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
-                                                                    onMouseEnter={() => setHoveredWorkspacePreview('listen')}
-                                                                    onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'listen' ? null : current)}
+                                                                    onMouseEnter={() => setHoveredWorkspacePreview('avabodha')}
+                                                                    onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'avabodha' ? null : current)}
                                                                 >
                                                                     <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.18em]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
-                                                                        <span>Dhwani</span>
+                                                                        <span>Avabodha</span>
                                                                         <span className="inline-flex items-center gap-1 rounded-full px-2 py-1" style={{
-                                                                            color: dhwaniPreviewActive ? 'rgba(214,156,68,0.88)' : 'rgba(243,234,214,0.55)',
-                                                                            background: dhwaniPreviewActive ? 'rgba(255,214,134,0.05)' : 'transparent',
+                                                                            color: avabodhaPreviewActive ? 'rgba(214,156,68,0.88)' : 'rgba(243,234,214,0.55)',
+                                                                            background: avabodhaPreviewActive ? 'rgba(255,214,134,0.05)' : 'transparent',
                                                                             transition: 'all 280ms ease',
                                                                         }}>
                                                                             <span>Sister</span>
@@ -1736,12 +1736,12 @@ function App() {
                                                                                 />
                                                                             ))}
                                                                         </div>
-                                                                        <div className="mt-2 text-xs" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>{dhwaniPreviewActive ? 'Listening...' : 'Ready to listen'}</div>
+                                                                        <div className="mt-2 text-xs" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>{avabodhaPreviewActive ? 'Listening...' : 'Ready to listen'}</div>
                                                                         <div
                                                                             className="mt-1 text-[10px] uppercase tracking-[0.16em]"
-                                                                            style={{ color: !dhwaniPreviewActive ? 'rgba(243, 234, 214, 0.45)' : practiceDemoPitchState === 'match' ? '#d7a448' : '#c48154', transition: 'color 320ms ease' }}
+                                                                            style={{ color: !avabodhaPreviewActive ? 'rgba(243, 234, 214, 0.45)' : practiceDemoPitchState === 'match' ? '#d7a448' : '#c48154', transition: 'color 320ms ease' }}
                                                                         >
-                                                                            {dhwaniPreviewActive
+                                                                            {avabodhaPreviewActive
                                                                                 ? (practiceDemoPitchState === 'match' ? `Detected: ${practiceDemoDetectedSwara}` : `Pitch: ${practiceDemoDetectedSwara}`)
                                                                                 : 'Mic inactive'}
                                                                         </div>
@@ -2192,7 +2192,6 @@ function App() {
 
                                                         <div className="mt-6 sm:mt-10 grid grid-cols-2 gap-x-4 gap-y-5 max-w-[220px] text-c-gold">
                                                             {[
-                                                                { id: 'viveka',     label: 'Viveka' },
                                                                 { id: 'transcribe', label: 'Transcribe' },
                                                                 { id: 'tutor',      label: 'Gurukul' },
                                                             ].map(({ id, label }) => (
@@ -2545,8 +2544,8 @@ function App() {
                 )}
                 {view === 'transcribe' && <Tutor saFrequency={saFrequency} appMode={appMode} transcribeOnly={true} />}
 
-                {/* ══ LISTEN ══ */}
-                {view === 'listen' && (
+                {/* ══ AVABODHA (Dhwani + Viveka) ══ */}
+                {(view === 'listen' || view === 'avabodha') && (
                     <main className="w-full max-w-3xl mx-auto flex flex-col items-center gap-7 px-4 md:px-8 py-10 animate-fade-in">
                         <div className="w-full flex flex-col items-center gap-7">
 

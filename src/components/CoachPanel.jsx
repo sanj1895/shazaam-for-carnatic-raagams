@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 const WELCOME = "Namaskaram! I'm your Ālāpana practice coach. Tell me what you want to work on today — or ask me to plan a session based on your history.";
 
 const TOOL_PATTERNS = [
+  { pattern: /\b(avabodha)\b/i, view: 'avabodha' },
   { pattern: /\b(gurukul|varisai|alankaram|kriti|gitam|lesson)\b/i, view: 'tutor' },
   { pattern: /\b(raga kosha|raga library|kosha)\b/i, view: 'library' },
   { pattern: /\b(viveka)\b/i, view: 'viveka' },

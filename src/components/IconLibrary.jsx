@@ -360,6 +360,14 @@ export const TranscribeIcon = ({ className = "w-5 h-5" }) => (
     </svg>
 );
 
+export const AvabodhaIcon = ({ className = "w-5 h-5" }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="9" strokeOpacity="0.2" />
+        <circle cx="8.5" cy="12" r="3.5" />
+        <circle cx="15.5" cy="12" r="3.5" />
+    </svg>
+);
+
 export const VivekaIcon = ({ className = "w-5 h-5" }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12" cy="12" r="2" fill="#C8941F" stroke="none" />
@@ -381,6 +389,7 @@ export const CuratedIcon = ({ icon, className = "w-5 h-5" }) => {
     if (icon === 'tutor') return <GurukulIcon className={className} />;
     if (icon === 'keyboard') return <KeyboardIcon className={className} />;
     if (icon === 'singback') return <TargetIcon className={className} />;
+    if (icon === 'avabodha') return <AvabodhaIcon className={className} />;
     if (icon === 'listen') return <DhwaniIcon className={className} />;
     if (icon === 'viveka') return <VivekaIcon className={className} />;
     if (icon === 'transcribe') return <TranscribeIcon className={className} />;

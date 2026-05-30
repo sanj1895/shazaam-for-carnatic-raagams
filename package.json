@@ -1,6 +1,6 @@
 {
   "name": "alapana",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -14,7 +14,6 @@
     "@google/genai": "^2.7.0",
     "autoprefixer": "^10.4.22",
     "google-auth-library": "^10.6.2",
-    "ml5": "^0.12.2",
     "mongodb": "^7.2.0",
     "p5": "^2.1.1",
     "postcss": "^8.5.6",

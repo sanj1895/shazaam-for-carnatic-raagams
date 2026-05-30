@@ -1,8 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { detectPitch, extractPitchFrames, mixToMono, findBestSegment } from '../utils/audioUtils';
 import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
-// ml5/CREPE commented out for hackathon — restore after contest
-// /* global ml5 */
+
 import { identifyRagaWithAI } from '../utils/ragaIdentify';
 import SketchyRule from './SketchyRule';
 
@@ -197,10 +196,6 @@ function buildSwaraString(noteEvents, saHz) {
     return `${noteSeq}\n\nNOTE FREQUENCY SUMMARY (most→least frequent): ${freqSummary}\nASCENT NOTES (approx): ${ascentStr || 'n/a'}\nDESCENT NOTES (approx): ${descentStr || 'n/a'}`;
 }
 
-// ml5/CREPE upload analysis commented out for hackathon — restore after contest
-// const CREPE_URL = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
-// function runCREPEOnBuffer(ctx, segBuffer) { ... }
-
 export default function Viveka({ onSelectRaga }) {
     const [inputMode,  setInputMode]  = useState(MODE.RECORD);
     const [status,    setStatus]    = useState(STATUS.IDLE);
@@ -391,7 +386,6 @@ export default function Viveka({ onSelectRaga }) {
             statusRef.current = STATUS.RECORDING;
             setStatus(STATUS.RECORDING);
 
-            // Primary: autocorrelation pitch detector (ml5/CREPE commented out for hackathon)
             const source  = ctx.createMediaStreamSource(stream);
             const analyser = ctx.createAnalyser();
             analyser.fftSize = 2048;
@@ -435,11 +429,6 @@ export default function Viveka({ onSelectRaga }) {
                     framesRef.current.push(hz);
                 }
             }, FRAME_MS);
-
-            // ml5/CREPE mic path commented out for hackathon — restore after contest
-            // const pitchBuf = [];
-            // const CREPE_URL = '...';
-            // ml5.pitchDetection(CREPE_URL, ctx, stream, (err, pitchModel) => { ... });
 
             countTimer.current    = setInterval(() => setElapsed(e => e + 1), 1000);
             autoStopTimer.current = setTimeout(stopAndAnalyze, MAX_RECORD_SEC * 1000);
@@ -511,10 +500,6 @@ export default function Viveka({ onSelectRaga }) {
             setUploadProgress(28);
             setUploadStage('Extracting melody…');
 
-            // ml5/CREPE upload path commented out for hackathon — restore after contest
-            // ({ frames, rawCount } = await runCREPEOnBuffer(ctx, segBuf));
-
-            // Autocorrelation (primary for hackathon)
             setUploadProgress(50);
             const fb = await extractPitchFrames(audioBuffer, { startSample, endSample });
             let frames = fb.frames;
@@ -530,7 +515,7 @@ export default function Viveka({ onSelectRaga }) {
                 totalDuration:     (audioBuffer.length / audioBuffer.sampleRate).toFixed(1) + 's',
                 selectedSegment:   `${segInfo.startSec}s – ${segInfo.endSec}s`,
                 channels:          audioBuffer.numberOfChannels,
-                rawCREPEFrames:    rawCount,
+                rawFrames:         rawCount,
                 stableFrames:      frames.length,
             });
 

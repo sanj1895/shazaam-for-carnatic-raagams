@@ -3,8 +3,7 @@ import { identifyRagaWithAI } from '../utils/ragaIdentify';
 import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
 import { detectPitch } from '../utils/audioUtils';
 
-// ml5/CREPE commented out for hackathon — restore after contest
-// /* global ml5 */
+
 
 const RECORD_SECS = 30;
 const MIN_SCORE   = 4.0;
@@ -42,7 +41,6 @@ export default function GroqPanel({ saFrequency }) {
             setPanelState(STATES.RECORDING);
             setCountdown(RECORD_SECS);
 
-            // Autocorrelation pitch detection (ml5/CREPE commented out for hackathon)
             const source = audioCtx.createMediaStreamSource(mediaStream);
             const analyser = audioCtx.createAnalyser();
             analyser.fftSize = 2048;
@@ -80,9 +78,6 @@ export default function GroqPanel({ saFrequency }) {
                     }
                 }
             }, 80);
-
-            // ml5/CREPE path commented out for hackathon — restore after contest
-            // ml5.pitchDetection(modelUrl, audioCtx, mediaStream, (err, pitchModel) => { ... });
 
             let remaining = RECORD_SECS;
             timerRef.current = setInterval(() => {

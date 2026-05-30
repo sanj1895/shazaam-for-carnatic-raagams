@@ -399,7 +399,7 @@ export function findBestSegment(monoData, sampleRate, targetSec = 25) {
 
 /**
  * Autocorrelation pitch extraction on an offline AudioBuffer.
- * Used as the fallback path when CREPE isn't available.
+ * Processes a segment of an offline AudioBuffer and returns pitch frames.
  * Accepts { startSample, endSample } to process a specific segment;
  * omit both to process the full buffer.
  * Returns { frames, startSec, endSec }.

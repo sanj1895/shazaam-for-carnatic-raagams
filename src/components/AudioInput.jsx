@@ -2,8 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { PlayIcon, StopIcon } from './IconLibrary';
 import { detectPitch } from '../utils/audioUtils';
 
-// ml5/CREPE commented out for hackathon — restore after contest
-// /* global ml5 */
 
 const STATUS = {
   READY:    'ready',
@@ -84,7 +82,6 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
                 audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
             });
 
-            // Ensure context is running before ml5 touches it.
             await resumePromise;
 
             setStream(mediaStream);
@@ -122,12 +119,6 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
             }
         }, 80);
     };
-
-    // ml5/CREPE path commented out for hackathon — restore after contest
-    // const startPitchDetectionCREPE = (audioCtx, mediaStream) => {
-    //     const modelUrl = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models/models/pitch-detection/crepe/';
-    //     ml5.pitchDetection(modelUrl, audioCtx, mediaStream, (err, model) => { ... });
-    // };
 
     const handleSetSa = () => {
         if (currentFreq > 0) onSaSet(currentFreq);

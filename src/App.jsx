@@ -294,6 +294,9 @@ function buildHashForView(view, tutorTarget = null, mode = null, options = {}) {
     const { workspace = false } = options;
     if (workspace && mode) return `#/workspace/${encodeURIComponent(mode)}`;
     if (!view || view === 'home') return '#/home';
+    // learner-model is mode-agnostic — omit mode from URL so reloading it never
+    // silently switches the app from beginner to musician or vice versa.
+    if (view === 'learner-model') return '#/learner-model';
     if (view !== 'tutor') {
         return mode
             ? `#/${encodeURIComponent(mode)}/${encodeURIComponent(view)}`

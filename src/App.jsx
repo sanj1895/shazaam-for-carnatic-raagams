@@ -368,7 +368,10 @@ function App() {
     const guestUserId = useRef(getGuestUserId());
     const userId = (isSignedIn && user?.id) ? user.id : guestUserId.current;
 
-    const initialRoute = parseHashRoute();
+    // Restore last route on fresh load (no hash in URL)
+    const startingHash = window.location.hash ||
+        (() => { try { return localStorage.getItem('alapana_last_route') || ''; } catch { return ''; } })();
+    const initialRoute = parseHashRoute(startingHash);
     const [view, setView] = useState(() => initialRoute.view);
     const [appMode, setAppMode] = useState(loadAppMode);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -827,6 +830,7 @@ function App() {
         if (window.location.hash !== nextHash) {
             window.location.hash = nextHash;
         }
+        try { localStorage.setItem('alapana_last_route', nextHash); } catch {}
     };
 
     const goToAdvanced = (id, options = {}) => goTo(id, { ...options, modeOverride: 'musician' });
@@ -1468,7 +1472,7 @@ function App() {
 
                                                     <div className="hidden md:block mt-4 lg:mt-0 lg:pl-4">
                                                         <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/14 bg-[radial-gradient(circle_at_50%_24%,rgba(125,56,24,0.18),transparent_28%),linear-gradient(180deg,rgba(22,8,4,0.9),rgba(10,4,2,0.96))] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.04)] overflow-hidden">
-                                                            <div className="grid md:grid-cols-4">
+                                                            <div className="grid md:grid-cols-3">
                                                                 <div
                                                                     className="workspace-preview-panel group sm:min-h-[340px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('shruthi')}
@@ -1677,7 +1681,7 @@ function App() {
                                                                 </div>
 
                                                                 <div
-                                                                    className="workspace-preview-panel avabodha-preview-panel group sm:min-h-[340px] px-4 sm:px-5 py-4 sm:py-5 text-left hover:bg-[rgba(255,214,134,0.02)]"
+                                                                    className="workspace-preview-panel avabodha-preview-panel group md:col-span-3 sm:min-h-[340px] px-4 sm:px-5 py-4 sm:py-5 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('avabodha')}
                                                                     onMouseLeave={() => setHoveredWorkspacePreview((current) => current === 'avabodha' ? null : current)}
                                                                 >
@@ -1686,28 +1690,28 @@ function App() {
                                                                         <span className="ml-2 text-[8px] font-mono tracking-widest" style={{ color: 'rgba(214,156,68,0.45)' }}>Dhwani · Viveka</span>
                                                                     </div>
                                                                     <div className="mt-5 flex flex-col items-center gap-4">
-                                                                        <div className="flex items-center gap-7">
+                                                                        <div className="flex items-center gap-8">
                                                                             {/* Dhwani — real-time */}
                                                                             <div className="flex flex-col items-center gap-3">
-                                                                                <div className="relative h-[56px] w-[56px] overflow-hidden rounded-full">
+                                                                                <div className="relative h-[52px] w-[52px] overflow-hidden rounded-full">
                                                                                     <div className="absolute inset-0 rounded-full border border-c-gold/12" />
                                                                                     <div
-                                                                                        className="absolute inset-[9px] rounded-full border transition-all duration-300"
+                                                                                        className="absolute inset-[8px] rounded-full border transition-all duration-300"
                                                                                         style={{
                                                                                             borderColor: practiceDemoPitchState === 'match' ? 'rgba(199,139,34,0.48)' : 'rgba(199,139,34,0.22)',
                                                                                             boxShadow: avabodhaPreviewActive && practiceDemoPitchState === 'match' ? '0 0 14px rgba(199,139,34,0.18)' : 'none',
                                                                                         }}
                                                                                     />
                                                                                     <div
-                                                                                        className="avabodha-sweep absolute inset-[11px] rounded-full"
+                                                                                        className="avabodha-sweep absolute inset-[10px] rounded-full"
                                                                                         style={{
                                                                                             background: 'conic-gradient(from 0deg, transparent 0deg 304deg, rgba(247,214,134,0.48) 332deg 344deg, transparent 360deg)',
                                                                                             maskImage: 'radial-gradient(circle, transparent 59%, black 62%, black 69%, transparent 72%)',
                                                                                             WebkitMaskImage: 'radial-gradient(circle, transparent 59%, black 62%, black 69%, transparent 72%)',
                                                                                         }}
                                                                                     />
-                                                                                    <div className="absolute left-1/2 top-1/2 h-[16px] w-[16px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(93,43,18,0.96))] flex items-center justify-center">
-                                                                                        <div className="h-[6px] w-[6px] rounded-full bg-[#160603]" />
+                                                                                    <div className="absolute left-1/2 top-1/2 h-[14px] w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,#d7a448,rgba(93,43,18,0.96))] flex items-center justify-center">
+                                                                                        <div className="h-[5px] w-[5px] rounded-full bg-[#160603]" />
                                                                                     </div>
                                                                                 </div>
                                                                                 <div className="flex h-[18px] items-end gap-[2px]">
@@ -1724,16 +1728,16 @@ function App() {
 
                                                                             {/* Viveka — phrase */}
                                                                             <div className="flex flex-col items-center gap-3">
-                                                                                <div className="relative flex h-[56px] w-[56px] items-center justify-center overflow-hidden rounded-full">
+                                                                                <div className="relative flex h-[52px] w-[52px] items-center justify-center overflow-hidden rounded-full">
                                                                                     <div className="absolute inset-0 rounded-full border border-c-gold/12" />
                                                                                     <div
-                                                                                        className="avabodha-sweep absolute inset-[11px] rounded-full border border-c-gold/20"
+                                                                                        className="avabodha-sweep absolute inset-[10px] rounded-full border border-c-gold/20"
                                                                                         style={{
                                                                                             background: 'conic-gradient(from 0deg, rgba(247,214,134,0) 0deg 228deg, rgba(247,214,134,0.18) 266deg 296deg, rgba(247,214,134,0) 332deg 360deg)',
                                                                                             boxShadow: avabodhaPreviewActive ? 'inset 0 0 10px rgba(214,156,68,0.08)' : 'none',
                                                                                         }}
                                                                                     />
-                                                                                    <div className="absolute left-1/2 top-1/2 h-[16px] w-[16px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                                                                                    <div className="absolute left-1/2 top-1/2 h-[14px] w-[14px] -translate-x-1/2 -translate-y-1/2 rounded-full"
                                                                                         style={{ background: 'radial-gradient(circle at 35% 35%, rgba(246,219,164,0.95), rgba(205,144,48,0.85) 44%, rgba(99,44,18,0.95) 76%)' }} />
                                                                                 </div>
                                                                                 <div className="text-[9px] text-center" style={{ color: 'rgba(214,156,68,0.65)' }}>
@@ -2214,7 +2218,7 @@ function App() {
 
                                                     <div className="hidden md:block mt-4 lg:mt-0 lg:pl-4">
                                                         <div className="rounded-[20px] sm:rounded-[28px] border border-c-gold/14 bg-[radial-gradient(circle_at_54%_18%,rgba(122,54,23,0.18),transparent_26%),linear-gradient(180deg,rgba(20,8,4,0.9),rgba(10,4,2,0.96))] shadow-[inset_0_0_0_1px_rgba(199,139,34,0.04)] overflow-hidden">
-                                                            <div className="grid md:grid-cols-3">
+                                                            <div className="grid md:grid-cols-2 lg:grid-cols-[0.98fr_1.02fr]">
                                                                 <div
                                                                     className="workspace-preview-panel group min-h-[212px] sm:min-h-[286px] px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-[rgba(255,214,134,0.02)]"
                                                                     onMouseEnter={() => setHoveredWorkspacePreview('transcribe')}

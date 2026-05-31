@@ -2,6 +2,7 @@
 import { MongoClient } from 'mongodb';
 import { requireVerifiedUserId } from './_auth.js';
 import { enforceRateLimit } from './_rateLimit.js';
+import { applyApiSecurity, rejectDisallowedOrigin } from './_security.js';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 let cachedClient = null;
@@ -24,10 +25,9 @@ function computeMasteryLevel({ totalSessions, identifiedCount }) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  applyApiSecurity(req, res, ['GET', 'OPTIONS']);
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (rejectDisallowedOrigin(req, res)) return;
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
     return res.status(405).json({ error: 'Method not allowed' });

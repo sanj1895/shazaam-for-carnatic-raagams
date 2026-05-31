@@ -3,6 +3,7 @@ import { MongoClient } from 'mongodb';
 import { GoogleAuth, UserRefreshClient } from 'google-auth-library';
 import { requireVerifiedUserId } from './_auth.js';
 import { enforceRateLimit } from './_rateLimit.js';
+import { applyApiSecurity, rejectDisallowedOrigin } from './_security.js';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 let cachedClient = null;
@@ -249,10 +250,9 @@ function getAuthClient() {
 // This API handler only routes messages and pre-fetches MongoDB context for latency.
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  applyApiSecurity(req, res, ['POST', 'OPTIONS']);
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (rejectDisallowedOrigin(req, res)) return;
 
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');

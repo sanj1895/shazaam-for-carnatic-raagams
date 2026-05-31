@@ -12,6 +12,7 @@
 import { GoogleAuth, UserRefreshClient } from 'google-auth-library';
 import { requireVerifiedUserId } from './_auth.js';
 import { enforceRateLimit } from './_rateLimit.js';
+import { applyApiSecurity, rejectDisallowedOrigin } from './_security.js';
 
 const GCP_PROJECT  = process.env.GOOGLE_CLOUD_PROJECT  || 'project-24a53985-305d-4031-ae8';
 const GCP_LOCATION = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1';
@@ -33,10 +34,9 @@ function getAuthClient() {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin',  '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  applyApiSecurity(req, res, ['POST', 'OPTIONS']);
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (rejectDisallowedOrigin(req, res)) return;
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });

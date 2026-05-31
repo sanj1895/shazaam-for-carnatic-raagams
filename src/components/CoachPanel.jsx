@@ -43,6 +43,17 @@ async function authHeaders(getToken) {
   } catch { return {}; }
 }
 
+async function readApiError(res, fallback) {
+  let message = fallback;
+  try {
+    const data = await res.json();
+    if (typeof data?.error === 'string' && data.error.trim()) message = data.error;
+  } catch {}
+  if (res.status === 401) return 'Please sign in again to keep using your practice coach.';
+  if (res.status === 429) return 'You are sending requests too quickly. Please wait a moment and try again.';
+  return message;
+}
+
 // Build 3 personalised quick prompts from the learner model.
 // Falls back to generic prompts when there's no history yet.
 function buildDynamicPrompts(model) {
@@ -92,6 +103,7 @@ export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadh
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [quickPrompts, setQuickPrompts] = useState(() => buildDynamicPrompts(null));
+  const [panelNotice, setPanelNotice] = useState('');
   const userIdRef = useRef(userId);
   useEffect(() => { userIdRef.current = userId; }, [userId]);
   const bottomRef = useRef(null);
@@ -110,7 +122,14 @@ export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadh
     if (!open) return;
     authHeaders(getToken).then(headers =>
       fetch(`/api/learner-model?userId=${encodeURIComponent(userId || 'default')}`, { headers })
-        .then(r => r.ok ? r.json() : null)
+        .then(async (r) => {
+          if (!r.ok) {
+            setPanelNotice(await readApiError(r, 'Could not load your musical memory.'));
+            return null;
+          }
+          setPanelNotice('');
+          return r.json();
+        })
         .then(model => { if (model) setQuickPrompts(buildDynamicPrompts(model)); })
         .catch(() => {})
     );
@@ -118,6 +137,7 @@ export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadh
 
   const sendMessage = useCallback(async (text) => {
     if (!text || loading) return;
+    setPanelNotice('');
     setMessages(prev => [...prev, { role: 'user', content: text }]);
     setLoading(true);
     try {
@@ -132,6 +152,12 @@ export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadh
           sadhanaCompleted: sadhanaState?.completed || [],
         }),
       });
+      if (!res.ok) {
+        const errorText = await readApiError(res, 'Sorry, I had trouble responding. Please try again.');
+        setMessages(prev => [...prev, { role: 'assistant', content: errorText }]);
+        setPanelNotice(errorText);
+        return;
+      }
       const data = await res.json();
       const rawReply = data.reply || 'Sorry, I had trouble responding. Please try again.';
       const reply = cleanAssistantText(rawReply);
@@ -251,6 +277,15 @@ export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadh
               </button>
             </div>
           </div>
+
+          {panelNotice && (
+            <div
+              className="px-4 py-2 text-[11px] font-playfair"
+              style={{ borderBottom: '1px solid rgba(199,139,34,0.12)', color: '#f0d6a0', background: 'rgba(199,139,34,0.06)' }}
+            >
+              {panelNotice}
+            </div>
+          )}
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-3 space-y-3" style={{ scrollbarWidth: 'none' }}>

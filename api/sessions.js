@@ -3,6 +3,7 @@ import { MongoClient } from 'mongodb';
 import { GoogleAuth, UserRefreshClient } from 'google-auth-library';
 import { requireVerifiedUserId } from './_auth.js';
 import { enforceRateLimit } from './_rateLimit.js';
+import { applyApiSecurity, rejectDisallowedOrigin } from './_security.js';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -73,10 +74,9 @@ async function writeSessionViaMCP(userId, sessionData) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  applyApiSecurity(req, res, ['GET', 'POST', 'OPTIONS']);
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (rejectDisallowedOrigin(req, res)) return;
 
   if (!MONGODB_URI) return res.status(500).json({ error: 'MongoDB not configured.' });
 

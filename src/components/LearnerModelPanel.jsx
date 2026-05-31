@@ -55,6 +55,16 @@ async function authHeaders(getToken) {
   }
 }
 
+async function parseError(res, fallback) {
+  try {
+    const data = await res.json();
+    if (typeof data?.error === 'string' && data.error.trim()) fallback = data.error;
+  } catch {}
+  if (res.status === 401) return 'Please sign in again to view your musical memory.';
+  if (res.status === 429) return 'You are checking memory too often. Please pause for a moment.';
+  return fallback;
+}
+
 export default function LearnerModelPanel({ userId, getToken }) {
   const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
@@ -66,7 +76,7 @@ export default function LearnerModelPanel({ userId, getToken }) {
     try {
       const headers = await authHeaders(getToken);
       const res = await fetch(`/api/learner-model?userId=${encodeURIComponent(userId || 'default')}`, { headers });
-      if (!res.ok) throw new Error('Could not load your musical memory.');
+      if (!res.ok) throw new Error(await parseError(res, 'Could not load your musical memory.'));
       const json = await res.json();
       setData(json);
     } catch (e) {

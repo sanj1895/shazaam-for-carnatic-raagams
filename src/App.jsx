@@ -69,14 +69,14 @@ const APP_MODES = {
         id: 'beginner',
         label: 'Guided Basics',
         shortLabel: 'Basics',
-        subtitle: 'A quieter, guided path for shruti, swaras, tala, and early lessons.',
+        subtitle: 'A guided path for learners who want structure — shruti, swaras, lessons, and daily practice.',
         primaryCta: 'Start Guided Basics',
     },
     musician: {
         id: 'musician',
         label: 'Practice Workspace',
         shortLabel: 'Workspace',
-        subtitle: 'A modern Carnatic practice workspace for trained musicians.',
+        subtitle: 'A practice workspace for trained musicians — raga identification, transcription, and deep exploration.',
         primaryCta: 'Open Workspace',
     },
 };
@@ -989,28 +989,28 @@ function App() {
                                         About Ālāpana
                                     </p>
                                     <h2 className="font-playfair text-c-gold-light text-[2rem] sm:text-[2.7rem] md:text-[3.4rem] leading-[1.04] tracking-[-0.025em] font-medium mb-5">
-                                        A dedicated space for learning, practicing, and exploring Carnatic music.
+                                        A practice agent for self-directed Carnatic learners.
                                     </h2>
                                     <p className="text-[0.98rem] sm:text-[1.04rem] leading-[1.82] mb-4" style={{ color: 'rgba(243,234,214,0.88)' }}>
-                                        Carnatic learning is often split across many disconnected experiences: lessons in one place, practice in another, notation somewhere else, and raga study somewhere else again. Ālāpana brings those pieces together so your musical growth can happen inside one coherent environment.
+                                        Carnatic learners practicing alone often lack continuous teacher feedback, structured next steps, and memory across sessions. Without a guru available every day, practice becomes inconsistent — students repeat the same mistakes without realizing the pattern.
                                     </p>
                                     <p className="text-[0.95rem] sm:text-[1.01rem] leading-[1.82]" style={{ color: 'rgba(243,234,214,0.62)' }}>
-                                        Whether you are finding your Sa for the first time or refining a kriti, the goal is the same: give you a space where guidance, discipline, and exploration naturally support each other.
+                                        Ālāpana is a Gemini-powered practice agent that listens to your singing, remembers your history across sessions, and guides you toward what to work on next. So you never have to start from zero.
                                     </p>
 
                                     <div className="mt-8 grid gap-3 sm:grid-cols-3">
                                         {[
                                             {
-                                                title: 'Learn',
-                                                body: 'Build foundations with structured lessons, placement, and guided progression.',
+                                                title: 'Listens',
+                                                body: 'Identifies ragas from your voice in real time. Gives AI feedback on phrases. Transcribes what you sing.',
                                             },
                                             {
-                                                title: 'Practice',
-                                                body: 'Stay anchored with shruti, tala, sadhana, and tools that support daily work.',
+                                                title: 'Remembers',
+                                                body: 'Tracks every session. Knows which ragas you confuse, how consistently you practice, and where you need work.',
                                             },
                                             {
-                                                title: 'Explore',
-                                                body: 'Study ragas, relationships, transcription, and musical ideas in more depth.',
+                                                title: 'Guides',
+                                                body: 'A Gemini coach that reads your history and tells you exactly what to practice next — not generic advice, your specific patterns.',
                                             },
                                         ].map(({ title, body }) => (
                                             <div
@@ -1373,7 +1373,7 @@ function App() {
                                             Ālāpana
                                         </h1>
                                         <p className="mb-4 max-w-[18rem] text-[9px] sm:max-w-none sm:text-[11px] md:text-xs uppercase tracking-[0.18em] sm:tracking-[0.22em]" style={{ color: 'rgba(247, 214, 134, 0.76)' }}>
-                                            Learn, practice, and explore Carnatic music
+                                            Your solo Carnatic practice companion · listens, remembers, guides
                                         </p>
                                         {isSignedIn ? (
                                             <div className="flex flex-wrap items-center justify-center gap-3 mt-3">

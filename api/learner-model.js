@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   try {
     const userId = await requireVerifiedUserId(req, res);
     if (!userId) return;
-    if (!enforceRateLimit(req, res, { name: 'learner-model', userId, limit: 24, windowMs: 60_000 })) return;
+    if (!await enforceRateLimit(req, res, { name: 'learner-model', userId, limit: 24, windowMs: 60_000 })) return;
     const db = await getDb();
 
     const [ragaStatsRaw, confusionPairsRaw, timelineRaw, totalSessions] = await Promise.all([

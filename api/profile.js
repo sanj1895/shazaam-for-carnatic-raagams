@@ -28,13 +28,13 @@ export default async function handler(req, res) {
     const db = await getDb();
 
     if (req.method === 'GET') {
-      if (!enforceRateLimit(req, res, { name: 'profile-get', userId, limit: 30, windowMs: 60_000 })) return;
+      if (!await enforceRateLimit(req, res, { name: 'profile-get', userId, limit: 30, windowMs: 60_000 })) return;
       const profile = await db.collection('profiles').findOne({ userId }, { projection: { _id: 0 } });
       return res.status(200).json({ profile: profile || null });
     }
 
     if (req.method === 'POST') {
-      if (!enforceRateLimit(req, res, { name: 'profile-post', userId, limit: 20, windowMs: 60_000 })) return;
+      if (!await enforceRateLimit(req, res, { name: 'profile-post', userId, limit: 20, windowMs: 60_000 })) return;
       const { userId: _ignoredUserId, ...profileData } = req.body || {};
       await db.collection('profiles').updateOne(
         { userId },

@@ -261,7 +261,7 @@ export default async function handler(req, res) {
 
   const userId = await requireVerifiedUserId(req, res);
   if (!userId) return;
-  if (!enforceRateLimit(req, res, { name: 'coach', userId, limit: 24, windowMs: 60_000 })) return;
+  if (!await enforceRateLimit(req, res, { name: 'coach', userId, limit: 24, windowMs: 60_000 })) return;
   const { message, history = [], appMode, sadhanaCompleted } = req.body || {};
   if (!message || typeof message !== 'string' || message.length > 2000) {
     return res.status(400).json({ error: 'Invalid message.' });

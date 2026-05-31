@@ -201,11 +201,13 @@ async function buildUserContext(userId, appMode, sadhanaCompleted) {
     if (confusionPairsRaw.length > 0) {
       lines.push('  - When asked "what am I getting wrong" or "what do I keep messing up": cite the CONFUSION PATTERNS above by name. Do not suggest generic tools.');
     } else {
-      lines.push('  - When asked "what am I getting wrong": explain that confusion patterns are tracked from Viveka sessions, and you don\'t have enough data yet. Direct them to use Viveka to identify a few ragas so their patterns can be recorded.');
+      lines.push('  - When asked "what am I getting wrong": explain that confusion patterns build up from raga identification practice across tools like Viveka, Dhwani, Gurukul exercises, and Sing-Back. You don\'t have enough session data yet to identify specific patterns — suggest they practice with any tool that matches their current goal and patterns will emerge.');
     }
     if (ragaStats.length > 0) {
       const weak = ragaStats.find(r => r.masteryLevel === 'exploring' || r.masteryLevel === 'developing');
-      if (weak) lines.push(`  - When asked "what should I practice": prioritize ${weak.raga} (${weak.masteryLevel}) and address the top confusion pattern.`);
+      const strong = ragaStats.find(r => r.masteryLevel === 'stable' || r.masteryLevel === 'strong');
+      if (weak) lines.push(`  - When asked "what should I practice": recommend ${weak.raga} as the priority focus area. Suggest the tool that fits their session goal — Gurukul for structured learning, Viveka or Dhwani for identification practice, Shruthi + Keyboard for scale internalization, Sing-Back for ear training.`);
+      if (strong) lines.push(`  - ${strong.raga} is strong — can be used as a confidence builder or to explore more advanced prayogams.`);
     }
 
     return lines.join('\n') + '\n\n';

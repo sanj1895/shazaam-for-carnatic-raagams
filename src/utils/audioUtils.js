@@ -139,6 +139,106 @@ export function closeMicStream(stream, ctx) {
   unmuteAppAudio();
 }
 
+function autocorrelateDetailed(buffer, sampleRate, minRms = 0.01) {
+  const SIZE = buffer.length;
+  let rms = 0;
+  for (let i = 0; i < SIZE; i++) rms += buffer[i] * buffer[i];
+  rms = Math.sqrt(rms / SIZE);
+  if (rms < minRms) return null;
+
+  const correlation = new Float32Array(SIZE);
+  for (let lag = 0; lag < SIZE; lag++) {
+    let sum = 0;
+    for (let i = 0; i < SIZE - lag; i++) sum += buffer[i] * buffer[i + lag];
+    correlation[lag] = sum;
+  }
+
+  let d = 0;
+  while (d < SIZE && correlation[d] > correlation[d + 1]) d++;
+
+  let maxVal = -Infinity;
+  let maxPos = -1;
+  for (let i = d; i < SIZE; i++) {
+    if (correlation[i] > maxVal) {
+      maxVal = correlation[i];
+      maxPos = i;
+    }
+  }
+  if (maxPos <= 0) return null;
+
+  for (let pass = 0; pass < 2; pass++) {
+    const half = Math.round(maxPos / 2);
+    if (half <= d) break;
+    const halfFreq = sampleRate / half;
+    if (halfFreq < 60 || halfFreq > 2000) break;
+    if (correlation[half] >= maxVal * 0.80) {
+      maxPos = half;
+      maxVal = correlation[maxPos];
+    } else {
+      break;
+    }
+  }
+
+  const y1 = correlation[maxPos - 1] || 0;
+  const y2 = correlation[maxPos];
+  const y3 = correlation[maxPos + 1] || 0;
+  const denom = 2 * y2 - y1 - y3;
+  const refinedPos = denom !== 0 ? maxPos - (y3 - y1) / (2 * denom) : maxPos;
+
+  const frequency = sampleRate / refinedPos;
+  const confidence = correlation[0] > 0 ? maxVal / correlation[0] : 0;
+  if (frequency < 60 || frequency > 2000 || confidence < 0.22) return null;
+
+  return { freq: frequency, confidence, rms };
+}
+
+function yinEstimate(buffer, sampleRate) {
+  const threshold = 0.14;
+  const maxTau = Math.min(1024, Math.floor(sampleRate / 60));
+  const minTau = Math.max(2, Math.floor(sampleRate / 1400));
+  const yin = new Float32Array(maxTau + 1);
+
+  for (let tau = 1; tau <= maxTau; tau++) {
+    let sum = 0;
+    for (let i = 0; i < buffer.length - tau; i++) {
+      const diff = buffer[i] - buffer[i + tau];
+      sum += diff * diff;
+    }
+    yin[tau] = sum;
+  }
+
+  yin[0] = 1;
+  let runningSum = 0;
+  for (let tau = 1; tau <= maxTau; tau++) {
+    runningSum += yin[tau];
+    yin[tau] = runningSum === 0 ? 1 : (yin[tau] * tau) / runningSum;
+  }
+
+  let tauEstimate = -1;
+  let bestTau = minTau;
+  for (let tau = minTau; tau <= maxTau; tau++) {
+    if (yin[tau] < yin[bestTau]) bestTau = tau;
+    if (yin[tau] < threshold) {
+      while (tau + 1 <= maxTau && yin[tau + 1] < yin[tau]) tau++;
+      tauEstimate = tau;
+      break;
+    }
+  }
+
+  if (tauEstimate === -1) {
+    if (yin[bestTau] > 0.34) return null;
+    tauEstimate = bestTau;
+  }
+
+  const freq = sampleRate / tauEstimate;
+  if (!Number.isFinite(freq) || freq < 60 || freq > 1500) return null;
+
+  return {
+    freq,
+    confidence: Math.max(0, 1 - yin[tauEstimate]),
+  };
+}
+
 /**
  * Play a single note using a triangle wave + octave harmonic.
  * Returns duration in ms so callers can chain notes.
@@ -505,63 +605,20 @@ export function detectPitch(analyserNode, sampleRate, minRms = 0.01) {
   const bufferLength = analyserNode.fftSize;
   const buffer = new Float32Array(bufferLength);
   analyserNode.getFloatTimeDomainData(buffer);
+  const yin = yinEstimate(buffer, sampleRate);
+  const acf = autocorrelateDetailed(buffer, sampleRate, minRms);
 
-  let rms = 0;
-  for (let i = 0; i < bufferLength; i++) rms += buffer[i] * buffer[i];
-  rms = Math.sqrt(rms / bufferLength);
-  if (rms < minRms) return null;
-
-  const SIZE = bufferLength;
-  const correlation = new Float32Array(SIZE);
-  for (let lag = 0; lag < SIZE; lag++) {
-    let sum = 0;
-    for (let i = 0; i < SIZE - lag; i++) sum += buffer[i] * buffer[i + lag];
-    correlation[lag] = sum;
-  }
-
-  // Skip the initial decay to find the first trough.
-  let d = 0;
-  while (d < SIZE && correlation[d] > correlation[d + 1]) d++;
-
-  // Find the raw correlation peak (unnormalized).
-  // Unnormalized values sum more terms at shorter lags, giving a small natural
-  // preference to higher frequencies — which is correct behaviour.
-  let maxVal = -Infinity;
-  let maxPos = -1;
-  for (let i = d; i < SIZE; i++) {
-    if (correlation[i] > maxVal) { maxVal = correlation[i]; maxPos = i; }
-  }
-  if (maxPos <= 0) return null;
-
-  // Subharmonic suppression.
-  // A voiced signal at frequency F has autocorrelation peaks at lags T, 2T, 3T…
-  // The raw max often lands on 2T (half the frequency, one octave down).
-  // If the half-lag candidate has ≥ 80 % of the current peak's strength, it is
-  // a valid alternative — prefer it (higher pitch = true fundamental).
-  // Repeat up to twice to also catch sub-subharmonic cases (4× subharmonic).
-  for (let pass = 0; pass < 2; pass++) {
-    const half = Math.round(maxPos / 2);
-    if (half <= d) break;
-    const halfFreq = sampleRate / half;
-    if (halfFreq < 60 || halfFreq > 2000) break;
-    if (correlation[half] >= maxVal * 0.80) {
-      maxPos = half;
-      maxVal = correlation[maxPos];
-    } else {
-      break;
+  if (yin && acf) {
+    const agreementCents = Math.abs(1200 * Math.log2(yin.freq / acf.freq));
+    if (agreementCents <= 70) {
+      return yin.confidence >= acf.confidence ? yin.freq : acf.freq;
     }
+    if (yin.confidence >= 0.36) return yin.freq;
+    if (acf.confidence >= 0.36) return acf.freq;
+    return yin.confidence >= acf.confidence ? yin.freq : acf.freq;
   }
 
-  // Parabolic interpolation for sub-sample accuracy.
-  const y1 = correlation[maxPos - 1] || 0;
-  const y2 = correlation[maxPos];
-  const y3 = correlation[maxPos + 1] || 0;
-  const denom = 2 * y2 - y1 - y3;
-  const refinedPos = denom !== 0 ? maxPos - (y3 - y1) / (2 * denom) : maxPos;
-
-  const frequency = sampleRate / refinedPos;
-  if (frequency < 60 || frequency > 2000) return null;
-  if (maxVal / correlation[0] < 0.50) return null;
-
-  return frequency;
+  if (yin && yin.confidence >= 0.24) return yin.freq;
+  if (acf && acf.confidence >= 0.24) return acf.freq;
+  return null;
 }

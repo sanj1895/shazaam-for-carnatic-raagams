@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { detectPitch, extractPitchFrames, mixToMono, findBestSegment, muteAppAudio, unmuteAppAudio } from '../utils/audioUtils';
+import { buildMicChain, closeMicStream, detectPitch, extractPitchFrames, mixToMono, findBestSegment, openMicStream } from '../utils/audioUtils';
 import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
 
 import { identifyRagaWithAI } from '../utils/ragaIdentify';
@@ -228,15 +228,10 @@ export default function Viveka({ onSelectRaga }) {
         clearInterval(pitchTimer.current);
         clearInterval(countTimer.current);
         clearTimeout(autoStopTimer.current);
-        streamRef.current?.getTracks().forEach(t => t.stop());
+        closeMicStream(streamRef.current, audioCtxRef.current);
         streamRef.current = null;
         analyserRef.current = null;
-        const ctx = audioCtxRef.current;
         audioCtxRef.current = null;
-        if (ctx && ctx.state !== 'closed') {
-            ctx.close().catch(() => {});
-        }
-        unmuteAppAudio();
     }, []);
 
     const runAnalysis = useCallback(async (frames) => {
@@ -385,29 +380,14 @@ export default function Viveka({ onSelectRaga }) {
         setElapsed(0);
 
         try {
-            // Kick off resume synchronously during the user gesture so iOS Safari allows it.
-            muteAppAudio();
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const stream = await openMicStream();
+            const { ctx, analyser } = buildMicChain(stream, { fftSize: 4096, gain: 4.0 });
             audioCtxRef.current = ctx;
-            const resumePromise = ctx.state === 'suspended' ? ctx.resume() : Promise.resolve();
-
-            const stream = await navigator.mediaDevices.getUserMedia({
-                audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
-            });
-            await resumePromise.catch(() => {});
+            if (ctx.state === 'suspended') await ctx.resume().catch(() => {});
             streamRef.current = stream;
 
             statusRef.current = STATUS.RECORDING;
             setStatus(STATUS.RECORDING);
-
-            const source   = ctx.createMediaStreamSource(stream);
-            const gainNode = ctx.createGain();
-            gainNode.gain.value = 4.0;
-            const analyser = ctx.createAnalyser();
-            analyser.fftSize = 4096;
-            analyser.smoothingTimeConstant = 0;
-            source.connect(gainNode);
-            gainNode.connect(analyser);
             analyserRef.current = analyser;
 
             // ── Calibration: measure ambient noise floor ───────────────────
@@ -436,7 +416,7 @@ export default function Viveka({ onSelectRaga }) {
             // accepts singing which is typically 5–15× above the noise floor).
             const sorted = [...calibRMS].sort((a, b) => a - b);
             const p75 = sorted[Math.floor(sorted.length * 0.75)] ?? 0.002;
-            dynamicGateRef.current = Math.max(p75 * 2.5, 0.003);
+            dynamicGateRef.current = Math.max(p75 * 2, 0.0025);
             // ──────────────────────────────────────────────────────────────
 
             statusRef.current = STATUS.RECORDING;
@@ -907,6 +887,18 @@ export default function Viveka({ onSelectRaga }) {
                         {guidanceMsg && (
                             <div className="w-full bg-c-gold/5 border border-c-gold/20 rounded-lg px-4 py-2.5 text-[11px] text-c-cream-dark font-playfair italic text-center">
                                 {guidanceMsg}
+                            </div>
+                        )}
+
+                        {/* Memory callout on ambiguous — connect the moment to the learner model */}
+                        {results.resultType === 'ambiguous' && results.ambiguousWith && (
+                            <div className="w-full bg-amber-700/6 border border-amber-700/20 rounded-lg px-4 py-2.5 flex items-center gap-2.5">
+                                <svg className="w-3.5 h-3.5 text-amber-700 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                                </svg>
+                                <p className="text-[10px] text-amber-800 font-mono leading-relaxed">
+                                    This confusion is saved to your musical memory — ask your coach to help you tell {results.matches[0]?.raagam} and {results.ambiguousWith} apart.
+                                </p>
                             </div>
                         )}
 

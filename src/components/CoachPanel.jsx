@@ -43,11 +43,55 @@ async function authHeaders(getToken) {
   } catch { return {}; }
 }
 
+// Build 3 personalised quick prompts from the learner model.
+// Falls back to generic prompts when there's no history yet.
+function buildDynamicPrompts(model) {
+  if (!model) {
+    return [
+      'What should I practice today?',
+      'Plan a 30-min beginner session',
+      'How does Carnatic raga practice work?',
+    ];
+  }
+  const { confusionPairs = [], ragaStats = [] } = model;
+  const prompts = [];
+
+  // 1. Top confusion pair → most urgent problem to fix
+  if (confusionPairs[0]) {
+    const { raga, confusedWith, count } = confusionPairs[0];
+    prompts.push(`Help me stop confusing ${raga} and ${confusedWith} (${count}× so far)`);
+  }
+
+  // 2. Stale developing raga → return to something in progress
+  const stale = ragaStats.find(r =>
+    (r.masteryLevel === 'developing' || r.masteryLevel === 'exploring') &&
+    r.lastPracticed &&
+    Date.now() - new Date(r.lastPracticed).getTime() > 3 * 24 * 60 * 60 * 1000
+  );
+  if (stale) {
+    prompts.push(`I haven't practiced ${stale.raga} in a while — what should I focus on?`);
+  }
+
+  // 3. Strongest raga → advance it, or generic next-step
+  const strong = ragaStats.find(r => r.masteryLevel === 'stable' || r.masteryLevel === 'strong');
+  if (strong && prompts.length < 2) {
+    prompts.push(`I want to go deeper on ${strong.raga} — what's my next challenge?`);
+  }
+
+  // Fill remaining slots with useful generics
+  if (prompts.length === 0) prompts.push('What should I practice today?');
+  if (prompts.length < 2)   prompts.push('Plan a 20-min session based on my weak areas');
+  if (prompts.length < 3)   prompts.push('What am I repeatedly getting wrong?');
+
+  return prompts.slice(0, 3);
+}
+
 export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadhanaState }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([{ role: 'assistant', content: WELCOME }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [quickPrompts, setQuickPrompts] = useState(() => buildDynamicPrompts(null));
   const userIdRef = useRef(userId);
   useEffect(() => { userIdRef.current = userId; }, [userId]);
   const bottomRef = useRef(null);
@@ -60,6 +104,17 @@ export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadh
       setTimeout(() => inputRef.current?.focus(), 80);
     }
   }, [open, messages]);
+
+  // Fetch learner model once when the panel first opens to personalise quick prompts
+  useEffect(() => {
+    if (!open) return;
+    authHeaders(getToken).then(headers =>
+      fetch(`/api/learner-model?userId=${encodeURIComponent(userId || 'default')}`, { headers })
+        .then(r => r.ok ? r.json() : null)
+        .then(model => { if (model) setQuickPrompts(buildDynamicPrompts(model)); })
+        .catch(() => {})
+    );
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const sendMessage = useCallback(async (text) => {
     if (!text || loading) return;
@@ -232,19 +287,15 @@ export default function CoachPanel({ userId, getToken, onNavigate, appMode, sadh
             <div ref={bottomRef} />
           </div>
 
-          {/* Quick prompts (shown only at start) */}
+          {/* Quick prompts — personalised from MongoDB learner model */}
           {messages.length === 1 && (
-            <div className="px-3 pb-2 flex flex-wrap gap-1.5 flex-shrink-0">
-              {[
-                'Plan a 30-min session',
-                'What should I practice today?',
-                'I want to improve Bhairavi',
-              ].map(prompt => (
+            <div className="px-3 pb-2 flex flex-col gap-1.5 flex-shrink-0">
+              {quickPrompts.map(prompt => (
                 <button
                   key={prompt}
-                  onClick={() => { setInput(prompt); setTimeout(() => inputRef.current?.focus(), 50); }}
-                  className="text-[10.5px] px-2.5 py-1 rounded-full transition-colors"
-                  style={{ background: 'rgba(199,139,34,0.12)', border: '1px solid rgba(199,139,34,0.25)', color: 'rgba(199,139,34,0.9)' }}
+                  onClick={() => { setInput(''); sendMessage(prompt); }}
+                  className="text-left text-[11px] px-3 py-2 rounded-xl transition-colors leading-snug"
+                  style={{ background: 'rgba(199,139,34,0.10)', border: '1px solid rgba(199,139,34,0.22)', color: 'rgba(199,139,34,0.92)' }}
                 >
                   {prompt}
                 </button>

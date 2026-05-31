@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { PlayIcon, StopIcon } from './IconLibrary';
-import { detectPitch, muteAppAudio, unmuteAppAudio } from '../utils/audioUtils';
+import { buildMicChain, closeMicStream, detectPitch, openMicStream } from '../utils/audioUtils';
 
 
 const STATUS = {
@@ -21,15 +21,24 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
 
     const onPitchDetectedRef = useRef(onPitchDetected);
     const activeOscRef = useRef(null);
+    const audioCtxRef = useRef(null);
+    const dynamicGateRef = useRef(0.008);
 
     useEffect(() => { onPitchDetectedRef.current = onPitchDetected; }, [onPitchDetected]);
     useEffect(() => {
         return () => {
             stopReferenceTone();
-            clearInterval(intervalRef.current);
-            unmuteAppAudio();
+            stopListening();
         };
     }, []);
+
+    const stopListening = () => {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+        closeMicStream(stream, audioCtxRef.current);
+        audioCtxRef.current = null;
+        setStream(null);
+    };
 
     const playReferenceTone = (freq) => {
         stopReferenceTone();
@@ -73,20 +82,15 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
 
     const startAudio = async () => {
         try {
-            // Mute drone/notes before opening mic so they don't bleed into detection.
-            muteAppAudio();
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const resumePromise = audioCtx.state === 'suspended' ? audioCtx.resume() : Promise.resolve();
+            const mediaStream = await openMicStream();
+            const { ctx, analyser } = buildMicChain(mediaStream, { fftSize: 4096, gain: 3.2 });
+            if (ctx.state === 'suspended') await ctx.resume().catch(() => {});
 
-            const mediaStream = await navigator.mediaDevices.getUserMedia({
-                audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
-            });
-
-            await resumePromise;
-
+            audioCtxRef.current = ctx;
             setStream(mediaStream);
             onStart?.();
-            startPitchDetection(audioCtx, mediaStream);
+            await calibrateMic(analyser);
+            startPitchDetection(ctx, analyser);
         } catch (err) {
             setStatus(STATUS.ERROR);
             setStatusMsg(err.name === 'NotAllowedError'
@@ -97,21 +101,30 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
 
     const intervalRef = useRef(null);
 
-    const startPitchDetection = (audioCtx, mediaStream) => {
+    const calibrateMic = async (analyser) => {
+        const rmsValues = [];
+        const interval = setInterval(() => {
+            const buffer = new Float32Array(analyser.fftSize);
+            analyser.getFloatTimeDomainData(buffer);
+            let sq = 0;
+            for (let i = 0; i < buffer.length; i++) sq += buffer[i] * buffer[i];
+            rmsValues.push(Math.sqrt(sq / buffer.length));
+        }, 80);
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        clearInterval(interval);
+
+        const sorted = rmsValues.sort((a, b) => a - b);
+        const p75 = sorted[Math.floor(sorted.length * 0.75)] ?? 0.002;
+        dynamicGateRef.current = Math.max(p75 * 2, 0.0025);
+    };
+
+    const startPitchDetection = (audioCtx, analyser) => {
         setStatus(STATUS.LISTENING);
         setStatusMsg('Sing or hum clearly');
 
-        const source = audioCtx.createMediaStreamSource(mediaStream);
-        const gainNode = audioCtx.createGain();
-        gainNode.gain.value = 2.5;
-        const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 4096;
-        analyser.smoothingTimeConstant = 0;
-        source.connect(gainNode);
-        gainNode.connect(analyser);
-
         intervalRef.current = setInterval(() => {
-            const hz = detectPitch(analyser, audioCtx.sampleRate);
+            const hz = detectPitch(analyser, audioCtx.sampleRate, dynamicGateRef.current);
             if (hz) {
                 setCurrentFreq(hz);
                 onPitchDetectedRef.current?.(hz);

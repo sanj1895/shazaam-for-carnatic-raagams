@@ -102,6 +102,21 @@ export default function LearnerModelPanel({ userId, getToken }) {
   const maxCount = Math.max(...allDays.map(d => d.count), 1);
   const isEmpty = ragaStats.length === 0 && confusionPairs.length === 0;
 
+  // Derive 1-3 "next focus" recommendations from the learner model
+  const nextFocus = [];
+  if (confusionPairs[0]) {
+    const { raga, confusedWith, count } = confusionPairs[0];
+    nextFocus.push({ text: `Distinguish ${raga} from ${confusedWith} — you've confused them ${count} time${count !== 1 ? 's' : ''}`, urgency: 'high' });
+  }
+  const stale = ragaStats.find(r =>
+    (r.masteryLevel === 'developing' || r.masteryLevel === 'exploring') &&
+    r.lastPracticed &&
+    Date.now() - new Date(r.lastPracticed).getTime() > 3 * 24 * 60 * 60 * 1000
+  );
+  if (stale) nextFocus.push({ text: `Return to ${stale.raga} — ${daysSince(stale.lastPracticed)} and still developing`, urgency: 'medium' });
+  const ready = ragaStats.find(r => r.masteryLevel === 'stable' && r.identifiedCount >= 3);
+  if (ready) nextFocus.push({ text: `Advance ${ready.raga} — you're stable here, try a more complex phrase`, urgency: 'low' });
+
   return (
     <main className="w-full max-w-3xl mx-auto flex flex-col gap-8 px-4 md:px-8 py-10 animate-fade-in">
 
@@ -136,6 +151,32 @@ export default function LearnerModelPanel({ userId, getToken }) {
         ))}
       </div>
 
+      {/* ── Your Next Focus ── */}
+      {nextFocus.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <h2 className="font-playfair text-base font-semibold text-c-cream-dim">What to Work on Next</h2>
+          <div className="flex flex-col gap-2">
+            {nextFocus.map((item, i) => (
+              <div key={i} className={`flex items-start gap-3 rounded-xl px-4 py-3 border ${
+                item.urgency === 'high'   ? 'bg-amber-700/8 border-amber-700/25' :
+                item.urgency === 'medium' ? 'bg-c-card border-c-border' :
+                                            'bg-c-card border-c-border'
+              }`}>
+                <span className={`text-base leading-none mt-0.5 flex-shrink-0 ${
+                  item.urgency === 'high' ? 'text-amber-700' : item.urgency === 'medium' ? 'text-c-gold' : 'text-emerald-700'
+                }`}>
+                  {item.urgency === 'high' ? '→' : item.urgency === 'medium' ? '↩' : '↑'}
+                </span>
+                <p className="text-sm text-c-cream-dim font-playfair leading-snug">{item.text}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-[9px] font-mono text-c-cream-dark/60 uppercase tracking-widest">
+            Derived from your MongoDB practice history
+          </p>
+        </section>
+      )}
+
       {isEmpty ? (
         <div className="w-full bg-c-card border border-c-border rounded-xl p-8 flex flex-col items-center gap-3 text-center">
           <p className="font-playfair text-c-cream-dim italic">Your musical memory is just beginning.</p>
@@ -153,7 +194,7 @@ export default function LearnerModelPanel({ userId, getToken }) {
           {ragaStats.length > 0 && (
             <section className="flex flex-col gap-3">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Raga Mastery</h2>
+                <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Your Progress by Raga</h2>
                 <div className="flex items-center gap-3 flex-wrap">
                   {['strong', 'stable', 'developing', 'exploring'].map(level => (
                     <div key={level} className="flex items-center gap-1">
@@ -216,9 +257,9 @@ export default function LearnerModelPanel({ userId, getToken }) {
           {confusionPairs.length > 0 && (
             <section className="flex flex-col gap-3">
               <div className="flex flex-col gap-0.5">
-                <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Common Confusions</h2>
+                <h2 className="font-playfair text-base font-semibold text-c-cream-dim">What You Keep Getting Wrong</h2>
                 <p className="text-[10px] text-c-cream-dark font-mono">
-                  MongoDB tracks these patterns · your coach cites them when you practice
+                  MongoDB remembers these · your coach addresses them directly
                 </p>
               </div>
 
@@ -261,9 +302,9 @@ export default function LearnerModelPanel({ userId, getToken }) {
           {/* ── Practice Timeline ── */}
           <section className="flex flex-col gap-3">
             <div className="flex flex-col gap-0.5">
-              <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Practice Timeline</h2>
+              <h2 className="font-playfair text-base font-semibold text-c-cream-dim">How Consistently You're Practicing</h2>
               <p className="text-[10px] text-c-cream-dark font-mono">
-                Each column is one day · bar height = number of sessions that day
+                Each column is one day · taller bar = more sessions
               </p>
             </div>
 

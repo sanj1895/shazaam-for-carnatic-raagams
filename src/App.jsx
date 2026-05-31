@@ -421,6 +421,8 @@ function App() {
     const [gurukulPreviewCategoryIndex, setGurukulPreviewCategoryIndex] = useState(1);
     const [gurukulPreviewMenuOpen, setGurukulPreviewMenuOpen] = useState(false);
     const [gurukulPreviewSnippetIndex, setGurukulPreviewSnippetIndex] = useState(0);
+    const [workspaceModel, setWorkspaceModel] = useState(null);
+    const [workspaceModelLoading, setWorkspaceModelLoading] = useState(false);
 
     const visibleFeatures = MODE_FEATURE_ORDER[appMode]
         .map((id) => FEATURES.find((feature) => feature.id === id))
@@ -430,6 +432,7 @@ function App() {
     const sessionFreq = useRef({});
     const transcribeWaveBarRefs = useRef([]);
     const transcribeWaveFrameRef = useRef(null);
+    const workspaceModelFetched = useRef(false);
     const step = !isListening ? 1 : !saFrequency ? 2 : 3;
     const isPreviewOpen = view === 'home' && showFeatures && !showWorkspaceSections;
     const isWorkspaceExpanded = view === 'home' && showFeatures && showWorkspaceSections;
@@ -678,6 +681,86 @@ function App() {
             localStorage.setItem('alapana_app_mode', appMode);
         } catch {}
     }, [appMode]);
+
+    // Fetch learner model once when the workspace first expands so the guided
+    // blocks at the top of the workspace can show real session data.
+    useEffect(() => {
+        if (!isWorkspaceExpanded || !isSignedIn || !userId || workspaceModelFetched.current) return;
+        workspaceModelFetched.current = true;
+        setWorkspaceModelLoading(true);
+        const load = async () => {
+            try {
+                const token = getToken ? await getToken() : null;
+                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                const res = await fetch(`/api/learner-model?userId=${encodeURIComponent(userId)}`, { headers });
+                if (res.ok) setWorkspaceModel(await res.json());
+            } catch { /* non-fatal — workspace still renders without model data */ }
+            finally { setWorkspaceModelLoading(false); }
+        };
+        load();
+    }, [isWorkspaceExpanded, isSignedIn, userId, getToken]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Derive the three guided workspace blocks from the learner model.
+    // Each block only renders when real data supports it — nothing is fabricated.
+    const workspaceBlocks = workspaceModel ? (() => {
+        const { confusionPairs = [], ragaStats = [] } = workspaceModel;
+        const msDay = 86400000;
+        const daysAgo = (d) => d ? Math.floor((Date.now() - new Date(d).getTime()) / msDay) : null;
+
+        // Recommendation: highest-priority single exercise
+        let recommendation = null;
+        if (confusionPairs[0]) {
+            const { raga, confusedWith, count } = confusionPairs[0];
+            recommendation = {
+                label: 'Top confusion pattern',
+                text: `You have confused ${raga} and ${confusedWith} ${count} time${count !== 1 ? 's' : ''}. Isolating the diagnostic phrase is the priority today.`,
+                cta: 'Practice in Viveka',
+                action: 'viveka',
+            };
+        } else {
+            const stale = ragaStats.find(r =>
+                (r.masteryLevel === 'developing' || r.masteryLevel === 'exploring') &&
+                r.lastPracticed && Date.now() - new Date(r.lastPracticed).getTime() > 3 * msDay
+            );
+            if (stale) {
+                const d = daysAgo(stale.lastPracticed);
+                recommendation = {
+                    label: 'Return to neglected raga',
+                    text: `${stale.raga} — ${d} day${d !== 1 ? 's' : ''} since last practice, still ${stale.masteryLevel}. Return before the scale shape fades.`,
+                    cta: 'Practice in Gurukul',
+                    action: 'tutor',
+                };
+            } else {
+                const ready = ragaStats.find(r => r.masteryLevel === 'stable' && r.identifiedCount >= 3);
+                if (ready) {
+                    recommendation = {
+                        label: 'Ready to advance',
+                        text: `${ready.raga} is stable with ${ready.totalSessions} sessions. Push it further with gamakam phrases.`,
+                        cta: 'Open Gurukul',
+                        action: 'tutor',
+                    };
+                }
+            }
+        }
+
+        // Focus items: additional stale or ready ragas not already in the recommendation
+        const focusItems = [];
+        ragaStats.forEach(r => {
+            if (recommendation?.text?.includes(r.raga)) return;
+            const d = daysAgo(r.lastPracticed);
+            if ((r.masteryLevel === 'developing' || r.masteryLevel === 'exploring') && d !== null && d > 3) {
+                focusItems.push({ icon: '↩', text: `${r.raga} — ${d}d ago, still ${r.masteryLevel}`, action: 'tutor', urgency: d > 7 ? 'high' : 'medium' });
+            } else if (r.masteryLevel === 'stable' && r.identifiedCount >= 3) {
+                focusItems.push({ icon: '↑', text: `${r.raga} — stable, ready for advanced phrases`, action: 'tutor', urgency: 'low' });
+            }
+        });
+
+        return {
+            recommendation,
+            confusionPairs: confusionPairs.slice(0, 3),
+            focusItems: focusItems.slice(0, 3),
+        };
+    })() : null;
 
     const handleReset = () => {
         setDetectedNotes([]);
@@ -1440,19 +1523,116 @@ function App() {
                                 >
                                     <div className="pb-16">
 
-                                        {/* ── Recommended next step banner ── */}
-                                        <div className="mt-4 sm:mt-5 px-1.5 sm:px-2 md:px-3">
-                                            <div className="rounded-[20px] border border-c-gold/20 bg-[linear-gradient(135deg,rgba(199,139,34,0.07),rgba(7,3,2,0.94))] px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
-                                                <div className="flex-1">
-                                                    <p className="text-[9px] uppercase tracking-[0.28em] text-c-gold/60 font-mono mb-1">Recommended next step</p>
-                                                    <p className="text-sm font-playfair text-c-cream-dim leading-relaxed">Open your coach <span className="text-c-gold">🪈</span> for a personalized next exercise — or review your memory to see what you keep getting wrong.</p>
+                                        {/* ══ GUIDED PRACTICE BLOCKS ══ */}
+                                        <div className="mt-4 sm:mt-5 flex flex-col gap-3 px-1.5 sm:px-2 md:px-3">
+
+                                            {/* Block 1 — Recommended next step */}
+                                            {workspaceModelLoading ? (
+                                                <div className="rounded-[20px] border border-c-gold/12 bg-[rgba(14,6,3,0.94)] px-5 py-5 animate-pulse">
+                                                    <div className="h-2.5 w-36 rounded-full bg-c-gold/10 mb-3" />
+                                                    <div className="h-4 w-4/5 rounded-full bg-c-gold/6 mb-2" />
+                                                    <div className="h-4 w-3/5 rounded-full bg-c-gold/6 mb-4" />
+                                                    <div className="h-8 w-40 rounded-xl bg-c-gold/8" />
                                                 </div>
-                                                <button
-                                                    onClick={() => goTo('learner-model')}
-                                                    className="flex-shrink-0 text-[10px] font-mono uppercase tracking-widest px-4 py-2 rounded-xl border border-c-gold/30 text-c-gold hover:bg-c-gold/10 transition-colors whitespace-nowrap"
-                                                >
-                                                    My Memory →
-                                                </button>
+                                            ) : workspaceBlocks?.recommendation ? (
+                                                <div className="rounded-[20px] border border-c-gold/30 bg-[linear-gradient(140deg,rgba(199,139,34,0.09),rgba(7,3,2,0.97))] px-5 py-5 shadow-[0_0_48px_rgba(199,139,34,0.07)]">
+                                                    <p className="text-[9px] uppercase tracking-[0.28em] text-c-gold/60 font-mono mb-2">{workspaceBlocks.recommendation.label}</p>
+                                                    <p className="text-[0.93rem] font-playfair text-c-cream-dim leading-relaxed mb-4">{workspaceBlocks.recommendation.text}</p>
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <button
+                                                            onClick={() => goToAdvanced(workspaceBlocks.recommendation.action)}
+                                                            className="text-[11px] font-mono uppercase tracking-widest px-4 py-2 rounded-xl bg-c-gold text-c-bg font-bold hover:bg-c-gold-light transition-all shadow-[0_0_20px_rgba(199,139,34,0.2)]"
+                                                        >
+                                                            {workspaceBlocks.recommendation.cta} →
+                                                        </button>
+                                                        <button
+                                                            onClick={() => goTo('learner-model')}
+                                                            className="text-[10px] font-mono uppercase tracking-widest px-3 py-2 rounded-xl border border-c-gold/22 text-c-gold/70 hover:bg-c-gold/8 transition-colors"
+                                                        >
+                                                            Full memory →
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : workspaceModel ? (
+                                                <div className="rounded-[20px] border border-c-gold/14 bg-[rgba(12,5,2,0.94)] px-5 py-4 flex items-center justify-between gap-4">
+                                                    <div>
+                                                        <p className="text-[9px] uppercase tracking-[0.28em] text-c-gold/45 font-mono mb-1">Practice status</p>
+                                                        <p className="text-sm font-playfair text-c-cream-dim">No critical gap right now — keep building consistency.</p>
+                                                    </div>
+                                                    <button onClick={() => goTo('learner-model')} className="flex-shrink-0 text-[10px] font-mono uppercase tracking-widest px-3 py-2 rounded-xl border border-c-gold/22 text-c-gold/70 hover:bg-c-gold/8 transition-colors whitespace-nowrap">My memory →</button>
+                                                </div>
+                                            ) : (
+                                                <div className="rounded-[20px] border border-c-gold/14 bg-[rgba(12,5,2,0.94)] px-5 py-4 flex items-center justify-between gap-4">
+                                                    <div>
+                                                        <p className="text-[9px] uppercase tracking-[0.28em] text-c-gold/45 font-mono mb-1">First session</p>
+                                                        <p className="text-sm font-playfair text-c-cream-dim">Open your coach <span className="text-c-gold">🪈</span> for your first prescription — or start with Shruthi to lock in your Sa.</p>
+                                                    </div>
+                                                    <button onClick={() => goToAdvanced('shruthi')} className="flex-shrink-0 text-[10px] font-mono uppercase tracking-widest px-3 py-2 rounded-xl border border-c-gold/22 text-c-gold/70 hover:bg-c-gold/8 transition-colors whitespace-nowrap">Start →</button>
+                                                </div>
+                                            )}
+
+                                            {/* Block 2 — What you keep getting wrong (confusion pairs) */}
+                                            {workspaceBlocks?.confusionPairs?.length > 0 && (
+                                                <div className="rounded-[20px] border border-c-gold/12 bg-[rgba(10,4,2,0.96)] px-4 py-4 sm:px-5 sm:py-5">
+                                                    <div className="flex items-center justify-between mb-3">
+                                                        <p className="text-[9px] uppercase tracking-[0.22em] text-c-gold/55 font-mono">What you keep getting wrong</p>
+                                                        <button onClick={() => goTo('learner-model')} className="text-[9px] font-mono uppercase tracking-widest text-c-gold/35 hover:text-c-gold/65 transition-colors">See all →</button>
+                                                    </div>
+                                                    <div className="flex flex-col gap-1.5">
+                                                        {workspaceBlocks.confusionPairs.map((pair, i) => (
+                                                            <button
+                                                                key={i}
+                                                                onClick={() => goToAdvanced('viveka')}
+                                                                className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-c-card border border-c-border hover:border-c-gold/25 hover:bg-[rgba(199,139,34,0.03)] transition-all text-left group"
+                                                            >
+                                                                <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                                    <span className="font-playfair text-[13px] text-c-cream-dim truncate">{pair.raga}</span>
+                                                                    <span className="text-c-gold/35 text-xs flex-shrink-0">↔</span>
+                                                                    <span className="font-playfair text-[13px] text-c-cream-dim truncate">{pair.confusedWith}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-1.5 flex-shrink-0">
+                                                                    <div className="flex gap-0.5">
+                                                                        {Array.from({ length: Math.min(pair.count, 5) }).map((_, j) => (
+                                                                            <div key={j} className="w-1.5 h-1.5 rounded-full bg-amber-700/60" />
+                                                                        ))}
+                                                                    </div>
+                                                                    <span className="text-[10px] font-mono text-amber-800/80">{pair.count}×</span>
+                                                                </div>
+                                                                <span className="text-[9px] font-mono uppercase tracking-widest text-c-gold/25 group-hover:text-c-gold/60 transition-colors flex-shrink-0 hidden sm:block">Practice →</span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Block 3 — Your next focus (stale / ready-to-advance ragas) */}
+                                            {workspaceBlocks?.focusItems?.length > 0 && (
+                                                <div className="rounded-[20px] border border-c-gold/12 bg-[rgba(10,4,2,0.96)] px-4 py-4 sm:px-5 sm:py-5">
+                                                    <p className="text-[9px] uppercase tracking-[0.22em] text-c-gold/55 font-mono mb-3">Your next focus</p>
+                                                    <div className="flex flex-col gap-1.5">
+                                                        {workspaceBlocks.focusItems.map((item, i) => (
+                                                            <button
+                                                                key={i}
+                                                                onClick={() => goToAdvanced(item.action)}
+                                                                className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-c-card border border-c-border hover:border-c-gold/25 hover:bg-[rgba(199,139,34,0.03)] transition-all text-left group"
+                                                            >
+                                                                <span className={`text-base leading-none flex-shrink-0 ${item.urgency === 'high' ? 'text-amber-700' : item.urgency === 'medium' ? 'text-c-gold' : 'text-emerald-700'}`}>{item.icon}</span>
+                                                                <p className="text-[13px] font-playfair text-c-cream-dim flex-1 leading-snug">{item.text}</p>
+                                                                <span className="text-[9px] font-mono uppercase tracking-widest text-c-gold/25 group-hover:text-c-gold/60 transition-colors flex-shrink-0 hidden sm:block">Go →</span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                        </div>
+
+                                        {/* ── All tools divider ── */}
+                                        <div className="mt-8 sm:mt-10 mb-2 px-1.5 sm:px-2 md:px-3">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-px flex-1 bg-c-gold/10" />
+                                                <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.28em] text-c-gold/40 font-mono">All tools</p>
+                                                <div className="h-px flex-1 bg-c-gold/10" />
                                             </div>
                                         </div>
 

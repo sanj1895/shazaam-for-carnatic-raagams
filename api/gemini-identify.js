@@ -10,6 +10,8 @@
  */
 /* global process */
 import { GoogleAuth, UserRefreshClient } from 'google-auth-library';
+import { requireVerifiedUserId } from './_auth.js';
+import { enforceRateLimit } from './_rateLimit.js';
 
 const GCP_PROJECT  = process.env.GOOGLE_CLOUD_PROJECT  || 'project-24a53985-305d-4031-ae8';
 const GCP_LOCATION = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1';
@@ -33,12 +35,16 @@ function getAuthClient() {
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin',  '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  const userId = await requireVerifiedUserId(req, res);
+  if (!userId) return;
+  if (!enforceRateLimit(req, res, { name: 'gemini-identify', userId, limit: 20, windowMs: 60_000 })) return;
 
   const bodyStr = JSON.stringify(req.body || {});
   if (bodyStr.length > MAX_BODY_BYTES) {

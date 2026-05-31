@@ -1,7 +1,8 @@
 /* global process, Buffer */
 import { MongoClient } from 'mongodb';
 import { GoogleAuth, UserRefreshClient } from 'google-auth-library';
-import { getVerifiedUserId } from './_auth.js';
+import { requireVerifiedUserId } from './_auth.js';
+import { enforceRateLimit } from './_rateLimit.js';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -74,17 +75,18 @@ async function writeSessionViaMCP(userId, sessionData) {
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (!MONGODB_URI) return res.status(500).json({ error: 'MongoDB not configured.' });
 
   try {
-    const verifiedUserId = await getVerifiedUserId(req);
+    const userId = await requireVerifiedUserId(req, res);
+    if (!userId) return;
 
     if (req.method === 'GET') {
+      if (!enforceRateLimit(req, res, { name: 'sessions-get', userId, limit: 60, windowMs: 60_000 })) return;
       const db = await getDb();
-      const userId = verifiedUserId || req.query.userId || 'default';
       const recent = await db.collection('sessions')
         .find({ userId })
         .sort({ timestamp: -1 })
@@ -94,12 +96,11 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
+      if (!enforceRateLimit(req, res, { name: 'sessions-post', userId, limit: 90, windowMs: 60_000 })) return;
       const {
-        userId: bodyUserId = 'default',
         tool, raga, durationMinutes, notes,
         outcome, confidence, confusedWith,
       } = req.body || {};
-      const userId = verifiedUserId || bodyUserId;
       const sessionData = {
         tool: tool || '',
         raga: raga || '',

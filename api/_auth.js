@@ -18,3 +18,10 @@ export async function getVerifiedUserId(req) {
     return null;
   }
 }
+
+export async function requireVerifiedUserId(req, res) {
+  const userId = await getVerifiedUserId(req);
+  if (userId) return userId;
+  res.status(401).json({ error: 'Authentication required.' });
+  return null;
+}

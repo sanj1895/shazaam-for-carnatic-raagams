@@ -1,6 +1,7 @@
 /* global process */
 import { MongoClient } from 'mongodb';
-import { getVerifiedUserId } from './_auth.js';
+import { requireVerifiedUserId } from './_auth.js';
+import { enforceRateLimit } from './_rateLimit.js';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 let cachedClient = null;
@@ -25,7 +26,7 @@ function computeMasteryLevel({ totalSessions, identifiedCount }) {
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
@@ -34,8 +35,9 @@ export default async function handler(req, res) {
   if (!MONGODB_URI) return res.status(500).json({ error: 'MongoDB not configured.' });
 
   try {
-    const verifiedUserId = await getVerifiedUserId(req);
-    const userId = verifiedUserId || req.query.userId || 'default';
+    const userId = await requireVerifiedUserId(req, res);
+    if (!userId) return;
+    if (!enforceRateLimit(req, res, { name: 'learner-model', userId, limit: 24, windowMs: 60_000 })) return;
     const db = await getDb();
 
     const [ragaStatsRaw, confusionPairsRaw, timelineRaw, totalSessions] = await Promise.all([

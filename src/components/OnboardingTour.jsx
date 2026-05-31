@@ -6,16 +6,16 @@ const STEPS = [
   {
     view: 'home',
     title: 'Welcome to Ālāpana',
-    body: "Your complete Carnatic music companion — whether you're starting from your very first swara or deepening an existing practice. Here's what's inside.",
+    body: "Priya has been practicing Carnatic music for two years. She keeps confusing Kalyani and Dharmavati. Here is how Ālāpana closes that loop — listen, remember, prescribe, improve.",
     isWelcome: true,
   },
   // ── START HERE ──
   {
     view: 'tutor',
     feature: 'Svara Gurukul',
-    title: 'Learn the notes step by step',
-    body: "A graded vocal curriculum that takes you from your very first swara to complex note patterns. Each lesson plays the phrase, then listens and guides your voice in real time.",
-    hint: "Best place to start if you're a complete beginner",
+    title: 'Prescribed correction space',
+    body: "The coach tells Priya: spend 10 minutes on phrase endings in Kalyani. Gurukul is where she does the work — structured exercises and scale flows targeting the exact confusion.",
+    hint: 'This is where you practice the fix, not just identify the problem',
   },
   {
     view: 'sadhana',
@@ -64,16 +64,16 @@ const STEPS = [
   {
     view: 'listen',
     feature: 'Dhwani',
-    title: 'Sing and discover your raga',
-    body: "Sing freely and Dhwani listens in real time — it maps every note onto a swara and builds a picture of which raga you might be singing. Use Ālaap AI for a deeper phrase analysis.",
+    title: 'First, Ālāpana listens',
+    body: "Priya sings a phrase. Dhwani maps every note in real time and flags the confusion — she is sliding into Kalyani when she means to be in Dharmavati. The app hears the mistake before she does.",
     hint: 'Set your Sa first so it calibrates to your voice',
   },
   {
     view: 'library',
     feature: 'Raga Kosha',
-    title: 'The treasury of ragas',
-    body: "Browse and search an encyclopedia of Carnatic ragas — scales, moods, time of day, famous compositions, and reference performances. The Practice tab has AI vocal coaching built in.",
-    hint: 'Search any raga by name or browse by parent melakarta',
+    title: 'Understand the raga you are working on',
+    body: "Priya checks Raga Kosha to study Kalyani and Dharmavati side by side — their scale differences and characteristic phrases. Supporting reference, not the center stage.",
+    hint: 'Use when you need to understand the raga you are practicing, not just explore',
   },
   {
     view: 'melakarta',
@@ -91,8 +91,8 @@ const STEPS = [
   },
   {
     view: null,
-    title: "You're ready to begin",
-    body: "New to Carnatic? Start with Svara Gurukul for guided, step-by-step training. Already practicing? Try Dhwani, Transcribe, or Raga Kosha.",
+    title: "The practice loop",
+    body: "Priya improves because the feedback is specific and persistent. Sing — Ālāpana detects the confusion — MongoDB remembers the pattern — your coach prescribes the exact next exercise. That is the loop.",
     isLast: true,
   },
 ];
@@ -230,13 +230,13 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onO
                   onClick={() => { handleDismiss(); onStartLearning?.(); }}
                   className="w-full py-3 bg-[#f7d686] hover:bg-white text-[#1e0c04] font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all"
                 >
-                  Start Learning →
+                  Start My Practice Check →
                 </button>
                 <button
                   onClick={() => { handleDismiss(); onOpenWorkspace?.(); }}
                   className="w-full py-3 border border-[#f7d686]/35 hover:border-[#f7d686]/65 text-[#f7d686] font-playfair font-bold text-xs tracking-wider uppercase rounded-xl transition-all"
                 >
-                  Open Practice Room →
+                  Continue My Practice Path →
                 </button>
               </div>
             ) : null}

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
-const WELCOME = "Namaskaram! I'm your Ālāpana practice coach. Tell me what you want to work on today — or ask me to plan a session based on your history.";
+const WELCOME = "Namaskaram! I'm your practice coach. I can read your practice history. Tell me what felt hard today, or I'll plan your next specific exercise based on your recurring patterns.";
 
 // Only navigate when the coach explicitly says to open a tool — never on incidental mentions
 const OPEN = /open(?:ing)?:?\s+/i;
@@ -59,9 +59,9 @@ async function readApiError(res, fallback) {
 function buildDynamicPrompts(model) {
   if (!model) {
     return [
-      'What should I practice today?',
-      'Plan a 30-min beginner session',
-      'How does Carnatic raga practice work?',
+      'What should I practice today based on my history?',
+      'What am I repeatedly getting wrong?',
+      'Plan my next 20-minute session',
     ];
   }
   const { confusionPairs = [], ragaStats = [] } = model;
@@ -90,9 +90,9 @@ function buildDynamicPrompts(model) {
   }
 
   // Fill remaining slots with useful generics
-  if (prompts.length === 0) prompts.push('What should I practice today?');
-  if (prompts.length < 2)   prompts.push('Plan a 20-min session based on my weak areas');
-  if (prompts.length < 3)   prompts.push('What am I repeatedly getting wrong?');
+  if (prompts.length === 0) prompts.push('What should I practice today based on my history?');
+  if (prompts.length < 2)   prompts.push('Plan my next 20-minute session');
+  if (prompts.length < 3)   prompts.push('What is my next specific exercise?');
 
   return prompts.slice(0, 3);
 }

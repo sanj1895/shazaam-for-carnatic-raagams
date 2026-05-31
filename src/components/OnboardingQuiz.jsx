@@ -59,13 +59,13 @@ const U_QUESTIONS = [
     {
         id: 'goal',
         qFn: (a) => a.learner === 'other'
-            ? 'What do they want help with first?'
-            : 'What do you want help with first?',
+            ? 'What feels difficult for them right now?'
+            : 'What feels difficult right now?',
         options: [
-            { label: 'Starting correctly',              sub: 'Shruti, swaras, tala, first lessons',          value: 'starting',   guided: 3, workspace: 0 },
-            { label: 'Building a daily routine',        sub: 'A consistent, focused practice flow',          value: 'routine',    guided: 2, workspace: 1 },
-            { label: 'Exploring ragas',                 sub: 'Understand and study raga structure',          value: 'explore',    guided: 0, workspace: 2 },
-            { label: 'Transcribing or analyzing',       sub: 'Work with my own singing and ideas',           value: 'transcribe', guided: 0, workspace: 3 },
+            { label: 'My pitch or shruti feels unstable', sub: 'I want to improve my tuning and ear accuracy',           value: 'starting',   guided: 3, workspace: 0 },
+            { label: 'I want to build daily practice',    sub: 'A consistent, focused practice flow with structure',     value: 'routine',    guided: 2, workspace: 1 },
+            { label: 'I keep confusing ragas',            sub: 'Two ragas sound similar and I cannot tell them apart',   value: 'explore',    guided: 0, workspace: 2 },
+            { label: 'I want feedback on what to do next',sub: 'I am practicing but not sure if I am improving',         value: 'transcribe', guided: 0, workspace: 3 },
         ],
     },
     {
@@ -448,8 +448,8 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSe
                             {/* Intro header — first universal question */}
                             {stage === 'universal' && uIdx === 0 && (
                                 <div className="mb-5 pb-5 border-b border-white/8">
-                                    <h2 className="font-playfair text-[18px] text-[#f7d686] font-bold mb-1.5">Find your best starting point</h2>
-                                    <p className="text-white/45 text-[12px] font-playfair leading-relaxed">We'll recommend the right Carnatic path based on your experience and goals.</p>
+                                    <h2 className="font-playfair text-[18px] text-[#f7d686] font-bold mb-1.5">What brings you here today?</h2>
+                                    <p className="text-white/45 text-[12px] font-playfair leading-relaxed">Answer a few questions and Ālāpana will prescribe your best first practice step.</p>
                                 </div>
                             )}
 
@@ -463,7 +463,7 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSe
                                     <p className="text-white/45 text-[12px] font-playfair leading-relaxed">
                                         {branch === 'guided_path'
                                             ? 'A few more questions to find your best starting lesson.'
-                                            : 'One last question to point you to the right starting tool.'}
+                                            : 'One last question to prescribe your first practice step.'}
                                     </p>
                                 </div>
                             )}

@@ -85,6 +85,97 @@ async function buildLearnerModelSummary(db, userId) {
   }
 }
 
+/**
+ * Pre-compute a concrete prescription from the learner data so the agent
+ * never has to derive it from raw numbers — it just presents it clearly.
+ * Each case names the specific raga(s), count, days, exercise, tool, and duration.
+ */
+function buildPrescription(ragaStats, confusionPairsRaw, totalApproxSessions) {
+  const lines = [];
+
+  // Case 1: Brand-new user — no session history at all
+  if (totalApproxSessions === 0) {
+    lines.push('PRESCRIBED NEXT EXERCISE (no session history — first session):');
+    lines.push('  Pattern: No session history recorded yet.');
+    lines.push('  Why: Locking in Sa alignment is the single most important first step — every identification and practice exercise depends on it.');
+    lines.push('  Exercise: Open Shruthi, pick a comfortable Sa (try C4 or D4), and hum a sustained "Sa" until your voice locks onto the drone. Then sing Sa-Ri-Ga-Ma-Pa-Dha-Ni-Sa slowly five times with it running.');
+    lines.push('  Tool: Open Shruthi first. Then Gurukul → Curriculum → Foundations → Lesson 1.');
+    lines.push('  Duration: 15 minutes.');
+    return lines.join('\n');
+  }
+
+  // Case 2: Active confusion pair — highest diagnostic value
+  if (confusionPairsRaw.length > 0) {
+    const top = confusionPairsRaw[0];
+    const raga1 = top._id.raga;
+    const raga2 = top._id.confusedWith;
+    const count = top.count;
+    lines.push('PRESCRIBED NEXT EXERCISE (top confusion pattern from session history):');
+    lines.push(`  Pattern: ${raga1} and ${raga2} have been confused ${count} time${count !== 1 ? 's' : ''} in recorded sessions.`);
+    lines.push(`  Why: Confusion at the identification stage means the ear has not yet isolated the diagnostic note that separates them — usually a characteristic Ni, Ga, or phrase ending. Targeted side-by-side comparison is the fastest fix.`);
+    lines.push(`  Exercise: Sing the upper tetrachord (Pa-Dha-Ni-Sa) of ${raga1} three times slowly, then immediately sing the same phrase in ${raga2} three times. Notice which note changes. Then sing a full phrase of each into Viveka and check whether it identifies them correctly.`);
+    lines.push(`  Tool: Open Viveka — sing a full phrase of ${raga1}, confirm identification, then do the same for ${raga2}.`);
+    lines.push(`  Duration: 10–15 minutes.`);
+    // Surface second confusion pair if present
+    if (confusionPairsRaw.length > 1) {
+      const second = confusionPairsRaw[1];
+      lines.push(`  ALSO NOTED: ${second._id.raga} and ${second._id.confusedWith} confused ${second.count} time${second.count !== 1 ? 's' : ''} — address after the top pair is resolved.`);
+    }
+    return lines.join('\n');
+  }
+
+  // Case 3: Stale developing raga — gap is widening
+  const stale = ragaStats.find(r =>
+    (r.masteryLevel === 'developing' || r.masteryLevel === 'exploring') &&
+    r.lastPracticed &&
+    Date.now() - new Date(r.lastPracticed).getTime() > 4 * 24 * 60 * 60 * 1000
+  );
+  if (stale) {
+    const daysSince = Math.floor((Date.now() - new Date(stale.lastPracticed).getTime()) / 86400000);
+    lines.push('PRESCRIBED NEXT EXERCISE (stale developing raga):');
+    lines.push(`  Pattern: ${stale.raga} has ${stale.totalSessions} session${stale.totalSessions !== 1 ? 's' : ''} and is still at ${stale.masteryLevel} level — last practiced ${daysSince} day${daysSince !== 1 ? 's' : ''} ago.`);
+    lines.push(`  Why: A ${daysSince}-day gap at the ${stale.masteryLevel} stage means the scale shape has not reached muscle memory. The window to consolidate it is closing.`);
+    lines.push(`  Exercise: Sing Sarali Varisai pattern 1 in ${stale.raga} at a slow, deliberate tempo — one note per beat with the drone running. Repeat 5 times, then sing the full arohanam-avarohanam 5 times.`);
+    lines.push(`  Tool: Open Shruthi (set Sa), then Gurukul → Curriculum → Sarali Varisai. For live pitch feedback, use Gurukul → Raga Practice tab with ${stale.raga} selected.`);
+    lines.push(`  Duration: 15 minutes.`);
+    return lines.join('\n');
+  }
+
+  // Case 4: A stable raga that can be pushed further
+  const ready = ragaStats.find(r => r.masteryLevel === 'stable' && r.totalSessions >= 4);
+  if (ready) {
+    lines.push('PRESCRIBED NEXT EXERCISE (advance stable raga):');
+    lines.push(`  Pattern: ${ready.raga} is at stable level with ${ready.totalSessions} sessions — the scale is settled but depth is not yet strong.`);
+    lines.push(`  Why: Moving a stable raga to strong requires practicing the characteristic gamakam phrases and vakra movements, not just the straight scale.`);
+    lines.push(`  Exercise: Pick one characteristic 3–4 swara phrase of ${ready.raga} that includes a gamakam or vakra movement. Sing it with the drone. Use Raga Practice AI feedback to check pitch accuracy and ornament quality.`);
+    lines.push(`  Tool: Open Gurukul → Raga Practice tab. Set raga to ${ready.raga} and tala to Adi.`);
+    lines.push(`  Duration: 15–20 minutes.`);
+    return lines.join('\n');
+  }
+
+  // Case 5: Only exploring-stage ragas — early practice history
+  const exploring = ragaStats.find(r => r.masteryLevel === 'exploring');
+  if (exploring) {
+    lines.push('PRESCRIBED NEXT EXERCISE (early-stage raga):');
+    lines.push(`  Pattern: ${exploring.raga} has ${exploring.totalSessions} session${exploring.totalSessions !== 1 ? 's' : ''} — still in the exploring stage.`);
+    lines.push(`  Why: At the exploring stage, the priority is internalizing the scale shape before attempting identification or ornamentation.`);
+    lines.push(`  Exercise: Look up ${exploring.raga} in Raga Kosha first — check the arohanam, avarohanam, and characteristic phrases. Then sing the scale 5 times against the drone, pausing on the characteristic Ni or Ga for two counts each time.`);
+    lines.push(`  Tool: Open Raga Kosha → search ${exploring.raga}. Then Shruthi + Gurukul → Raga Practice tab.`);
+    lines.push(`  Duration: 15 minutes.`);
+    return lines.join('\n');
+  }
+
+  // Fallback: has sessions but no specific gap detected
+  const mostPracticed = ragaStats[0];
+  lines.push('PRESCRIBED NEXT EXERCISE (consistent practice — no critical gap):');
+  lines.push(`  Pattern: ${ragaStats.length} raga${ragaStats.length !== 1 ? 's' : ''} in history, ${totalApproxSessions} total sessions — no critical confusion or stale gap detected right now.`);
+  lines.push(`  Why: Maintaining consistency matters more than fixing a specific gap when none is urgent.`);
+  lines.push(`  Exercise: ${mostPracticed ? `Sing Sarali Varisai patterns 1–3 in ${mostPracticed.raga}` : 'Sing Sarali Varisai patterns 1–3 in your most comfortable raga'} with the drone. Focus on breath support and not rushing.`);
+  lines.push(`  Tool: Open Shruthi (set Sa), then Gurukul → Curriculum → Sarali Varisai.`);
+  lines.push(`  Duration: 15 minutes.`);
+  return lines.join('\n');
+}
+
 async function buildUserContext(userId, appMode, sadhanaCompleted) {
   if (!MONGODB_URI) return '';
   try {
@@ -197,20 +288,12 @@ async function buildUserContext(userId, appMode, sadhanaCompleted) {
       lines.push(`SADHANA COMPLETED TODAY: ${sadhanaCompleted.join(', ')}`);
     }
 
-    // Explicit coaching instructions so the agent answers correctly
+    // Pre-computed prescription — agent must deliver this rather than derive from raw numbers
+    const totalApproxSessions = ragaStats.reduce((sum, r) => sum + r.totalSessions, 0);
     lines.push('');
-    lines.push('COACHING INSTRUCTIONS:');
-    if (confusionPairsRaw.length > 0) {
-      lines.push('  - When asked "what am I getting wrong" or "what do I keep messing up": cite the CONFUSION PATTERNS above by name. Do not suggest generic tools.');
-    } else {
-      lines.push('  - When asked "what am I getting wrong": explain that confusion patterns build up from raga identification practice across tools like Viveka, Dhwani, Gurukul exercises, and Sing-Back. You don\'t have enough session data yet to identify specific patterns — suggest they practice with any tool that matches their current goal and patterns will emerge.');
-    }
-    if (ragaStats.length > 0) {
-      const weak = ragaStats.find(r => r.masteryLevel === 'exploring' || r.masteryLevel === 'developing');
-      const strong = ragaStats.find(r => r.masteryLevel === 'stable' || r.masteryLevel === 'strong');
-      if (weak) lines.push(`  - When asked "what should I practice": recommend ${weak.raga} as the priority focus area. Suggest the tool that fits their session goal — Gurukul for structured learning, Viveka or Dhwani for identification practice, Shruthi + Keyboard for scale internalization, Sing-Back for ear training.`);
-      if (strong) lines.push(`  - ${strong.raga} is strong — can be used as a confidence builder or to explore more advanced prayogams.`);
-    }
+    lines.push(buildPrescription(ragaStats, confusionPairsRaw, totalApproxSessions));
+    lines.push('');
+    lines.push('DELIVERY RULE: When the user asks what to practice, what they keep getting wrong, or to plan a session — deliver the PRESCRIBED NEXT EXERCISE above as direct sentences: state the pattern (with the specific raga name and number), explain why it matters, name the exercise, name the exact tool and tab, and give the duration. Do not say "consider" or "you might want to". Say "Practice X for Y minutes" or "Spend X minutes on Y".');
 
     return lines.join('\n') + '\n\n';
   } catch {

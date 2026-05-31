@@ -49,13 +49,13 @@ const renderTabIcon = (id, className = "w-5 h-5") => {
 };
 
 const FEATURES = [
-    { id: 'tutor',     label: 'Gurukul',      desc: 'Classical vocal academy & scale flow', symbol: '📿',  mobileSymbol: '📿', level: 'beginner', highlight: true },
-    { id: 'avabodha',  label: 'Avabodha',     desc: 'Raga discernment — real-time and phrase-based', symbol: '◉',  mobileSymbol: '◉', level: 'intermediate', highlight: true },
-    { id: 'listen',    label: 'Dhwani',       desc: 'Real-time raga listening from your singing', symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
-    { id: 'viveka',    label: 'Viveka',       desc: 'Phrase-first sister tool for deeper discernment', symbol: '◎',  mobileSymbol: '◎', level: 'intermediate', highlight: true },
-    { id: 'transcribe',label: 'Transcribe',   desc: 'Transcribe your sangatis against tala',    symbol: '✍︎', mobileSymbol: '✍︎', level: 'intermediate', highlight: true },
-    { id: 'library',   label: 'Raga Kosha',   desc: 'Explore & practice every raga scale',    symbol: '◈',  mobileSymbol: '◈', level: 'all', highlight: true },
-    { id: 'sadhana',   label: 'Sadhana',      desc: 'Your recommended daily practice path',    symbol: '🧘‍♀️', mobileSymbol: '🧘‍♀️', level: 'start' },
+    { id: 'tutor',     label: 'Gurukul',      desc: 'Prescribed correction space — practice the exercise that fixes it', symbol: '📿',  mobileSymbol: '📿', level: 'beginner', highlight: true },
+    { id: 'avabodha',  label: 'Avabodha',     desc: 'Listening feedback — detect what you\'re singing and where the confusion is', symbol: '◉',  mobileSymbol: '◉', level: 'intermediate', highlight: true },
+    { id: 'listen',    label: 'Dhwani',       desc: 'First-pass real-time listening — what am I singing right now?', symbol: '♬',  mobileSymbol: '♬', level: 'intermediate', highlight: true },
+    { id: 'viveka',    label: 'Viveka',       desc: 'Phrase-level discernment — what raga confusion is happening?', symbol: '◎',  mobileSymbol: '◎', level: 'intermediate', highlight: true },
+    { id: 'transcribe',label: 'Transcribe',   desc: 'Capture and analyze what you\'re actually singing against tala',    symbol: '✍︎', mobileSymbol: '✍︎', level: 'intermediate', highlight: true },
+    { id: 'library',   label: 'Raga Kosha',   desc: 'Supporting reference — understand the raga you\'re working on',    symbol: '◈',  mobileSymbol: '◈', level: 'all', highlight: true },
+    { id: 'sadhana',   label: 'Sadhana',      desc: 'Your daily next-step practice sequence',    symbol: '🧘‍♀️', mobileSymbol: '🧘‍♀️', level: 'start' },
     { id: 'shruthi',   label: 'Shruthi',      desc: 'Continuous drone for practice',          symbol: '〜', mobileSymbol: '🎵', level: 'beginner' },
     { id: 'talam',     label: 'Talam',        desc: 'Keep the rhythmic cycle',                symbol: '॥',  mobileSymbol: '🥁', level: 'beginner' },
     { id: 'keyboard',  label: 'Keyboard',     desc: 'Play swaras on virtual keys',            symbol: '♩',  mobileSymbol: '🎹', level: 'intermediate' },
@@ -69,15 +69,15 @@ const APP_MODES = {
         id: 'beginner',
         label: 'Guided Basics',
         shortLabel: 'Basics',
-        subtitle: 'A guided path for learners who want structure — shruti, swaras, lessons, and daily practice.',
-        primaryCta: 'Start Guided Basics',
+        subtitle: 'A guided path with feedback, memory, and a daily next-step sequence.',
+        primaryCta: 'Start My Practice Check',
     },
     musician: {
         id: 'musician',
         label: 'Practice Workspace',
         shortLabel: 'Workspace',
-        subtitle: 'A practice workspace for trained musicians — raga identification, transcription, and deep exploration.',
-        primaryCta: 'Open Workspace',
+        subtitle: 'A practice workspace with listening feedback, learner memory, and coaching for your specific gaps.',
+        primaryCta: 'Continue My Practice Path',
     },
 };
 
@@ -992,25 +992,25 @@ function App() {
                                         A practice agent for self-directed Carnatic learners.
                                     </h2>
                                     <p className="text-[0.98rem] sm:text-[1.04rem] leading-[1.82] mb-4" style={{ color: 'rgba(243,234,214,0.88)' }}>
-                                        Carnatic learners practicing alone often lack continuous teacher feedback, structured next steps, and memory across sessions. Without a guru available every day, practice becomes inconsistent — students repeat the same mistakes without realizing the pattern.
+                                        Self-guided Carnatic learners often practice without timely feedback, without a record of recurring mistakes, and without a clear next step. Ālāpana closes that loop.
                                     </p>
                                     <p className="text-[0.95rem] sm:text-[1.01rem] leading-[1.82]" style={{ color: 'rgba(243,234,214,0.62)' }}>
-                                        Ālāpana is a Gemini-powered practice agent that listens to your singing, remembers your history across sessions, and guides you toward what to work on next. So you never have to start from zero.
+                                        Ālāpana is a Carnatic solo-practice agent that listens to your singing, remembers your recurring mistakes, and prescribes the next best exercise.
                                     </p>
 
                                     <div className="mt-8 grid gap-3 sm:grid-cols-3">
                                         {[
                                             {
                                                 title: 'Listens',
-                                                body: 'Identifies ragas from your voice in real time. Gives AI feedback on phrases. Transcribes what you sing.',
+                                                body: 'Dhwani detects notes in real time. Viveka catches phrase-level raga confusion. First, the app hears what you\'re singing.',
                                             },
                                             {
                                                 title: 'Remembers',
-                                                body: 'Tracks every session. Knows which ragas you confuse, how consistently you practice, and where you need work.',
+                                                body: 'MongoDB tracks which ragas you confuse, what you keep getting wrong, and when you last practiced each one.',
                                             },
                                             {
                                                 title: 'Guides',
-                                                body: 'A Gemini coach that reads your history and tells you exactly what to practice next — not generic advice, your specific patterns.',
+                                                body: 'Your coach reads your history and prescribes a specific next exercise — not a generic suggestion, but the exact phrase to work on today.',
                                             },
                                         ].map(({ title, body }) => (
                                             <div
@@ -1372,8 +1372,8 @@ function App() {
                                         >
                                             Ālāpana
                                         </h1>
-                                        <p className="mb-4 max-w-[18rem] text-[9px] sm:max-w-none sm:text-[11px] md:text-xs uppercase tracking-[0.18em] sm:tracking-[0.22em]" style={{ color: 'rgba(247, 214, 134, 0.76)' }}>
-                                            Your solo Carnatic practice companion · listens, remembers, guides
+                                        <p className="mb-4 max-w-[22rem] text-[9px] sm:max-w-none sm:text-[11px] md:text-xs uppercase tracking-[0.18em] sm:tracking-[0.22em]" style={{ color: 'rgba(247, 214, 134, 0.76)' }}>
+                                            Practicing Carnatic music alone is hard · Ālāpana listens, remembers what you struggle with, guides your next step
                                         </p>
                                         {isSignedIn ? (
                                             <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
@@ -1384,7 +1384,7 @@ function App() {
                                                     }}
                                                     className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 shadow-[0_0_36px_rgba(200,148,31,0.26)] cursor-pointer"
                                                 >
-                                                    Start Learning
+                                                    Start My Practice Check
                                                 </button>
                                                 <button
                                                     onClick={() => {
@@ -1393,7 +1393,7 @@ function App() {
                                                     }}
                                                     className="group border border-c-gold/55 hover:border-c-gold text-c-gold hover:text-c-gold-light font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 cursor-pointer"
                                                 >
-                                                    Enter Practice Room
+                                                    Continue My Practice Path
                                                 </button>
                                             </div>
                                         ) : (
@@ -1440,13 +1440,29 @@ function App() {
                                 >
                                     <div className="pb-16">
 
+                                        {/* ── Recommended next step banner ── */}
+                                        <div className="mt-4 sm:mt-5 px-1.5 sm:px-2 md:px-3">
+                                            <div className="rounded-[20px] border border-c-gold/20 bg-[linear-gradient(135deg,rgba(199,139,34,0.07),rgba(7,3,2,0.94))] px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+                                                <div className="flex-1">
+                                                    <p className="text-[9px] uppercase tracking-[0.28em] text-c-gold/60 font-mono mb-1">Recommended next step</p>
+                                                    <p className="text-sm font-playfair text-c-cream-dim leading-relaxed">Open your coach <span className="text-c-gold">🪈</span> for a personalized next exercise — or review your memory to see what you keep getting wrong.</p>
+                                                </div>
+                                                <button
+                                                    onClick={() => goTo('learner-model')}
+                                                    className="flex-shrink-0 text-[10px] font-mono uppercase tracking-widest px-4 py-2 rounded-xl border border-c-gold/30 text-c-gold hover:bg-c-gold/10 transition-colors whitespace-nowrap"
+                                                >
+                                                    My Memory →
+                                                </button>
+                                            </div>
+                                        </div>
+
                                         <section className="mt-4 sm:mt-6 px-1.5 sm:px-2 md:px-3">
                                             <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/18 bg-[linear-gradient(180deg,rgba(14,6,3,0.96),rgba(7,3,2,0.98))] shadow-[0_30px_80px_rgba(0,0,0,0.42),0_0_0_1px_rgba(199,139,34,0.08)] overflow-hidden backdrop-blur-md">
                                                 <div className="relative z-10 px-4 pt-4 pb-3 sm:px-10">
                                                     <div className="flex items-center justify-center gap-4">
                                                         <div className="h-px flex-1 bg-gradient-to-r from-transparent via-c-gold/15 to-c-gold/5" />
                                                         <p className="text-[9px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.28em] text-c-gold/90 text-center">
-                                                            Everything Your Practice Session Needs
+                                                            Your Practice Path
                                                         </p>
                                                         <div className="h-px flex-1 bg-gradient-to-l from-transparent via-c-gold/15 to-c-gold/5" />
                                                     </div>
@@ -1464,7 +1480,7 @@ function App() {
                                                         </div>
 
                                                         <p className="mt-3 sm:mt-4 max-w-none sm:max-w-[260px] text-[0.95rem] sm:text-[1.02rem] leading-[1.65] sm:leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
-                                                            Stay in tune, keep the rhythm, and train your ear — all in one focused practice flow.
+                                                            The foundation of every session — drone, rhythm, real-time listening, and raga detection.
                                                         </p>
 
                                                         <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 max-w-[320px] text-c-gold">
@@ -1793,7 +1809,7 @@ function App() {
                                                                             Best for
                                                                         </div>
                                                                         <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
-                                                                            Identifying ragas from your voice — real-time note-by-note with Dhwani, or full-phrase tonic inference with Viveka.
+                                                                            Detecting what you're singing right now. Dhwani gives real-time note feedback; Viveka catches phrase-level raga confusion.
                                                                         </p>
                                                                     </div>
                                                                 </div>
@@ -1813,12 +1829,12 @@ function App() {
                                                                 {renderTabIcon('library', 'w-8 h-8')}
                                                             </div>
                                                             <h3 className="font-playfair text-c-gold-light text-[2.15rem] sm:text-[2.7rem] leading-none">
-                                                                Practice
+                                                                Reference
                                                             </h3>
                                                         </div>
 
                                                         <p className="mt-3 sm:mt-4 max-w-none sm:max-w-[270px] text-[0.95rem] sm:text-[1.02rem] leading-[1.65] sm:leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
-                                                            Understand ragas from the ground up. Explore structures, relationships, and transformations.
+                                                            Look up the raga you're working on — scales, relationships, and the 72-parent system.
                                                         </p>
 
                                                         <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 max-w-[270px] text-c-gold">
@@ -1929,7 +1945,7 @@ function App() {
                                                                             Best for
                                                                         </div>
                                                                         <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
-                                                                            Looking up a ragam’s scale, color, and identity before you start practicing or exploring it.
+                                                                            Supporting reference when you need to understand the raga you're working on — scale, mood, characteristic phrases.
                                                                         </p>
                                                                     </div>
                                                                 </div>
@@ -2218,12 +2234,12 @@ function App() {
                                                                 {renderTabIcon('transcribe', 'w-8 h-8')}
                                                             </div>
                                                             <h3 className="font-playfair text-c-gold-light text-[2.15rem] sm:text-[2.7rem] leading-none">
-                                                                Explore
+                                                                Correct
                                                             </h3>
                                                         </div>
 
                                                         <p className="mt-4 sm:mt-6 max-w-none sm:max-w-[270px] text-[0.95rem] sm:text-[1.02rem] leading-[1.65] sm:leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
-                                                            Capture your ideas. Transcribe with ease. Build, organize, and elevate your repertoire.
+                                                            Prescribed correction space — structured exercises and transcription of what you're actually working on.
                                                         </p>
 
                                                         <div className="mt-6 sm:mt-10 grid grid-cols-2 gap-x-4 gap-y-5 max-w-[220px] text-c-gold">

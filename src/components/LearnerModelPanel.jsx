@@ -142,7 +142,7 @@ export default function LearnerModelPanel({ userId, getToken }) {
         <div>
           <h1 className="font-playfair text-xl font-bold text-c-gold tracking-wide">Your Musical Memory</h1>
           <p className="text-[10px] font-mono uppercase tracking-widest text-c-cream-dim">
-            Progressive learner model · powered by MongoDB
+            What you keep getting wrong · what's improving · what to practice next
           </p>
         </div>
       </div>
@@ -164,7 +164,7 @@ export default function LearnerModelPanel({ userId, getToken }) {
       {/* ── Your Next Focus ── */}
       {nextFocus.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="font-playfair text-base font-semibold text-c-cream-dim">What to Work on Next</h2>
+          <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Your Next Priority</h2>
           <div className="flex flex-col gap-2">
             {nextFocus.map((item, i) => (
               <div key={i} className={`flex items-start gap-3 rounded-xl px-4 py-3 border ${
@@ -191,8 +191,7 @@ export default function LearnerModelPanel({ userId, getToken }) {
         <div className="w-full bg-c-card border border-c-border rounded-xl p-8 flex flex-col items-center gap-3 text-center">
           <p className="font-playfair text-c-cream-dim italic">Your musical memory is just beginning.</p>
           <p className="text-xs text-c-cream-dark leading-relaxed max-w-xs">
-            Use Viveka to identify ragas, practice with Gurukul, or explore Raga Kosha.
-            Every session builds your personal learner model here.
+            Sing something with Dhwani, practice with Gurukul, or try Viveka. Every session adds to your memory here.
           </p>
           <p className="text-[9px] font-mono uppercase tracking-widest text-c-cream-dark/70 mt-1">
             MongoDB stores your patterns · coach learns from them
@@ -304,8 +303,44 @@ export default function LearnerModelPanel({ userId, getToken }) {
               </div>
 
               <p className="text-[9px] text-c-cream-dark font-playfair italic text-center mt-1">
-                Ask your coach to help you distinguish these ragas
+                Ask your coach to prescribe the specific exercise that fixes this
               </p>
+            </section>
+          )}
+
+          {/* ── Recently Improving ── */}
+          {ragaStats.filter(r => (r.masteryLevel === 'stable' || r.masteryLevel === 'strong') && r.lastPracticed && Date.now() - new Date(r.lastPracticed).getTime() < 7 * 24 * 60 * 60 * 1000).length > 0 && (
+            <section className="flex flex-col gap-2">
+              <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Recently Improving</h2>
+              <div className="flex flex-col gap-2">
+                {ragaStats
+                  .filter(r => (r.masteryLevel === 'stable' || r.masteryLevel === 'strong') && r.lastPracticed && Date.now() - new Date(r.lastPracticed).getTime() < 7 * 24 * 60 * 60 * 1000)
+                  .slice(0, 3)
+                  .map((r, i) => (
+                  <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3 bg-emerald-700/5 border border-emerald-700/20">
+                    <span className="text-base text-emerald-700 flex-shrink-0">↑</span>
+                    <p className="text-sm text-c-cream-dim font-playfair leading-snug">{r.raga} — {MASTERY_STYLES[r.masteryLevel]?.label} · {daysSince(r.lastPracticed)}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ── Needs Return Practice ── */}
+          {ragaStats.filter(r => (r.masteryLevel === 'developing' || r.masteryLevel === 'exploring') && r.lastPracticed && Date.now() - new Date(r.lastPracticed).getTime() > 5 * 24 * 60 * 60 * 1000).length > 0 && (
+            <section className="flex flex-col gap-2">
+              <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Needs Return Practice</h2>
+              <div className="flex flex-col gap-2">
+                {ragaStats
+                  .filter(r => (r.masteryLevel === 'developing' || r.masteryLevel === 'exploring') && r.lastPracticed && Date.now() - new Date(r.lastPracticed).getTime() > 5 * 24 * 60 * 60 * 1000)
+                  .slice(0, 3)
+                  .map((r, i) => (
+                  <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3 bg-c-card border border-c-border">
+                    <span className="text-base text-amber-700 flex-shrink-0">↩</span>
+                    <p className="text-sm text-c-cream-dim font-playfair leading-snug">{r.raga} — last practiced {daysSince(r.lastPracticed)}, still {MASTERY_STYLES[r.masteryLevel]?.label?.toLowerCase()}</p>
+                  </div>
+                ))}
+              </div>
             </section>
           )}
 
@@ -398,7 +433,7 @@ export default function LearnerModelPanel({ userId, getToken }) {
           </svg>
         </div>
         <span className="text-[9px] font-mono text-c-cream-dark uppercase tracking-widest">
-          Built on MongoDB · learner model updates with every session
+          MongoDB remembers every session · your coach reads this to prescribe your next exercise
         </span>
       </div>
 

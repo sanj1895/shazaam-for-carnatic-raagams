@@ -142,18 +142,20 @@ const WORKSPACE_QUESTIONS = [
 // ── Tool detection (mirrors CoachPanel) ──────────────────────────────────────
 
 const QUIZ_TOOL_PATTERNS = [
-    { pattern: /\b(gurukul|varisai|alankaram|kriti|gitam|lesson)\b/i, view: 'tutor' },
-    { pattern: /\b(raga kosha|raga library|kosha)\b/i,                 view: 'library' },
-    { pattern: /\b(viveka)\b/i,                                         view: 'viveka' },
-    { pattern: /\b(dhwani)\b/i,                                         view: 'listen' },
-    { pattern: /\b(transcribe|sangati)\b/i,                             view: 'transcribe' },
-    { pattern: /\b(shruthi|drone|shruti)\b/i,                           view: 'shruthi' },
-    { pattern: /\b(talam|tala)\b/i,                                     view: 'talam' },
-    { pattern: /\b(keyboard)\b/i,                                       view: 'keyboard' },
-    { pattern: /\b(sing.?back|ear training)\b/i,                        view: 'singback' },
+    { pattern: /\b(sadhana|daily practice|daily routine)\b/i,           view: 'sadhana' },
+    { pattern: /\b(gurukul|varisai|alankaram|kriti|gitam|lesson)\b/i,   view: 'tutor' },
+    { pattern: /\b(raga kosha|raga library|kosha)\b/i,                   view: 'library' },
+    { pattern: /\b(viveka)\b/i,                                           view: 'viveka' },
+    { pattern: /\b(dhwani)\b/i,                                           view: 'listen' },
+    { pattern: /\b(transcribe|sangati)\b/i,                               view: 'transcribe' },
+    { pattern: /\b(shruthi|drone|shruti)\b/i,                             view: 'shruthi' },
+    { pattern: /\b(talam|tala)\b/i,                                       view: 'talam' },
+    { pattern: /\b(keyboard)\b/i,                                         view: 'keyboard' },
+    { pattern: /\b(sing.?back|ear training)\b/i,                          view: 'singback' },
 ];
 
 const TOOL_LABELS = {
+    sadhana:    'Open Daily Sadhana',
     transcribe: 'Open Transcribe',
     listen:     'Open Dhwani',
     tutor:      'Open Gurukul',
@@ -164,6 +166,16 @@ const TOOL_LABELS = {
     keyboard:   'Open Keyboard',
     singback:   'Open Sing-Back',
 };
+
+function cleanReply(text) {
+    return String(text || '')
+        .replace(/\*\*([^*]+)\*\*/g, '$1')
+        .replace(/\*([^*]+)\*/g, '$1')
+        .replace(/`([^`]*)`/g, '$1')
+        .replace(/^[ \t]*[-*#>]+\s?/gm, '')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+}
 
 function detectTool(text) {
     for (const { pattern, view } of QUIZ_TOOL_PATTERNS) {
@@ -177,10 +189,17 @@ function detectTool(text) {
 function computeBranch(answers) {
     if (answers.age === 'very_young') return 'guided_path';
 
+    // Serious performers and active practitioners always get the workspace,
+    // regardless of whether they asked to be "guided" — "guided" for them means
+    // structured coaching inside the workspace, not the beginner onboarding path.
+    if (answers.experience === 'serious' || answers.experience === 'practice') {
+        return 'practice_workspace';
+    }
+
     const SCORES = {
         experience: { new: [3, 0], basics: [2, 0], practice: [0, 2], serious: [0, 3] },
         goal:       { starting: [3, 0], routine: [2, 1], explore: [0, 2], transcribe: [0, 3] },
-        preference: { guided: [4, 0], workspace: [0, 4] },
+        preference: { guided: [2, 0], workspace: [0, 4] }, // reduced guided weight so goal/experience dominate
     };
 
     let g = 0, w = 0;
@@ -268,7 +287,14 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSe
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
                 body: JSON.stringify({
-                    message: "I just finished my setup. What's the best place for me to start?",
+                    message: [
+                        `I just completed my setup.`,
+                        finalAnswers.experience && `My experience level: ${finalAnswers.experience}.`,
+                        finalAnswers.goal && `My goal: ${finalAnswers.goal}.`,
+                        finalAnswers.age && `Age group: ${finalAnswers.age}.`,
+                        `I'm on the ${finalBranch === 'practice_workspace' ? 'practice workspace' : 'guided basics'} path.`,
+                        `In 2 sentences, tell me the single best tool to open first right now and why.`,
+                    ].filter(Boolean).join(' '),
                     userId,
                     history: [],
                     appMode: mode,
@@ -503,7 +529,7 @@ export default function OnboardingQuiz({ active, onDismiss, onNavigate, onModeSe
                                 <>
                                     {coachReply && (
                                         <p className="text-white/65 text-[13px] font-playfair leading-relaxed text-center mb-5">
-                                            {coachReply}
+                                            {cleanReply(coachReply)}
                                         </p>
                                     )}
                                     <div className="flex flex-col gap-2 mt-2">

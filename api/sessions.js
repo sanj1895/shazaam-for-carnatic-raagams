@@ -85,7 +85,15 @@ export default async function handler(req, res) {
     if (!userId) return;
 
     if (req.method === 'GET') {
-      if (!await enforceRateLimit(req, res, { name: 'sessions-get', userId, limit: 60, windowMs: 60_000 })) return;
+      if (!await enforceRateLimit(req, res, {
+        name: 'sessions-get',
+        userId,
+        limit: 60,
+        windowMs: 60_000,
+        extraLimits: [
+          { label: 'daily', limit: 600, windowMs: 24 * 60 * 60 * 1000 },
+        ],
+      })) return;
       const db = await getDb();
       const recent = await db.collection('sessions')
         .find({ userId })
@@ -96,7 +104,15 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      if (!await enforceRateLimit(req, res, { name: 'sessions-post', userId, limit: 90, windowMs: 60_000 })) return;
+      if (!await enforceRateLimit(req, res, {
+        name: 'sessions-post',
+        userId,
+        limit: 90,
+        windowMs: 60_000,
+        extraLimits: [
+          { label: 'daily', limit: 1000, windowMs: 24 * 60 * 60 * 1000 },
+        ],
+      })) return;
       const {
         tool, raga, durationMinutes, notes,
         outcome, confidence, confusedWith,

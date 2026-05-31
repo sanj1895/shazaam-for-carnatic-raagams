@@ -65,8 +65,6 @@ pip install google-adk mcp
 ```bash
 cp .env.example .env
 # Fill in MONGODB_URI, GOOGLE_CLOUD_PROJECT, GOOGLE_CREDENTIALS_B64
-# Optional but recommended for shared serverless rate limiting:
-# UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN
 ```
 
 ### 3. Deploy the agent to Vertex AI Agent Engine
@@ -83,17 +81,6 @@ python agent/deploy_to_agent_engine.py
 npm run dev       # frontend on http://localhost:5173
 adk web agent     # ADK dev UI on http://localhost:8000 (optional)
 ```
-
-### Optional: shared rate limiting with Upstash
-
-For production on Vercel, add these environment variables to enable cross-instance rate limiting:
-
-```bash
-UPSTASH_REDIS_REST_URL=...
-UPSTASH_REDIS_REST_TOKEN=...
-```
-
-If they are missing, the app falls back to in-memory per-instance rate limiting for local development.
 
 ## How the MongoDB Integration Works
 

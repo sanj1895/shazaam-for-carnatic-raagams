@@ -44,7 +44,15 @@ export default async function handler(req, res) {
 
   const userId = await requireVerifiedUserId(req, res);
   if (!userId) return;
-  if (!await enforceRateLimit(req, res, { name: 'gemini-identify', userId, limit: 20, windowMs: 60_000 })) return;
+  if (!await enforceRateLimit(req, res, {
+    name: 'gemini-identify',
+    userId,
+    limit: 20,
+    windowMs: 60_000,
+    extraLimits: [
+      { label: 'daily', limit: 120, windowMs: 24 * 60 * 60 * 1000 },
+    ],
+  })) return;
 
   const bodyStr = JSON.stringify(req.body || {});
   if (bodyStr.length > MAX_BODY_BYTES) {

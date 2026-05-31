@@ -87,40 +87,128 @@ async function buildUserContext(userId, appMode, sadhanaCompleted) {
   if (!MONGODB_URI) return '';
   try {
     const db = await getDb();
-    const [profile, learnerModelSummary] = await Promise.all([
+
+    // Run profile + learner model queries in parallel
+    const [profile, ragaStatsRaw, confusionPairsRaw] = await Promise.all([
       db.collection('profiles').findOne({ userId }, { projection: { _id: 0 } }),
-      buildLearnerModelSummary(db, userId),
+      db.collection('sessions').aggregate([
+        { $match: { userId, raga: { $exists: true, $nin: ['', null] } } },
+        {
+          $group: {
+            _id: '$raga',
+            totalSessions: { $sum: 1 },
+            identifiedCount: {
+              $sum: { $cond: [{ $in: ['$outcome', ['identified', 'likely']] }, 1, 0] },
+            },
+            lastPracticed: { $max: '$timestamp' },
+          },
+        },
+        { $sort: { totalSessions: -1 } },
+        { $limit: 8 },
+      ]).toArray(),
+      db.collection('sessions').aggregate([
+        {
+          $match: {
+            userId,
+            confusedWith: { $exists: true, $nin: ['', null] },
+            raga: { $exists: true, $nin: ['', null] },
+          },
+        },
+        {
+          $group: {
+            _id: { raga: '$raga', confusedWith: '$confusedWith' },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { count: -1 } },
+        { $limit: 5 },
+      ]).toArray(),
     ]);
-    // Only surface sessions from after the most recent quiz — redoing the quiz starts a clean slate
+
     const sessionFilter = profile?.updatedAt
       ? { userId, timestamp: { $gt: profile.updatedAt } }
       : { userId };
-    const sessions = await db.collection('sessions')
+    const recentSessions = await db.collection('sessions')
       .find(sessionFilter)
       .sort({ timestamp: -1 })
       .limit(5)
       .toArray();
-    const parts = [`userId=${userId}`];
+
+    const ragaStats = ragaStatsRaw.map(r => ({
+      raga: r._id,
+      totalSessions: r.totalSessions,
+      identifiedCount: r.identifiedCount,
+      lastPracticed: r.lastPracticed,
+      masteryLevel: computeMasteryLevel(r),
+    }));
+
+    // Build an explicit coaching brief rather than a terse metadata block.
+    // The agent must use these facts when answering questions about progress,
+    // weaknesses, and next steps — not give generic tool suggestions.
+    const lines = [];
+
+    // Student profile
     if (profile) {
-      const exp = profile.experience ? `experience=${profile.experience}` : null;
-      const learner = profile.learner ? `learner=${profile.learner}` : null;
-      const age = profile.age ? `age=${profile.age}` : null;
-      const branch = profile.branch ? `path=${profile.branch}` : null;
-      const filtered = [exp, learner, age, branch].filter(Boolean);
-      if (filtered.length) parts.push(`Profile: ${filtered.join(', ')}`);
+      lines.push(`STUDENT PROFILE: experience=${profile.experience || 'unknown'}, goal=${profile.goal || 'unknown'}, path=${profile.branch || 'unknown'}, app_mode=${appMode || 'musician'}`);
+    } else {
+      lines.push(`STUDENT PROFILE: app_mode=${appMode || 'musician'}`);
     }
-    if (sessions.length) {
-      const recent = sessions
+
+    // Confusion patterns — this is what answers "what am I getting wrong"
+    if (confusionPairsRaw.length > 0) {
+      lines.push('');
+      lines.push('RECURRING CONFUSION PATTERNS (from MongoDB session history — use these when asked what the student gets wrong):');
+      confusionPairsRaw.forEach(c => {
+        lines.push(`  • ${c._id.raga} confused with ${c._id.confusedWith}: ${c.count} time${c.count !== 1 ? 's' : ''} recorded`);
+      });
+    } else {
+      lines.push('');
+      lines.push('CONFUSION PATTERNS: none recorded yet — the student has not completed enough Viveka identification sessions to establish patterns.');
+    }
+
+    // Raga progress
+    if (ragaStats.length > 0) {
+      lines.push('');
+      lines.push('RAGA PROGRESS (from MongoDB):');
+      ragaStats.forEach(r => {
+        const daysSince = r.lastPracticed
+          ? Math.floor((Date.now() - new Date(r.lastPracticed).getTime()) / 86400000)
+          : null;
+        const recency = daysSince === null ? '' : daysSince === 0 ? ', practiced today' : `, last practiced ${daysSince}d ago`;
+        lines.push(`  • ${r.raga}: ${r.masteryLevel} (${r.totalSessions} sessions${recency})`);
+      });
+    } else {
+      lines.push('');
+      lines.push('RAGA PROGRESS: no raga-specific history yet.');
+    }
+
+    // Recent activity
+    if (recentSessions.length > 0) {
+      const recent = recentSessions
         .map(s => [s.tool, s.raga].filter(Boolean).join('/'))
         .filter(Boolean)
         .join(', ');
-      if (recent) parts.push(`Recent tools: ${recent}`);
+      if (recent) lines.push(`\nRECENT ACTIVITY: ${recent}`);
     }
-    if (learnerModelSummary) parts.push(learnerModelSummary);
-    if (appMode) parts.push(`App mode: ${appMode}`);
-    if (sadhanaCompleted?.length) parts.push(`Sadhana done today: ${sadhanaCompleted.join(', ')}`);
-    if (!parts.length) return '';
-    return `[${parts.join(' | ')}]\n\n`;
+
+    if (sadhanaCompleted?.length) {
+      lines.push(`SADHANA COMPLETED TODAY: ${sadhanaCompleted.join(', ')}`);
+    }
+
+    // Explicit coaching instructions so the agent answers correctly
+    lines.push('');
+    lines.push('COACHING INSTRUCTIONS:');
+    if (confusionPairsRaw.length > 0) {
+      lines.push('  - When asked "what am I getting wrong" or "what do I keep messing up": cite the CONFUSION PATTERNS above by name. Do not suggest generic tools.');
+    } else {
+      lines.push('  - When asked "what am I getting wrong": explain that confusion patterns are tracked from Viveka sessions, and you don\'t have enough data yet. Direct them to use Viveka to identify a few ragas so their patterns can be recorded.');
+    }
+    if (ragaStats.length > 0) {
+      const weak = ragaStats.find(r => r.masteryLevel === 'exploring' || r.masteryLevel === 'developing');
+      if (weak) lines.push(`  - When asked "what should I practice": prioritize ${weak.raga} (${weak.masteryLevel}) and address the top confusion pattern.`);
+    }
+
+    return lines.join('\n') + '\n\n';
   } catch {
     return '';
   }

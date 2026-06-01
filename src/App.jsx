@@ -1640,12 +1640,12 @@ function App() {
                                         <div className="mt-8 sm:mt-10 mb-2 px-1.5 sm:px-2 md:px-3">
                                             <div className="flex items-center gap-4">
                                                 <div className="h-px flex-1 bg-c-gold/10" />
-                                                <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.28em] text-c-gold/40 font-mono">All tools</p>
+                                                <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.28em] text-c-gold/30 font-mono">Reference — when you need to open something specific</p>
                                                 <div className="h-px flex-1 bg-c-gold/10" />
                                             </div>
                                         </div>
 
-                                        <section className="mt-4 sm:mt-6 px-1.5 sm:px-2 md:px-3">
+                                        <section className="mt-4 sm:mt-6 px-1.5 sm:px-2 md:px-3" style={{ opacity: workspaceBlocks?.recommendation ? 0.72 : 1, transition: 'opacity 300ms ease' }}>
                                             <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/18 bg-[linear-gradient(180deg,rgba(14,6,3,0.96),rgba(7,3,2,0.98))] shadow-[0_30px_80px_rgba(0,0,0,0.42),0_0_0_1px_rgba(199,139,34,0.08)] overflow-hidden backdrop-blur-md">
                                                 <div className="relative z-10 px-4 pt-4 pb-3 sm:px-10">
                                                     <div className="flex items-center justify-center gap-4">
@@ -2009,7 +2009,7 @@ function App() {
                                             </div>
                                         </section>
 
-                                        <section className="mt-4 px-1.5 sm:px-2 md:px-3">
+                                        <section className="mt-4 px-1.5 sm:px-2 md:px-3" style={{ opacity: workspaceBlocks?.recommendation ? 0.72 : 1, transition: 'opacity 300ms ease' }}>
                                             <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/18 bg-[linear-gradient(180deg,rgba(14,6,3,0.96),rgba(7,3,2,0.98))] shadow-[0_30px_80px_rgba(0,0,0,0.42),0_0_0_1px_rgba(199,139,34,0.08)] overflow-hidden backdrop-blur-md">
                                                 <div className="relative z-10 grid lg:grid-cols-[31%_69%] gap-0 px-3 py-3 sm:px-6 sm:py-6">
                                                     <div className="rounded-[20px] sm:rounded-[28px] bg-[linear-gradient(180deg,rgba(29,12,6,0.62),rgba(12,5,2,0.34))] px-4 py-4 sm:px-7 sm:py-6 backdrop-blur-sm">
@@ -2414,7 +2414,7 @@ function App() {
                                             </div>
                                         </section>
 
-                                        <section className="mt-4 px-1.5 sm:px-2 md:px-3">
+                                        <section className="mt-4 px-1.5 sm:px-2 md:px-3" style={{ opacity: workspaceBlocks?.recommendation ? 0.72 : 1, transition: 'opacity 300ms ease' }}>
                                             <div className="rounded-[24px] sm:rounded-[34px] border border-c-gold/18 bg-[linear-gradient(180deg,rgba(14,6,3,0.96),rgba(7,3,2,0.98))] shadow-[0_30px_80px_rgba(0,0,0,0.42),0_0_0_1px_rgba(199,139,34,0.08)] overflow-hidden backdrop-blur-md">
                                                 <div className="grid lg:grid-cols-[31%_69%] gap-0 px-3 py-3 sm:px-6 sm:py-6">
                                                     <div className="rounded-[20px] sm:rounded-[28px] bg-[linear-gradient(180deg,rgba(29,12,6,0.62),rgba(12,5,2,0.34))] px-4 py-4 sm:px-7 sm:py-8">

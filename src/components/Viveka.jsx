@@ -685,8 +685,6 @@ export default function Viveka({ onSelectRaga }) {
                                     onClick={startRecording}
                                     className="relative w-32 h-32 rounded-full bg-c-card border-2 border-c-gold/50 hover:border-c-gold hover:bg-c-gold-faint flex flex-col items-center justify-center gap-1.5 transition-all active:scale-95 group shadow-lg"
                                 >
-                                    <div className="absolute inset-[-6px] rounded-full border border-c-gold/20 animate-ping opacity-40" />
-                                    <div className="absolute inset-[-14px] rounded-full border border-c-gold/08 animate-ping opacity-20" style={{ animationDelay: '0.3s' }} />
                                     <svg className="w-8 h-8 text-c-gold" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/>
                                         <path d="M19 11a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 6 6.92V20H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.08A7 7 0 0 0 19 11z" fillOpacity="0.7"/>

@@ -10,7 +10,7 @@
  */
 /* global process */
 import { GoogleAuth, UserRefreshClient } from 'google-auth-library';
-import { requireVerifiedUserId } from './_auth.js';
+//import { requireVerifiedUserId } from './_auth.js';
 import { enforceRateLimit } from './_rateLimit.js';
 import { applyApiSecurity, rejectDisallowedOrigin } from './_security.js';
 
@@ -42,16 +42,21 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const userId = await requireVerifiedUserId(req, res);
-  if (!userId) return;
-  if (!await enforceRateLimit(req, res, {
-    name: 'gemini-identify',
-    userId,
-    limit: 20,
-    windowMs: 60_000,
-    extraLimits: [
-      { label: 'daily', limit: 120, windowMs: 24 * 60 * 60 * 1000 },
-    ],
+  // AI Guru should work for public practice users without requiring login.
+// Keep rate limiting, but key it by IP instead of authenticated user id.
+  const userId =
+  req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+  req.socket?.remoteAddress ||
+  'anonymous';
+
+if (!await enforceRateLimit(req, res, {
+  name: 'gemini-identify',
+  userId,
+  limit: 20,
+  windowMs: 60_000,
+  extraLimits: [
+    { label: 'daily', limit: 120, windowMs: 24 * 60 * 60 * 1000 },
+  ],
   })) return;
 
   const bodyStr = JSON.stringify(req.body || {});

@@ -56,12 +56,18 @@ async function authHeaders(getToken) {
 }
 
 async function parseError(res, fallback) {
+  let scope = null;
   try {
     const data = await res.json();
     if (typeof data?.error === 'string' && data.error.trim()) fallback = data.error;
+    if (typeof data?.scope === 'string') scope = data.scope;
   } catch {}
   if (res.status === 401) return 'Please sign in again to view your musical memory.';
-  if (res.status === 429) return 'You are checking memory too often. Please pause for a moment.';
+  if (res.status === 429) {
+    return scope === 'daily'
+      ? 'You have reached today’s memory-view limit. Please come back tomorrow.'
+      : 'You are checking memory too often. Please pause for a moment.';
+  }
   return fallback;
 }
 

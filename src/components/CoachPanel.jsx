@@ -45,12 +45,18 @@ async function authHeaders(getToken) {
 
 async function readApiError(res, fallback) {
   let message = fallback;
+  let scope = null;
   try {
     const data = await res.json();
     if (typeof data?.error === 'string' && data.error.trim()) message = data.error;
+    if (typeof data?.scope === 'string') scope = data.scope;
   } catch {}
   if (res.status === 401) return 'Please sign in again to keep using your practice coach.';
-  if (res.status === 429) return 'You are sending requests too quickly. Please wait a moment and try again.';
+  if (res.status === 429) {
+    return scope === 'daily'
+      ? 'You have reached today’s practice-coach usage limit. Please come back tomorrow.'
+      : 'You are sending requests too quickly. Please wait a moment and try again.';
+  }
   return message;
 }
 

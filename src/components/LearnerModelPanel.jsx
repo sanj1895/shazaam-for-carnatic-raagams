@@ -133,8 +133,8 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
     nextFocus.push({
       text:        `Distinguish ${raga} from ${confusedWith} — you have confused them ${count} time${count !== 1 ? 's' : ''}`,
       urgency:     'high',
-      action:      'tutor',
-      actionLabel: 'Practice in Gurukul',
+      action:      { view: 'compare', ragaA: raga, ragaB: confusedWith },
+      actionLabel: 'Compare Ragas',
     });
   }
   if (stale) nextFocus.push({
@@ -157,8 +157,8 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
     recommendedExercise = {
       label:    'Most urgent',
       text:     `You have confused ${raga} and ${confusedWith} ${count} time${count !== 1 ? 's' : ''}.`,
-      exercise: `Sing Pa-Dha-Ni-Sa of ${raga} three times, then ${confusedWith} three times. Hold the Ni each time and notice which note differs.`,
-      tool:     'Gurukul', action: 'tutor', duration: '10–15 min',
+      exercise: `Open the comparison to see which note differs, then sing both arohanas back to back in Gurukul with the drone running.`,
+      tool:     'Raga Kosha', action: { view: 'compare', ragaA: raga, ragaB: confusedWith }, duration: '10–15 min',
     };
   } else if (stale) {
     const d = Math.floor((Date.now() - new Date(stale.lastPracticed).getTime()) / 86400000);
@@ -296,10 +296,10 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
                       <span className="text-[9px] font-mono text-c-cream-dark/60 flex-shrink-0 hidden sm:block">{daysSince(pair.lastOccurred)}</span>
                     )}
                     <button
-                      onClick={() => nav('tutor')}
+                      onClick={() => nav({ view: 'compare', ragaA: pair.raga, ragaB: pair.confusedWith })}
                       className="flex-shrink-0 text-[9px] font-mono uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-c-gold/22 text-c-gold/70 hover:bg-c-gold/8 hover:text-c-gold transition-colors whitespace-nowrap"
                     >
-                      Practice →
+                      Compare →
                     </button>
                   </div>
                 ))}
@@ -449,7 +449,7 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
           <section className="flex flex-col gap-3">
             <div className="flex flex-col gap-0.5">
               <h2 className="font-playfair text-base font-semibold text-c-cream-dim">How Consistently You're Practicing</h2>
-              <p className="text-[10px] text-c-cream-dark font-mono">Each column is one day · taller bar = more sessions</p>
+              <p className="text-[10px] text-c-cream-dark font-mono">Each column is one day · counts shown above active days</p>
             </div>
             <div className="bg-c-card border border-c-border rounded-xl p-4 flex flex-col gap-3">
               {activeDays === 0 ? (
@@ -464,37 +464,41 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
               ) : (
                 <div className="flex gap-3">
                   {timelineWeeks.map((week) => (
-                    <div key={week.label} className="flex-1 flex flex-col gap-1.5">
-                      <div className="flex items-end gap-0.5 h-10">
+                    <div key={week.label} className="flex-1 flex flex-col gap-2 rounded-lg border border-c-border/70 bg-c-surface/70 p-2.5">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[8px] font-mono text-c-cream-dark uppercase tracking-widest">{week.label}</p>
+                        <span className="text-[9px] font-mono text-c-gold/70">
+                          {week.days.reduce((sum, day) => sum + day.count, 0)} sess
+                        </span>
+                      </div>
+                      <div className="flex items-end gap-1 h-16">
                         {week.days.map((day) => {
-                          const heightPct = day.count === 0 ? 0 : Math.max((day.count / maxCount) * 100, 18);
+                          const heightPct = day.count === 0 ? 0 : Math.max((day.count / maxCount) * 100, 22);
                           return (
-                            <div key={day.date} className="flex-1 flex flex-col items-center justify-end"
+                            <div key={day.date} className="flex-1 flex flex-col items-center justify-end gap-1"
                               title={day.count > 0
                                 ? `${day.dayLabel} ${day.date}: ${day.count} session${day.count !== 1 ? 's' : ''}${day.ragas.filter(Boolean).length ? ` · ${day.ragas.filter(Boolean).join(', ')}` : ''}`
                                 : `${day.dayLabel} — no practice`}>
+                              <span className={`text-[8px] font-mono leading-none ${day.count > 0 ? 'text-c-gold/75' : 'text-transparent'}`}>
+                                {day.count > 0 ? day.count : '0'}
+                              </span>
                               <div
-                                className={`w-full rounded-sm transition-all ${day.count === 0 ? 'bg-c-border/50' : day.isToday ? 'bg-c-gold' : 'bg-c-gold-dim'}`}
-                                style={{ height: day.count === 0 ? '3px' : `${heightPct}%` }}
+                                className={`w-full rounded-[3px] transition-all ${day.count === 0 ? 'bg-c-border/55' : day.isToday ? 'bg-c-gold' : 'bg-c-gold-dim'}`}
+                                style={{ height: day.count === 0 ? '4px' : `${heightPct}%` }}
                               />
                             </div>
                           );
                         })}
                       </div>
-                      {week.label === 'This week' ? (
-                        <div className="flex gap-0.5">
-                          {week.days.map((day) => (
-                            <div key={day.date} className="flex-1 text-center">
-                              <span className={`text-[7px] font-mono uppercase ${day.isToday ? 'text-c-gold font-bold' : 'text-c-cream-dark/60'}`}>
-                                {day.isToday ? 'now' : day.dayLabel}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="h-[10px]" />
-                      )}
-                      <p className="text-[8px] font-mono text-c-cream-dark uppercase tracking-widest text-center">{week.label}</p>
+                      <div className="flex gap-1">
+                        {week.days.map((day) => (
+                          <div key={day.date} className="flex-1 text-center">
+                            <span className={`text-[7px] font-mono uppercase ${day.isToday ? 'text-c-gold font-bold' : 'text-c-cream-dark/60'}`}>
+                              {day.isToday ? 'now' : day.dayLabel}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>

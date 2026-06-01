@@ -22,6 +22,7 @@ import SketchyRule from './components/SketchyRule';
 import CoachPanel from './components/CoachPanel';
 import LearnerModelPanel from './components/LearnerModelPanel';
 import SessionDiagnostic from './components/SessionDiagnostic';
+import RagaCompare from './components/RagaCompare';
 
 const VeenaIcon = () => (
     <svg width="16" height="50" viewBox="0 0 22 68" fill="none" className="text-c-gold-dim">
@@ -89,7 +90,7 @@ const MODE_FEATURE_ORDER = {
 
 const MODE_ALLOWED_VIEWS = {
     beginner: new Set(['home', 'tutor', 'sadhana', 'shruthi', 'talam', 'keyboard', 'singback', 'learner-model']),
-    musician: new Set(['home', 'avabodha', 'tutor', 'listen', 'viveka', 'transcribe', 'library', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam', 'learner-model']),
+    musician: new Set(['home', 'avabodha', 'tutor', 'listen', 'viveka', 'transcribe', 'library', 'keyboard', 'shruthi', 'talam', 'melakarta', 'bhedam', 'learner-model', 'compare']),
 };
 
 const PENDING_ROUTE_KEY = 'alapana_pending_route';
@@ -403,6 +404,7 @@ function App() {
     const [sadhana, setSadhana] = useState(loadSadhanaState);
     const [sadhanaToast, setSadhanaToast] = useState(null); // { title, stepName }
     const [selectedRaga, setSelectedRaga] = useState(null); // { raga, hasClearMatch, type: 'library' | 'identify' | 'melakarta' }
+    const [compareRagas, setCompareRagas] = useState(null); // { a, b }
     const [showGuide, setShowGuide] = useState(false);
     const [practiceDemoBeat, setPracticeDemoBeat] = useState(0);
     const [practiceDemoSlider, setPracticeDemoSlider] = useState(4);
@@ -715,9 +717,11 @@ function App() {
             const { raga, confusedWith, count } = confusionPairs[0];
             recommendation = {
                 label: 'Top confusion pattern',
-                text: `You have confused ${raga} and ${confusedWith} ${count} time${count !== 1 ? 's' : ''}. Drilling the distinguishing phrase in Gurukul is the priority today.`,
-                cta: 'Practice in Gurukul',
-                action: 'tutor',
+                text: `You have confused ${raga} and ${confusedWith} ${count} time${count !== 1 ? 's' : ''}. See exactly which note differs and drill it.`,
+                cta: 'Compare Ragas',
+                action: 'compare',
+                ragaA: raga,
+                ragaB: confusedWith,
             };
         } else {
             const stale = ragaStats.find(r =>
@@ -940,6 +944,11 @@ function App() {
     };
 
     const goToAdvanced = (id, options = {}) => goTo(id, { ...options, modeOverride: 'musician' });
+
+    const goToCompare = (a, b) => {
+        setCompareRagas({ a, b });
+        goToAdvanced('compare');
+    };
     const enterWorkspace = (modeOverride = appMode) => goTo('home', { modeOverride, workspace: true });
 
     const openAbout = () => {
@@ -1549,7 +1558,12 @@ function App() {
                                                     <p className="text-[0.85rem] font-playfair text-white/70 leading-relaxed mb-3">{workspaceBlocks.recommendation.text}</p>
                                                     <div className="flex flex-wrap items-center gap-2">
                                                         <button
-                                                            onClick={() => goToAdvanced(workspaceBlocks.recommendation.action)}
+                                                            onClick={() => {
+                                                                const r = workspaceBlocks.recommendation;
+                                                                r.action === 'compare'
+                                                                    ? goToCompare(r.ragaA, r.ragaB)
+                                                                    : goToAdvanced(r.action);
+                                                            }}
                                                             className="text-[10px] font-mono uppercase tracking-widest px-3.5 py-1.5 rounded-lg bg-c-gold text-c-bg font-bold hover:bg-c-gold-light transition-all"
                                                         >
                                                             {workspaceBlocks.recommendation.cta} →
@@ -1591,7 +1605,7 @@ function App() {
                                                         {workspaceBlocks.confusionPairs.map((pair, i) => (
                                                             <button
                                                                 key={i}
-                                                                onClick={() => goToAdvanced('tutor')}
+                                                                onClick={() => goToCompare(pair.raga, pair.confusedWith)}
                                                                 className="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/6 hover:bg-white/[0.07] hover:border-white/12 transition-all text-left group"
                                                             >
                                                                 <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -2868,6 +2882,14 @@ function App() {
                         <RagaLibrary onSelectRaga={(r) => setSelectedRaga({ raga: r, hasClearMatch: true, type: 'library' })} />
                     </div>
                 )}
+                {view === 'compare' && compareRagas && (
+                    <RagaCompare
+                        ragaA={compareRagas.a}
+                        ragaB={compareRagas.b}
+                        onBack={() => goTo('home')}
+                        onPractice={() => goToAdvanced('tutor')}
+                    />
+                )}
                 {view === 'melakarta' && (
                     <div className="w-full p-4 md:p-8 flex flex-col items-center animate-fade-in raga-melakarta-chart">
                         <MelakartaChart onSelectRaga={(r) => setSelectedRaga({ raga: r, type: 'melakarta' })} />
@@ -2899,7 +2921,13 @@ function App() {
                     </div>
                 )}
                 {view === 'learner-model' && (
-                    <LearnerModelPanel userId={userId} getToken={getToken} onNavigate={(view) => goToAdvanced(view)} />
+                    <LearnerModelPanel userId={userId} getToken={getToken} onNavigate={(dest) => {
+                        if (dest && typeof dest === 'object') {
+                            dest.view === 'compare' ? goToCompare(dest.ragaA, dest.ragaB) : goToAdvanced(dest.view);
+                        } else {
+                            goToAdvanced(dest);
+                        }
+                    }} />
                 )}
                 {view === 'sadhana' && appMode !== 'beginner' && (
                     <div className="w-full max-w-xl mx-auto flex flex-col items-center gap-5 py-16 px-6 text-center animate-fade-in">

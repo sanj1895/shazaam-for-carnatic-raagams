@@ -1491,7 +1491,7 @@ function App() {
                                                     Start My Practice Check
                                                 </button>
                                                 <button
-                                                    onClick={() => setDiagnosticActive(true)}
+                                                    onClick={() => enterWorkspace('musician')}
                                                     className="group border border-c-gold/55 hover:border-c-gold text-c-gold hover:text-c-gold-light font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 cursor-pointer"
                                                 >
                                                     Continue My Practice Path

@@ -1,9 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
-import { detectPitch, startDrone, SWARA_SEMITONE, playNote, getOctaveSequence, playSequence, openMicStream, buildMicChain, closeMicStream } from '../utils/audioUtils';
+import {
+  detectPitch,
+  startDrone,
+  SWARA_SEMITONE,
+  playNote,
+  getOctaveSequence,
+  playSequence,
+  openMicStream,
+  buildMicChain,
+  closeMicStream,
+  getAudioCtx,
+} from '../utils/audioUtils';
 import { getSwaram, toSargam } from '../utils/ragaLogic';
 import { geminiChat as groqChatCompletion } from '../utils/ragaIdentify';
-import { deriveConfusedRaga } from '../utils/practiceAnalytics';
-
+import { deriveConfusedRaga, uniqueSwaras } from '../utils/practiceAnalytics';
 const RECORD_SECS = 20;
 
 const PITCHES = [

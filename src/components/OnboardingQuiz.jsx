@@ -75,7 +75,7 @@ const U_QUESTIONS = [
             : 'What kind of experience sounds better right now?',
         options: [
             { label: 'Guide me step by step',      sub: 'One clear next step, no decisions needed',       value: 'guided',    guided: 4, workspace: 0 },
-            { label: 'Give me a practice workspace',sub: 'I want to choose from a set of tools',          value: 'workspace', guided: 0, workspace: 4 },
+            { label: 'Give me a practice workspace',sub: 'I practice regularly and want to choose my own session focus', value: 'workspace', guided: 0, workspace: 4 },
         ],
     },
 ];
@@ -129,12 +129,12 @@ const GUIDED_QUESTIONS = [
 const WORKSPACE_QUESTIONS = [
     {
         id: 'workspace_intent',
-        qFn: (a) => a.learner === 'other' ? 'What will they probably use first?' : 'What will you probably use first?',
+        qFn: (a) => a.learner === 'other' ? 'What is their main practice challenge right now?' : 'What is your main practice challenge right now?',
         options: [
-            { label: 'Raga identification',     sub: "Sing and discover which raga you're in",        value: 'identify' },
-            { label: 'Phrase transcription',    sub: 'Capture sangatis and musical ideas',            value: 'transcribe' },
-            { label: 'Daily practice tools',    sub: 'Shruthi, talam, keyboard warm-up',             value: 'daily_practice' },
-            { label: 'Raga study and exploration',sub: 'Scales, relationships, raga encyclopedia',   value: 'study' },
+            { label: 'I keep confusing similar ragas',    sub: 'Two ragas feel similar and I cannot tell them apart',                            value: 'identify' },
+            { label: 'I want to transcribe what I sing',  sub: 'Capture sangatis and musical ideas from my practice sessions',                   value: 'transcribe' },
+            { label: 'I need daily structure',            sub: 'Drone, beat, and basic exercises before I start singing',                        value: 'daily_practice' },
+            { label: 'I want to understand ragas I study',sub: 'Know the scale and characteristic phrases of the ragas in my current repertoire', value: 'study' },
         ],
     },
 ];

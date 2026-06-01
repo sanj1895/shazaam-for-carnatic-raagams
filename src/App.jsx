@@ -1669,7 +1669,7 @@ function App() {
                                                         </div>
 
                                                         <p className="mt-3 sm:mt-4 max-w-none sm:max-w-[260px] text-[0.95rem] sm:text-[1.02rem] leading-[1.65] sm:leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
-                                                            The foundation of every session — drone, rhythm, real-time listening, and raga detection.
+                                                            Start every practice session here — set your drone, hold the tala, and detect what you are actually singing.
                                                         </p>
 
                                                         <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 max-w-[320px] text-c-gold">
@@ -2018,12 +2018,12 @@ function App() {
                                                                 {renderTabIcon('library', 'w-8 h-8')}
                                                             </div>
                                                             <h3 className="font-playfair text-c-gold-light text-[2.15rem] sm:text-[2.7rem] leading-none">
-                                                                Reference
+                                                                Understand
                                                             </h3>
                                                         </div>
 
                                                         <p className="mt-3 sm:mt-4 max-w-none sm:max-w-[270px] text-[0.95rem] sm:text-[1.02rem] leading-[1.65] sm:leading-[1.8]" style={{ color: 'rgba(243, 234, 214, 0.94)' }}>
-                                                            Look up the raga you're working on — scales, relationships, and the 72-parent system.
+                                                            Know the raga you are practicing — its scale, how it relates to others, and where it sits in the Melakarta system.
                                                         </p>
 
                                                         <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-4 max-w-[270px] text-c-gold">
@@ -2134,7 +2134,7 @@ function App() {
                                                                             Best for
                                                                         </div>
                                                                         <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
-                                                                            Supporting reference when you need to understand the raga you're working on — scale, mood, characteristic phrases.
+                                                                            Check the raga before or during practice — its scale, mood, and characteristic phrases that define it.
                                                                         </p>
                                                                     </div>
                                                                 </div>
@@ -2280,7 +2280,7 @@ function App() {
                                                                             Best for
                                                                         </div>
                                                                         <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
-                                                                            Studying the full 72-parent system and seeing how ragas are organized at the broadest level.
+                                                                            Locate your raga in the 72-parent system to understand which swaras define it and which ragas are adjacent.
                                                                         </p>
                                                                     </div>
                                                                 </div>
@@ -2380,7 +2380,7 @@ function App() {
                                                                                 }}
                                                                             >
                                                                                 <span style={{ transform: bhedamPreviewActive ? 'translateX(3px)' : 'translateX(0)', transition: 'transform 300ms ease' }}>
-                                                                                    Explore Transformations
+                                                                                    See Raga Shifts
                                                                                 </span>
                                                                                 <ArrowRightMini
                                                                                     className="h-3.5 w-3.5 text-c-gold transition-all duration-300"
@@ -2403,7 +2403,7 @@ function App() {
                                                                             Best for
                                                                         </div>
                                                                         <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
-                                                                            Discovering how shifting Sa transforms one raga into another and reveals deeper relationships.
+                                                                            Understand why two ragas feel similar — useful when the coach identifies a specific raga confusion to fix.
                                                                         </p>
                                                                     </div>
                                                                 </div>
@@ -2633,7 +2633,7 @@ function App() {
                                                                             Best for
                                                                         </div>
                                                                         <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'rgba(243,234,214,0.68)' }}>
-                                                                            Guided learning, repertoire structure, and a clearer practice path when you want more than one-off tools.
+                                                                            Structured daily riyaz with AI pitch feedback — use when the coach prescribes a specific raga or exercise to work on.
                                                                         </p>
                                                                     </div>
                                                                 </div>

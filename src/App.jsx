@@ -1001,6 +1001,8 @@ function App() {
         <>
             <SessionDiagnostic
                 active={diagnosticActive}
+                userId={userId}
+                getToken={getToken}
                 onNavigate={(view) => {
                     setDiagnosticActive(false);
                     goToAdvanced(view);

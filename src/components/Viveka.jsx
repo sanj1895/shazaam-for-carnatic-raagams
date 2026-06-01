@@ -27,6 +27,22 @@ function hzToNoteName(hz) {
     return `${NOTE_NAMES[((semi % 12) + 12) % 12]}${Math.floor(semi / 12)}`;
 }
 
+function stabilizeOctave(candidateHz, referenceHz) {
+    if (!candidateHz || !referenceHz) return candidateHz;
+
+    const doubled = candidateHz * 2;
+    const halved = candidateHz / 2;
+    const centsTo = (target, source) => Math.abs(1200 * Math.log2(target / source));
+
+    if (candidateHz < referenceHz * 0.7 && doubled >= 60 && doubled <= 1600 && centsTo(doubled, referenceHz) <= 85) {
+        return doubled;
+    }
+    if (candidateHz > referenceHz * 1.45 && halved >= 60 && halved <= 1600 && centsTo(halved, referenceHz) <= 85) {
+        return halved;
+    }
+    return candidateHz;
+}
+
 // Group consecutive pitch frames into stable note events.
 // Compares each new frame to the MODE semitone of the current group (not the last frame)
 // so that natural pitch drift within a sustained note doesn't shatter the group.
@@ -219,6 +235,7 @@ export default function Viveka({ onSelectRaga }) {
     const fileInputRef   = useRef(null);
     const audioCtxRef    = useRef(null);
     const dynamicGateRef = useRef(0.004); // calibrated per-session noise floor
+    const stablePitchRef = useRef(null);
 
     useEffect(() => {
         inputModeRef.current = inputMode;
@@ -232,6 +249,7 @@ export default function Viveka({ onSelectRaga }) {
         streamRef.current = null;
         analyserRef.current = null;
         audioCtxRef.current = null;
+        stablePitchRef.current = null;
     }, []);
 
     const runAnalysis = useCallback(async (frames) => {
@@ -428,8 +446,8 @@ export default function Viveka({ onSelectRaga }) {
             let missCount = 0;
             pitchTimer.current = setInterval(() => {
                 if (!analyserRef.current) return;
-                const hz = detectPitch(analyserRef.current, ctx.sampleRate, dynamicGateRef.current);
-                if (!hz) {
+                const rawHz = detectPitch(analyserRef.current, ctx.sampleRate, dynamicGateRef.current);
+                if (!rawHz) {
                     missCount++;
                     if (missCount >= 4) {
                         setCurrentHz(null);
@@ -438,6 +456,11 @@ export default function Viveka({ onSelectRaga }) {
                 }
 
                 missCount = 0;
+                const hz = stabilizeOctave(rawHz, stablePitchRef.current);
+                const prevStablePitch = stablePitchRef.current;
+                if (!prevStablePitch || Math.abs(1200 * Math.log2(hz / prevStablePitch)) <= 320) {
+                    stablePitchRef.current = hz;
+                }
                 setCurrentHz(hz);
 
                 const last = pitchBuf[pitchBuf.length - 1];

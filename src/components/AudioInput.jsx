@@ -12,6 +12,22 @@ const STATUS = {
   NO_PITCH: 'no_pitch',
 };
 
+function stabilizeOctave(candidateHz, referenceHz) {
+    if (!candidateHz || !referenceHz) return candidateHz;
+
+    const doubled = candidateHz * 2;
+    const halved = candidateHz / 2;
+    const centsTo = (target, source) => Math.abs(1200 * Math.log2(target / source));
+
+    if (candidateHz < referenceHz * 0.7 && doubled >= 60 && doubled <= 1600 && centsTo(doubled, referenceHz) <= 85) {
+        return doubled;
+    }
+    if (candidateHz > referenceHz * 1.45 && halved >= 60 && halved <= 1600 && centsTo(halved, referenceHz) <= 85) {
+        return halved;
+    }
+    return candidateHz;
+}
+
 const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
     const [stream, setStream]         = useState(null);
     const [status, setStatus]         = useState(STATUS.READY);
@@ -23,6 +39,7 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
     const activeOscRef = useRef(null);
     const audioCtxRef = useRef(null);
     const dynamicGateRef = useRef(0.004);
+    const stablePitchRef = useRef(null);
 
     useEffect(() => { onPitchDetectedRef.current = onPitchDetected; }, [onPitchDetected]);
     useEffect(() => {
@@ -37,6 +54,7 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
         intervalRef.current = null;
         closeMicStream(stream, audioCtxRef.current);
         audioCtxRef.current = null;
+        stablePitchRef.current = null;
         setStream(null);
     };
 
@@ -126,10 +144,15 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
         setStatusMsg('Sing or hum clearly');
 
         intervalRef.current = setInterval(() => {
-            const hz = detectPitch(analyser, audioCtx.sampleRate, dynamicGateRef.current);
-            if (hz) {
-                setCurrentFreq(hz);
-                onPitchDetectedRef.current?.(hz);
+            const rawHz = detectPitch(analyser, audioCtx.sampleRate, dynamicGateRef.current);
+            if (rawHz) {
+                const correctedHz = stabilizeOctave(rawHz, stablePitchRef.current);
+                const prevStable = stablePitchRef.current;
+                if (!prevStable || Math.abs(1200 * Math.log2(correctedHz / prevStable)) <= 320) {
+                    stablePitchRef.current = correctedHz;
+                }
+                setCurrentFreq(correctedHz);
+                onPitchDetectedRef.current?.(correctedHz);
                 setStatus(STATUS.LISTENING);
                 setStatusMsg('Sing or hum clearly');
             } else {

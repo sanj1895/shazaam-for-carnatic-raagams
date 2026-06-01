@@ -21,6 +21,7 @@ import { CuratedIcon, FireIcon, DhwaniIcon, SadhanaIcon } from './components/Ico
 import SketchyRule from './components/SketchyRule';
 import CoachPanel from './components/CoachPanel';
 import LearnerModelPanel from './components/LearnerModelPanel';
+import SessionDiagnostic from './components/SessionDiagnostic';
 
 const VeenaIcon = () => (
     <svg width="16" height="50" viewBox="0 0 22 68" fill="none" className="text-c-gold-dim">
@@ -393,6 +394,7 @@ function App() {
     const [activeMode, setActiveMode] = useState('standard');
     const [tourActive, setTourActive] = useState(false);
     const [quizActive, setQuizActive] = useState(false);
+    const [diagnosticActive, setDiagnosticActive] = useState(false);
     const [aboutOpen, setAboutOpen] = useState(() => initialRoute.about === true);
     const [tutorLaunchTarget, setTutorLaunchTarget] = useState(() => {
         const route = initialRoute;
@@ -997,6 +999,17 @@ function App() {
 
     return (
         <>
+            <SessionDiagnostic
+                active={diagnosticActive}
+                onNavigate={(view) => {
+                    setDiagnosticActive(false);
+                    goToAdvanced(view);
+                }}
+                onDismiss={() => {
+                    setDiagnosticActive(false);
+                    enterWorkspace('musician');
+                }}
+            />
             <OnboardingQuiz
                 active={quizActive}
                 onDismiss={() => setQuizActive(false)}
@@ -1461,19 +1474,13 @@ function App() {
                                         {isSignedIn ? (
                                             <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
                                                 <button
-                                                    onClick={() => {
-                                                        setAppMode('beginner');
-                                                        setQuizActive(true);
-                                                    }}
+                                                    onClick={() => setDiagnosticActive(true)}
                                                     className="group bg-c-gold hover:bg-[#f7d686] text-c-bg font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 shadow-[0_0_36px_rgba(200,148,31,0.26)] cursor-pointer"
                                                 >
                                                     Start My Practice Check
                                                 </button>
                                                 <button
-                                                    onClick={() => {
-                                                        try { localStorage.setItem('alapana_skipped_intro', 'true'); } catch (e) {}
-                                                        enterWorkspace('musician');
-                                                    }}
+                                                    onClick={() => setDiagnosticActive(true)}
                                                     className="group border border-c-gold/55 hover:border-c-gold text-c-gold hover:text-c-gold-light font-playfair font-bold px-7 sm:px-10 py-3 rounded-full text-xs sm:text-sm tracking-[0.14em] sm:tracking-[0.16em] uppercase transition-all duration-500 cursor-pointer"
                                                 >
                                                     Continue My Practice Path

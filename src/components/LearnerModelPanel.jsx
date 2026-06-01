@@ -71,7 +71,7 @@ async function parseError(res, fallback) {
   return fallback;
 }
 
-export default function LearnerModelPanel({ userId, getToken }) {
+export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
   const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState(null);
@@ -118,20 +118,66 @@ export default function LearnerModelPanel({ userId, getToken }) {
   const maxCount = Math.max(...allDays.map(d => d.count), 1);
   const isEmpty = ragaStats.length === 0 && confusionPairs.length === 0;
 
-  // Derive 1-3 "next focus" recommendations from the learner model
-  const nextFocus = [];
-  if (confusionPairs[0]) {
-    const { raga, confusedWith, count } = confusionPairs[0];
-    nextFocus.push({ text: `Distinguish ${raga} from ${confusedWith} — you've confused them ${count} time${count !== 1 ? 's' : ''}`, urgency: 'high' });
-  }
+  // Shared derived values used by both nextFocus and recommendedExercise
   const stale = ragaStats.find(r =>
     (r.masteryLevel === 'developing' || r.masteryLevel === 'exploring') &&
     r.lastPracticed &&
     Date.now() - new Date(r.lastPracticed).getTime() > 3 * 24 * 60 * 60 * 1000
   );
-  if (stale) nextFocus.push({ text: `Return to ${stale.raga} — ${daysSince(stale.lastPracticed)} and still developing`, urgency: 'medium' });
   const ready = ragaStats.find(r => r.masteryLevel === 'stable' && r.identifiedCount >= 3);
-  if (ready) nextFocus.push({ text: `Advance ${ready.raga} — you're stable here, try a more complex phrase`, urgency: 'low' });
+
+  // Next-focus items — each now carries an action so its row can have a direct CTA
+  const nextFocus = [];
+  if (confusionPairs[0]) {
+    const { raga, confusedWith, count } = confusionPairs[0];
+    nextFocus.push({
+      text:        `Distinguish ${raga} from ${confusedWith} — you have confused them ${count} time${count !== 1 ? 's' : ''}`,
+      urgency:     'high',
+      action:      'viveka',
+      actionLabel: 'Practice in Viveka',
+    });
+  }
+  if (stale) nextFocus.push({
+    text:        `Return to ${stale.raga} — ${daysSince(stale.lastPracticed)} and still developing`,
+    urgency:     'medium',
+    action:      'tutor',
+    actionLabel: 'Open Gurukul',
+  });
+  if (ready) nextFocus.push({
+    text:        `Advance ${ready.raga} — stable here, ready for more complex phrases`,
+    urgency:     'low',
+    action:      'tutor',
+    actionLabel: 'Open Gurukul',
+  });
+
+  // Single pre-computed prescription — mirrors buildPrescription in api/coach.js
+  let recommendedExercise = null;
+  if (confusionPairs[0]) {
+    const { raga, confusedWith, count } = confusionPairs[0];
+    recommendedExercise = {
+      label:    'Most urgent',
+      text:     `You have confused ${raga} and ${confusedWith} ${count} time${count !== 1 ? 's' : ''}.`,
+      exercise: `Sing Pa-Dha-Ni-Sa of ${raga} three times, then ${confusedWith} three times. Hold the Ni each time. Then confirm each phrase in Viveka.`,
+      tool:     'Viveka', action: 'viveka', duration: '10–15 min',
+    };
+  } else if (stale) {
+    const d = Math.floor((Date.now() - new Date(stale.lastPracticed).getTime()) / 86400000);
+    recommendedExercise = {
+      label:    `${d} days without practice`,
+      text:     `${stale.raga} is still ${stale.masteryLevel} and has not been practiced in ${d} day${d !== 1 ? 's' : ''}.`,
+      exercise: `Sing Sarali Varisai pattern 1 in ${stale.raga} — one note per beat, five repetitions with the drone running.`,
+      tool:     'Gurukul', action: 'tutor', duration: '15 min',
+    };
+  } else if (ready) {
+    recommendedExercise = {
+      label:    'Ready to advance',
+      text:     `${ready.raga} is stable with ${ready.totalSessions} sessions.`,
+      exercise: `Practice a characteristic gamakam phrase in ${ready.raga} with AI vocal feedback. Focus on phrase endings and ornament clarity.`,
+      tool:     'Gurukul', action: 'tutor', duration: '15 min',
+    };
+  }
+
+  const nav = onNavigate || (() => {});
 
   return (
     <main className="w-full max-w-3xl mx-auto flex flex-col gap-8 px-4 md:px-8 py-10 animate-fade-in">
@@ -167,45 +213,180 @@ export default function LearnerModelPanel({ userId, getToken }) {
         ))}
       </div>
 
-      {/* ── Your Next Focus ── */}
-      {nextFocus.length > 0 && (
-        <section className="flex flex-col gap-2">
-          <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Your Next Priority</h2>
-          <div className="flex flex-col gap-2">
-            {nextFocus.map((item, i) => (
-              <div key={i} className={`flex items-start gap-3 rounded-xl px-4 py-3 border ${
-                item.urgency === 'high'   ? 'bg-amber-700/8 border-amber-700/25' :
-                item.urgency === 'medium' ? 'bg-c-card border-c-border' :
-                                            'bg-c-card border-c-border'
-              }`}>
-                <span className={`text-base leading-none mt-0.5 flex-shrink-0 ${
-                  item.urgency === 'high' ? 'text-amber-700' : item.urgency === 'medium' ? 'text-c-gold' : 'text-emerald-700'
-                }`}>
-                  {item.urgency === 'high' ? '→' : item.urgency === 'medium' ? '↩' : '↑'}
-                </span>
-                <p className="text-sm text-c-cream-dim font-playfair leading-snug">{item.text}</p>
-              </div>
-            ))}
+      {/* ── Recommended Exercise (top prescription) ── */}
+      {recommendedExercise ? (
+        <section className="rounded-[18px] border border-c-gold/28 bg-[linear-gradient(140deg,rgba(199,139,34,0.08),rgba(7,3,2,0.96))] px-5 py-5 flex flex-col gap-3 shadow-[0_0_40px_rgba(199,139,34,0.06)]">
+          <div>
+            <p className="text-[9px] uppercase tracking-[0.28em] text-c-gold/55 font-mono mb-1.5">{recommendedExercise.label}</p>
+            <p className="text-[0.9rem] font-playfair text-c-cream-dim leading-relaxed">{recommendedExercise.text}</p>
           </div>
-          <p className="text-[9px] font-mono text-c-cream-dark/60 uppercase tracking-widest">
-            Derived from your MongoDB practice history
-          </p>
+          <div className="rounded-[12px] bg-c-card/60 border border-c-border px-4 py-3">
+            <p className="text-[9px] uppercase tracking-[0.2em] text-c-gold/50 font-mono mb-1">Exercise</p>
+            <p className="text-[13px] font-playfair text-c-cream-dim leading-relaxed">{recommendedExercise.exercise}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <button
+              onClick={() => nav(recommendedExercise.action)}
+              className="text-[11px] font-mono uppercase tracking-widest px-4 py-2 rounded-xl bg-c-gold text-c-bg font-bold hover:bg-c-gold-light transition-all shadow-[0_0_16px_rgba(199,139,34,0.18)]"
+            >
+              Open {recommendedExercise.tool} →
+            </button>
+            <span className="text-[10px] font-mono text-c-cream-dark">{recommendedExercise.duration}</span>
+          </div>
+        </section>
+      ) : !isEmpty && (
+        <section className="rounded-[18px] border border-c-border bg-c-card px-5 py-4 flex items-center justify-between gap-4">
+          <p className="text-sm font-playfair text-c-cream-dim">No critical gap right now — keep building consistency.</p>
+          <button onClick={() => nav('tutor')} className="flex-shrink-0 text-[10px] font-mono uppercase tracking-widest px-3 py-2 rounded-xl border border-c-gold/25 text-c-gold hover:bg-c-gold/8 transition-colors whitespace-nowrap">
+            Open Gurukul →
+          </button>
         </section>
       )}
 
       {isEmpty ? (
-        <div className="w-full bg-c-card border border-c-border rounded-xl p-8 flex flex-col items-center gap-3 text-center">
+        <div className="w-full bg-c-card border border-c-border rounded-xl p-8 flex flex-col items-center gap-4 text-center">
           <p className="font-playfair text-c-cream-dim italic">Your musical memory is just beginning.</p>
           <p className="text-xs text-c-cream-dark leading-relaxed max-w-xs">
             Sing something with Dhwani, practice with Gurukul, or try Viveka. Every session adds to your memory here.
           </p>
-          <p className="text-[9px] font-mono uppercase tracking-widest text-c-cream-dark/70 mt-1">
+          <div className="flex flex-wrap justify-center gap-2 mt-1">
+            {[
+              { label: 'Open Dhwani', action: 'listen' },
+              { label: 'Open Viveka', action: 'viveka' },
+              { label: 'Open Gurukul', action: 'tutor' },
+            ].map(({ label, action }) => (
+              <button key={action} onClick={() => nav(action)}
+                className="text-[10px] font-mono uppercase tracking-widest px-3 py-2 rounded-xl border border-c-gold/22 text-c-gold/70 hover:bg-c-gold/8 transition-colors">
+                {label} →
+              </button>
+            ))}
+          </div>
+          <p className="text-[9px] font-mono uppercase tracking-widest text-c-cream-dark/60 mt-1">
             MongoDB stores your patterns · coach learns from them
           </p>
         </div>
       ) : (
         <>
-          {/* ── Raga Mastery ── */}
+          {/* ── What You Keep Getting Wrong ── */}
+          {confusionPairs.length > 0 && (
+            <section className="flex flex-col gap-3">
+              <div className="flex flex-col gap-0.5">
+                <h2 className="font-playfair text-base font-semibold text-c-cream-dim">What You Keep Getting Wrong</h2>
+                <p className="text-[10px] text-c-cream-dark font-mono">
+                  MongoDB tracks these · each one is a specific exercise waiting to be fixed
+                </p>
+              </div>
+              <div className="flex flex-col gap-2">
+                {confusionPairs.map((pair, i) => (
+                  <div key={i} className="bg-c-card border border-c-border rounded-xl px-4 py-3.5 flex items-center gap-3">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <span className="font-playfair font-semibold text-c-cream-dim text-sm truncate">{pair.raga}</span>
+                      <span className="text-c-gold text-xs flex-shrink-0">↔</span>
+                      <span className="font-playfair font-semibold text-c-cream-dim text-sm truncate">{pair.confusedWith}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: Math.min(pair.count, 5) }).map((_, j) => (
+                          <div key={j} className="w-1.5 h-1.5 rounded-full bg-amber-700/70" />
+                        ))}
+                      </div>
+                      <span className="text-[10px] font-mono text-amber-800">{pair.count}×</span>
+                    </div>
+                    {pair.lastOccurred && (
+                      <span className="text-[9px] font-mono text-c-cream-dark/60 flex-shrink-0 hidden sm:block">{daysSince(pair.lastOccurred)}</span>
+                    )}
+                    <button
+                      onClick={() => nav('viveka')}
+                      className="flex-shrink-0 text-[9px] font-mono uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-c-gold/22 text-c-gold/70 hover:bg-c-gold/8 hover:text-c-gold transition-colors whitespace-nowrap"
+                    >
+                      Practice →
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ── Your Next Priority ── */}
+          {nextFocus.length > 0 && (
+            <section className="flex flex-col gap-2">
+              <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Your Next Priority</h2>
+              <div className="flex flex-col gap-2">
+                {nextFocus.map((item, i) => (
+                  <div key={i} className={`flex items-center gap-3 rounded-xl px-4 py-3 border ${
+                    item.urgency === 'high' ? 'bg-amber-700/5 border-amber-700/20' : 'bg-c-card border-c-border'
+                  }`}>
+                    <span className={`text-base leading-none flex-shrink-0 ${
+                      item.urgency === 'high' ? 'text-amber-700' : item.urgency === 'medium' ? 'text-c-gold' : 'text-emerald-700'
+                    }`}>
+                      {item.urgency === 'high' ? '→' : item.urgency === 'medium' ? '↩' : '↑'}
+                    </span>
+                    <p className="text-sm text-c-cream-dim font-playfair leading-snug flex-1">{item.text}</p>
+                    <button
+                      onClick={() => nav(item.action)}
+                      className="flex-shrink-0 text-[9px] font-mono uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-c-gold/22 text-c-gold/70 hover:bg-c-gold/8 hover:text-c-gold transition-colors whitespace-nowrap"
+                    >
+                      {item.actionLabel} →
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ── Recently Improving ── */}
+          {ragaStats.filter(r => (r.masteryLevel === 'stable' || r.masteryLevel === 'strong') && r.lastPracticed && Date.now() - new Date(r.lastPracticed).getTime() < 7 * 24 * 60 * 60 * 1000).length > 0 && (
+            <section className="flex flex-col gap-2">
+              <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Recently Improving</h2>
+              <div className="flex flex-col gap-2">
+                {ragaStats
+                  .filter(r => (r.masteryLevel === 'stable' || r.masteryLevel === 'strong') && r.lastPracticed && Date.now() - new Date(r.lastPracticed).getTime() < 7 * 24 * 60 * 60 * 1000)
+                  .slice(0, 3)
+                  .map((r, i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3 bg-emerald-700/5 border border-emerald-700/18">
+                      <span className="text-base text-emerald-700 flex-shrink-0">↑</span>
+                      <p className="text-sm text-c-cream-dim font-playfair leading-snug flex-1">
+                        {r.raga} — {MASTERY_STYLES[r.masteryLevel]?.label} · {daysSince(r.lastPracticed)}
+                      </p>
+                      <button
+                        onClick={() => nav('tutor')}
+                        className="flex-shrink-0 text-[9px] font-mono uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-emerald-700/25 text-emerald-700/70 hover:bg-emerald-700/8 hover:text-emerald-700 transition-colors whitespace-nowrap"
+                      >
+                        Advance →
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            </section>
+          )}
+
+          {/* ── Needs Return Practice ── */}
+          {ragaStats.filter(r => (r.masteryLevel === 'developing' || r.masteryLevel === 'exploring') && r.lastPracticed && Date.now() - new Date(r.lastPracticed).getTime() > 5 * 24 * 60 * 60 * 1000).length > 0 && (
+            <section className="flex flex-col gap-2">
+              <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Needs Return Practice</h2>
+              <div className="flex flex-col gap-2">
+                {ragaStats
+                  .filter(r => (r.masteryLevel === 'developing' || r.masteryLevel === 'exploring') && r.lastPracticed && Date.now() - new Date(r.lastPracticed).getTime() > 5 * 24 * 60 * 60 * 1000)
+                  .slice(0, 3)
+                  .map((r, i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3 bg-c-card border border-c-border">
+                      <span className="text-base text-amber-700 flex-shrink-0">↩</span>
+                      <p className="text-sm text-c-cream-dim font-playfair leading-snug flex-1">
+                        {r.raga} — {daysSince(r.lastPracticed)}, still {MASTERY_STYLES[r.masteryLevel]?.label?.toLowerCase()}
+                      </p>
+                      <button
+                        onClick={() => nav('tutor')}
+                        className="flex-shrink-0 text-[9px] font-mono uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-c-gold/22 text-c-gold/70 hover:bg-c-gold/8 hover:text-c-gold transition-colors whitespace-nowrap"
+                      >
+                        Return →
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            </section>
+          )}
+
+          {/* ── Your Progress by Raga (reference, de-emphasised) ── */}
           {ragaStats.length > 0 && (
             <section className="flex flex-col gap-3">
               <div className="flex items-center justify-between flex-wrap gap-2">
@@ -219,13 +400,11 @@ export default function LearnerModelPanel({ userId, getToken }) {
                   ))}
                 </div>
               </div>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {ragaStats.map(raga => {
                   const style = MASTERY_STYLES[raga.masteryLevel] || MASTERY_STYLES.exploring;
                   const successPct = raga.totalSessions > 0
-                    ? Math.round((raga.identifiedCount / raga.totalSessions) * 100)
-                    : 0;
+                    ? Math.round((raga.identifiedCount / raga.totalSessions) * 100) : 0;
                   return (
                     <div key={raga.raga} className="bg-c-card border border-c-border rounded-xl px-4 py-3 flex flex-col gap-2">
                       <div className="flex items-start justify-between gap-2">
@@ -237,7 +416,6 @@ export default function LearnerModelPanel({ userId, getToken }) {
                           {style.label}
                         </span>
                       </div>
-
                       <div className="flex flex-col gap-1">
                         <div className="flex justify-between items-center">
                           <span className="text-[10px] text-c-cream-dark font-mono">
@@ -255,7 +433,6 @@ export default function LearnerModelPanel({ userId, getToken }) {
                           />
                         </div>
                       </div>
-
                       {raga.confusedCount > 0 && (
                         <p className="text-[9px] text-amber-800 font-mono">
                           {raga.confusedCount} ambiguous result{raga.confusedCount !== 1 ? 's' : ''}
@@ -268,97 +445,12 @@ export default function LearnerModelPanel({ userId, getToken }) {
             </section>
           )}
 
-          {/* ── Common Confusions ── */}
-          {confusionPairs.length > 0 && (
-            <section className="flex flex-col gap-3">
-              <div className="flex flex-col gap-0.5">
-                <h2 className="font-playfair text-base font-semibold text-c-cream-dim">What You Keep Getting Wrong</h2>
-                <p className="text-[10px] text-c-cream-dark font-mono">
-                  MongoDB remembers these · your coach addresses them directly
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                {confusionPairs.map((pair, i) => (
-                  <div
-                    key={i}
-                    className="bg-c-card border border-c-border rounded-xl px-4 py-3.5 flex items-center gap-3"
-                  >
-                    <div className="flex-1 min-w-0 flex items-center gap-2 justify-between">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="font-playfair font-semibold text-c-cream-dim text-sm truncate">{pair.raga}</span>
-                        <span className="text-c-gold text-xs flex-shrink-0">↔</span>
-                        <span className="font-playfair font-semibold text-c-cream-dim text-sm truncate">{pair.confusedWith}</span>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <div className="flex gap-0.5">
-                          {Array.from({ length: Math.min(pair.count, 5) }).map((_, j) => (
-                            <div key={j} className="w-1.5 h-1.5 rounded-full bg-amber-700" />
-                          ))}
-                        </div>
-                        <span className="text-[10px] font-mono text-amber-800">{pair.count}×</span>
-                      </div>
-                    </div>
-                    {pair.lastOccurred && (
-                      <span className="text-[9px] font-mono text-c-cream-dark/70 flex-shrink-0">
-                        {daysSince(pair.lastOccurred)}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <p className="text-[9px] text-c-cream-dark font-playfair italic text-center mt-1">
-                Ask your coach to prescribe the specific exercise that fixes this
-              </p>
-            </section>
-          )}
-
-          {/* ── Recently Improving ── */}
-          {ragaStats.filter(r => (r.masteryLevel === 'stable' || r.masteryLevel === 'strong') && r.lastPracticed && Date.now() - new Date(r.lastPracticed).getTime() < 7 * 24 * 60 * 60 * 1000).length > 0 && (
-            <section className="flex flex-col gap-2">
-              <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Recently Improving</h2>
-              <div className="flex flex-col gap-2">
-                {ragaStats
-                  .filter(r => (r.masteryLevel === 'stable' || r.masteryLevel === 'strong') && r.lastPracticed && Date.now() - new Date(r.lastPracticed).getTime() < 7 * 24 * 60 * 60 * 1000)
-                  .slice(0, 3)
-                  .map((r, i) => (
-                  <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3 bg-emerald-700/5 border border-emerald-700/20">
-                    <span className="text-base text-emerald-700 flex-shrink-0">↑</span>
-                    <p className="text-sm text-c-cream-dim font-playfair leading-snug">{r.raga} — {MASTERY_STYLES[r.masteryLevel]?.label} · {daysSince(r.lastPracticed)}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* ── Needs Return Practice ── */}
-          {ragaStats.filter(r => (r.masteryLevel === 'developing' || r.masteryLevel === 'exploring') && r.lastPracticed && Date.now() - new Date(r.lastPracticed).getTime() > 5 * 24 * 60 * 60 * 1000).length > 0 && (
-            <section className="flex flex-col gap-2">
-              <h2 className="font-playfair text-base font-semibold text-c-cream-dim">Needs Return Practice</h2>
-              <div className="flex flex-col gap-2">
-                {ragaStats
-                  .filter(r => (r.masteryLevel === 'developing' || r.masteryLevel === 'exploring') && r.lastPracticed && Date.now() - new Date(r.lastPracticed).getTime() > 5 * 24 * 60 * 60 * 1000)
-                  .slice(0, 3)
-                  .map((r, i) => (
-                  <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3 bg-c-card border border-c-border">
-                    <span className="text-base text-amber-700 flex-shrink-0">↩</span>
-                    <p className="text-sm text-c-cream-dim font-playfair leading-snug">{r.raga} — last practiced {daysSince(r.lastPracticed)}, still {MASTERY_STYLES[r.masteryLevel]?.label?.toLowerCase()}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
           {/* ── Practice Timeline ── */}
           <section className="flex flex-col gap-3">
             <div className="flex flex-col gap-0.5">
               <h2 className="font-playfair text-base font-semibold text-c-cream-dim">How Consistently You're Practicing</h2>
-              <p className="text-[10px] text-c-cream-dark font-mono">
-                Each column is one day · taller bar = more sessions
-              </p>
+              <p className="text-[10px] text-c-cream-dark font-mono">Each column is one day · taller bar = more sessions</p>
             </div>
-
             <div className="bg-c-card border border-c-border rounded-xl p-4 flex flex-col gap-3">
               {activeDays === 0 ? (
                 <div className="flex flex-col items-center gap-2 py-4 text-center">
@@ -367,44 +459,28 @@ export default function LearnerModelPanel({ userId, getToken }) {
                       <div key={i} className="flex-1 bg-c-border rounded-sm" style={{ height: '4px' }} />
                     ))}
                   </div>
-                  <p className="text-[11px] text-c-cream-dark font-playfair italic mt-1">
-                    No sessions yet in the last 21 days
-                  </p>
-                  <p className="text-[10px] text-c-cream-dark/70 font-mono">
-                    Practice with Viveka, Gurukul, or any tool to start your timeline
-                  </p>
+                  <p className="text-[11px] text-c-cream-dark font-playfair italic mt-1">No sessions yet in the last 21 days</p>
                 </div>
               ) : (
                 <div className="flex gap-3">
                   {timelineWeeks.map((week) => (
                     <div key={week.label} className="flex-1 flex flex-col gap-1.5">
-                      {/* bars */}
                       <div className="flex items-end gap-0.5 h-10">
                         {week.days.map((day) => {
                           const heightPct = day.count === 0 ? 0 : Math.max((day.count / maxCount) * 100, 18);
                           return (
-                            <div
-                              key={day.date}
-                              className="flex-1 flex flex-col items-center justify-end"
+                            <div key={day.date} className="flex-1 flex flex-col items-center justify-end"
                               title={day.count > 0
                                 ? `${day.dayLabel} ${day.date}: ${day.count} session${day.count !== 1 ? 's' : ''}${day.ragas.filter(Boolean).length ? ` · ${day.ragas.filter(Boolean).join(', ')}` : ''}`
-                                : `${day.dayLabel} — no practice`}
-                            >
+                                : `${day.dayLabel} — no practice`}>
                               <div
-                                className={`w-full rounded-sm transition-all ${
-                                  day.count === 0
-                                    ? 'bg-c-border/50'
-                                    : day.isToday
-                                    ? 'bg-c-gold'
-                                    : 'bg-c-gold-dim'
-                                }`}
+                                className={`w-full rounded-sm transition-all ${day.count === 0 ? 'bg-c-border/50' : day.isToday ? 'bg-c-gold' : 'bg-c-gold-dim'}`}
                                 style={{ height: day.count === 0 ? '3px' : `${heightPct}%` }}
                               />
                             </div>
                           );
                         })}
                       </div>
-                      {/* day labels — only for this week */}
                       {week.label === 'This week' ? (
                         <div className="flex gap-0.5">
                           {week.days.map((day) => (
@@ -418,10 +494,7 @@ export default function LearnerModelPanel({ userId, getToken }) {
                       ) : (
                         <div className="h-[10px]" />
                       )}
-                      {/* week label */}
-                      <p className="text-[8px] font-mono text-c-cream-dark uppercase tracking-widest text-center">
-                        {week.label}
-                      </p>
+                      <p className="text-[8px] font-mono text-c-cream-dark uppercase tracking-widest text-center">{week.label}</p>
                     </div>
                   ))}
                 </div>

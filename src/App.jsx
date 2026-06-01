@@ -2899,7 +2899,7 @@ function App() {
                     </div>
                 )}
                 {view === 'learner-model' && (
-                    <LearnerModelPanel userId={userId} getToken={getToken} />
+                    <LearnerModelPanel userId={userId} getToken={getToken} onNavigate={(view) => goToAdvanced(view)} />
                 )}
                 {view === 'sadhana' && appMode !== 'beginner' && (
                     <div className="w-full max-w-xl mx-auto flex flex-col items-center gap-5 py-16 px-6 text-center animate-fade-in">

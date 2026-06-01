@@ -133,8 +133,8 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
     nextFocus.push({
       text:        `Distinguish ${raga} from ${confusedWith} — you have confused them ${count} time${count !== 1 ? 's' : ''}`,
       urgency:     'high',
-      action:      'viveka',
-      actionLabel: 'Practice in Viveka',
+      action:      'tutor',
+      actionLabel: 'Practice in Gurukul',
     });
   }
   if (stale) nextFocus.push({
@@ -157,8 +157,8 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
     recommendedExercise = {
       label:    'Most urgent',
       text:     `You have confused ${raga} and ${confusedWith} ${count} time${count !== 1 ? 's' : ''}.`,
-      exercise: `Sing Pa-Dha-Ni-Sa of ${raga} three times, then ${confusedWith} three times. Hold the Ni each time. Then confirm each phrase in Viveka.`,
-      tool:     'Viveka', action: 'viveka', duration: '10–15 min',
+      exercise: `Sing Pa-Dha-Ni-Sa of ${raga} three times, then ${confusedWith} three times. Hold the Ni each time and notice which note differs.`,
+      tool:     'Gurukul', action: 'tutor', duration: '10–15 min',
     };
   } else if (stale) {
     const d = Math.floor((Date.now() - new Date(stale.lastPracticed).getTime()) / 86400000);
@@ -215,19 +215,19 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
 
       {/* ── Recommended Exercise (top prescription) ── */}
       {recommendedExercise ? (
-        <section className="rounded-[18px] border border-c-gold/28 bg-[linear-gradient(140deg,rgba(199,139,34,0.08),rgba(7,3,2,0.96))] px-5 py-5 flex flex-col gap-3 shadow-[0_0_40px_rgba(199,139,34,0.06)]">
+        <section className="rounded-[18px] border border-c-gold/28 bg-c-card px-5 py-5 flex flex-col gap-3">
           <div>
             <p className="text-[9px] uppercase tracking-[0.28em] text-c-gold/55 font-mono mb-1.5">{recommendedExercise.label}</p>
             <p className="text-[0.9rem] font-playfair text-c-cream-dim leading-relaxed">{recommendedExercise.text}</p>
           </div>
-          <div className="rounded-[12px] bg-c-card/60 border border-c-border px-4 py-3">
+          <div className="rounded-[12px] bg-c-gold/5 border border-c-gold/22 px-4 py-3">
             <p className="text-[9px] uppercase tracking-[0.2em] text-c-gold/50 font-mono mb-1">Exercise</p>
             <p className="text-[13px] font-playfair text-c-cream-dim leading-relaxed">{recommendedExercise.exercise}</p>
           </div>
           <div className="flex flex-wrap items-center gap-2 pt-1">
             <button
               onClick={() => nav(recommendedExercise.action)}
-              className="text-[11px] font-mono uppercase tracking-widest px-4 py-2 rounded-xl bg-c-gold text-c-bg font-bold hover:bg-c-gold-light transition-all shadow-[0_0_16px_rgba(199,139,34,0.18)]"
+              className="text-[11px] font-mono uppercase tracking-widest px-4 py-2 rounded-xl bg-c-gold text-c-bg font-bold hover:bg-c-gold-light transition-all"
             >
               Open {recommendedExercise.tool} →
             </button>

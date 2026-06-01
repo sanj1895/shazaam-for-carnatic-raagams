@@ -471,11 +471,11 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
                           {week.days.reduce((sum, day) => sum + day.count, 0)} sess
                         </span>
                       </div>
-                      <div className="flex items-end gap-1 h-16">
+                      <div className="flex items-end gap-1 h-20">
                         {week.days.map((day) => {
                           const heightPct = day.count === 0 ? 0 : Math.max((day.count / maxCount) * 100, 22);
                           return (
-                            <div key={day.date} className="flex-1 flex flex-col items-center justify-end gap-1"
+                            <div key={day.date} className="flex-1 h-full flex flex-col items-center justify-end gap-1"
                               title={day.count > 0
                                 ? `${day.dayLabel} ${day.date}: ${day.count} session${day.count !== 1 ? 's' : ''}${day.ragas.filter(Boolean).length ? ` · ${day.ragas.filter(Boolean).join(', ')}` : ''}`
                                 : `${day.dayLabel} — no practice`}>
@@ -483,7 +483,7 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
                                 {day.count > 0 ? day.count : '0'}
                               </span>
                               <div
-                                className={`w-full rounded-[3px] transition-all ${day.count === 0 ? 'bg-c-border/55' : day.isToday ? 'bg-c-gold' : 'bg-c-gold-dim'}`}
+                                className={`w-full min-h-[4px] rounded-[3px] transition-all ${day.count === 0 ? 'bg-c-border/55' : day.isToday ? 'bg-c-gold' : 'bg-c-gold-dim'}`}
                                 style={{ height: day.count === 0 ? '4px' : `${heightPct}%` }}
                               />
                             </div>

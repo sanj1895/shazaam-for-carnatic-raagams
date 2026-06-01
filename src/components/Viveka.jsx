@@ -218,7 +218,7 @@ export default function Viveka({ onSelectRaga }) {
     const inputModeRef   = useRef(MODE.RECORD);
     const fileInputRef   = useRef(null);
     const audioCtxRef    = useRef(null);
-    const dynamicGateRef = useRef(0.01); // calibrated per-session noise floor
+    const dynamicGateRef = useRef(0.004); // calibrated per-session noise floor
 
     useEffect(() => {
         inputModeRef.current = inputMode;
@@ -415,8 +415,8 @@ export default function Viveka({ onSelectRaga }) {
             // Gate = 4× the 75th-percentile silence RMS (rejects drone/hum,
             // accepts singing which is typically 5–15× above the noise floor).
             const sorted = [...calibRMS].sort((a, b) => a - b);
-            const p75 = sorted[Math.floor(sorted.length * 0.75)] ?? 0.002;
-            dynamicGateRef.current = Math.max(p75 * 2, 0.0025);
+            const p75 = sorted[Math.floor(sorted.length * 0.75)] ?? 0.0015;
+            dynamicGateRef.current = Math.min(Math.max(p75 * 1.45, 0.0018), 0.008);
             // ──────────────────────────────────────────────────────────────
 
             statusRef.current = STATUS.RECORDING;
@@ -476,7 +476,7 @@ export default function Viveka({ onSelectRaga }) {
         cleanup();
         statusRef.current = STATUS.IDLE;
         setStatus(STATUS.IDLE);
-        dynamicGateRef.current = 0.01;
+        dynamicGateRef.current = 0.004;
         setResults(null);
         setErrorMsg('');
         setElapsed(0);

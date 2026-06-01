@@ -22,7 +22,7 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
     const onPitchDetectedRef = useRef(onPitchDetected);
     const activeOscRef = useRef(null);
     const audioCtxRef = useRef(null);
-    const dynamicGateRef = useRef(0.008);
+    const dynamicGateRef = useRef(0.004);
 
     useEffect(() => { onPitchDetectedRef.current = onPitchDetected; }, [onPitchDetected]);
     useEffect(() => {
@@ -88,6 +88,8 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
 
             audioCtxRef.current = ctx;
             setStream(mediaStream);
+            setStatus(STATUS.LOADING);
+            setStatusMsg('Calibrating microphone…');
             onStart?.();
             await calibrateMic(analyser);
             startPitchDetection(ctx, analyser);
@@ -115,8 +117,8 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
         clearInterval(interval);
 
         const sorted = rmsValues.sort((a, b) => a - b);
-        const p75 = sorted[Math.floor(sorted.length * 0.75)] ?? 0.002;
-        dynamicGateRef.current = Math.max(p75 * 2, 0.0025);
+        const p75 = sorted[Math.floor(sorted.length * 0.75)] ?? 0.0015;
+        dynamicGateRef.current = Math.min(Math.max(p75 * 1.35, 0.0018), 0.0065);
     };
 
     const startPitchDetection = (audioCtx, analyser) => {

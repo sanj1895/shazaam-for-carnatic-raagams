@@ -139,7 +139,7 @@ export function closeMicStream(stream, ctx) {
   unmuteAppAudio();
 }
 
-function autocorrelateDetailed(buffer, sampleRate, minRms = 0.01) {
+function autocorrelateDetailed(buffer, sampleRate, minRms = 0.006) {
   const SIZE = buffer.length;
   let rms = 0;
   for (let i = 0; i < SIZE; i++) rms += buffer[i] * buffer[i];
@@ -187,7 +187,7 @@ function autocorrelateDetailed(buffer, sampleRate, minRms = 0.01) {
 
   const frequency = sampleRate / refinedPos;
   const confidence = correlation[0] > 0 ? maxVal / correlation[0] : 0;
-  if (frequency < 60 || frequency > 2000 || confidence < 0.22) return null;
+  if (frequency < 60 || frequency > 2000 || confidence < 0.16) return null;
 
   return { freq: frequency, confidence, rms };
 }
@@ -601,7 +601,7 @@ function _autocorrelate(buffer, sampleRate) {
 }
 
 // minRms defaults to 0.01 but callers can pass a calibrated dynamic gate instead.
-export function detectPitch(analyserNode, sampleRate, minRms = 0.01) {
+export function detectPitch(analyserNode, sampleRate, minRms = 0.006) {
   const bufferLength = analyserNode.fftSize;
   const buffer = new Float32Array(bufferLength);
   analyserNode.getFloatTimeDomainData(buffer);
@@ -613,12 +613,12 @@ export function detectPitch(analyserNode, sampleRate, minRms = 0.01) {
     if (agreementCents <= 70) {
       return yin.confidence >= acf.confidence ? yin.freq : acf.freq;
     }
-    if (yin.confidence >= 0.36) return yin.freq;
-    if (acf.confidence >= 0.36) return acf.freq;
+    if (yin.confidence >= 0.28) return yin.freq;
+    if (acf.confidence >= 0.28) return acf.freq;
     return yin.confidence >= acf.confidence ? yin.freq : acf.freq;
   }
 
-  if (yin && yin.confidence >= 0.24) return yin.freq;
-  if (acf && acf.confidence >= 0.24) return acf.freq;
+  if (yin && yin.confidence >= 0.18) return yin.freq;
+  if (acf && acf.confidence >= 0.18) return acf.freq;
   return null;
 }

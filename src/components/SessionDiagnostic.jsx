@@ -43,7 +43,7 @@ const ICONS = {
 
 // ── Static fallback options (no learner history) ───────────────────────────────
 const DEFAULTS = [
-  { id: 'confusion', label: 'I keep confusing ragas',            sub: 'Two ragas sound similar and I cannot tell them apart',     view: 'viveka',  tag: 'Viveka',  iconKey: 'confusion' },
+  { id: 'confusion', label: 'I keep confusing ragas',            sub: 'Two ragas sound similar and I cannot tell them apart',     view: 'tutor',   tag: 'Gurukul', iconKey: 'confusion' },
   { id: 'pitch',     label: 'My pitch or shruti feels unstable', sub: 'I want to improve my tuning and ear accuracy',             view: 'shruthi', tag: 'Shruthi', iconKey: 'pitch'     },
   { id: 'guided',    label: 'I want a guided 20-minute session', sub: 'Take me through a structured practice sequence',           view: 'tutor',   tag: 'Gurukul', iconKey: 'guided'    },
   { id: 'listen',    label: 'Listen to me and tell me what to fix', sub: 'Sing a phrase and get real-time feedback',              view: 'listen',  tag: 'Dhwani',  iconKey: 'listen'    },
@@ -62,7 +62,7 @@ function buildOptions(model) {
     opts[0] = {
       ...opts[0],
       label: `Fix ${raga} vs ${confusedWith}`,
-      sub:   `You have confused these ${count} time${count !== 1 ? 's' : ''} — use Viveka to isolate the diagnostic phrase`,
+      sub:   `You have confused these ${count} time${count !== 1 ? 's' : ''} — drill the distinguishing phrase in Gurukul`,
     };
   }
 

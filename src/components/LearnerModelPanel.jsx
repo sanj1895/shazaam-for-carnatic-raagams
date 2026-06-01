@@ -296,7 +296,7 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
                       <span className="text-[9px] font-mono text-c-cream-dark/60 flex-shrink-0 hidden sm:block">{daysSince(pair.lastOccurred)}</span>
                     )}
                     <button
-                      onClick={() => nav('viveka')}
+                      onClick={() => nav('tutor')}
                       className="flex-shrink-0 text-[9px] font-mono uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-c-gold/22 text-c-gold/70 hover:bg-c-gold/8 hover:text-c-gold transition-colors whitespace-nowrap"
                     >
                       Practice →

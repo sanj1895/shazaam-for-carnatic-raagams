@@ -113,8 +113,8 @@ function buildPrescription(ragaStats, confusionPairsRaw, totalApproxSessions) {
     lines.push('PRESCRIBED NEXT EXERCISE (top confusion pattern from session history):');
     lines.push(`  Pattern: ${raga1} and ${raga2} have been confused ${count} time${count !== 1 ? 's' : ''} in recorded sessions.`);
     lines.push(`  Why: Confusion at the identification stage means the ear has not yet isolated the diagnostic note that separates them — usually a characteristic Ni, Ga, or phrase ending. Targeted side-by-side comparison is the fastest fix.`);
-    lines.push(`  Exercise: Sing the upper tetrachord (Pa-Dha-Ni-Sa) of ${raga1} three times slowly, then immediately sing the same phrase in ${raga2} three times. Notice which note changes. Then sing a full phrase of each into Viveka and check whether it identifies them correctly.`);
-    lines.push(`  Tool: Open Viveka — sing a full phrase of ${raga1}, confirm identification, then do the same for ${raga2}.`);
+    lines.push(`  Exercise: Open Gurukul → Raga Practice. Set the drone to your Sa. Sing the upper tetrachord (Pa-Dha-Ni-Sa) of ${raga1} three times slowly, then the same phrase in ${raga2} three times. Hold the characteristic note each time and notice exactly which note differs between them.`);
+    lines.push(`  Tool: Open Gurukul → Raga Practice. After drilling, use Dhwani to verify your ear is now distinguishing them correctly.`);
     lines.push(`  Duration: 10–15 minutes.`);
     // Surface second confusion pair if present
     if (confusionPairsRaw.length > 1) {

@@ -715,9 +715,9 @@ function App() {
             const { raga, confusedWith, count } = confusionPairs[0];
             recommendation = {
                 label: 'Top confusion pattern',
-                text: `You have confused ${raga} and ${confusedWith} ${count} time${count !== 1 ? 's' : ''}. Isolating the diagnostic phrase is the priority today.`,
-                cta: 'Practice in Viveka',
-                action: 'viveka',
+                text: `You have confused ${raga} and ${confusedWith} ${count} time${count !== 1 ? 's' : ''}. Drilling the distinguishing phrase in Gurukul is the priority today.`,
+                cta: 'Practice in Gurukul',
+                action: 'tutor',
             };
         } else {
             const stale = ragaStats.find(r =>
@@ -1591,7 +1591,7 @@ function App() {
                                                         {workspaceBlocks.confusionPairs.map((pair, i) => (
                                                             <button
                                                                 key={i}
-                                                                onClick={() => goToAdvanced('viveka')}
+                                                                onClick={() => goToAdvanced('tutor')}
                                                                 className="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/6 hover:bg-white/[0.07] hover:border-white/12 transition-all text-left group"
                                                             >
                                                                 <div className="flex items-center gap-2 flex-1 min-w-0">

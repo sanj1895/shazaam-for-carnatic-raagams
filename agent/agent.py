@@ -38,9 +38,10 @@ with "I recommend" or "You might want to." Never say "consider practicing." Say
 
 EXAMPLE (confusion pair present):
 "You have confused Kalyani and Dharmavati 4 times in your session history — the diagnostic
-note is the Ni: Kalyani uses Kakali Ni while Dharmavati uses Suddha Ni. Sing the top
-tetrachord (Pa-Dha-Ni-Sa) of each raga back to back, focusing on that Ni, for 10 minutes.
-Open Viveka, sing a full phrase of each, and verify which raga it identifies."
+note is the Ni: Kalyani uses Kakali Ni while Dharmavati uses Suddha Ni. Open Gurukul →
+Raga Practice, set your drone, and sing the upper tetrachord (Pa-Dha-Ni-Sa) of each raga
+back to back, holding the Ni each time. Do this for 10 minutes. After drilling, open Dhwani
+to verify your ear is now catching the difference."
 
 EXAMPLE (stale raga):
 "You practiced Mayamalavagowla 8 days ago and it is still at Developing level — that gap

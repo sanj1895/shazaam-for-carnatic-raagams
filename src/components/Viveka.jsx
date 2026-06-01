@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { buildMicChain, closeMicStream, detectPitch, extractPitchFrames, mixToMono, findBestSegment, openMicStream } from '../utils/audioUtils';
+import { buildMicChain, closeMicStream, detectPitchDetailed, extractPitchFrames, mixToMono, findBestSegment, openMicStream } from '../utils/audioUtils';
 import { getSwaram, identifyRaga, RAGAS } from '../utils/ragaLogic';
 
 import { identifyRagaWithAI } from '../utils/ragaIdentify';
@@ -236,6 +236,8 @@ export default function Viveka({ onSelectRaga }) {
     const audioCtxRef    = useRef(null);
     const dynamicGateRef = useRef(0.004); // calibrated per-session noise floor
     const stablePitchRef = useRef(null);
+    const holdFramesRef  = useRef(0);
+    const recentPitchRef = useRef([]);
 
     useEffect(() => {
         inputModeRef.current = inputMode;
@@ -250,6 +252,20 @@ export default function Viveka({ onSelectRaga }) {
         analyserRef.current = null;
         audioCtxRef.current = null;
         stablePitchRef.current = null;
+        holdFramesRef.current = 0;
+        recentPitchRef.current = [];
+    }, []);
+
+    const smoothPitch = useCallback((hz) => {
+        const history = recentPitchRef.current;
+        const last = history[history.length - 1];
+        if (last && Math.abs(1200 * Math.log2(hz / last)) > 260) {
+            history.length = 0;
+        }
+        history.push(hz);
+        if (history.length > 4) history.shift();
+        const sorted = [...history].sort((a, b) => a - b);
+        return sorted[Math.floor(sorted.length / 2)] || hz;
     }, []);
 
     const runAnalysis = useCallback(async (frames) => {
@@ -345,14 +361,16 @@ export default function Viveka({ onSelectRaga }) {
             family:     c.family,
         }));
 
-        // Save a rich identification event to MongoDB so the learner model can track
-        // per-raga mastery and confusion patterns over time.
+        // Save the identification result so the learner model can track which ragas
+        // the learner is working with and how often they practice each one.
+        // confusedWith is intentionally omitted: an ambiguous classifier result is
+        // model uncertainty about one audio clip, not evidence of a learner confusion
+        // pattern. Confusion pairs are tracked from evaluated practice in Gurukul.
         window.__alapanaCoach?.saveSession({
             tool: 'viveka',
             raga: topMatches[0]?.raagam || '',
             outcome: resultType,
             confidence: localConfidence,
-            confusedWith: ambiguousWith || '',
         });
 
         setResults({
@@ -434,7 +452,7 @@ export default function Viveka({ onSelectRaga }) {
             // accepts singing which is typically 5–15× above the noise floor).
             const sorted = [...calibRMS].sort((a, b) => a - b);
             const p75 = sorted[Math.floor(sorted.length * 0.75)] ?? 0.0015;
-            dynamicGateRef.current = Math.min(Math.max(p75 * 1.45, 0.0018), 0.008);
+            dynamicGateRef.current = Math.min(Math.max(p75 * 1.25, 0.0016), 0.006);
             // ──────────────────────────────────────────────────────────────
 
             statusRef.current = STATUS.RECORDING;
@@ -443,33 +461,43 @@ export default function Viveka({ onSelectRaga }) {
             // Require a short stable run so real singing registers more reliably than
             // one-off noisy estimates from autocorrelation.
             const pitchBuf = [];
-            let missCount = 0;
             pitchTimer.current = setInterval(() => {
                 if (!analyserRef.current) return;
-                const rawHz = detectPitch(analyserRef.current, ctx.sampleRate, dynamicGateRef.current);
-                if (!rawHz) {
-                    missCount++;
-                    if (missCount >= 4) {
+                const detection = detectPitchDetailed(analyserRef.current, ctx.sampleRate, dynamicGateRef.current);
+                if (!detection?.freq) {
+                    const sustainGate = dynamicGateRef.current * 0.52;
+                    if (stablePitchRef.current && detection?.rms >= sustainGate && holdFramesRef.current < 3) {
+                        holdFramesRef.current += 1;
+                        setCurrentHz(stablePitchRef.current);
+                        const prev = framesRef.current[framesRef.current.length - 1];
+                        if (!prev || Math.abs(Math.log2(stablePitchRef.current / prev)) < 0.45) {
+                            framesRef.current.push(stablePitchRef.current);
+                        }
+                        return;
+                    }
+                    holdFramesRef.current += 1;
+                    if (holdFramesRef.current >= 3) {
                         setCurrentHz(null);
                     }
                     return;
                 }
 
-                missCount = 0;
-                const hz = stabilizeOctave(rawHz, stablePitchRef.current);
+                holdFramesRef.current = 0;
+                const hz = stabilizeOctave(detection.freq, stablePitchRef.current);
+                const smoothedHz = smoothPitch(hz);
                 const prevStablePitch = stablePitchRef.current;
-                if (!prevStablePitch || Math.abs(1200 * Math.log2(hz / prevStablePitch)) <= 320) {
-                    stablePitchRef.current = hz;
+                if (!prevStablePitch || Math.abs(1200 * Math.log2(smoothedHz / prevStablePitch)) <= 320) {
+                    stablePitchRef.current = smoothedHz;
                 }
-                setCurrentHz(hz);
+                setCurrentHz(smoothedHz);
 
                 const last = pitchBuf[pitchBuf.length - 1];
-                if (last && Math.abs(Math.log2(hz / last)) >= 0.6) {
+                if (last && Math.abs(Math.log2(smoothedHz / last)) >= 0.55) {
                     pitchBuf.length = 0;
                 }
 
-                pitchBuf.push(hz);
-                if (pitchBuf.length > 3) pitchBuf.shift();
+                pitchBuf.push(smoothedHz);
+                if (pitchBuf.length > 4) pitchBuf.shift();
                 if (pitchBuf.length < 3) return;
 
                 const semis = pitchBuf.map(f => Math.round(12 * Math.log2(f / 130.81)));
@@ -477,8 +505,8 @@ export default function Viveka({ onSelectRaga }) {
                 if (!stable) return;
 
                 const prev = framesRef.current[framesRef.current.length - 1];
-                if (!prev || Math.abs(Math.log2(hz / prev)) < 0.6) {
-                    framesRef.current.push(hz);
+                if (!prev || Math.abs(Math.log2(smoothedHz / prev)) < 0.55) {
+                    framesRef.current.push(smoothedHz);
                 }
             }, FRAME_MS);
 
@@ -911,14 +939,14 @@ export default function Viveka({ onSelectRaga }) {
                             </div>
                         )}
 
-                        {/* Memory callout on ambiguous — connect the moment to the learner model */}
+                        {/* Ambiguity callout — this is a diagnostic moment, not learner-memory evidence */}
                         {results.resultType === 'ambiguous' && results.ambiguousWith && (
                             <div className="w-full bg-amber-700/6 border border-amber-700/20 rounded-lg px-4 py-2.5 flex items-center gap-2.5">
                                 <svg className="w-3.5 h-3.5 text-amber-700 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
                                 </svg>
                                 <p className="text-[10px] text-amber-800 font-mono leading-relaxed">
-                                    This confusion is saved to your musical memory — ask your coach to help you tell {results.matches[0]?.raagam} and {results.ambiguousWith} apart.
+                                    Viveka hears this phrase as close to both {results.matches[0]?.raagam} and {results.ambiguousWith}. Use Raga Kosha to compare them side by side, then drill the difference in Gurukul.
                                 </p>
                             </div>
                         )}

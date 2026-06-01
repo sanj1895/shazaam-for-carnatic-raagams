@@ -72,11 +72,12 @@ export default async function handler(req, res) {
         { $sort: { totalSessions: -1 } },
       ]).toArray(),
 
-      // Confusion pairs: which ragas get mixed up most
+      // Confusion pairs: only from evaluated practice flows, never from Viveka classifier uncertainty
       db.collection('sessions').aggregate([
         {
           $match: {
             userId,
+            tool: { $in: ['tutor'] },
             confusedWith: { $exists: true, $nin: ['', null] },
             raga: { $exists: true, $nin: ['', null] },
           },

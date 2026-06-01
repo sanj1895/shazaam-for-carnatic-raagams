@@ -75,11 +75,20 @@ export default function SingBackChallenge({ onSadhanaComplete }) {
             correct: isCovered(target, detected),
         }));
         setScores(noteScores);
+        const missedNotes = noteScores.filter(item => !item.correct).map(item => item.target);
+        const ratio = targetPhrase.length ? noteScores.filter(item => item.correct).length / targetPhrase.length : 0;
+        window.__alapanaCoach?.saveSession({
+            tool: 'singback',
+            raga: selectedRaga,
+            outcome: ratio >= 0.8 ? 'identified' : ratio >= 0.5 ? 'likely' : 'ambiguous',
+            confidence: ratio >= 0.8 ? 'high' : ratio >= 0.5 ? 'medium' : 'low',
+            swarasFocused: missedNotes,
+        });
         setTimeout(() => {
             setState(STATES.RESULT);
             onSadhanaComplete?.('singback');
         }, 400);
-    }, [onSadhanaComplete]);
+    }, [onSadhanaComplete, selectedRaga]);
 
     const startChallenge = useCallback(async () => {
         const newPhrase = generatePhrase(raga, diff.noteCount);

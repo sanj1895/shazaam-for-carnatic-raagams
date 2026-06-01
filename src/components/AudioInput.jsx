@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { PlayIcon, StopIcon } from './IconLibrary';
-import { buildMicChain, closeMicStream, detectPitch, openMicStream } from '../utils/audioUtils';
+import { buildMicChain, closeMicStream, detectPitchDetailed, openMicStream } from '../utils/audioUtils';
 
 
 const STATUS = {
@@ -40,6 +40,8 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
     const audioCtxRef = useRef(null);
     const dynamicGateRef = useRef(0.004);
     const stablePitchRef = useRef(null);
+    const holdFramesRef = useRef(0);
+    const recentPitchRef = useRef([]);
 
     useEffect(() => { onPitchDetectedRef.current = onPitchDetected; }, [onPitchDetected]);
     useEffect(() => {
@@ -55,7 +57,21 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
         closeMicStream(stream, audioCtxRef.current);
         audioCtxRef.current = null;
         stablePitchRef.current = null;
+        holdFramesRef.current = 0;
+        recentPitchRef.current = [];
         setStream(null);
+    };
+
+    const smoothPitch = (hz) => {
+        const history = recentPitchRef.current;
+        const last = history[history.length - 1];
+        if (last && Math.abs(1200 * Math.log2(hz / last)) > 260) {
+            history.length = 0;
+        }
+        history.push(hz);
+        if (history.length > 3) history.shift();
+        const sorted = [...history].sort((a, b) => a - b);
+        return sorted[Math.floor(sorted.length / 2)] || hz;
     };
 
     const playReferenceTone = (freq) => {
@@ -136,7 +152,7 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
 
         const sorted = rmsValues.sort((a, b) => a - b);
         const p75 = sorted[Math.floor(sorted.length * 0.75)] ?? 0.0015;
-        dynamicGateRef.current = Math.min(Math.max(p75 * 1.35, 0.0018), 0.0065);
+        dynamicGateRef.current = Math.min(Math.max(p75 * 1.22, 0.0016), 0.0055);
     };
 
     const startPitchDetection = (audioCtx, analyser) => {
@@ -144,20 +160,34 @@ const AudioInput = ({ onPitchDetected, onSaSet, saFrequency, onStart }) => {
         setStatusMsg('Sing or hum clearly');
 
         intervalRef.current = setInterval(() => {
-            const rawHz = detectPitch(analyser, audioCtx.sampleRate, dynamicGateRef.current);
-            if (rawHz) {
-                const correctedHz = stabilizeOctave(rawHz, stablePitchRef.current);
+            const detection = detectPitchDetailed(analyser, audioCtx.sampleRate, dynamicGateRef.current);
+            if (detection?.freq) {
+                holdFramesRef.current = 0;
+                const correctedHz = stabilizeOctave(detection.freq, stablePitchRef.current);
+                const smoothedHz = smoothPitch(correctedHz);
                 const prevStable = stablePitchRef.current;
-                if (!prevStable || Math.abs(1200 * Math.log2(correctedHz / prevStable)) <= 320) {
-                    stablePitchRef.current = correctedHz;
+                if (!prevStable || Math.abs(1200 * Math.log2(smoothedHz / prevStable)) <= 320) {
+                    stablePitchRef.current = smoothedHz;
                 }
-                setCurrentFreq(correctedHz);
-                onPitchDetectedRef.current?.(correctedHz);
+                setCurrentFreq(smoothedHz);
+                onPitchDetectedRef.current?.(smoothedHz);
                 setStatus(STATUS.LISTENING);
                 setStatusMsg('Sing or hum clearly');
             } else {
-                setStatus(STATUS.NO_PITCH);
-                setStatusMsg('No pitch detected  ·  try singing louder');
+                const sustainGate = dynamicGateRef.current * 0.52;
+                if (stablePitchRef.current && detection?.rms >= sustainGate && holdFramesRef.current < 3) {
+                    holdFramesRef.current += 1;
+                    setCurrentFreq(stablePitchRef.current);
+                    onPitchDetectedRef.current?.(stablePitchRef.current);
+                    setStatus(STATUS.LISTENING);
+                    setStatusMsg('Sing or hum clearly');
+                    return;
+                }
+                holdFramesRef.current += 1;
+                if (holdFramesRef.current >= 2) {
+                    setStatus(STATUS.NO_PITCH);
+                    setStatusMsg('No pitch detected  ·  try singing louder');
+                }
             }
         }, 80);
     };

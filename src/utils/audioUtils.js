@@ -139,11 +139,15 @@ export function closeMicStream(stream, ctx) {
   unmuteAppAudio();
 }
 
+function getRms(buffer) {
+  let rms = 0;
+  for (let i = 0; i < buffer.length; i++) rms += buffer[i] * buffer[i];
+  return Math.sqrt(rms / buffer.length);
+}
+
 function autocorrelateDetailed(buffer, sampleRate, minRms = 0.006) {
   const SIZE = buffer.length;
-  let rms = 0;
-  for (let i = 0; i < SIZE; i++) rms += buffer[i] * buffer[i];
-  rms = Math.sqrt(rms / SIZE);
+  const rms = getRms(buffer);
   if (rms < minRms) return null;
 
   const correlation = new Float32Array(SIZE);
@@ -601,24 +605,47 @@ function _autocorrelate(buffer, sampleRate) {
 }
 
 // minRms defaults to 0.01 but callers can pass a calibrated dynamic gate instead.
-export function detectPitch(analyserNode, sampleRate, minRms = 0.006) {
+export function detectPitchDetailed(analyserNode, sampleRate, minRms = 0.006) {
   const bufferLength = analyserNode.fftSize;
   const buffer = new Float32Array(bufferLength);
   analyserNode.getFloatTimeDomainData(buffer);
-  const yin = yinEstimate(buffer, sampleRate);
+  const rms = getRms(buffer);
+  const yin = rms >= minRms * 0.45 ? yinEstimate(buffer, sampleRate) : null;
   const acf = autocorrelateDetailed(buffer, sampleRate, minRms);
 
   if (yin && acf) {
     const agreementCents = Math.abs(1200 * Math.log2(yin.freq / acf.freq));
     if (agreementCents <= 70) {
-      return yin.confidence >= acf.confidence ? yin.freq : acf.freq;
+      const preferred = yin.confidence >= acf.confidence ? yin : acf;
+      return {
+        freq: preferred.freq,
+        confidence: Math.max(yin.confidence, acf.confidence),
+        rms,
+        strong: true,
+        method: 'hybrid',
+      };
     }
-    if (yin.confidence >= 0.28) return yin.freq;
-    if (acf.confidence >= 0.28) return acf.freq;
-    return yin.confidence >= acf.confidence ? yin.freq : acf.freq;
+    if (yin.confidence >= 0.28) {
+      return { freq: yin.freq, confidence: yin.confidence, rms, strong: true, method: 'yin' };
+    }
+    if (acf.confidence >= 0.28) {
+      return { freq: acf.freq, confidence: acf.confidence, rms, strong: true, method: 'acf' };
+    }
+    const fallback = yin.confidence >= acf.confidence ? yin : acf;
+    return { freq: fallback.freq, confidence: fallback.confidence, rms, strong: false, method: 'fallback' };
   }
 
-  if (yin && yin.confidence >= 0.18) return yin.freq;
-  if (acf && acf.confidence >= 0.18) return acf.freq;
+  if (yin && yin.confidence >= 0.18) {
+    return { freq: yin.freq, confidence: yin.confidence, rms, strong: yin.confidence >= 0.28, method: 'yin' };
+  }
+  if (acf && acf.confidence >= 0.18) {
+    return { freq: acf.freq, confidence: acf.confidence, rms, strong: acf.confidence >= 0.28, method: 'acf' };
+  }
+  return { freq: null, confidence: 0, rms, strong: false, method: 'none' };
+}
+
+export function detectPitch(analyserNode, sampleRate, minRms = 0.006) {
+  const result = detectPitchDetailed(analyserNode, sampleRate, minRms);
+  if (result?.freq) return result.freq;
   return null;
 }

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { detectPitch, startDrone, SWARA_SEMITONE, playNote, getOctaveSequence, playSequence, openMicStream, buildMicChain, closeMicStream } from '../utils/audioUtils';
-import { getSwaram, toSargam } from '../utils/ragaLogic';
+import { RAGAS, getSwaram, toSargam } from '../utils/ragaLogic';
 import { geminiChat as groqChatCompletion } from '../utils/ragaIdentify';
 
 const RECORD_SECS = 20;
@@ -55,6 +55,41 @@ function alignSequence(detected, expected) {
     if (note === expected[eIdx]) { results[eIdx].hit = true; eIdx++; }
   }
   return results;
+}
+
+function uniqueSwaras(notes) {
+  return [...new Set((notes || []).filter(Boolean))];
+}
+
+function fullRagaSet(raga) {
+  return new Set(uniqueSwaras([...(raga?.arohanam || []), ...(raga?.avarohanam || [])]));
+}
+
+function deriveConfusedRaga(targetRagaName, targetRaga, detectedNotes, missedNotes) {
+  const targetSet = fullRagaSet(targetRaga);
+  const detectedSet = uniqueSwaras(detectedNotes);
+  const alienNotes = detectedSet.filter(note => !targetSet.has(note));
+  if (alienNotes.length === 0) return '';
+
+  const targetMissed = uniqueSwaras(missedNotes);
+  let best = null;
+
+  for (const [candidateName, candidateRaga] of Object.entries(RAGAS)) {
+    if (candidateName === targetRagaName) continue;
+    const candidateSet = fullRagaSet(candidateRaga);
+    const candidateExclusive = [...candidateSet].filter(note => !targetSet.has(note));
+    const targetExclusive = [...targetSet].filter(note => !candidateSet.has(note));
+
+    const alienMatch = alienNotes.filter(note => candidateExclusive.includes(note)).length;
+    const missedSignal = targetMissed.filter(note => targetExclusive.includes(note)).length;
+    const sharedSupport = detectedSet.filter(note => candidateSet.has(note)).length;
+    const score = (alienMatch * 3) + (missedSignal * 2) + (sharedSupport * 0.15);
+
+    if (alienMatch === 0 || score < 3) continue;
+    if (!best || score > best.score) best = { name: candidateName, score };
+  }
+
+  return best?.name || '';
 }
 
 // ── Main component ───────────────────────────────────────────────────────────
@@ -244,8 +279,20 @@ export default function RagaPracticePanel({ raga, initialSaHz = 293.66, compactM
         return `- ${note}: ✓ hit · ${sign}${s.avgDev}¢ (${tuning}) · ${s.stability}`;
       }).join('\n');
 
-      const aroStr = formatAlignment(alignSequence(detected, expectedAro));
-      const avaStr = formatAlignment(alignSequence(detected, expectedAva));
+      const aroAligned = alignSequence(detected, expectedAro);
+      const avaAligned = alignSequence(detected, expectedAva);
+      const aroStr = formatAlignment(aroAligned);
+      const avaStr = formatAlignment(avaAligned);
+      const allAligned = [...aroAligned, ...avaAligned];
+      const totalTargets = allAligned.length || 1;
+      const hitCount = allAligned.filter(item => item.hit).length;
+      const hitRate = hitCount / totalTargets;
+      const missedNotes = uniqueSwaras(allAligned.filter(item => !item.hit).map(item => item.note));
+      const practiceOutcome =
+        hitRate >= 0.72 ? 'identified' :
+        hitRate >= 0.45 ? 'likely' :
+        'ambiguous';
+      const confusedWith = deriveConfusedRaga(raga.name, raga, detected, missedNotes);
 
       // 3. Harmonic richness → resonance
       const harmArr = harmonicHist.current;
@@ -334,6 +381,16 @@ Tone: warm but direct. Address them as a serious student. Do not mention numbers
         } catch { /* keep raw */ }
       }
       setFeedback(parsed);
+
+      // Save evaluated learner behavior from AI Guru practice, not classifier ambiguity.
+      window.__alapanaCoach?.saveSession({
+        tool: 'tutor',
+        raga: raga.name,
+        outcome: practiceOutcome,
+        confidence: hitRate >= 0.72 ? 'high' : hitRate >= 0.45 ? 'medium' : 'low',
+        swarasFocused: missedNotes,
+        ...(confusedWith ? { confusedWith } : {}),
+      });
 
       setPhase('result');
     } catch (err) {

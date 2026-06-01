@@ -47,6 +47,7 @@ async function buildLearnerModelSummary(db, userId) {
         {
           $match: {
             userId,
+            tool: { $in: ['tutor'] },
             confusedWith: { $exists: true, $nin: ['', null] },
             raga: { $exists: true, $nin: ['', null] },
           },
@@ -203,6 +204,7 @@ async function buildUserContext(userId, appMode, sadhanaCompleted) {
         {
           $match: {
             userId,
+            tool: { $in: ['tutor'] },
             confusedWith: { $exists: true, $nin: ['', null] },
             raga: { $exists: true, $nin: ['', null] },
           },
@@ -256,7 +258,7 @@ async function buildUserContext(userId, appMode, sadhanaCompleted) {
       });
     } else {
       lines.push('');
-      lines.push('CONFUSION PATTERNS: none recorded yet — the student has not completed enough Viveka identification sessions to establish patterns.');
+      lines.push('CONFUSION PATTERNS: none recorded yet — the student has not completed enough evaluated Gurukul practice to establish recurring raga mix-ups.');
     }
 
     // Raga progress

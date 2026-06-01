@@ -115,7 +115,7 @@ export default async function handler(req, res) {
       })) return;
       const {
         tool, raga, durationMinutes, notes,
-        outcome, confidence, confusedWith,
+        outcome, confidence, confusedWith, swarasFocused,
       } = req.body || {};
       const sessionData = {
         tool: tool || '',
@@ -125,6 +125,7 @@ export default async function handler(req, res) {
         ...(outcome    && { outcome }),
         ...(confidence && { confidence }),
         ...(confusedWith && { confusedWith }),
+        ...(Array.isArray(swarasFocused) && swarasFocused.length > 0 ? { swarasFocused } : {}),
       };
 
       // Rich identification sessions (with outcome data) skip MCP — write directly so all

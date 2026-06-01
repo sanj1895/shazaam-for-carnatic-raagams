@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { getSwaram } from '../../utils/ragaLogic';
 import { geminiChat as groqChatCompletion } from '../../utils/ragaIdentify';
 import { CuratedIcon } from '../IconLibrary';
+import { deriveConfusedRaga, derivePracticeConfidence, derivePracticeOutcome, resolveKnownRagaName } from '../../utils/practiceAnalytics';
 import {
     detectPitch as detectPitchAudio,
     startDrone,
@@ -2700,6 +2701,13 @@ function SingAlongFeedback({ lesson, currentExercise, sa, onClose, onSadhanaComp
     const samplesRef = useRef([]); // holds { note, freq, dev, time }
     const sequenceRef = useRef([]); // holds chronological list of distinct notes (duplicates allowed with pauses)
     const countdownIntervalRef = useRef(null);
+    const resolvedRagaName = resolveKnownRagaName(
+        lesson?.raga?.name,
+        currentExercise?.raga?.name,
+        lesson?.title,
+        currentExercise?.title,
+        currentExercise?.instruction
+    );
 
     const cleanup = () => {
         clearInterval(intervalRef.current);
@@ -3005,6 +3013,29 @@ CRITICAL INSTRUCTIONS FOR GURU:
             };
 
             feedbackText = tryFormatGuruJson(feedbackText);
+
+            if (resolvedRagaName && expectedSwaras.length > 0) {
+                const targetRaga = lesson?.raga?.name === resolvedRagaName
+                    ? lesson.raga
+                    : currentExercise?.raga?.name === resolvedRagaName
+                        ? currentExercise.raga
+                        : null;
+                const missedNotes = expectedSwaras.filter((note) => !sequenceRef.current.includes(note));
+                const matchedCount = expectedSwaras.length - missedNotes.length;
+                const ratio = expectedSwaras.length ? matchedCount / expectedSwaras.length : 0;
+                const confusedWith = targetRaga
+                    ? deriveConfusedRaga(resolvedRagaName, targetRaga, sequenceRef.current, missedNotes)
+                    : '';
+
+                window.__alapanaCoach?.saveSession({
+                    tool: 'lesson-feedback',
+                    raga: resolvedRagaName,
+                    outcome: derivePracticeOutcome(ratio),
+                    confidence: derivePracticeConfidence(ratio),
+                    swarasFocused: missedNotes,
+                    ...(confusedWith ? { confusedWith } : {}),
+                });
+            }
 
             setFeedback(feedbackText);
             setPhase('result');

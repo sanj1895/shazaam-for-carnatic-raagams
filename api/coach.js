@@ -7,6 +7,7 @@ import { applyApiSecurity, rejectDisallowedOrigin } from './_security.js';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 let cachedClient = null;
+const EVALUATED_CONFUSION_TOOLS = ['tutor', 'singback', 'lesson-feedback'];
 
 async function getDb() {
   if (cachedClient && !cachedClient.topology?.isConnected()) cachedClient = null;
@@ -47,7 +48,7 @@ async function buildLearnerModelSummary(db, userId) {
         {
           $match: {
             userId,
-            tool: { $in: ['tutor'] },
+            tool: { $in: EVALUATED_CONFUSION_TOOLS },
             confusedWith: { $exists: true, $nin: ['', null] },
             raga: { $exists: true, $nin: ['', null] },
           },
@@ -204,7 +205,7 @@ async function buildUserContext(userId, appMode, sadhanaCompleted) {
         {
           $match: {
             userId,
-            tool: { $in: ['tutor'] },
+            tool: { $in: EVALUATED_CONFUSION_TOOLS },
             confusedWith: { $exists: true, $nin: ['', null] },
             raga: { $exists: true, $nin: ['', null] },
           },
@@ -258,7 +259,7 @@ async function buildUserContext(userId, appMode, sadhanaCompleted) {
       });
     } else {
       lines.push('');
-      lines.push('CONFUSION PATTERNS: none recorded yet — the student has not completed enough evaluated Gurukul practice to establish recurring raga mix-ups.');
+      lines.push('CONFUSION PATTERNS: none recorded yet — the student has not completed enough evaluated practice sessions to establish recurring raga mix-ups.');
     }
 
     // Raga progress

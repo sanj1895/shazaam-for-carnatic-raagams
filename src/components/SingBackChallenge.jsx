@@ -3,6 +3,7 @@ import { RAGAS, toSargam } from '../utils/ragaLogic';
 import { playSequence, detectPitch, SWARA_SEMITONE, openMicStream, buildMicChain, closeMicStream } from '../utils/audioUtils';
 import { CuratedIcon } from './IconLibrary';
 import SketchyRule from './SketchyRule';
+import { deriveConfusedRaga, derivePracticeConfidence, derivePracticeOutcome } from '../utils/practiceAnalytics';
 
 const ragaNames = Object.keys(RAGAS).sort();
 const DIFFICULTIES = [
@@ -77,12 +78,14 @@ export default function SingBackChallenge({ onSadhanaComplete }) {
         setScores(noteScores);
         const missedNotes = noteScores.filter(item => !item.correct).map(item => item.target);
         const ratio = targetPhrase.length ? noteScores.filter(item => item.correct).length / targetPhrase.length : 0;
+        const confusedWith = deriveConfusedRaga(selectedRaga, raga, detected, missedNotes);
         window.__alapanaCoach?.saveSession({
             tool: 'singback',
             raga: selectedRaga,
-            outcome: ratio >= 0.8 ? 'identified' : ratio >= 0.5 ? 'likely' : 'ambiguous',
-            confidence: ratio >= 0.8 ? 'high' : ratio >= 0.5 ? 'medium' : 'low',
+            outcome: derivePracticeOutcome(ratio),
+            confidence: derivePracticeConfidence(ratio),
             swarasFocused: missedNotes,
+            ...(confusedWith ? { confusedWith } : {}),
         });
         setTimeout(() => {
             setState(STATES.RESULT);

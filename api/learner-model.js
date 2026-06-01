@@ -6,6 +6,7 @@ import { applyApiSecurity, rejectDisallowedOrigin } from './_security.js';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 let cachedClient = null;
+const EVALUATED_CONFUSION_TOOLS = ['tutor', 'singback', 'lesson-feedback'];
 
 async function getDb() {
   if (cachedClient && !cachedClient.topology?.isConnected()) cachedClient = null;
@@ -77,7 +78,7 @@ export default async function handler(req, res) {
         {
           $match: {
             userId,
-            tool: { $in: ['tutor'] },
+            tool: { $in: EVALUATED_CONFUSION_TOOLS },
             confusedWith: { $exists: true, $nin: ['', null] },
             raga: { $exists: true, $nin: ['', null] },
           },

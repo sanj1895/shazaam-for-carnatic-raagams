@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { detectPitch, startDrone, SWARA_SEMITONE, playNote, getOctaveSequence, playSequence, openMicStream, buildMicChain, closeMicStream } from '../utils/audioUtils';
-import { RAGAS, getSwaram, toSargam } from '../utils/ragaLogic';
+import { getSwaram, toSargam } from '../utils/ragaLogic';
 import { geminiChat as groqChatCompletion } from '../utils/ragaIdentify';
+import { deriveConfusedRaga } from '../utils/practiceAnalytics';
 
 const RECORD_SECS = 20;
 
@@ -55,41 +56,6 @@ function alignSequence(detected, expected) {
     if (note === expected[eIdx]) { results[eIdx].hit = true; eIdx++; }
   }
   return results;
-}
-
-function uniqueSwaras(notes) {
-  return [...new Set((notes || []).filter(Boolean))];
-}
-
-function fullRagaSet(raga) {
-  return new Set(uniqueSwaras([...(raga?.arohanam || []), ...(raga?.avarohanam || [])]));
-}
-
-function deriveConfusedRaga(targetRagaName, targetRaga, detectedNotes, missedNotes) {
-  const targetSet = fullRagaSet(targetRaga);
-  const detectedSet = uniqueSwaras(detectedNotes);
-  const alienNotes = detectedSet.filter(note => !targetSet.has(note));
-  if (alienNotes.length === 0) return '';
-
-  const targetMissed = uniqueSwaras(missedNotes);
-  let best = null;
-
-  for (const [candidateName, candidateRaga] of Object.entries(RAGAS)) {
-    if (candidateName === targetRagaName) continue;
-    const candidateSet = fullRagaSet(candidateRaga);
-    const candidateExclusive = [...candidateSet].filter(note => !targetSet.has(note));
-    const targetExclusive = [...targetSet].filter(note => !candidateSet.has(note));
-
-    const alienMatch = alienNotes.filter(note => candidateExclusive.includes(note)).length;
-    const missedSignal = targetMissed.filter(note => targetExclusive.includes(note)).length;
-    const sharedSupport = detectedSet.filter(note => candidateSet.has(note)).length;
-    const score = (alienMatch * 3) + (missedSignal * 2) + (sharedSupport * 0.15);
-
-    if (alienMatch === 0 || score < 3) continue;
-    if (!best || score > best.score) best = { name: candidateName, score };
-  }
-
-  return best?.name || '';
 }
 
 // ── Main component ───────────────────────────────────────────────────────────

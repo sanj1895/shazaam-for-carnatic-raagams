@@ -1544,70 +1544,70 @@ function App() {
                                                     <div className="h-8 w-40 rounded-xl bg-c-gold/8" />
                                                 </div>
                                             ) : workspaceBlocks?.recommendation ? (
-                                                <div className="rounded-[20px] border border-c-gold/30 bg-[linear-gradient(140deg,rgba(199,139,34,0.09),rgba(7,3,2,0.97))] px-5 py-5 shadow-[0_0_48px_rgba(199,139,34,0.07)]">
-                                                    <p className="text-[9px] uppercase tracking-[0.28em] text-c-gold/60 font-mono mb-2">{workspaceBlocks.recommendation.label}</p>
-                                                    <p className="text-[0.93rem] font-playfair text-c-cream-dim leading-relaxed mb-4">{workspaceBlocks.recommendation.text}</p>
+                                                <div className="rounded-[16px] border border-c-gold/22 bg-[linear-gradient(140deg,rgba(199,139,34,0.07),rgba(7,3,2,0.98))] px-4 py-4">
+                                                    <p className="text-[8px] uppercase tracking-[0.28em] text-c-gold/50 font-mono mb-1.5">{workspaceBlocks.recommendation.label}</p>
+                                                    <p className="text-[0.85rem] font-playfair text-white/70 leading-relaxed mb-3">{workspaceBlocks.recommendation.text}</p>
                                                     <div className="flex flex-wrap items-center gap-2">
                                                         <button
                                                             onClick={() => goToAdvanced(workspaceBlocks.recommendation.action)}
-                                                            className="text-[11px] font-mono uppercase tracking-widest px-4 py-2 rounded-xl bg-c-gold text-c-bg font-bold hover:bg-c-gold-light transition-all shadow-[0_0_20px_rgba(199,139,34,0.2)]"
+                                                            className="text-[10px] font-mono uppercase tracking-widest px-3.5 py-1.5 rounded-lg bg-c-gold text-c-bg font-bold hover:bg-c-gold-light transition-all"
                                                         >
                                                             {workspaceBlocks.recommendation.cta} →
                                                         </button>
                                                         <button
                                                             onClick={() => goTo('learner-model')}
-                                                            className="text-[10px] font-mono uppercase tracking-widest px-3 py-2 rounded-xl border border-c-gold/22 text-c-gold/70 hover:bg-c-gold/8 transition-colors"
+                                                            className="text-[10px] font-mono uppercase tracking-widest px-3 py-1.5 rounded-lg border border-white/12 text-white/35 hover:border-white/20 hover:text-white/55 transition-colors"
                                                         >
                                                             Full memory →
                                                         </button>
                                                     </div>
                                                 </div>
                                             ) : workspaceModel ? (
-                                                <div className="rounded-[20px] border border-c-gold/14 bg-[rgba(12,5,2,0.94)] px-5 py-4 flex items-center justify-between gap-4">
+                                                <div className="rounded-[16px] border border-white/6 bg-[rgba(10,4,2,0.92)] px-4 py-3 flex items-center justify-between gap-4">
                                                     <div>
-                                                        <p className="text-[9px] uppercase tracking-[0.28em] text-c-gold/45 font-mono mb-1">Practice status</p>
-                                                        <p className="text-sm font-playfair text-c-cream-dim">No critical gap right now — keep building consistency.</p>
+                                                        <p className="text-[8px] uppercase tracking-[0.28em] text-c-gold/40 font-mono mb-1">Practice status</p>
+                                                        <p className="text-[0.82rem] font-playfair text-white/55">No critical gap right now — keep building consistency.</p>
                                                     </div>
-                                                    <button onClick={() => goTo('learner-model')} className="flex-shrink-0 text-[10px] font-mono uppercase tracking-widest px-3 py-2 rounded-xl border border-c-gold/22 text-c-gold/70 hover:bg-c-gold/8 transition-colors whitespace-nowrap">My memory →</button>
+                                                    <button onClick={() => goTo('learner-model')} className="flex-shrink-0 text-[9px] font-mono uppercase tracking-widest px-3 py-1.5 rounded-lg border border-white/10 text-white/30 hover:border-white/18 hover:text-white/50 transition-colors whitespace-nowrap">My memory →</button>
                                                 </div>
                                             ) : (
-                                                <div className="rounded-[20px] border border-c-gold/14 bg-[rgba(12,5,2,0.94)] px-5 py-4 flex items-center justify-between gap-4">
+                                                <div className="rounded-[16px] border border-white/6 bg-[rgba(10,4,2,0.92)] px-4 py-3 flex items-center justify-between gap-4">
                                                     <div>
-                                                        <p className="text-[9px] uppercase tracking-[0.28em] text-c-gold/45 font-mono mb-1">First session</p>
-                                                        <p className="text-sm font-playfair text-c-cream-dim">Open your coach <span className="text-c-gold">🪈</span> for your first prescription — or start with Shruthi to lock in your Sa.</p>
+                                                        <p className="text-[8px] uppercase tracking-[0.28em] text-c-gold/40 font-mono mb-1">First session</p>
+                                                        <p className="text-[0.82rem] font-playfair text-white/55">Open your coach <span className="text-c-gold">🪈</span> for your first prescription — or start with Shruthi to lock in your Sa.</p>
                                                     </div>
-                                                    <button onClick={() => goToAdvanced('shruthi')} className="flex-shrink-0 text-[10px] font-mono uppercase tracking-widest px-3 py-2 rounded-xl border border-c-gold/22 text-c-gold/70 hover:bg-c-gold/8 transition-colors whitespace-nowrap">Start →</button>
+                                                    <button onClick={() => goToAdvanced('shruthi')} className="flex-shrink-0 text-[9px] font-mono uppercase tracking-widest px-3 py-1.5 rounded-lg border border-white/10 text-white/30 hover:border-white/18 hover:text-white/50 transition-colors whitespace-nowrap">Start →</button>
                                                 </div>
                                             )}
 
                                             {/* Block 2 — What you keep getting wrong (confusion pairs) */}
                                             {workspaceBlocks?.confusionPairs?.length > 0 && (
-                                                <div className="rounded-[20px] border border-c-gold/12 bg-[rgba(10,4,2,0.96)] px-4 py-4 sm:px-5 sm:py-5">
-                                                    <div className="flex items-center justify-between mb-3">
-                                                        <p className="text-[9px] uppercase tracking-[0.22em] text-c-gold/55 font-mono">What you keep getting wrong</p>
-                                                        <button onClick={() => goTo('learner-model')} className="text-[9px] font-mono uppercase tracking-widest text-c-gold/35 hover:text-c-gold/65 transition-colors">See all →</button>
+                                                <div className="rounded-[16px] border border-white/6 bg-[rgba(10,4,2,0.92)] px-4 py-3">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <p className="text-[8px] uppercase tracking-[0.22em] text-c-gold/45 font-mono">What you keep getting wrong</p>
+                                                        <button onClick={() => goTo('learner-model')} className="text-[8px] font-mono uppercase tracking-widest text-white/25 hover:text-white/50 transition-colors">See all →</button>
                                                     </div>
-                                                    <div className="flex flex-col gap-1.5">
+                                                    <div className="flex flex-col gap-1">
                                                         {workspaceBlocks.confusionPairs.map((pair, i) => (
                                                             <button
                                                                 key={i}
                                                                 onClick={() => goToAdvanced('viveka')}
-                                                                className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-c-card border border-c-border hover:border-c-gold/25 hover:bg-[rgba(199,139,34,0.03)] transition-all text-left group"
+                                                                className="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/6 hover:bg-white/[0.07] hover:border-white/12 transition-all text-left group"
                                                             >
                                                                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                                                                    <span className="font-playfair text-[13px] text-c-cream-dim truncate">{pair.raga}</span>
-                                                                    <span className="text-c-gold/35 text-xs flex-shrink-0">↔</span>
-                                                                    <span className="font-playfair text-[13px] text-c-cream-dim truncate">{pair.confusedWith}</span>
+                                                                    <span className="font-playfair text-[12.5px] text-white/75 truncate">{pair.raga}</span>
+                                                                    <span className="text-white/20 text-xs flex-shrink-0">↔</span>
+                                                                    <span className="font-playfair text-[12.5px] text-white/75 truncate">{pair.confusedWith}</span>
                                                                 </div>
                                                                 <div className="flex items-center gap-1.5 flex-shrink-0">
                                                                     <div className="flex gap-0.5">
                                                                         {Array.from({ length: Math.min(pair.count, 5) }).map((_, j) => (
-                                                                            <div key={j} className="w-1.5 h-1.5 rounded-full bg-amber-700/60" />
+                                                                            <div key={j} className="w-1.5 h-1.5 rounded-full bg-c-gold/35" />
                                                                         ))}
                                                                     </div>
-                                                                    <span className="text-[10px] font-mono text-amber-800/80">{pair.count}×</span>
+                                                                    <span className="text-[9px] font-mono text-c-gold/50">{pair.count}×</span>
                                                                 </div>
-                                                                <span className="text-[9px] font-mono uppercase tracking-widest text-c-gold/25 group-hover:text-c-gold/60 transition-colors flex-shrink-0 hidden sm:block">Practice →</span>
+                                                                <span className="text-[8px] font-mono uppercase tracking-widest text-white/20 group-hover:text-c-gold/55 transition-colors flex-shrink-0 hidden sm:block">Practice →</span>
                                                             </button>
                                                         ))}
                                                     </div>
@@ -1616,18 +1616,18 @@ function App() {
 
                                             {/* Block 3 — Your next focus (stale / ready-to-advance ragas) */}
                                             {workspaceBlocks?.focusItems?.length > 0 && (
-                                                <div className="rounded-[20px] border border-c-gold/12 bg-[rgba(10,4,2,0.96)] px-4 py-4 sm:px-5 sm:py-5">
-                                                    <p className="text-[9px] uppercase tracking-[0.22em] text-c-gold/55 font-mono mb-3">Your next focus</p>
-                                                    <div className="flex flex-col gap-1.5">
+                                                <div className="rounded-[16px] border border-white/6 bg-[rgba(10,4,2,0.92)] px-4 py-3">
+                                                    <p className="text-[8px] uppercase tracking-[0.22em] text-c-gold/45 font-mono mb-2">Your next focus</p>
+                                                    <div className="flex flex-col gap-1">
                                                         {workspaceBlocks.focusItems.map((item, i) => (
                                                             <button
                                                                 key={i}
                                                                 onClick={() => goToAdvanced(item.action)}
-                                                                className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-c-card border border-c-border hover:border-c-gold/25 hover:bg-[rgba(199,139,34,0.03)] transition-all text-left group"
+                                                                className="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/6 hover:bg-white/[0.07] hover:border-white/12 transition-all text-left group"
                                                             >
-                                                                <span className={`text-base leading-none flex-shrink-0 ${item.urgency === 'high' ? 'text-amber-700' : item.urgency === 'medium' ? 'text-c-gold' : 'text-emerald-700'}`}>{item.icon}</span>
-                                                                <p className="text-[13px] font-playfair text-c-cream-dim flex-1 leading-snug">{item.text}</p>
-                                                                <span className="text-[9px] font-mono uppercase tracking-widest text-c-gold/25 group-hover:text-c-gold/60 transition-colors flex-shrink-0 hidden sm:block">Go →</span>
+                                                                <span className={`text-sm leading-none flex-shrink-0 ${item.urgency === 'high' ? 'text-amber-500/70' : item.urgency === 'medium' ? 'text-c-gold/60' : 'text-emerald-500/60'}`}>{item.icon}</span>
+                                                                <p className="text-[12.5px] font-playfair text-white/65 flex-1 leading-snug">{item.text}</p>
+                                                                <span className="text-[8px] font-mono uppercase tracking-widest text-white/20 group-hover:text-c-gold/55 transition-colors flex-shrink-0 hidden sm:block">Go →</span>
                                                             </button>
                                                         ))}
                                                     </div>

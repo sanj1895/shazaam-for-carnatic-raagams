@@ -125,6 +125,7 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
     Date.now() - new Date(r.lastPracticed).getTime() > 3 * 24 * 60 * 60 * 1000
   );
   const ready = ragaStats.find(r => r.masteryLevel === 'stable' && r.identifiedCount >= 3);
+  const mostPracticed = ragaStats[0] || null;
 
   // Next-focus items — each now carries an action so its row can have a direct CTA
   const nextFocus = [];
@@ -140,14 +141,14 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
   if (stale) nextFocus.push({
     text:        `Return to ${stale.raga} — ${daysSince(stale.lastPracticed)} and still developing`,
     urgency:     'medium',
-    action:      'tutor',
-    actionLabel: 'Open Gurukul',
+    action:      { view: 'tutor', tutorTarget: { tab: 'practice' } },
+    actionLabel: 'Open Raga Practice',
   });
   if (ready) nextFocus.push({
     text:        `Advance ${ready.raga} — stable here, ready for more complex phrases`,
     urgency:     'low',
-    action:      'tutor',
-    actionLabel: 'Open Gurukul',
+    action:      { view: 'tutor', tutorTarget: { tab: 'practice' } },
+    actionLabel: 'Open Raga Practice',
   });
 
   // Single pre-computed prescription — mirrors buildPrescription in api/coach.js
@@ -166,16 +167,22 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
       label:    `${d} days without practice`,
       text:     `${stale.raga} is still ${stale.masteryLevel} and has not been practiced in ${d} day${d !== 1 ? 's' : ''}.`,
       exercise: `Sing Sarali Varisai pattern 1 in ${stale.raga} — one note per beat, five repetitions with the drone running.`,
-      tool:     'Gurukul', action: 'tutor', duration: '15 min',
+      tool:     'Raga Practice', action: { view: 'tutor', tutorTarget: { tab: 'practice' } }, duration: '15 min',
     };
   } else if (ready) {
     recommendedExercise = {
       label:    'Ready to advance',
       text:     `${ready.raga} is stable with ${ready.totalSessions} sessions.`,
       exercise: `Practice a characteristic gamakam phrase in ${ready.raga} with AI vocal feedback. Focus on phrase endings and ornament clarity.`,
-      tool:     'Gurukul', action: 'tutor', duration: '15 min',
+      tool:     'Raga Practice', action: { view: 'tutor', tutorTarget: { tab: 'practice' } }, duration: '15 min',
     };
   }
+
+  const consistencyAction = mostPracticed
+    ? (mostPracticed.masteryLevel === 'exploring' || mostPracticed.masteryLevel === 'developing'
+        ? { tool: 'Swara Keyboard', action: 'keyboard' }
+        : { tool: 'Raga Practice', action: { view: 'tutor', tutorTarget: { tab: 'practice' } } })
+    : { tool: 'Raga Kosha', action: 'library' };
 
   const nav = onNavigate || (() => {});
 
@@ -237,8 +244,8 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
       ) : !isEmpty && (
         <section className="rounded-[18px] border border-c-border bg-c-card px-5 py-4 flex items-center justify-between gap-4">
           <p className="text-sm font-playfair text-c-cream-dim">No critical gap right now — keep building consistency.</p>
-          <button onClick={() => nav('tutor')} className="flex-shrink-0 text-[10px] font-mono uppercase tracking-widest px-3 py-2 rounded-xl border border-c-gold/25 text-c-gold hover:bg-c-gold/8 transition-colors whitespace-nowrap">
-            Open Gurukul →
+          <button onClick={() => nav(consistencyAction.action)} className="flex-shrink-0 text-[10px] font-mono uppercase tracking-widest px-3 py-2 rounded-xl border border-c-gold/25 text-c-gold hover:bg-c-gold/8 transition-colors whitespace-nowrap">
+            Open {consistencyAction.tool} →
           </button>
         </section>
       )}
@@ -349,7 +356,7 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
                         {r.raga} — {MASTERY_STYLES[r.masteryLevel]?.label} · {daysSince(r.lastPracticed)}
                       </p>
                       <button
-                        onClick={() => nav('tutor')}
+                        onClick={() => nav({ view: 'tutor', tutorTarget: { tab: 'practice' } })}
                         className="flex-shrink-0 text-[9px] font-mono uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-emerald-700/25 text-emerald-700/70 hover:bg-emerald-700/8 hover:text-emerald-700 transition-colors whitespace-nowrap"
                       >
                         Advance →
@@ -375,7 +382,7 @@ export default function LearnerModelPanel({ userId, getToken, onNavigate }) {
                         {r.raga} — {daysSince(r.lastPracticed)}, still {MASTERY_STYLES[r.masteryLevel]?.label?.toLowerCase()}
                       </p>
                       <button
-                        onClick={() => nav('tutor')}
+                        onClick={() => nav({ view: 'tutor', tutorTarget: { tab: 'practice' } })}
                         className="flex-shrink-0 text-[9px] font-mono uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-c-gold/22 text-c-gold/70 hover:bg-c-gold/8 hover:text-c-gold transition-colors whitespace-nowrap"
                       >
                         Return →

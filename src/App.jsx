@@ -2923,7 +2923,13 @@ function App() {
                 {view === 'learner-model' && (
                     <LearnerModelPanel userId={userId} getToken={getToken} onNavigate={(dest) => {
                         if (dest && typeof dest === 'object') {
-                            dest.view === 'compare' ? goToCompare(dest.ragaA, dest.ragaB) : goToAdvanced(dest.view);
+                            if (dest.view === 'compare') {
+                                goToCompare(dest.ragaA, dest.ragaB);
+                            } else if (dest.view === 'tutor' && dest.tutorTarget) {
+                                goToAdvanced('tutor', { tutorTarget: dest.tutorTarget });
+                            } else {
+                                goToAdvanced(dest.view);
+                            }
                         } else {
                             goToAdvanced(dest);
                         }

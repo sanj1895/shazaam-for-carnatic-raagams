@@ -1266,7 +1266,7 @@ function App() {
                         <div className="font-playfair text-c-gold text-base md:text-lg leading-none">Ālāpana</div>
                         <div className={`text-[8px] md:text-[9px] tracking-widest uppercase ${
                             view === 'home' && showFeatures ? 'text-c-gold/70' : 'text-c-cream-dark'
-                        }`}>Carnatic Music</div>
+                        }`}>Solo Practice</div>
                     </div>
                 </button>
 

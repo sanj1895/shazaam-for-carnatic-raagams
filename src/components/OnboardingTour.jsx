@@ -254,7 +254,7 @@ export default function OnboardingTour({ active, onDismiss, onStartLearning, onO
                   onClick={handleDismiss}
                   className="text-xs text-white/50 hover:text-white transition-all font-playfair italic py-2.5 px-3 -mr-1"
                 >
-                  Just explore
+                  Open workspace
                 </button>
               ) : (
                 <button
